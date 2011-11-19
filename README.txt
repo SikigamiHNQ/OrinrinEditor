@@ -2,6 +2,12 @@ OrinrinEditor
 OrinrinViewer
 OrinrinCollector
 
+★ＡＡストーリーエディタ
+
+
+★General Public License Ver3
+
+
 ★コンパイルに必要なもの
 
 ●Visual C++ Express 2008
