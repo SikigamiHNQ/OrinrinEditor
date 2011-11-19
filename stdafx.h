@@ -1,0 +1,324 @@
+// stdafx.h : 標準のシステム インクルード ファイルのインクルード ファイル、または
+// 参照回数が多く、かつあまり変更されない、プロジェクト専用のインクルード ファイル
+// を記述します。
+//
+
+#pragma once
+#define STRICT
+
+//!	無効にする警告
+#pragma warning( disable : 4100 )	//!<	引数は函数の本体部で 1 度も参照されません。
+//#pragma warning( disable : 4101 )	//!<	ローカル変数は 1 度も使われていません。
+#pragma warning( disable : 4201 )	//!<	非標準の拡張機能が使用されています
+#pragma warning( disable : 4244 )	//!<	型変換における、データが失われる可能性について。
+#pragma warning( disable : 4312 )	//!<	より大きいサイズへの型変換について
+//#pragma warning( disable : 4995 )	//!<	名前が避けられた #pragma として記述されています。
+
+#include "targetver.h"
+
+#pragma comment(linker, "/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='x86' publicKeyToken='6595b64144ccf1df' language='*'\"")
+
+#define WIN32_LEAN_AND_MEAN		//	Windows ヘッダーから使用されていない部分を除外します。
+// Windows ヘッダー ファイル:
+#include <windows.h>
+#include <shlobj.h>
+#include <shellapi.h>
+#include <windowsX.h>
+
+//	シェルとか
+#pragma comment(lib, "shell32.lib")
+
+//	コモンダイヤログ
+#include <commdlg.h>
+
+#include <Commctrl.h>
+#pragma comment(lib, "ComCtl32.lib")
+
+#ifndef _ORCOLL
+
+//	IMEの操作に使う
+#include <imm.h>
+#pragma comment(lib, "imm32.lib")
+
+//	SQLite3
+#include "sqlite3.h"
+#pragma comment(lib, "sqlite3.lib")
+
+//	デバッグ用メッセージ
+#ifdef _DEBUG
+#define SQL_DEBUG(db)	SqlErrMsgView(db,__LINE__)
+#else
+#define SQL_DEBUG(db)
+#endif
+
+#endif
+
+// C ランタイム ヘッダー ファイル
+#include <assert.h>
+#include <stdlib.h>
+#include <malloc.h>
+#ifdef _DEBUG
+#include <crtdbg.h>
+#endif
+#include <memory.h>
+#include <tchar.h>
+
+#define STRSAFE_NO_CB_FUNCTIONS
+#include <strsafe.h>
+
+#pragma warning( disable : 4995 )
+#include <shlwapi.h>
+#pragma warning( default : 4995 )
+#pragma comment(lib, "shlwapi.lib")
+
+//-------------------------------------------------------------------------------------------------
+
+#pragma warning( disable : 4995 )	//	名前が避けられた #pragma として記述されています。
+#include <vector>
+#include <list>
+#include <string>
+#include <algorithm>
+#pragma warning( default : 4995 )
+
+using namespace	std;	//	このスコープ内ではstd::が省略できる
+//-------------------------------------------------------------------------------------------------
+
+//このアプリのGUID、特に意味はない
+//	{66D3E881-972B-458B-935E-9E78B926B415}
+static CONST GUID gcstGUID = { 0x66D3E881, 0x972B, 0x458B, { 0x93, 0x5E, 0x9E, 0x78, 0xB9, 0x26, 0xB4, 0x15 } };
+//-------------------------------------------------------------------------------------------------
+
+//#define OPEN_HISTORY
+
+//#define FIND_STRINGS	//	文字列検索機能
+
+//機能ＯＫ
+#define  MOZI_SCRIPT	//	５０音Script機能
+#define CONTEXT_EDIT	//	右クリメニュー編集
+#define MAA_PROFILE		//	ツリー構成をプロファイルする機能
+#define MULTI_FILE		//	複数ファイルの同時展開
+
+#define USE_NOTIFYICON	//	タスクトレイアイコンを有効
+//-------------------------------------------------------------------------------------------------
+
+//	単なる識別名　externで外部参照されてる変数にくっつけておく
+#define EXTERNED
+//-------------------------------------------------------------------------------------------------
+
+#ifdef _DEBUG
+
+#define TRACE(str,...)	OutputDebugStringPlus( GetLastError(), __FILE__, __LINE__, __FUNCTION__, str, __VA_ARGS__ )
+
+VOID	OutputDebugStringPlus( DWORD, LPSTR, INT, LPSTR, LPTSTR, ... );	//!<	
+
+VOID	SqlErrMsgView( sqlite3 *, DWORD );
+
+#else
+	#define TRACE(x,...)
+#endif
+
+#define FREE(pp)	{if(pp){free(pp);pp=NULL;}}
+
+//ステータスバー文字列追加マクロ
+#define StatusBar_SetText(hwndSB,ipart,ptext)	(BOOLEAN)SNDMSG((hwndSB),SB_SETTEXT,ipart,(LPARAM)(LPCTSTR)(ptext))
+//-------------------------------------------------------------------------------------------------
+
+#define MIN_STRING	20
+#define SUB_STRING	64
+#define MAX_STRING	130
+#define BIG_STRING	520
+
+//	ウインドウサイズ
+#define W_WIDTH		480
+#define W_HEIGHT	400
+
+//	ウインドウサイズ
+#define WCL_WIDTH	480
+#define WCL_HEIGHT	320
+
+//	ドッキングサイズ
+#define PLIST_DOCK	190
+#define TMPL_DOCK	150
+//-------------------------------------------------------------------------------------------------
+
+#define WMP_TRAYNOTIFYICON	(WM_APP+1)
+#define WMP_BRUSH_TOGGLE	(WM_APP+2)
+#define WMP_PREVIEW_CLOSE	(WM_APP+3)
+//-------------------------------------------------------------------------------------------------
+
+#define BASIC_COLOUR	RGB(0xF0,0xF0,0xF0)	//	Collector用
+//-------------------------------------------------------------------------------------------------
+
+#define USER_ITEM_FILE	TEXT("UserItem.ast")
+#define USER_ITEM_MAX	16
+
+#define AA_BRUSH_FILE	TEXT("aabrush.txt")		//	塗りつぶし用
+#define AA_LIST_FILE	TEXT("aalist.txt")		//	壱行テンプレート
+
+#define MAA_FAVDB_FILE	TEXT("Favorite.qmt")	//	AAリスト用
+#define MAA_TREE_CACHE	TEXT("TreeCache.qor")	//	ツリーの中身を取っておく・使わない
+
+#define NAMELESS_DUMMY	TEXT("NoName0.txt")
+#define NAME_DUMMY_NAME	TEXT("NoName")
+#define NAME_DUMMY_EXT	TEXT("txt")
+
+#define TEMPLATE_DIR	TEXT("Templates")
+#define BACKUP_DIR		TEXT("BackUp")
+#define PROFILE_DIR		TEXT("Profile")
+//-------------------------------------------------------------------------------------------------
+
+//	枠の数	20110707	枠を１０個に増やした
+#define FRAME_MAX	10
+
+//	設定について
+#define INI_FILE		TEXT("Utuho.ini")
+#define FRAME_INI_FILE	TEXT("Satori.ini")
+#define MZCX_INI_FILE	TEXT("Koisi.ini")
+
+
+
+#define INIT_LOAD		1
+#define INIT_SAVE		0
+
+#define WDP_MVIEW		1
+#define WDP_PLIST		2
+#define WDP_LNTMPL		3
+#define WDP_BRTMPL		4
+#define WDP_MAATPL		5
+#define WDP_PREVIEW		6
+
+#define FONTSZ_NORMAL	16
+#define FONTSZ_REDUCE	12
+
+#define VL_GROUP_UNDO	1	//	グループアンドゥ
+#define VL_USE_UNICODE	2	//	ユニコードパディング
+#define VL_LAYER_TRANS	3	//	レイヤボックス透明度
+#define VL_RIGHT_SLIDE	4	//	右寄せる位置
+#define VL_MAA_SPLIT	5	//	ＭＡＡのスプリットバーの位置
+#define VL_SETMETHOD	6	//	ＭＡＡ一覧でクルッコしたときの標準動作
+#define VL_UNILISTLAST	7	//	ユニコード一覧を閉じたときの位置
+#define VL_MAATIP_VIEW	8	//	ＭＡＡのＡＡツールチップの表示するか
+#define VL_MAATIP_SIZE	9	//	ＭＡＡのＡＡツールチップの文字サイズ・16か12
+#define VL_LINETMP_CLM	10	//	壱行テンプレのカラム数
+#define VL_BRUSHTMP_CLM	11	//	ブラシテンプレのカラム数
+#define VL_UNIRADIX_HEX	12	//	ユニコード数値参照を１６進数にするかどうか
+#define VL_BACKUP_INTVL	13	//	バックアップ感覚・デフォ５分くらい？
+#define VL_BACKUP_MSGON	14	//	バックアップしたときのメッセージを表示するか？
+#define VL_GRID_X_POS	15	//	グリッド線のＸドット数
+#define VL_GRID_Y_POS	16	//	グリッド線のＹドット数
+#define VL_MAA_TOPMOST	17	//	ＭＡＡを最前面・ビューワ専用
+#define VL_R_RULER_POS	18	//	右ルーラの位置
+#define VL_CRLF_CODE	19	//	改行コード：０したらば・非０ＹＹ
+//#define VL_SPACE_VIEW	20	//	空白を表示するか　非０表示
+#define VL_GRID_VIEW	21	//	グリッド表示するか
+#define VL_R_RULER_VIEW	22	//	右ルーラ表示するか
+#define VL_PAGETIP_VIEW	23	//	頁一覧のツールチップ表示するか
+#define VL_PCOMBINE_NM	24	//	１なら統合Message無し
+#define VL_PDIVIDE_NM	25	//	１なら分割Message無し
+#define VL_PDELETE_NM	26	//	１なら削除Message無し
+#define VL_MAASEP_STYLE	27	//	複数テンプレ・１なら区切り線スタイル
+#define VL_USE_BALLOON	28	//	保存確認メッセージ表示するかどうか
+#define VL_CLIPFILECNT	29
+#define VL_PLS_LN_DOCK	30	//	頁一覧窓はくっつくか
+//#define VL_BRUSH_DOCK	31	//	壱行・Brushテンプレ窓はくっつくか
+#define VS_PROFILE_NAME	32	//	
+#define VS_PAGE_FORMAT	33	//	頁番号挿入の文字列テンプレ
+#define VL_SWAP_COPY	34	//	コピー標準をSJISにするか
+
+#define CLRV_BASICPEN	101
+#define CLRV_BASICBK	102
+#define CLRV_GRIDLINE	103
+#define CLRV_CRLFMARK	104
+#define CLRV_CANTSJIS	105
+//-------------------------------------------------------------------------------------------------
+
+//	ステータスバーの内
+#define SB_MODIFY	0	//	変更
+#define SB_OP_STYLE	1	//	オペ状況
+#define SB_MOUSEPOS	2	//	マウスカーソル位置
+#define SB_CURSOR	3	//	カーソル位置のドット値とか
+#define SB_LAYER	4	//	レイヤボックスの位置
+#define SB_BYTECNT	5	//	バイト数
+#define SB_SELBYTE	6	//	選択範囲のバイト数
+//-------------------------------------------------------------------------------------------------
+
+//	窓番号
+#define WND_MAIN	1
+#define WND_MAAT	2
+#define WND_PAGE	3
+#define WND_LINE	4
+#define WND_BRUSH	5
+#define WND_TAIL	5	//	末端ダミー
+
+//	モード
+#define M_DESTROY	0
+#define M_CREATE	1
+#define M_EXISTENCE	2
+
+#define MAA_DEFAULT		0xFF
+#define MAA_INSERT		0
+#define MAA_INTERRUPT	1
+#define MAA_LAYERED		2
+#define MAA_UNICLIP		3
+#define MAA_SJISCLIP	4
+
+
+//	指示コード・かぶらないように
+#define D_SJIS		0x00	//	シフトJIS
+#define D_UNI		0x01	//	ユニコード
+#define D_SQUARE	0x02	//	矩形選択
+#define D_INVISI	0x10	//	不可視状態の特別処理
+#define D_RENAME	0x80	//	名前を付けて保存
+//-------------------------------------------------------------------------------------------------
+
+//	ImgCtl.dllに準拠
+#define ISAVE_BMP	0x1
+//#define ISAVE_JPEG	0x2
+#define ISAVE_PNG	0x3
+//-------------------------------------------------------------------------------------------------
+
+#define CLIP_FORMAT	TEXT("ORINRIN_EDITOR_STYLE")	//!<	識別用・特に意味はない
+#define CLIP_SQUARE	TEXT("MSDEVColumnSelect")	//!<	矩形選択識別子・VCのやつ
+//-------------------------------------------------------------------------------------------------
+
+
+//!	キーコード割り当て
+#define	VK_0	0x30
+#define	VK_1	0x31
+#define	VK_2	0x32
+#define	VK_3	0x33
+#define	VK_4	0x34
+#define	VK_5	0x35
+#define	VK_6	0x36
+#define	VK_7	0x37
+#define	VK_8	0x38
+#define	VK_9	0x39
+
+//	必要なボタンに名前付けをしておく
+#define	VK_A	0x41
+#define	VK_B	0x42
+#define	VK_C	0x43
+#define	VK_D	0x44
+#define	VK_E	0x45
+#define	VK_F	0x46
+#define	VK_G	0x47
+#define	VK_H	0x48
+#define	VK_I	0x49
+#define	VK_J	0x4A
+#define	VK_K	0x4B
+#define	VK_L	0x4C
+#define	VK_M	0x4D
+#define	VK_N	0x4E
+#define	VK_O	0x4F
+#define	VK_P	0x50
+#define	VK_Q	0x51
+#define	VK_R	0x52
+#define	VK_S	0x53
+#define	VK_T	0x54
+#define	VK_U	0x55
+#define	VK_V	0x56
+#define	VK_W	0x57
+#define	VK_X	0x58
+#define	VK_Y	0x59
+#define	VK_Z	0x5A
+//-------------------------------------------------------------------------------------------------

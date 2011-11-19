@@ -1,0 +1,947 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#ifndef APSTUDIO_INVOKED
+#include "targetver.h"
+#endif
+#define APSTUDIO_HIDDEN_SYMBOLS
+#include "windows.h"
+#undef APSTUDIO_HIDDEN_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// 日本語 resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_JPN)
+#ifdef _WIN32
+LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
+#pragma code_page(932)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDI_ORINRINEDITOR       ICON                    "OrinrinEditor.ico"
+IDI_SMALL               ICON                    "OrinrinEditor.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDC_ORINRINEDITOR MENU 
+BEGIN
+    POPUP "ファイル(&F)"
+    BEGIN
+        MENUITEM "新規作成(&N)\tCtrl + N",          IDM_NEWFILE
+        MENUITEM "ファイル開く(&O)\tCtrl + O",        IDM_OPEN
+        MENUITEM SEPARATOR
+        MENUITEM "上書き保存(&S)\tCtrl + S",         IDM_OVERWRITESAVE
+        MENUITEM "名前を付けて保存(&M)\tCtrl + Alt + S", IDM_RENAMESAVE
+        MENUITEM "現在頁を画像にして保存(&I)",             IDM_IMAGE_SAVE
+        MENUITEM SEPARATOR
+        MENUITEM "一般設定(&G)",                    IDM_GENERAL_OPTION
+        MENUITEM "右クリックメニュー編集",                 IDM_MENUEDIT_DLG_OPEN
+        MENUITEM "AA一覧ツリーを再構築(&T)",             IDM_TREE_RECONSTRUCT
+        MENUITEM SEPARATOR
+        MENUITEM "バージョン情報(&A)",                 IDM_ABOUT
+        MENUITEM SEPARATOR
+        MENUITEM "終了(&Q)",                      IDM_EXIT
+    END
+    POPUP "編集(&E)"
+    BEGIN
+        MENUITEM "元に戻す(&U)\tCtrl + Z",          IDM_UNDO
+        MENUITEM "やり直し(&R)\tCtrl + Y",          IDM_REDO
+        MENUITEM SEPARATOR
+        MENUITEM "切り取り(&T)\tCtrl + X",          IDM_CUT
+        MENUITEM "Unicodeコピー(&C)\tCtrl + C",    IDM_COPY
+        MENUITEM "貼付(&P)\tCtrl + V",            IDM_PASTE
+        MENUITEM "削除(&D)\tDelete",              IDM_DELETE
+        MENUITEM SEPARATOR
+        MENUITEM "SJISコピー(&J)",                 IDM_SJISCOPY
+        MENUITEM "投下用に頁全体コピー(&SJIS)\tCtrl + Shift + C", IDM_SJISCOPY_ALL
+        MENUITEM SEPARATOR
+        MENUITEM "全選択(&A)\tCtrl + A",           IDM_ALLSEL
+        MENUITEM "矩形選択(&B)\tCtrl + Alt + B",    IDM_SQSELECT
+        MENUITEM SEPARATOR
+        MENUITEM "レイヤボックス(&L)\tAlt + Space",    IDM_LAYERBOX
+        MENUITEM "部分抽出モード(&E)",                 IDM_EXTRACTION_MODE
+        MENUITEM SEPARATOR
+        MENUITEM "次の行以降を新頁に分割(&V)",             IDM_PAGEL_DIVIDE
+        MENUITEM SEPARATOR
+        MENUITEM "文字列検索(&F)\tCtrl + F",         IDM_FIND_DLG_OPEN
+        MENUITEM "検索ハイライト解除(&H)\tCtrl + Shift + F", IDM_FIND_HIGHLIGHT_OFF
+    END
+    POPUP "挿入(&I)"
+    BEGIN
+        POPUP "ユニコード空白(&S)"
+        BEGIN
+            MENUITEM " &1dot (HAIR SPACE)\tU8202",  IDM_IN_01SPACE
+            MENUITEM " &2dot (THIN SPACE)\tU8201",  IDM_IN_02SPACE
+            MENUITEM " &3dot (SIX-PER-EM SPACE)\tU8198", IDM_IN_03SPACE
+            MENUITEM " &4dot (FOUR-PER-EM SPACE)\tU8197", IDM_IN_04SPACE
+            MENUITEM " &5dot (THREE-PER-EM SPACE)\tU8196", IDM_IN_05SPACE
+            MENUITEM " &8dot (EN SPACE)\tU8194",    IDM_IN_08SPACE
+            MENUITEM "1&0dot (FIGURE SPACE)\tU8199", IDM_IN_10SPACE
+            MENUITEM "1&6dot (EM SPACE)\tU8195",    IDM_IN_16SPACE
+        END
+        POPUP "色指定(&C)"
+        BEGIN
+            MENUITEM "白(&W)",                       IDM_INSTAG_WHITE
+            MENUITEM "青(&U)",                       IDM_INSTAG_BLUE
+            MENUITEM "黒(&B)",                       IDM_INSTAG_BLACK
+            MENUITEM "赤(&R)",                       IDM_INSTAG_RED
+            MENUITEM "緑(&G)",                       IDM_INSTAG_GREEN
+        END
+        MENUITEM SEPARATOR
+        MENUITEM "枠挿入ボックス(&I)\tCtrl + W",       IDM_FRMINSBOX_OPEN
+        MENUITEM "枠　&Alpha",                    IDM_INSFRAME_ALPHA
+        POPUP "枠...(&F)"
+        BEGIN
+            MENUITEM "枠　&Bravo",                    IDM_INSFRAME_BRAVO
+            MENUITEM "枠　&Charlie",                  IDM_INSFRAME_CHARLIE
+            MENUITEM "枠　&Delta",                    IDM_INSFRAME_DELTA
+            MENUITEM "枠　&Echo",                     IDM_INSFRAME_ECHO
+            MENUITEM "枠　&Foxtrot",                  IDM_INSFRAME_FOXTROT
+            MENUITEM "枠　&Golf",                     IDM_INSFRAME_GOLF
+            MENUITEM "枠　&Hotel",                    IDM_INSFRAME_HOTEL
+            MENUITEM "枠　&India",                    IDM_INSFRAME_INDIA
+            MENUITEM "枠　&Juliette",                 IDM_INSFRAME_JULIETTE
+            MENUITEM SEPARATOR
+            MENUITEM "枠編集(&A)",                     IDM_INSFRAME_EDIT
+        END
+        MENUITEM SEPARATOR
+        MENUITEM "文字ＡＡ変換ボックス(&M)",              IDM_MOZI_SCR_OPEN
+        MENUITEM SEPARATOR
+        POPUP "ユーザ定義(&U)"
+        BEGIN
+            MENUITEM "(无)",                         IDM_USERINS_NA
+        END
+        MENUITEM SEPARATOR
+        MENUITEM "各頁に通し番号を入れる(&N)",             IDM_PAGENUM_DLG_OPEN
+    END
+    POPUP "整形(&P)"
+    BEGIN
+        MENUITEM "右揃え線(&R)\tCtrl + Alt + R",    IDM_RIGHT_GUIDE_SET
+        MENUITEM "行頭に全角空白追加(&I)\tCtrl + I",     IDM_INS_TOPSPACE
+        MENUITEM SEPARATOR
+        MENUITEM "行頭空白削除(&U)\tCtrl + U",        IDM_DEL_TOPSPACE
+        MENUITEM "行末空白削除(&G)\tCtrl + G",        IDM_DEL_LASTSPACE
+        MENUITEM "行末文字削除(&E)\tCtrl + Shift + G", IDM_DEL_LASTLETTER
+        MENUITEM "選択範囲を空白にする(&F)\tCtrl + Alt + G", IDM_FILL_SPACE
+        MENUITEM "頁全体を空白で埋める(&B)",              IDM_FILL_ZENSP
+        MENUITEM SEPARATOR
+        MENUITEM "右に寄せる(&H)",                   IDM_RIGHT_SLIDE
+        MENUITEM "１ドット増やす(&D)\tAlt + →",        IDM_INCREMENT_DOT
+        MENUITEM "１ドット減らす(&O)\tAlt + ←",        IDM_DECREMENT_DOT
+        MENUITEM SEPARATOR
+        MENUITEM "全体を１ドット右へ(&J)\tAlt + Shift + →", IDM_INCR_DOT_LINES
+        MENUITEM "全体を１ドット左へ(&K)\tAlt + Shift + ←", IDM_DECR_DOT_LINES
+        MENUITEM SEPARATOR
+        POPUP "ドットずれ調整(&A)"
+        BEGIN
+            MENUITEM "調整基準ロック(&R)\tCtrl + Alt + W", IDM_DOTDIFF_LOCK
+            MENUITEM "カーソル位置で調整(&D)\tCtrl + Alt + E", IDM_DOTDIFF_ADJT
+        END
+    END
+    POPUP "表示(&N)"
+    BEGIN
+        MENUITEM "空白を表示(&W)",                   IDM_SPACE_VIEW_TOGGLE
+        MENUITEM "グリッド線を表示(&H)",                IDM_GRID_VIEW_TOGGLE
+        MENUITEM "右ガイド線を表示(&M)",                IDM_RIGHT_RULER_TOGGLE
+        MENUITEM SEPARATOR
+        MENUITEM "複数行テンプレート(&A)",               IDM_MAATMPLE_VIEW
+        MENUITEM "頁一覧(&L)",                     IDM_PAGELIST_VIEW
+        MENUITEM "壱行テンプレート(&T)",                IDM_LINE_TEMPLATE
+        MENUITEM "塗り潰しブラシ(&F)",                 IDM_BRUSH_PALETTE
+        MENUITEM "ユニコード表(&U)",                  IDM_UNI_PALETTE
+        MENUITEM "トレスモード(&R)",                  IDM_TRACE_MODE_ON
+        MENUITEM SEPARATOR
+        MENUITEM "プレビュー(&P)",                   IDM_ON_PREVIEW
+    END
+END
+
+IDC_PGLVPOPUPMENU MENU 
+BEGIN
+    POPUP "頁一覧操作"
+    BEGIN
+        MENUITEM "内容ポップアップ表示(&T)",              IDM_PAGEL_AATIP_TOGGLE
+        MENUITEM SEPARATOR
+        MENUITEM "末尾に新規作成(&N)",                 IDM_PAGEL_ADD
+        MENUITEM "選択頁の次に新規作成(&I)",              IDM_PAGEL_INSERT
+        MENUITEM "選択頁を複製(&C)",                  IDM_PAGEL_DUPLICATE
+        MENUITEM SEPARATOR
+        MENUITEM "選択頁を削除(&D)",                  IDM_PAGEL_DELETE
+        MENUITEM "次の頁と統合(&U)",                  IDM_PAGEL_COMBINE
+        MENUITEM "頁を上へ移動(&W)",                  IDM_PAGEL_UPFLOW
+        MENUITEM "頁を下へ移動(&S)",                  IDM_PAGEL_DOWNSINK
+        MENUITEM SEPARATOR
+        MENUITEM "頁名称の変更(&R)",                  IDM_PAGEL_RENAME
+        MENUITEM SEPARATOR
+        MENUITEM "最新の情報に更新(&Y)",                IDM_PAGEL_DETAIL, GRAYED
+        MENUITEM SEPARATOR
+        MENUITEM "常に手前に表示(&Z)",                 IDM_TOPMOST_TOGGLE
+    END
+END
+
+IDC_VIEWPOPUPMENU MENU 
+BEGIN
+    POPUP "編集ビュー内の操作"
+    BEGIN
+        MENUITEM "切り取り(&T)",                    IDM_CUT
+        MENUITEM "Unicodeコピー(&C)",              IDM_COPY
+        MENUITEM "貼付(&P)",                      IDM_PASTE
+        MENUITEM "全選択(&A)",                     IDM_ALLSEL
+        MENUITEM SEPARATOR
+        MENUITEM "SJISコピー(&J)",                 IDM_SJISCOPY
+        MENUITEM "全体をSJISコピー(&S)",              IDM_SJISCOPY_ALL
+        MENUITEM SEPARATOR
+        MENUITEM "枠　(&1)",                      IDM_INSFRAME_ALPHA
+        MENUITEM "枠　(&2)",                      IDM_INSFRAME_BRAVO
+        MENUITEM "枠　(&3)",                      IDM_INSFRAME_CHARLIE
+        POPUP "枠４～"
+        BEGIN
+            MENUITEM "枠　(&4)",                      IDM_INSFRAME_DELTA
+            MENUITEM "枠　(&5)",                      IDM_INSFRAME_ECHO
+            MENUITEM "枠　(&6)",                      IDM_INSFRAME_FOXTROT
+            MENUITEM "枠　(&7)",                      IDM_INSFRAME_GOLF
+            MENUITEM "枠　(&8)",                      IDM_INSFRAME_HOTEL
+            MENUITEM "枠　(&9)",                      IDM_INSFRAME_INDIA
+            MENUITEM "枠　(&0)",                      IDM_INSFRAME_JULIETTE
+        END
+        MENUITEM SEPARATOR
+        MENUITEM "右に寄せる(&H)",                   IDM_RIGHT_SLIDE
+        MENUITEM "行末空白削除(&G)",                  IDM_DEL_LASTSPACE
+        MENUITEM "選択範囲を空白にする(&F)",              IDM_FILL_SPACE
+        POPUP "整形その他操作"
+        BEGIN
+            MENUITEM "右揃え線(&R)",                    IDM_RIGHT_GUIDE_SET
+            MENUITEM "行頭に全角空白追加(&I)",               IDM_INS_TOPSPACE
+            MENUITEM "行頭全角空白削除(&U)",                IDM_DEL_TOPSPACE
+            MENUITEM "行末文字削除(&E)",                  IDM_DEL_LASTLETTER
+        END
+        POPUP "ドットずれ調整(&D)"
+        BEGIN
+            MENUITEM "調整基準ロック(&R)",                 IDM_DOTDIFF_LOCK
+            MENUITEM "カーソル位置で調整(&D)",               IDM_DOTDIFF_ADJT
+        END
+        MENUITEM SEPARATOR
+        MENUITEM "矩形選択(&B)",                    IDM_SQSELECT
+        MENUITEM SEPARATOR
+        MENUITEM "レイヤボックス(&L)",                 IDM_LAYERBOX
+        MENUITEM "文字ＡＡ変換ボックス(&M)",              IDM_MOZI_SCR_OPEN
+        MENUITEM SEPARATOR
+        MENUITEM "空白を表示",                       IDM_SPACE_VIEW_TOGGLE
+        MENUITEM "グリッド線を表示",                    IDM_GRID_VIEW_TOGGLE
+        MENUITEM "右ガイド線を表示",                    IDM_RIGHT_RULER_TOGGLE
+        MENUITEM SEPARATOR
+        MENUITEM "次の行以降を新頁に分割",                 IDM_PAGEL_DIVIDE
+    END
+END
+
+IDM_AALIST_POPUP MENU 
+BEGIN
+    POPUP "複数行テンプレ表示でのアレ"
+    BEGIN
+        MENUITEM "ＡＡポップアップ表示(&T)",              IDM_MAA_AATIP_TOGGLE
+        MENUITEM "ＡＡ区切りスタイル切換",                 IDM_MAA_SEP_STYLE_TOGGLE
+        MENUITEM SEPARATOR
+        MENUITEM "編集ビューに通常挿入(&I)",              IDM_MAA_INSERT_EDIT
+        MENUITEM "編集ビューに矩形挿入(&R)",              IDM_MAA_INTERRUPT_EDIT
+        MENUITEM SEPARATOR
+        MENUITEM "レイヤで開く(&L)",                  IDM_MAA_SET_LAYERBOX
+        MENUITEM SEPARATOR
+        MENUITEM "コピー(UNI&CODE)",               IDM_MAA_CLIP_UNICODE
+        MENUITEM "コピー(Shift&JIS)",              IDM_MAA_CLIP_SHIFTJIS
+        MENUITEM SEPARATOR
+        MENUITEM "削除(&D)",                      IDM_MAA_FAV_DELETE, GRAYED
+    END
+END
+
+IDM_AATREE_POPUP MENU 
+BEGIN
+    POPUP "複数行テンプレツリーのアレ"
+    BEGIN
+        MENUITEM "プロファイル作成／開く(&N)",             IDM_MAA_PROFILE_MAKE
+        MENUITEM "AA一覧ツリーを再構築(&T)",             IDM_TREE_RECONSTRUCT
+        MENUITEM SEPARATOR
+        MENUITEM "（名称未設定）",                     IDM_DUMMY, GRAYED
+        MENUITEM "主タブで開く(&M)",                  IDM_AATREE_MAINOPEN
+        MENUITEM "副タブを追加(&S)",                  IDM_AATREE_SUBADD
+        MENUITEM "編集ビューに開く(&E)",                IDM_AATREE_GOEDIT
+        MENUITEM SEPARATOR
+        MENUITEM "アイテム追加(&A)",                  IDM_MAA_IADD_OPEN
+    END
+END
+
+IDM_AATABS_POPUP MENU 
+BEGIN
+    POPUP "複数行テンプレタブのアレ"
+    BEGIN
+        MENUITEM "このタブを閉じる(&Q)",                IDM_AATABS_DELETE
+        MENUITEM SEPARATOR
+        MENUITEM "編集ビューに開く(&E)",                IDM_AATREE_GOEDIT
+    END
+END
+
+IDM_LAYERBOX_POPUP MENU 
+BEGIN
+    POPUP "レイヤボックスのアレ"
+    BEGIN
+        MENUITEM "コピー(&C)",                     IDM_LYB_COPY
+        MENUITEM SEPARATOR
+        MENUITEM "透過領域設定をリセット(&R)",             IDM_LYB_TRANCE_RELEASE
+        MENUITEM "全ての空白を透過領域に設定(&T)",           IDM_LYB_TRANCE_ALL
+    END
+END
+
+IDM_MULTIFILE_POPUP MENU 
+BEGIN
+    POPUP "複数ファイルタブのアレ"
+    BEGIN
+        MENUITEM "保存(&S)",                      IDM_OVERWRITESAVE
+        MENUITEM "名前を付けて保存(&M)",                IDM_RENAMESAVE
+        MENUITEM SEPARATOR
+        MENUITEM "タブを閉じる(&Q)",                  IDM_FILE_CLOSE
+    END
+END
+
+IDM_TEMPLATE_POPUP MENU 
+BEGIN
+    POPUP "テンプレウインドウのアレ"
+    BEGIN
+        MENUITEM "常に手前に表示(&Z)",                 IDM_TOPMOST_TOGGLE
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Accelerator
+//
+
+IDC_ORINRINEDITOR ACCELERATORS 
+BEGIN
+    "A",            IDM_ALLSEL,             VIRTKEY, CONTROL, NOINVERT
+    "B",            IDM_SQSELECT,           VIRTKEY, CONTROL, ALT, NOINVERT
+    "C",            IDM_COPY,               VIRTKEY, CONTROL, NOINVERT
+    "C",            IDM_PAGEL_DUPLICATE,    VIRTKEY, ALT, NOINVERT
+    "C",            IDM_SJISCOPY_ALL,       VIRTKEY, SHIFT, CONTROL, NOINVERT
+    "E",            IDM_DOTDIFF_ADJT,       VIRTKEY, CONTROL, ALT, NOINVERT
+    "F",            IDM_FIND_DLG_OPEN,      VIRTKEY, CONTROL, NOINVERT
+    "F",            IDM_FIND_HIGHLIGHT_OFF, VIRTKEY, SHIFT, CONTROL, NOINVERT
+    "G",            IDM_DEL_LASTLETTER,     VIRTKEY, SHIFT, CONTROL, NOINVERT
+    "G",            IDM_DEL_LASTSPACE,      VIRTKEY, CONTROL, NOINVERT
+    "G",            IDM_FILL_SPACE,         VIRTKEY, CONTROL, ALT, NOINVERT
+    "G",            IDM_PAGEL_COMBINE,      VIRTKEY, ALT, NOINVERT
+    "H",            IDM_TRC_VIEWTOGGLE,     VIRTKEY, ALT, NOINVERT
+    "I",            IDM_INS_TOPSPACE,       VIRTKEY, CONTROL, NOINVERT
+    "I",            IDM_PAGEL_INSERT,       VIRTKEY, ALT, NOINVERT
+    "I",            IDM_PAGEL_ADD,          VIRTKEY, SHIFT, ALT, NOINVERT
+    "J",            IDM_PAGEL_DOWNSINK,     VIRTKEY, ALT, NOINVERT
+    "N",            IDM_NEWFILE,            VIRTKEY, CONTROL, NOINVERT
+    "N",            IDM_PAGEL_RENAME,       VIRTKEY, ALT, NOINVERT
+    "O",            IDM_OPEN,               VIRTKEY, CONTROL, NOINVERT
+    "R",            IDM_RIGHT_GUIDE_SET,    VIRTKEY, CONTROL, ALT, NOINVERT
+    "S",            IDM_OVERWRITESAVE,      VIRTKEY, CONTROL, NOINVERT
+    "S",            IDM_RENAMESAVE,         VIRTKEY, CONTROL, ALT, NOINVERT
+    "U",            IDM_DEL_TOPSPACE,       VIRTKEY, CONTROL, NOINVERT
+    "U",            IDM_PAGEL_UPFLOW,       VIRTKEY, ALT, NOINVERT
+    "V",            IDM_PASTE,              VIRTKEY, CONTROL, NOINVERT
+    "W",            IDM_DOTDIFF_LOCK,       VIRTKEY, CONTROL, ALT, NOINVERT
+    "W",            IDM_FRMINSBOX_OPEN,     VIRTKEY, CONTROL, NOINVERT
+    "W",            IDM_SPACE_VIEW_TOGGLE,  VIRTKEY, SHIFT, CONTROL, NOINVERT
+    "X",            IDM_CUT,                VIRTKEY, CONTROL, NOINVERT
+    "Y",            IDM_REDO,               VIRTKEY, CONTROL, NOINVERT
+    "Z",            IDM_REDO,               VIRTKEY, SHIFT, CONTROL, NOINVERT
+    "Z",            IDM_UNDO,               VIRTKEY, CONTROL, NOINVERT
+    VK_RIGHT,       IDM_TMPL_GRID_INCREASE, VIRTKEY, CONTROL, NOINVERT
+    VK_RIGHT,       IDM_INCREMENT_DOT,      VIRTKEY, ALT, NOINVERT
+    VK_RIGHT,       IDM_INCR_DOT_LINES,     VIRTKEY, SHIFT, ALT, NOINVERT
+    VK_LEFT,        IDM_TMPL_GRID_DECREASE, VIRTKEY, CONTROL, NOINVERT
+    VK_LEFT,        IDM_DECREMENT_DOT,      VIRTKEY, ALT, NOINVERT
+    VK_LEFT,        IDM_DECR_DOT_LINES,     VIRTKEY, SHIFT, ALT, NOINVERT
+    VK_UP,          IDM_PAGE_PREV,          VIRTKEY, ALT, NOINVERT
+    VK_UP,          IDM_TMPLT_GROUP_PREV,   VIRTKEY, CONTROL, NOINVERT
+    VK_DOWN,        IDM_PAGE_NEXT,          VIRTKEY, ALT, NOINVERT
+    VK_DOWN,        IDM_TMPLT_GROUP_NEXT,   VIRTKEY, CONTROL, NOINVERT
+    VK_SPACE,       IDM_LAYERBOX,           VIRTKEY, ALT, NOINVERT
+    VK_TAB,         IDM_WINDOW_CHANGE,      VIRTKEY, CONTROL, NOINVERT
+    VK_TAB,         IDM_WINDOW_CHG_RVRS,    VIRTKEY, SHIFT, CONTROL, NOINVERT
+    VK_PRIOR,       IDM_FILE_PREV,          VIRTKEY, CONTROL, NOINVERT
+    VK_NEXT,        IDM_FILE_NEXT,          VIRTKEY, CONTROL, NOINVERT
+    VK_F4,          IDM_FILE_CLOSE,         VIRTKEY, CONTROL, NOINVERT
+    VK_F5,          IDM_NOW_PAGE_REFRESH,   VIRTKEY, NOINVERT
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_ABOUTBOX DIALOG  0, 0, 215, 196
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_TOOLWINDOW
+CAPTION "バージョン情報 - Orinrin Editor"
+FONT 9, "MS UI Gothic"
+BEGIN
+    ICON            IDI_ORINRINEDITOR,IDC_MYICON,6,6,20,20
+    LTEXT           "Orinrin Editor, Version 0.24.1 Aurora (2011.1118.2230.920)",IDC_STATIC,36,6,168,8,SS_NOPREFIX
+    LTEXT           "Copyright (C) 2011 by SikigamiHNQ",IDC_STATIC,36,18,168,8
+    LTEXT           "Site ： お燐ちゃんは俺の嫁．ｃｏｍ",IDC_STATIC,36,30,168,8
+    DEFPUSHBUTTON   "OK",IDOK,84,180,48,12,WS_GROUP
+    EDITTEXT        IDE_ABOUT_DISP,6,42,204,132,ES_MULTILINE | ES_READONLY | NOT WS_BORDER,WS_EX_STATICEDGE
+END
+
+IDD_UNICODE_PALETTE_DLG DIALOG  0, 0, 438, 188
+STYLE DS_SETFONT | DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_TOOLWINDOW
+CAPTION "ユニコード一覧表"
+FONT 11, "MS UI Gothic"
+BEGIN
+    COMBOBOX        IDCB_UNI_GROUPSEL,96,6,336,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    CONTROL         "",IDLV_UNI_CATALOGUE,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_OWNERDATA | LVS_NOCOLUMNHEADER | LVS_NOSORTHEADER | WS_BORDER,96,36,336,126
+    EDITTEXT        IDE_UNI_LETTER_NAME,96,168,336,12,ES_AUTOHSCROLL | ES_READONLY
+    GROUPBOX        "文字",IDC_STATIC,6,24,54,132
+    CTEXT           "",IDS_UNI_LETTER_IMG,12,36,42,42,SS_CENTERIMAGE | WS_BORDER
+    EDITTEXT        IDE_UNI_HEX_CODE,12,84,42,12,ES_CENTER | ES_AUTOHSCROLL | ES_READONLY | NOT WS_BORDER
+    EDITTEXT        IDE_UNI_DEC_CODE,12,102,42,12,ES_CENTER | ES_AUTOHSCROLL | ES_READONLY | NOT WS_BORDER
+    PUSHBUTTON      "確定",IDB_UNI_DECIDE,12,120,42,12
+    PUSHBUTTON      "コピー",IDB_UNI_COPY_CLIP,12,138,42,12
+    LTEXT           "0x0",IDC_STATIC,96,24,13,8
+    LTEXT           "0x1",IDC_STATIC,126,24,13,8
+    LTEXT           "0x2",IDC_STATIC,146,24,13,8
+    LTEXT           "0x3",IDC_STATIC,166,24,13,8
+    LTEXT           "0x4",IDC_STATIC,186,24,13,8
+    LTEXT           "0x5",IDC_STATIC,206,24,13,8
+    LTEXT           "0x6",IDC_STATIC,226,24,13,8
+    LTEXT           "0x7",IDC_STATIC,246,24,13,8
+    LTEXT           "0x8",IDC_STATIC,266,24,13,8
+    LTEXT           "0x9",IDC_STATIC,286,24,13,8
+    LTEXT           "0xA",IDC_STATIC,306,24,13,8
+    LTEXT           "0xB",IDC_STATIC,326,24,13,8
+    LTEXT           "0xC",IDC_STATIC,346,24,13,8
+    LTEXT           "0xD",IDC_STATIC,366,24,13,8
+    LTEXT           "0xE",IDC_STATIC,386,24,13,8
+    LTEXT           "0xF",IDC_STATIC,406,24,13,8
+    LTEXT           "0x0000",IDS_UA_ALPHA,63,38,30,8
+    LTEXT           "0x0010",IDS_UA_BRAVO,63,54,30,8
+    LTEXT           "0x0020",IDS_UA_CHARLIE,63,69,30,8
+    LTEXT           "0x0030",IDS_UA_DELTA,63,85,30,8
+    LTEXT           "0x0040",IDS_UA_ECHO,63,101,30,8
+    LTEXT           "0x0050",IDS_UA_FOXTROT,63,117,30,8
+    LTEXT           "0x0060",IDS_UA_GOLF,63,133,30,8
+    LTEXT           "0x0070",IDS_UA_HOTEL,63,148,30,8
+END
+
+IDD_FRAME_EDIT_DLG DIALOG  0, 0, 186, 182
+STYLE DS_SETFONT | DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_TOOLWINDOW
+CAPTION "枠の設定"
+FONT 11, "MS UI Gothic"
+BEGIN
+    DEFPUSHBUTTON   "OK",IDB_OK,6,162,42,12
+    PUSHBUTTON      "キャンセル",IDB_CANCEL,72,162,42,12
+    PUSHBUTTON      "適用",IDB_APPLY,138,162,42,12
+    COMBOBOX        IDCB_BOX_NAME_SEL,6,6,174,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    EDITTEXT        IDE_BOXP_NAME_EDIT,6,24,144,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "確定",IDB_BOXP_NAME_APPLY,150,24,30,12
+    EDITTEXT        IDE_BOXP_MORNING,6,42,42,12,ES_CENTER | ES_AUTOHSCROLL
+    EDITTEXT        IDE_BOXP_NOON,72,42,42,12,ES_CENTER | ES_AUTOHSCROLL
+    EDITTEXT        IDE_BOXP_AFTERNOON,138,42,42,12,ES_CENTER | ES_AUTOHSCROLL
+    EDITTEXT        IDE_BOXP_DAYBREAK,6,66,42,12,ES_CENTER | ES_AUTOHSCROLL
+    EDITTEXT        IDE_BOXP_NIGHTFALL,138,66,42,12,ES_CENTER | ES_AUTOHSCROLL
+    EDITTEXT        IDE_BOXP_DAWN,6,90,42,12,ES_CENTER | ES_AUTOHSCROLL
+    EDITTEXT        IDE_BOXP_MIDNIGHT,72,90,42,12,ES_CENTER | ES_AUTOHSCROLL
+    EDITTEXT        IDE_BOXP_TWILIGHT,138,90,42,12,ES_CENTER | ES_AUTOHSCROLL
+    CONTROL         "",IDS_FRAME_IMAGE,"Static",SS_OWNERDRAW | SS_NOPREFIX | SS_NOTIFY | WS_BORDER | WS_GROUP,6,108,174,48,WS_EX_CLIENTEDGE
+    LTEXT           "左オフセット",IDC_STATIC,54,60,36,8,NOT WS_VISIBLE
+    EDITTEXT        IDE_LEFT_OFFSET,54,72,24,12,ES_AUTOHSCROLL | NOT WS_VISIBLE
+    CONTROL         "",IDSP_LEFT_OFFSET,"msctls_updown32",UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_HORZ | UDS_HOTTRACK | NOT WS_VISIBLE,78,72,12,12
+    RTEXT           "右オフセット",IDC_STATIC,96,60,36,8
+    EDITTEXT        IDE_RIGHT_OFFSET,96,72,24,12,ES_AUTOHSCROLL
+    CONTROL         "",IDSP_RIGHT_OFFSET,"msctls_updown32",UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_HORZ | UDS_HOTTRACK,120,72,12,12
+END
+
+IDD_PAGE_NAME_DLG DIALOG  0, 0, 167, 54
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_TOOLWINDOW
+CAPTION "頁の名前入力"
+FONT 11, "MS UI Gothic"
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,72,36,42,12
+    PUSHBUTTON      "キャンセル",IDCANCEL,120,36,42,12
+    LTEXT           "名前を入力してください",IDC_STATIC,6,6,156,8
+    EDITTEXT        IDE_PAGENAME,6,18,156,12,ES_AUTOHSCROLL
+END
+
+IDD_GENERAL_OPTION_DLG DIALOG  0, 0, 271, 263
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_TOOLWINDOW
+CAPTION "設定いろいろ"
+FONT 10, "MS UI Gothic"
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,102,246,42,12
+    PUSHBUTTON      "キャンセル",IDCANCEL,162,246,42,12
+    PUSHBUTTON      "適用",IDB_APPLY,222,246,42,12
+    GROUPBOX        "AAの入ってるディレクトリ",IDC_STATIC,6,6,258,42
+    EDITTEXT        IDE_AA_DIRECTORY,12,18,210,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "参照",IDB_AADIR_SEARCH,228,18,30,12
+    LTEXT           "ポップアップ表示",IDC_STATIC,12,36,48,8
+    CONTROL         "通常",IDRB_POPUP_NOMAL,"Button",BS_AUTORADIOBUTTON | WS_GROUP,84,36,42,8
+    CONTROL         "縮小",IDRB_POPUP_REDUCE,"Button",BS_AUTORADIOBUTTON,138,36,30,8
+    CONTROL         "表示する",IDCB_POPUP_VISIBLE,"Button",BS_AUTOCHECKBOX | WS_GROUP | WS_TABSTOP,186,36,48,8
+    GROUPBOX        "右寄せの目標ドット値",IDC_STATIC,6,54,78,36
+    EDITTEXT        IDE_RIGHTSLIDE_DOT,24,66,42,12,ES_CENTER | ES_AUTOHSCROLL | ES_NUMBER
+    GROUPBOX        "自動保存間隔（分） ※０で無効",IDC_STATIC,90,54,120,36
+    EDITTEXT        IDE_AUTO_BU_INTVL,96,66,30,12,ES_CENTER | ES_AUTOHSCROLL | ES_NUMBER
+    CONTROL         "バックアップしたら\r\nメッセージを表示",IDCB_AUTOBU_MSG_ON,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,132,66,72,18
+    GROUPBOX        "改行コード",IDC_STATIC,216,54,48,36
+    CONTROL         "したらば",IDRB_CRLF_STRB,"Button",BS_AUTORADIOBUTTON | WS_GROUP,222,66,36,10
+    CONTROL         "2ch・YY",IDRB_CRLF_2CH_YY,"Button",BS_AUTORADIOBUTTON,222,78,36,10
+    CONTROL         "ドット数調整にユニコード空白を使う",IDCB_USE_UNISPACE_SET,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,96,156,8
+    CONTROL         "ユニコードの数値参照を１６進数で扱う",IDCB_UNIRADIX_HEX,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,108,156,8
+    CONTROL         "アンドゥ・リドゥの同じタイミング操作をまとめて行う",IDCB_GROUPUNDO_SET,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,120,156,8
+    CONTROL         "コピーの標準をShiftJISにする",IDCB_COPY_STYLE_SWAP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,132,156,10
+    CONTROL         "テンプレ窓をメイン窓に統合（再起動後に有効）",IDCB_DOCKING_STYLE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,144,156,10
+    GROUPBOX        "レイヤボックスの透明度",IDC_STATIC,6,162,258,36
+    CONTROL         "",IDSL_LAYERBOX_TRANCED,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | WS_TABSTOP,36,174,198,15
+    CTEXT           "儚い",IDC_STATIC,12,174,18,18,SS_CENTERIMAGE
+    CTEXT           "濃い",IDC_STATIC,240,174,18,18,SS_CENTERIMAGE
+    GROUPBOX        "複数行テンプレをクリックしたときの動作",IDC_STATIC,6,204,198,36
+    CONTROL         "通常挿入",IDRB_SEL_INS_EDIT,"Button",BS_AUTORADIOBUTTON | WS_GROUP,12,215,42,8
+    CONTROL         "矩形挿入",IDRB_SEL_INTRPT_EDIT,"Button",BS_AUTORADIOBUTTON,12,228,42,8
+    CONTROL         "レイヤボックス",IDRB_SEL_SET_LAYER,"Button",BS_AUTORADIOBUTTON,60,215,54,8
+    CONTROL         "コピー（ユニコード）",IDRB_SEL_CLIP_UNI,"Button",BS_AUTORADIOBUTTON,120,215,72,8
+    CONTROL         "コピー（ShiftJIS）",IDRB_SEL_CLIP_SJIS,"Button",BS_AUTORADIOBUTTON,120,228,72,8
+    GROUPBOX        "右ルーラ位置",IDC_STATIC,210,204,54,36
+    EDITTEXT        IDE_RIGHT_RULER_POS,216,215,42,12,ES_CENTER | ES_AUTOHSCROLL | ES_NUMBER
+    GROUPBOX        "グリッド位置（ドット指定）",IDC_STATIC,174,96,90,42
+    EDITTEXT        IDE_GRID_X_POS,192,108,24,12,ES_CENTER | ES_AUTOHSCROLL | ES_NUMBER
+    EDITTEXT        IDE_GRID_Y_POS,234,108,24,12,ES_CENTER | ES_AUTOHSCROLL | ES_NUMBER
+    CTEXT           "X",IDC_STATIC,180,108,8,12,SS_CENTERIMAGE
+    CTEXT           "Y",IDC_STATIC,222,108,8,12,SS_CENTERIMAGE
+    LTEXT           "※壱行は18ドットです",IDC_STATIC,186,126,72,8
+END
+
+IDD_TRACEADJUST_DLG DIALOG  0, 0, 139, 281
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_TOOLWINDOW
+CAPTION "トレス コントロール"
+FONT 10, "MS UI Gothic"
+BEGIN
+    DEFPUSHBUTTON   "絵",IDB_TRC_IMAGEOPEN,6,6,19,19
+    GROUPBOX        "Ｘ位置",IDC_STATIC,30,6,102,30
+    CONTROL         "",IDSL_TRC_HRIZ_POS,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | WS_TABSTOP,36,18,66,11
+    EDITTEXT        IDE_TRC_HRIZ_VALUE,102,18,24,12,ES_CENTER | ES_AUTOHSCROLL | ES_READONLY
+    GROUPBOX        "Ｙ位置",IDC_STATIC,6,42,30,114
+    CONTROL         "",IDSL_TRC_VART_POS,"msctls_trackbar32",TBS_VERT | TBS_BOTH | TBS_NOTICKS | WS_TABSTOP,12,54,11,78
+    EDITTEXT        IDE_TRC_VART_VALUE,6,138,30,12,ES_CENTER | ES_AUTOHSCROLL | ES_READONLY
+    GROUPBOX        "文字色",IDC_STATIC,6,162,30,36
+    CONTROL         "",IDPL_TRC_MOZICOLOUR,"Static",SS_BLACKFRAME | SS_NOTIFY | SS_SUNKEN,12,174,18,18
+    CONTROL         "上下反転",IDCB_TRC_IMG_UPSET,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,6,204,30,18
+    CONTROL         "左右反転",IDCB_TRC_IMG_MIRROR,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,6,222,30,18
+    GROUPBOX        "コントラスト",IDC_STATIC,42,42,90,42
+    CONTROL         "",IDSL_TRC_CONTRAST,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | WS_TABSTOP,48,54,78,11
+    LTEXT           "-255",IDC_STATIC,48,66,18,12,SS_CENTERIMAGE
+    LTEXT           "255",IDC_STATIC,114,66,12,12,SS_CENTERIMAGE
+    EDITTEXT        IDE_TRC_CONTRAST_VALUE,72,66,30,12,ES_CENTER | ES_AUTOHSCROLL | ES_READONLY
+    GROUPBOX        "ガンマ",IDC_STATIC,42,90,90,42
+    CONTROL         "",IDSL_TRC_GAMMA,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | WS_TABSTOP,48,103,78,11
+    LTEXT           "0",IDC_STATIC,48,114,8,12,SS_CENTERIMAGE
+    LTEXT           "3.0",IDC_STATIC,114,114,12,12,SS_CENTERIMAGE
+    EDITTEXT        IDE_TRC_GAMMA_VALUE,72,114,30,12,ES_CENTER | ES_AUTOHSCROLL | ES_READONLY
+    GROUPBOX        "淡色化",IDC_STATIC,42,138,90,42
+    CONTROL         "",IDSL_TRC_GRAYMOPH,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | WS_TABSTOP,48,151,78,11
+    LTEXT           "0",IDC_STATIC,48,162,8,12,SS_CENTERIMAGE
+    LTEXT           "255",IDC_STATIC,114,162,12,12,SS_CENTERIMAGE
+    EDITTEXT        IDE_TRC_GRAYMOPH_VALUE,72,162,30,12,ES_CENTER | ES_AUTOHSCROLL | ES_READONLY
+    GROUPBOX        "ズーム",IDC_STATIC,42,186,90,42
+    CONTROL         "",IDSL_TRC_ZOOM,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | WS_TABSTOP,48,199,78,11
+    LTEXT           "(-)",IDC_STATIC,48,210,10,12,SS_CENTERIMAGE
+    LTEXT           "(+)",IDC_STATIC,120,210,10,12,SS_CENTERIMAGE
+    EDITTEXT        IDE_TRC_ZOOM_VALUE,72,210,30,12,ES_CENTER | ES_AUTOHSCROLL | ES_READONLY
+    GROUPBOX        "回転",IDC_STATIC,42,234,90,42
+    CONTROL         "",IDSL_TRC_TURN,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | WS_TABSTOP,48,246,78,11
+    LTEXT           "0",IDC_STATIC,48,258,8,12,SS_CENTERIMAGE
+    LTEXT           "359",IDC_STATIC,114,258,12,12,SS_CENTERIMAGE
+    EDITTEXT        IDE_TRC_TURN_VALUE,72,258,30,12,ES_CENTER | ES_AUTOHSCROLL | ES_READONLY
+    PUSHBUTTON      "非表示",IDB_TRC_VIEWTOGGLE,6,246,30,12
+    PUSHBUTTON      "リセット",IDB_TRC_RESET,6,263,30,12
+END
+
+IDD_TRACEADJUST_DLG2 DIALOG  0, 0, 139, 281
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_TOOLWINDOW
+CAPTION "トレス コントロール"
+FONT 10, "MS UI Gothic"
+BEGIN
+    DEFPUSHBUTTON   "絵",IDB_TRC_IMAGEOPEN,6,6,19,19
+    GROUPBOX        "Ｘ位置",IDC_STATIC,30,6,102,30
+    SCROLLBAR       IDSL_TRC_HRIZ_POS,36,18,66,11
+    EDITTEXT        IDE_TRC_HRIZ_VALUE,102,18,24,12,ES_CENTER | ES_AUTOHSCROLL | ES_READONLY
+    GROUPBOX        "Ｙ位置",IDC_STATIC,6,42,30,114
+    SCROLLBAR       IDSL_TRC_VART_POS,12,54,11,78,SBS_VERT
+    EDITTEXT        IDE_TRC_VART_VALUE,6,138,30,12,ES_CENTER | ES_AUTOHSCROLL | ES_READONLY
+    GROUPBOX        "文字色",IDC_STATIC,6,162,30,36
+    CONTROL         "",IDPL_TRC_MOZICOLOUR,"Static",SS_BLACKFRAME | SS_NOTIFY | SS_SUNKEN,12,174,18,18
+    CONTROL         "上下反転",IDCB_TRC_IMG_UPSET,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,6,204,30,18
+    CONTROL         "左右反転",IDCB_TRC_IMG_MIRROR,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,6,222,30,18
+    GROUPBOX        "コントラスト",IDC_STATIC,42,42,90,42
+    SCROLLBAR       IDSL_TRC_CONTRAST,48,54,78,11
+    LTEXT           "-255",IDC_STATIC,48,66,18,12,SS_CENTERIMAGE
+    LTEXT           "255",IDC_STATIC,114,66,12,12,SS_CENTERIMAGE
+    EDITTEXT        IDE_TRC_CONTRAST_VALUE,72,66,30,12,ES_CENTER | ES_AUTOHSCROLL | ES_READONLY
+    GROUPBOX        "ガンマ",IDC_STATIC,42,90,90,42
+    SCROLLBAR       IDSL_TRC_GAMMA,48,103,78,11
+    LTEXT           "0",IDC_STATIC,48,114,8,12,SS_CENTERIMAGE
+    LTEXT           "3.0",IDC_STATIC,114,114,12,12,SS_CENTERIMAGE
+    EDITTEXT        IDE_TRC_GAMMA_VALUE,72,114,30,12,ES_CENTER | ES_AUTOHSCROLL | ES_READONLY
+    GROUPBOX        "淡色化",IDC_STATIC,42,138,90,42
+    SCROLLBAR       IDSL_TRC_GRAYMOPH,48,151,78,11
+    LTEXT           "0",IDC_STATIC,48,162,8,12,SS_CENTERIMAGE
+    LTEXT           "255",IDC_STATIC,114,162,12,12,SS_CENTERIMAGE
+    EDITTEXT        IDE_TRC_GRAYMOPH_VALUE,72,162,30,12,ES_CENTER | ES_AUTOHSCROLL | ES_READONLY
+    GROUPBOX        "ズーム",IDC_STATIC,42,186,90,42
+    SCROLLBAR       IDSL_TRC_ZOOM,48,199,78,11
+    LTEXT           "(-)",IDC_STATIC,48,210,10,12,SS_CENTERIMAGE
+    LTEXT           "(+)",IDC_STATIC,120,210,10,12,SS_CENTERIMAGE
+    EDITTEXT        IDE_TRC_ZOOM_VALUE,72,210,30,12,ES_CENTER | ES_AUTOHSCROLL | ES_READONLY
+    GROUPBOX        "回転",IDC_STATIC,42,234,90,42
+    SCROLLBAR       IDSL_TRC_TURN,48,246,78,11
+    LTEXT           "0",IDC_STATIC,48,258,8,12,SS_CENTERIMAGE
+    LTEXT           "359",IDC_STATIC,114,258,12,12,SS_CENTERIMAGE
+    EDITTEXT        IDE_TRC_TURN_VALUE,72,258,30,12,ES_CENTER | ES_AUTOHSCROLL | ES_READONLY
+    PUSHBUTTON      "非表示",IDB_TRC_VIEWTOGGLE,6,246,30,12
+    PUSHBUTTON      "リセット",IDB_TRC_RESET,6,263,30,12
+END
+
+IDD_IMAGE_OPEN_DLG DIALOG  0, 0, 321, 122
+STYLE DS_SETFONT | DS_3DLOOK | DS_CONTROL | WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN
+FONT 10, "MS UI Gothic"
+BEGIN
+    LTEXT           "",IDC_STATIC_STC32,0,0,192,120
+    CONTROL         "サムネイルを表示する",IDCB_TRC_DLG_USETHUMB,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,198,6,78,10
+    CONTROL         "",IDS_TRC_DLG_THUMBFRAME,"Static",SS_BLACKFRAME | WS_BORDER,198,24,114,96
+END
+
+IDD_PROFILE_TREESEL_DLG DIALOG  0, 0, 203, 275
+STYLE DS_SETFONT | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_TOOLWINDOW
+CAPTION "使用するディレクトリを選択"
+FONT 10, "MS UI Gothic"
+BEGIN
+    DEFPUSHBUTTON   "構築",IDOK,77,258,48,12
+    PUSHBUTTON      "リストアップ",IDB_PRTREE_LISTUP,156,6,42,12
+    EDITTEXT        IDE_PRTREE_DIR,6,6,120,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "参照",IDB_PRTREE_DIR_REF,126,6,24,12
+    CONTROL         "",IDTV_PRTREE_DIR_TVIEW,"SysTreeView32",TVS_HASBUTTONS | TVS_HASLINES | TVS_LINESATROOT | TVS_DISABLEDRAGDROP | TVS_SHOWSELALWAYS | TVS_CHECKBOXES | WS_BORDER | WS_HSCROLL | WS_TABSTOP,6,24,192,228
+END
+
+IDD_MSGCHECKBOX_DLG DIALOG  0, 0, 210, 71
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION
+EXSTYLE WS_EX_TOOLWINDOW
+CAPTION "操作確認なのです。あぅあぅ"
+FONT 10, "MS UI Gothic"
+BEGIN
+    ICON            32516,IDC_ICON_BOX,6,6,20,20
+    DEFPUSHBUTTON   "やっちゃう",IDYES,42,48,48,14
+    PUSHBUTTON      "やめとく",IDNO,120,48,48,14
+    LTEXT           "スタティック",IDS_MC_MSG1,36,6,168,8
+    LTEXT           "スタティック",IDS_MC_MSG2,36,18,168,8
+    CONTROL         "次からはこの確認は要らないよ",IDCB_MC_CHECKBOX,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,36,30,168,8
+END
+
+IDD_PAGENUMBER_DLG DIALOG  0, 0, 143, 83
+STYLE DS_SETFONT | DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_TOOLWINDOW
+CAPTION "頁番号挿入"
+FONT 10, "MS UI Gothic"
+BEGIN
+    DEFPUSHBUTTON   "イれる",IDOK,48,66,48,12
+    RTEXT           "開始番号",IDC_STATIC,18,6,36,12,SS_CENTERIMAGE
+    EDITTEXT        IDE_PN_START,60,6,42,12,ES_CENTER | ES_AUTOHSCROLL | ES_NUMBER
+    RTEXT           "書式",IDC_STATIC,18,24,36,12,SS_CENTERIMAGE
+    EDITTEXT        IDE_PN_STYLE,60,24,60,12,ES_AUTOHSCROLL
+    CONTROL         "最下行に挿入（未チェックで頁先頭行）",IDCB_PN_UNDER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,42,132,8
+    CONTROL         "該当行の内容を削除して上書",IDCB_PN_OVERRIDE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,54,132,8
+END
+
+IDD_MAA_IADD_DLG DIALOG  0, 0, 320, 240
+STYLE DS_SETFONT | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
+EXSTYLE WS_EX_TOOLWINDOW
+CAPTION "追加アイテムの確認と名称設定"
+FONT 10, "MS UI Gothic"
+BEGIN
+END
+
+IDD_CONTEXT_ITEM_DLG DIALOG  0, 0, 275, 251
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_TOOLWINDOW
+CAPTION "コンテキストメニュー編集"
+FONT 10, "MS UI Gothic"
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,138,234,48,12
+    PUSHBUTTON      "キャンセル",IDCANCEL,198,234,48,12
+    CONTROL         "",IDLV_MENU_ALLITEM,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_ALIGNLEFT | LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,6,18,102,210
+    PUSHBUTTON      "→",IDB_MENUITEM_ADD,114,96,24,12
+    PUSHBUTTON      "←",IDB_MENUITEM_DEL,114,126,24,12
+    CONTROL         "",IDLV_MENU_BUILDX,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_ALIGNLEFT | LVS_NOCOLUMNHEADER | LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,144,18,102,210
+    PUSHBUTTON      "↑",IDB_MENUITEM_SPINUP,252,96,18,18
+    PUSHBUTTON      "↓",IDB_MENUITEM_SPINDOWN,252,120,18,18
+    LTEXT           "全項目",IDC_STATIC,6,6,54,8
+    LTEXT           "メニュー状態",IDC_STATIC,144,6,66,8
+END
+
+IDD_FIND_STRING_DLG DIALOG 0, 0, 179, 150
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_TOOLWINDOW
+CAPTION "文字列検索"
+FONT 10, "MS UI Gothic"
+BEGIN
+    PUSHBUTTON      "検索開始",IDOK,90,126,54,18
+    PUSHBUTTON      "ハイライト解除",IDB_FIND_CLEAR,6,132,54,12
+    EDITTEXT        IDE_FIND_TEXT,12,18,156,12,ES_AUTOHSCROLL
+    GROUPBOX        "検索する文字列",IDC_STATIC,6,6,168,30
+    GROUPBOX        "検索範囲",IDC_STATIC,6,42,168,30
+    COMBOBOX        IDCB_FIND_TARGET,12,54,156,30,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    GROUPBOX        "検索条件",IDC_STATIC,6,78,168,42
+    CONTROL         "\\n = 改行、\\\\ = \\ として検索（半角で指定）",IDCB_MOD_CRLF_YEN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,90,156,8
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 2011,1118,2230,920
+ PRODUCTVERSION 0,24,1,920
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x411, 1200
+    END
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "041104b0"
+        BEGIN
+            VALUE "Comments", "Japanese Only, Perfectly No Warranty"
+            VALUE "CompanyName", "I love 2ch, Yaruo and TohoProject"
+            VALUE "LegalCopyright", "Copyright (C) 2011 SikigamiHNQ"
+            VALUE "LegalTrademarks", "License : GPLv3"
+            VALUE "PrivateBuild", "Build by Visual Studio 2008"
+            VALUE "SpecialBuild", "Not Speciality"
+            VALUE "FileVersion", "2011.1118.2230.920"
+            VALUE "ProductVersion", "0.24.1.920"
+            VALUE "FileDescription", "AsciiArt Editor by Orinrin!"
+            VALUE "OriginalFilename", "OrinrinEditor.exe"
+            VALUE "InternalName", "Orinrin Editor"
+            VALUE "ProductName", "Orinrin Editor"
+        END
+    END
+END
+
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#ifndef APSTUDIO_INVOKED\r\n"
+    "#include ""targetver.h""\r\n"
+    "#endif\r\n"
+    "#define APSTUDIO_HIDDEN_SYMBOLS\r\n"
+    "#include ""windows.h""\r\n"
+    "#undef APSTUDIO_HIDDEN_SYMBOLS\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDBMP_ALLSELECT         BITMAP                  "resource\\AllSelect.bmp"
+IDBMQ_ALLSELECT         BITMAP                  "resource\\AllSelect_q.bmp"
+IDBMP_BOXSELECT         BITMAP                  "resource\\BoxSelect.bmp"
+IDBMQ_BOXSELECT         BITMAP                  "resource\\BoxSelect_q.bmp"
+IDBMP_BRUSH_MODE        BITMAP                  "resource\\BrushMode.bmp"
+IDBMQ_BRUSH_MODE        BITMAP                  "resource\\BrushMode_q.bmp"
+IDBMP_COLOURTAG         BITMAP                  "resource\\ColourTag.bmp"
+IDBMQ_COLOURTAG         BITMAP                  "resource\\ColourTag_q.bmp"
+IDBMP_COPY              BITMAP                  "resource\\Copy.bmp"
+IDBMQ_COPY              BITMAP                  "resource\\Copy_q.bmp"
+IDBMP_CUT               BITMAP                  "resource\\Cut.bmp"
+IDBMQ_CUT               BITMAP                  "resource\\Cut_q.bmp"
+IDBMP_DELETE            BITMAP                  "resource\\Delete.bmp"
+IDBMQ_DELETE            BITMAP                  "resource\\Delete_q.bmp"
+IDBMP_DECREMENT_DOT     BITMAP                  "resource\\DecrementDot.bmp"
+IDBMQ_DECREMENT_DOT     BITMAP                  "resource\\DecrementDot_q.bmp"
+IDBMP_EXTRACT           BITMAP                  "resource\\Extract.bmp"
+IDBMQ_EXTRACT           BITMAP                  "resource\\Extract_q.bmp"
+IDBMP_EXTRACTLAYER      BITMAP                  "resource\\ExtractLayer.bmp"
+IDBMQ_EXTRACTLAYER      BITMAP                  "resource\\ExtractLayer_q.bmp"
+IDBMP_FILE_NEW          BITMAP                  "resource\\FileCreate.bmp"
+IDBMQ_FILE_NEW          BITMAP                  "resource\\FileCreate_q.bmp"
+IDBMP_FILE_OPEN         BITMAP                  "resource\\FileOpen.bmp"
+IDBMQ_FILE_OPEN         BITMAP                  "resource\\FileOpen_q.bmp"
+IDBMP_FILE_SAVE         BITMAP                  "resource\\FileSave.bmp"
+IDBMQ_FILE_SAVE         BITMAP                  "resource\\FileSave_q.bmp"
+IDBMP_FRAME_INSERT      BITMAP                  "resource\\Frame.bmp"
+IDBMQ_FRAME_INSERT      BITMAP                  "resource\\Frame_q.bmp"
+IDBMP_HEADSPACEADD      BITMAP                  "resource\\HeadSpaceAdd.bmp"
+IDBMQ_HEADSPACEADD      BITMAP                  "resource\\HeadSpaceAdd_q.bmp"
+IDBMP_HEADSPACEDEL      BITMAP                  "resource\\HeadSpaceDel.bmp"
+IDBMQ_HEADSPACEDEL      BITMAP                  "resource\\HeadSpaceDel_q.bmp"
+IDBMP_INCREMENT_DOT     BITMAP                  "resource\\IncrementDot.bmp"
+IDBMQ_INCREMENT_DOT     BITMAP                  "resource\\IncrementDot_q.bmp"
+IDBMP_LAAYEROVERWRITE   BITMAP                  "resource\\LaayerOverWrite.bmp"
+IDBMQ_LAAYEROVERWRITE   BITMAP                  "resource\\LaayerOverWrite_q.bmp"
+IDBMP_LAYERBOX          BITMAP                  "resource\\LayerBox.bmp"
+IDBMQ_LAYERBOX          BITMAP                  "resource\\LayerBox_q.bmp"
+IDBMP_LAYERINSERT       BITMAP                  "resource\\LayerInsert.bmp"
+IDBMQ_LAYERINSERT       BITMAP                  "resource\\LayerInsert_q.bmp"
+IDBMP_LAYERTEXTEDIT     BITMAP                  "resource\\LayerTextEdit.bmp"
+IDBMQ_LAYERTEXTEDIT     BITMAP                  "resource\\LayerTextEdit_q.bmp"
+IDBMP_LINESSHIFTLEFT    BITMAP                  "resource\\LinesShiftLeft.bmp"
+IDBMQ_LINESSHIFTLEFT    BITMAP                  "resource\\LinesShiftLeft_q.bmp"
+IDBMP_LINESSHIFTRIGHT   BITMAP                  "resource\\LinesShiftRight.bmp"
+IDBMQ_LINESSHIFTRIGHT   BITMAP                  "resource\\LinesShiftRight_q.bmp"
+IDBMP_PAGECOMBINE       BITMAP                  "resource\\PageCombine.bmp"
+IDBMQ_PAGECOMBINE       BITMAP                  "resource\\PageCombine_q.bmp"
+IDBMP_PAGECREATE        BITMAP                  "resource\\PageCreate.bmp"
+IDBMQ_PAGECREATE        BITMAP                  "resource\\PageCreate_q.bmp"
+IDBMP_PAGEDELETE        BITMAP                  "resource\\PageDelete.bmp"
+IDBMQ_PAGEDELETE        BITMAP                  "resource\\PageDelete_q.bmp"
+IDBMP_PAGEDIVIDE        BITMAP                  "resource\\PageDivide.bmp"
+IDBMQ_PAGEDIVIDE        BITMAP                  "resource\\PageDivide_q.bmp"
+IDBMP_PAGEDUPLICATE     BITMAP                  "resource\\PageDuplicate.bmp"
+IDBMQ_PAGEDUPLICATE     BITMAP                  "resource\\PageDuplicate_q.bmp"
+IDBMP_PAGEINSERT        BITMAP                  "resource\\PageInsert.bmp"
+IDBMQ_PAGEINSERT        BITMAP                  "resource\\PageInsert_q.bmp"
+IDBMP_PAGENAMECHANGE    BITMAP                  "resource\\PageNameChange.bmp"
+IDBMQ_PAGENAMECHANGE    BITMAP                  "resource\\PageNameChange_q.bmp"
+IDBMP_PAGESJISCOPY      BITMAP                  "resource\\PageSjisCopy.bmp"
+IDBMQ_PAGESJISCOPY      BITMAP                  "resource\\PageSjisCopy_q.bmp"
+IDBMP_PAGEUNDERSHIFT    BITMAP                  "resource\\PageUnderShift.bmp"
+IDBMQ_PAGEUNDERSHIFT    BITMAP                  "resource\\PageUnderShift_q.bmp"
+IDBMP_PAGEUPPERSHIFT    BITMAP                  "resource\\PageUpperShift.bmp"
+IDBMQ_PAGEUPPERSHIFT    BITMAP                  "resource\\PageUpperShift_q.bmp"
+IDBMP_PASTE             BITMAP                  "resource\\Paste.bmp"
+IDBMQ_PASTE             BITMAP                  "resource\\Paste_q.bmp"
+IDBMP_PREVIEW           BITMAP                  "resource\\Preview.bmp"
+IDBMQ_PREVIEW           BITMAP                  "resource\\Preview_q.bmp"
+IDBMP_PREVIEW_ALL       BITMAP                  "resource\\PreviewAll.bmp"
+IDBMQ_PREVIEW_ALL       BITMAP                  "resource\\PreviewAll_q.bmp"
+IDBMP_REDO              BITMAP                  "resource\\Redo.bmp"
+IDBMQ_REDO              BITMAP                  "resource\\Redo_q.bmp"
+IDBMP_REFRESH           BITMAP                  "resource\\Refresh.bmp"
+IDBMQ_REFRESH           BITMAP                  "resource\\Refresh_q.bmp"
+IDBMP_RIGHTGUIDE        BITMAP                  "resource\\RightGuide.bmp"
+IDBMQ_RIGHTGUIDE        BITMAP                  "resource\\RightGuide_q.bmp"
+IDBMP_RIGHTSLIDE        BITMAP                  "resource\\RightShift.bmp"
+IDBMQ_RIGHTSLIDE        BITMAP                  "resource\\RightShift_q.bmp"
+IDBMP_SETTING           BITMAP                  "resource\\Setting.bmp"
+IDBMQ_SETTING           BITMAP                  "resource\\Setting_q.bmp"
+IDBMP_SJISCOPY          BITMAP                  "resource\\SJIScopy.bmp"
+IDBMQ_SJISCOPY          BITMAP                  "resource\\SJIScopy_q.bmp"
+IDBMP_TAILLETTERDEL     BITMAP                  "resource\\TailLetterDel.bmp"
+IDBMQ_TAILLETTERDEL     BITMAP                  "resource\\TailLetterDel_q.bmp"
+IDBMP_TAILSPACEDEL      BITMAP                  "resource\\TailSpaceDel.bmp"
+IDBMQ_TAILSPACEDEL      BITMAP                  "resource\\TailSpaceDel_q.bmp"
+IDBMP_TRACEMODE         BITMAP                  "resource\\TraceMode.bmp"
+IDBMQ_TRACEMODE         BITMAP                  "resource\\TraceMode_q.bmp"
+IDBMP_UNDO              BITMAP                  "resource\\Undo.bmp"
+IDBMQ_UNDO              BITMAP                  "resource\\Undo_q.bmp"
+IDBMP_UNIPALETTE        BITMAP                  "resource\\UniPalette.bmp"
+IDBMQ_UNIPALETTE        BITMAP                  "resource\\UniPalette_q.bmp"
+IDBMP_UNISPACE          BITMAP                  "resource\\UniSpace.bmp"
+IDBMQ_UNISPACE          BITMAP                  "resource\\UniSpace_q.bmp"
+IDBMP_USERDEF           BITMAP                  "resource\\UserDef.bmp"
+IDBMQ_USERDEF           BITMAP                  "resource\\UserDef_q.bmp"
+IDBMP_FRMINS_ALPHA      BITMAP                  "resource\\Box1.bmp"
+IDBMP_FRMINS_BRAVO      BITMAP                  "resource\\Box2.bmp"
+IDBMP_FRMINS_CHARLIE    BITMAP                  "resource\\Box3.bmp"
+IDBMP_FRMINS_DELTA      BITMAP                  "resource\\Box4.bmp"
+IDBMP_FRMINS_ECHO       BITMAP                  "resource\\Box5.bmp"
+IDBMP_FRMINS_FOXTROT    BITMAP                  "resource\\Box6.bmp"
+IDBMP_FRMINS_GOLF       BITMAP                  "resource\\Box7.bmp"
+IDBMP_FRMINS_HOTEL      BITMAP                  "resource\\Box8.bmp"
+IDBMP_FRMINS_INDIA      BITMAP                  "resource\\Box9.bmp"
+IDBMP_FRMINS_JULIETTE   BITMAP                  "resource\\Box10.bmp"
+IDBMQ_FRMINS_SEL        BITMAP                  "resource\\Box_q.bmp"
+IDBMP_FRMINS_INSERT     BITMAP                  "resource\\BoxInsert.bmp"
+IDBMQ_FRMINS_INSERT     BITMAP                  "resource\\BoxInsert_q.bmp"
+IDBMP_MOZI_SCRIPT       BITMAP                  "resource\\MoziScript.bmp"
+IDBMQ_MOZI_SCRIPT       BITMAP                  "resource\\MoziScript_q.bmp"
+IDBMP_MOZI_WRITE        BITMAP                  "resource\\MoziWrite.bmp"
+IDBMP_MOZI_ADVANCE      BITMAP                  "resource\\MoziAdv.bmp"
+IDBMQ_MOZI_ADVANCE      BITMAP                  "resource\\MoziAdv_q.bmp"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE 
+BEGIN
+    IDS_APP_TITLE           "OrinrinEditor"
+    IDC_ORINRINEDITOR       "ORINRINEDITOR"
+END
+
+#endif    // 日本語 resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

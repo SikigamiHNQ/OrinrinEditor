@@ -1,0 +1,1513 @@
+/*! @file
+	@brief ツリービューとお気に入り、タブの制御をします
+	このファイルは MaaTreeView.cpp です。
+	@author	SikigamiHNQ
+	@date	2011/06/22
+*/
+//-------------------------------------------------------------------------------------------------
+
+
+
+#include "stdafx.h"
+#include "OrinrinEditor.h"
+#include "MaaTemplate.h"
+//-------------------------------------------------------------------------------------------------
+
+//	複数ファイル保持のアレ
+typedef struct tagMULTIPLEMAA
+{
+	INT		dTabNum;				//!<	タブの番号・２インデックス
+	TCHAR	atFilePath[MAX_PATH];	//!<	ファイルパス・空なら使用から開いた
+	TCHAR	atBase[MAX_PATH];		//!<	使用リストに入れる時のグループ名
+
+	UINT	dLastTop;				//!<	見てたAAの番号
+
+} MULTIPLEMAA, *LPMULTIPLEMAA;
+
+//-------------------------------------------------------------------------------------------------
+
+extern  HWND		ghSplitaWnd;	//	スプリットバーハンドル
+
+static HFONT		ghTabFont;
+
+static  HWND		ghTabWnd;		//!<	選択タブのハンドル
+
+static  HWND		ghFavLtWnd;		//!<	よく使う奴を登録するリストボックス
+
+static  HWND		ghTreeWnd;		//!<	ツリーのハンドル
+static HTREEITEM	ghTreeRoot;		//!<	ツリーのルートアイテム
+
+static HIMAGELIST	ghImageList, ghOldIL;	//!<	ツリービューにくっつけるイメージリスト
+
+static TCHAR		gatAARoot[MAX_PATH];	//!<	ＡＡディレクトリのカレント
+static TCHAR		gatBaseName[MAX_PATH];	//!<	使用リストに入れる時のグループ名
+
+static INT			gixUseTab;	//!<	今開いてるの・０ツリー　１お気に入り　２～複数ファイル
+//	タブ番号であることに注意・複数ファイルリストの割当番号ではない
+
+static WNDPROC	gpfOriginFavListProc;	
+static WNDPROC	gpfOriginTreeViewProc;	
+static WNDPROC	gpfOriginTabMultiProc;	
+
+
+list<MULTIPLEMAA>	gltMultiFiles;	//!<	複数ファイルの保持
+typedef  list<MULTIPLEMAA>::iterator	MLTT_ITR;
+//-------------------------------------------------------------------------------------------------
+
+#ifdef MAA_PROFILE
+UINT	TreeItemFromSql( LPCTSTR, HTREEITEM, UINT );
+#else
+HRESULT	TreeItemFind( LPCTSTR, HTREEITEM, UINT );	//!<	
+#endif
+
+INT		TreeSelItemProc( HWND, HTREEITEM, UINT );	//!<	
+
+HRESULT	TabMultipleRestore( HWND );
+INT		TabMultipleSelect( HWND, INT, UINT );	//!<	
+//INT	TabMultipleOpen( HWND , HTREEITEM );	//!<	
+HRESULT	TabMultipleAppend( HWND );				//!<	
+HRESULT	TabMultipleDelete( HWND, CONST INT );	//!<	
+
+UINT	TabMultipleIsFavTab( INT, LPTSTR, UINT_PTR );
+
+
+LRESULT	CALLBACK gpfFavListProc( HWND, UINT, WPARAM, LPARAM );	//	
+LRESULT	CALLBACK gpfTreeViewProc( HWND, UINT, WPARAM, LPARAM );	//	
+LRESULT	CALLBACK gpfTabMultiProc( HWND, UINT, WPARAM, LPARAM );	//	
+//-------------------------------------------------------------------------------------------------
+
+/*!
+	ツリービューとかを作る
+	@param[in]	hWnd	親ウインドウハンドル・NULLで破壊処理
+	@param[in]	hInst	アプリの実存
+	@param[in]	ptRect	メインウインドウの位置と大きさ
+	@return		HRESULT	終了状態コード
+*/
+HRESULT TreeInitialise( HWND hWnd, HINSTANCE hInst, LPRECT ptRect )
+{
+	TCITEM		stTcItem;
+	RECT		itRect, clRect;
+
+	SHFILEINFO	stShFileInfo;
+
+	//	破壊するとき
+	if( !(hWnd) )
+	{
+		SetWindowFont( ghTabWnd, GetStockFont(DEFAULT_GUI_FONT), FALSE );
+		DeleteFont( ghTabFont );
+
+		//	開いてる副タブをINIに保存
+		TabMultipleStore( hWnd );
+
+		return S_OK;
+	}
+
+	//ghImageList = ImageList_Create( 16, 16, (ILC_COLOR4|ILC_MASK), 2, 1 );
+	//ImageList_AddIcon( ghImageList, LoadIcon( NULL, IDI_QUESTION ) );
+	//ImageList_AddIcon( ghImageList, LoadIcon( NULL, IDI_ASTERISK ) );
+
+	ghTabFont = CreateFont( 14, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE, DEFAULT_CHARSET, OUT_OUTLINE_PRECIS, CLIP_DEFAULT_PRECIS, PROOF_QUALITY, VARIABLE_PITCH, TEXT("MS UI Gothic") );
+
+
+	gixUseTab = ACT_ALLTREE;
+
+	ZeroMemory( gatAARoot, sizeof(gatAARoot) );
+
+	GetClientRect( hWnd, &clRect );
+
+//表示選択タブ
+	ghTabWnd = CreateWindowEx( 0, WC_TABCONTROL, TEXT("treetab"),
+		WS_VISIBLE | WS_CHILD | WS_CLIPSIBLINGS | TCS_RIGHTJUSTIFY | TCS_MULTILINE,
+		0, 0, TREE_WIDTH, 0, hWnd, (HMENU)IDTB_TREESEL, hInst, NULL );	//	TCS_SINGLELINE
+	SetWindowFont( ghTabWnd, ghTabFont, FALSE );
+
+	ZeroMemory( &stTcItem, sizeof(stTcItem) );
+	stTcItem.mask = TCIF_TEXT;
+	stTcItem.pszText = TEXT("全て");	TabCtrl_InsertItem( ghTabWnd, 0, &stTcItem );
+	stTcItem.pszText = TEXT("使用");	TabCtrl_InsertItem( ghTabWnd, 1, &stTcItem );
+
+	//	選ばれしファイルをタブ的に追加？　タブ幅はウインドウ幅
+
+	TabCtrl_GetItemRect( ghTabWnd, 1, &itRect );
+	itRect.bottom -= itRect.top;
+
+	itRect.right -= itRect.left;
+	itRect.top = 0;
+	itRect.left = 0;
+	TabCtrl_AdjustRect( ghTabWnd, 0, &itRect );
+
+	MoveWindow( ghTabWnd, 0, 0, clRect.right, itRect.top, TRUE );
+
+	//	サブクラス化
+	gpfOriginTabMultiProc =SubclassWindow( ghTabWnd, gpfTabMultiProc );
+
+//お気に入り用リストボックス
+	ghFavLtWnd = CreateWindowEx( WS_EX_CLIENTEDGE, WC_LISTBOX, TEXT("favlist"),
+		WS_CHILD | WS_VSCROLL | LBS_NOTIFY | LBS_SORT | LBS_NOINTEGRALHEIGHT,
+		0, itRect.bottom, TREE_WIDTH, ptRect->bottom-itRect.bottom-1, hWnd, (HMENU)IDLB_FAVLIST, hInst, NULL );
+
+	//	サブクラス化
+	gpfOriginFavListProc = SubclassWindow( ghFavLtWnd, gpfFavListProc );
+
+
+//全ＡＡリストツリー
+	ghImageList = (HIMAGELIST)SHGetFileInfo( TEXT(""), 0, &stShFileInfo, sizeof(SHFILEINFO), (SHGFI_SYSICONINDEX|SHGFI_SMALLICON) );
+
+	ghTreeWnd = CreateWindowEx( WS_EX_CLIENTEDGE, WC_TREEVIEW, TEXT("itemtree"),
+		WS_VISIBLE | WS_CHILD | TVS_DISABLEDRAGDROP | TVS_HASBUTTONS | TVS_HASLINES | TVS_LINESATROOT | TVS_SHOWSELALWAYS,
+		0, itRect.bottom, TREE_WIDTH, ptRect->bottom-itRect.bottom-1, hWnd, (HMENU)IDTV_ITEMTREE, hInst, NULL );
+	TreeView_SetImageList( ghTreeWnd, ghImageList, TVSIL_NORMAL );
+
+	//	サブクラス化
+	gpfOriginTreeViewProc = SubclassWindow( ghTreeWnd, gpfTreeViewProc );
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+
+/*!
+	お気にリストのサブクラスプロシージャ
+	@param[in]	hWnd	リストのハンドル
+	@param[in]	msg		ウインドウメッセージの識別番号
+	@param[in]	wParam	追加の情報１
+	@param[in]	lParam	追加の情報２
+	@return	処理結果とか
+*/
+LRESULT CALLBACK gpfFavListProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
+{
+	UINT	ulRslt;
+
+	switch( msg )
+	{
+		HANDLE_MSG( hWnd, WM_CHAR, Maa_OnChar );		//	
+
+		case WM_MOUSEWHEEL:
+			ulRslt = Maa_OnMouseWheel( hWnd, (int)(short)LOWORD(lParam), (int)(short)HIWORD(lParam), (int)(short)HIWORD(wParam), (UINT)(short)LOWORD(wParam) );
+			if( ulRslt )	return 0;
+			break;
+
+		default:	break;
+	}
+
+	return CallWindowProc( gpfOriginFavListProc, hWnd, msg, wParam, lParam );
+}
+//-------------------------------------------------------------------------------------------------
+
+
+/*!
+	ツリービューのサブクラスプロシージャ
+	@param[in]	hWnd	リストのハンドル
+	@param[in]	msg		ウインドウメッセージの識別番号
+	@param[in]	wParam	追加の情報１
+	@param[in]	lParam	追加の情報２
+	@return	処理結果とか
+*/
+LRESULT CALLBACK gpfTreeViewProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
+{
+	UINT	ulRslt;
+
+	switch( msg )
+	{
+		HANDLE_MSG( hWnd, WM_CHAR, Maa_OnChar );		//	
+
+		case WM_MOUSEWHEEL:
+			ulRslt = Maa_OnMouseWheel( hWnd, (int)(short)LOWORD(lParam), (int)(short)HIWORD(lParam), (int)(short)HIWORD(wParam), (UINT)(short)LOWORD(wParam) );
+			if( ulRslt )	return 0;
+			break;
+
+		default:	break;
+	}
+
+	return CallWindowProc( gpfOriginTreeViewProc, hWnd, msg, wParam, lParam );
+}
+//-------------------------------------------------------------------------------------------------
+
+/*!
+	マルチプルタブのサブクラスプロシージャ
+	@param[in]	hWnd	リストのハンドル
+	@param[in]	msg		ウインドウメッセージの識別番号
+	@param[in]	wParam	追加の情報１
+	@param[in]	lParam	追加の情報２
+	@return	処理結果とか
+*/
+LRESULT	CALLBACK gpfTabMultiProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
+{
+	switch( msg )
+	{
+		HANDLE_MSG( hWnd, WM_CHAR, Maa_OnChar );
+		default:	break;
+	}
+
+	return CallWindowProc( gpfOriginTabMultiProc, hWnd, msg, wParam, lParam );
+}
+//-------------------------------------------------------------------------------------------------
+
+/*!
+	MAAのどっかで文字キーオサレが発生
+	@param[in]	hWnd	ウインドウハンドル・発生源に注意
+	@param[in]	ch		押された文字
+	@param[in]	cRepeat	キーリピート回数・効いてない？
+	@return		無し
+*/
+VOID Maa_OnChar( HWND hWnd, TCHAR ch, INT cRepeat )
+{
+	BOOLEAN	bShift;
+	NMHDR	stNmHdr;
+	INT		iTabs, iTarget;
+
+	bShift = (0x8000 & GetKeyState(VK_SHIFT)) ? TRUE : FALSE;
+
+	TRACE( TEXT("CHAR[%04X][%d]"), ch, bShift );
+
+	if( VK_TAB != ch )	return;
+
+	iTabs = TabCtrl_GetItemCount( ghTabWnd );
+
+	if( bShift )	//	逆回し
+	{
+		iTarget = gixUseTab - 1;
+		if( 0 > iTarget ){	iTarget = iTabs - 1;	}
+	}
+	else
+	{
+		iTarget = gixUseTab + 1;
+		if( iTabs <=  iTarget ){	iTarget = 0;	}
+	}
+
+	TabCtrl_SetCurSel( ghTabWnd, iTarget );
+
+	stNmHdr.hwndFrom = ghTabWnd;
+	stNmHdr.idFrom   = IDTB_TREESEL;
+	stNmHdr.code     = TCN_SELCHANGE;
+
+	TabBarNotify( hWnd, &stNmHdr );
+
+	return;
+}
+//-------------------------------------------------------------------------------------------------
+
+/*!
+	コンテキストメニュー呼びだしアクション(要は右クルック）
+	@param[in]	hWnd		ウインドウハンドル
+	@param[in]	hWndContext	コンテキストが発生したウインドウのハンドル
+	@param[in]	xPos		スクリーンＸ座標
+	@param[in]	yPos		スクリーンＹ座業
+	@return		無し
+*/
+VOID Maa_OnContextMenu( HWND hWnd, HWND hWndContext, UINT xPos, UINT yPos )
+{
+	HMENU	hMenu, hSubMenu;
+	UINT	dRslt;
+	INT		curSel;
+	TCHAR	atText[MAX_PATH], atName[MAX_PATH];
+	LPARAM	lPrm;
+	UINT_PTR	cchSize;
+//#ifndef _ORRVW
+	LONG_PTR	rdExStyle;
+	TCHAR	atSelName[MAX_PATH], atMenuStr[MAX_PATH];
+	MULTIPLEMAA	stMulti;
+//#endif
+	POINT			stPost;
+	TVHITTESTINFO	stTvHitInfo;
+	TCHITTESTINFO	stTcHitInfo;
+	TCITEM			stTcItem;
+	MENUITEMINFO	stMenuItemInfo;
+	HTREEITEM		hTvHitItem;
+
+
+	stPost.x = (SHORT)xPos;	//	画面座標はマイナスもありうる
+	stPost.y = (SHORT)yPos;
+
+	TRACE( TEXT("MAAコンテキストメニュー") );
+
+//#ifndef _ORRVW
+	//	お気にリストボックスのコンテキスト
+	if( ghFavLtWnd == hWndContext )
+	{
+		ZeroMemory( atSelName, sizeof(atSelName) );
+		ZeroMemory( atMenuStr, sizeof(atMenuStr) );
+
+		curSel = ListBox_GetCurSel( ghFavLtWnd );
+		TRACE( TEXT("リストボックスコンテキスト %d"), curSel );
+		if( 0 > curSel )	return;
+
+		ListBox_GetText( ghFavLtWnd, curSel, atSelName );
+		StringCchPrintf( atMenuStr, MAX_PATH, TEXT("[ %s ]で副タブを追加"), atSelName );
+
+		hMenu = CreatePopupMenu(  );
+		//	お気にリストのセットを副タブに表示する機能
+		AppendMenu( hMenu, MF_STRING, IDM_AATREE_SUBADD, atMenuStr );
+
+		dRslt = TrackPopupMenu( hMenu, TPM_RETURNCMD, stPost.x, stPost.y, 0, hWnd, NULL );
+		if( IDM_AATREE_SUBADD == dRslt )
+		{
+			ZeroMemory( &stMulti, sizeof(MULTIPLEMAA) );
+			StringCchCopy( stMulti.atBase, MAX_PATH, atSelName );
+			//	atFilePathを空にすることで、使用リストからってことで
+			stMulti.dTabNum = 0;	//	初期化・割当は２以降
+
+			gltMultiFiles.push_back( stMulti );
+			TabMultipleAppend( hWnd );
+		}
+		DestroyMenu( hMenu );
+		return;
+	}
+//#endif
+
+	//	ツリービューのコンテキスト
+	if( ghTreeWnd == hWndContext )
+	{
+		hMenu = LoadMenu( GetModuleHandle(NULL), MAKEINTRESOURCE(IDM_AATREE_POPUP) );
+		hSubMenu = GetSubMenu( hMenu, 0 );
+
+#ifndef MAA_PROFILE
+		DeleteMenu( hSubMenu, 2, MF_BYPOSITION );
+		DeleteMenu( hSubMenu, 1, MF_BYPOSITION );
+		DeleteMenu( hSubMenu, 0, MF_BYPOSITION );
+#endif
+		stTvHitInfo.pt = stPost;
+		ScreenToClient( ghTreeWnd, &(stTvHitInfo.pt) );
+		hTvHitItem = TreeView_HitTest( ghTreeWnd, &stTvHitInfo );
+
+		//	選択されたやつのファイル名、もしくはディレクトリ名確保
+		lPrm = TreeItemInfoGet( hTvHitItem, atName, MAX_PATH );
+		StringCchCat( atName, MAX_PATH, TEXT(" の操作") );
+		//	名称を明示しておく
+		ModifyMenu( hSubMenu, IDM_DUMMY, MF_BYCOMMAND | MF_STRING | MF_GRAYED, IDM_DUMMY, atName );
+//		EnableMenuItem( hSubMenu, IDM_DUMMY, MF_GRAYED );
+		if( lPrm )	//	Directoryなら
+		{
+			EnableMenuItem( hSubMenu, IDM_AATREE_MAINOPEN, MF_GRAYED );
+			EnableMenuItem( hSubMenu, IDM_AATREE_SUBADD, MF_GRAYED );
+			EnableMenuItem( hSubMenu, IDM_AATREE_GOEDIT, MF_GRAYED );
+			EnableMenuItem( hSubMenu, IDM_MAA_IADD_OPEN, MF_GRAYED );
+		}
+
+		//	右クリではノード選択されないようだ
+		dRslt = TrackPopupMenu( hSubMenu, TPM_RETURNCMD, stPost.x, stPost.y, 0, hWnd, NULL );	//	TPM_CENTERALIGN | TPM_VCENTERALIGN | 
+		DestroyMenu( hMenu );
+		switch( dRslt )
+		{
+#if defined(MAA_PROFILE) && !defined(_ORRVW)
+			//	プロフファイル開く
+			case IDM_MAA_PROFILE_MAKE:	TreeProfileOpen( hWnd );	break;
+
+			//	ディレクトリ系を再セット	ディレクトリ設定ダイヤログを開く
+			case IDM_TREE_RECONSTRUCT:	TreeProfileRebuild( hWnd  );	break;
+#endif
+			case IDM_AATREE_MAINOPEN:	TreeSelItemProc( hWnd, hTvHitItem , 0 );	break;
+			case  IDM_AATREE_SUBADD:	TreeSelItemProc( hWnd, hTvHitItem , 1 );	break;
+#ifndef _ORRVW
+			case  IDM_AATREE_GOEDIT:	TreeSelItemProc( hWnd, hTvHitItem , 2 );	break;
+#endif
+			case  IDM_MAA_IADD_OPEN:	TreeSelItemProc( hWnd, hTvHitItem , 3 );	break;
+
+			default:	break;
+		}
+
+		return;
+	}
+
+	//	タブバーのコンテキスト
+	if( ghTabWnd == hWndContext )
+	{
+		stTcHitInfo.pt = stPost;
+		ScreenToClient( ghTabWnd, &(stTcHitInfo.pt) );
+		curSel = TabCtrl_HitTest( ghTabWnd, &stTcHitInfo );
+
+		//	固定の二つの場合は無視
+		if( 1 >= curSel )	return;
+
+		hMenu = LoadMenu( GetModuleHandle(NULL), MAKEINTRESOURCE(IDM_AATABS_POPUP) );
+		hSubMenu = GetSubMenu( hMenu, 0 );
+
+		ZeroMemory( &stTcItem, sizeof(TCITEM) );
+		stTcItem.mask       = TCIF_TEXT;
+		stTcItem.pszText    = atText;
+		stTcItem.cchTextMax = MAX_PATH;
+		TabCtrl_GetItem( ghTabWnd, curSel, &stTcItem );
+
+		StringCchCat( atText, MAX_PATH, TEXT(" を閉じる(&Q)") );
+		StringCchLength( atText, MAX_PATH, &cchSize );
+
+		ZeroMemory( &stMenuItemInfo, sizeof(MENUITEMINFO) );
+		stMenuItemInfo.cbSize     = sizeof(MENUITEMINFO);
+		stMenuItemInfo.fMask      = MIIM_TYPE;
+		stMenuItemInfo.fType      = MFT_STRING;
+		stMenuItemInfo.cch        = cchSize;
+		stMenuItemInfo.dwTypeData = atText;
+		SetMenuItemInfo( hSubMenu, IDM_AATABS_DELETE, FALSE, &stMenuItemInfo );
+
+		//もし、お気にタブなら、編集で開くは無効にする
+		if( TabMultipleIsFavTab( curSel, NULL, 0 ) )
+		{
+			EnableMenuItem( hSubMenu, IDM_AATREE_GOEDIT, MF_GRAYED );
+		}
+
+		dRslt = TrackPopupMenu( hSubMenu, TPM_RETURNCMD, stPost.x, stPost.y, 0, hWnd, NULL );
+		DestroyMenu( hMenu );
+		switch( dRslt )
+		{
+			case  IDM_AATABS_DELETE:	TabMultipleDelete( hWnd, curSel );	break;
+			case  IDM_AATREE_GOEDIT:	TabMultipleSelect( hWnd, curSel, 1 );	break;
+				//	ツリー側とはアプローチが違うから注意
+			default:	break;
+		}
+
+		return;
+	}
+
+#ifndef _ORRVW
+	//	それ以外の場所のポッパップメニュー・常に手前に表示のアレ
+	hMenu = LoadMenu( GetModuleHandle(NULL), MAKEINTRESOURCE(IDM_TEMPLATE_POPUP) );
+	hSubMenu = GetSubMenu( hMenu, 0 );
+
+	rdExStyle = GetWindowLongPtr( hWnd, GWL_EXSTYLE );
+	if( WS_EX_TOPMOST & rdExStyle ){	CheckMenuItem( hSubMenu , IDM_TOPMOST_TOGGLE, MF_BYCOMMAND | MF_CHECKED );	}
+
+	dRslt = TrackPopupMenu( hSubMenu, 0, stPost.x, stPost.y, 0, hWnd, NULL );
+	//	選択せずで０か－１？、選択したらそのメニューのＩＤでWM_COMMANDが発行
+	DestroyMenu( hMenu );
+#endif
+	return;
+}
+//-------------------------------------------------------------------------------------------------
+
+/*!
+	画面サイズが変わったのでサイズ変更
+	@param[in]	hWnd	親ウインドウハンドル
+	@param[in]	ptRect	MAAウインドウの大きさ・高さはステータスバーとタブバーの考慮ずみ
+	@return		HRESULT	終了状態コード
+*/
+HRESULT TreeResize( HWND hWnd, LPRECT ptRect )
+{
+	RECT	rect, sptRect;
+
+	//	タブバーの幅を修正
+	MaaTabBarSizeGet( &rect );
+	//MoveWindow( ghTabWnd, 0, 0, ptRect->right, rect.bottom, TRUE );
+
+
+	SplitBarPosGet( ghSplitaWnd, &sptRect );
+
+	MoveWindow( ghFavLtWnd, 0, rect.bottom, sptRect.left, ptRect->bottom, TRUE );
+	MoveWindow( ghTreeWnd,  0, rect.bottom, sptRect.left, ptRect->bottom, TRUE );
+	//	TREE_WIDTH
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+
+#if 0//def MAA_PROFILE
+
+LRESULT CALLBACK TreeTest( UINT id, UINT type, UINT prnt, LPCVOID pVoida )
+{
+//	TCHAR	atBuff[MAX_STRING];
+
+	TRACE( TEXT("%4u\t%4u\t%4u\t%s"), id, type, prnt, (LPCTSTR)pVoida );
+	
+	return 0;
+}
+//-------------------------------------------------------------------------------------------------
+
+#endif
+
+/*!
+	カレントダディレクトリを受け取って、ツリーをアッセンブリーする
+	@param[in]	hWnd		親ウインドウハンドル
+	@param[in]	ptCurrent	カレントディレクトリ名
+	@param[in]	bSubTabReb	非０で副タブ復元
+	@return		HRESULT		終了状態コード
+*/
+HRESULT TreeConstruct( HWND hWnd, LPCTSTR ptCurrent, BOOLEAN bSubTabReb )
+{
+	TVINSERTSTRUCT	stTreeIns;
+	SHFILEINFO	stShFileInfo;
+
+	ZeroMemory( gatAARoot, sizeof(gatAARoot) );
+	StringCchCopy( gatAARoot, MAX_PATH, ptCurrent );
+
+	StatusBarMsgSet( 2, TEXT("ツリーを構築中です") );
+
+	TreeView_DeleteAllItems( ghTreeWnd );
+	//	ルートアイテム作る
+	ZeroMemory( &stTreeIns, sizeof(TVINSERTSTRUCT) );
+	stTreeIns.hParent      = TVI_ROOT;
+	stTreeIns.hInsertAfter = TVI_SORT;
+	stTreeIns.item.mask    = TVIF_TEXT | TVIF_PARAM | TVIF_IMAGE | TVIF_SELECTEDIMAGE;
+	stTreeIns.item.pszText = TEXT("ROOT");
+	stTreeIns.item.lParam  = 1;
+
+	SHGetFileInfo( TEXT(""), 0, &stShFileInfo, sizeof(SHFILEINFO), (SHGFI_SYSICONINDEX|SHGFI_SMALLICON) );
+	stTreeIns.item.iImage = stShFileInfo.iIcon;
+	SHGetFileInfo( TEXT(""), 0, &stShFileInfo, sizeof(SHFILEINFO), (SHGFI_SYSICONINDEX|SHGFI_SMALLICON|SHGFI_OPENICON) );
+	stTreeIns.item.iSelectedImage = stShFileInfo.iIcon;
+
+	ghTreeRoot = TreeView_InsertItem( ghTreeWnd, &stTreeIns );
+
+	//	ディレクトリ指定が無かったら終わり
+	if( 0 == ptCurrent[0] )
+	{
+		StatusBarMsgSet( 2, TEXT("") );
+		return E_INVALIDARG;
+	}
+
+	//	カレントダディレクトリはフルパスのはず
+
+	//	プロファイルモードなら、常にSQLからでおｋ
+
+#ifdef MAA_PROFILE
+	//	SQLから展開
+	TreeItemFromSql( ptCurrent, ghTreeRoot, 0 );
+#else
+	//	ファイルから構築
+	TreeItemFind( ptCurrent, ghTreeRoot, 0 );	//	カレント以下を再帰検索
+#endif
+
+	StatusBarMsgSet( 2, TEXT("") );
+	TreeView_Expand( ghTreeWnd, ghTreeRoot, TVE_EXPAND );
+
+	//	副タブもSQLから再構築
+	if( bSubTabReb ){	TabMultipleRestore( hWnd  );	}	//	終了時の副タブを復帰する
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+
+#ifdef MAA_PROFILE
+
+/*!
+	ディレクトリとファイルをＳＱＬからツリービューに展開・再帰に注意セヨ
+	@param[in]	ptRootName	検索するディレクトリ名
+	@param[in]	hTreeParent	対象ディレクトリのツリーアイテム・こいつにぶら下げていく
+	@param[in]	dPrntID		SQLのID・ディレクトリ番号
+	@return		UINT		最後のID
+*/
+UINT TreeItemFromSql( LPCTSTR ptRootName, HTREEITEM hTreeParent, UINT dPrntID )
+{
+	TCHAR	atPath[MAX_PATH], atNewTop[MAX_PATH], atTarget[MAX_PATH];
+	BOOL	bLooping;
+	UINT	dPnID, dTgtID, type, dPrvID;
+
+	HTREEITEM	hNewParent, hLastDir = TVI_FIRST;
+	TVINSERTSTRUCT	stTreeIns;
+	SHFILEINFO	stShFileInfo;
+
+	ZeroMemory( &stTreeIns, sizeof(TVINSERTSTRUCT) );
+	stTreeIns.hParent      = hTreeParent;
+	stTreeIns.hInsertAfter = TVI_LAST;
+	stTreeIns.item.mask    = TVIF_TEXT | TVIF_PARAM | TVIF_IMAGE | TVIF_SELECTEDIMAGE;
+
+	ZeroMemory( atTarget, sizeof(atTarget) );
+	dTgtID = SqlTreeNodeSelectID( dPrntID, &type, &dPnID, atTarget, 1 );
+	//	無くなったら終わり
+	if( 0 == dTgtID )	return 0;
+	//	この時点でＩＤが異なるのは、ディレクトリ指定だけがあって、中身が無い場合
+	if( dPrntID != dPnID )	return dPrntID;
+
+	bLooping = TRUE;
+	do
+	{
+		StringCchCopy( atPath, MAX_PATH, ptRootName );
+		PathAppend( atPath, atTarget );
+
+		SHGetFileInfo( atPath, 0, &stShFileInfo, sizeof(SHFILEINFO), (SHGFI_SYSICONINDEX|SHGFI_SMALLICON) );
+		stTreeIns.item.iImage = stShFileInfo.iIcon;
+		SHGetFileInfo( atPath, 0, &stShFileInfo, sizeof(SHFILEINFO), (SHGFI_SYSICONINDEX|SHGFI_SMALLICON|SHGFI_OPENICON) );
+		stTreeIns.item.iSelectedImage = stShFileInfo.iIcon;
+		stTreeIns.item.pszText = atTarget;
+
+		if( FILE_ATTRIBUTE_DIRECTORY == type )	//	ディレクトリの場合
+		{
+			stTreeIns.item.lParam  = 1;
+			stTreeIns.hInsertAfter = hLastDir;
+			hNewParent = TreeView_InsertItem( ghTreeWnd, &stTreeIns );
+			hLastDir = hNewParent;
+
+			StringCchCopy( atNewTop, MAX_PATH, ptRootName );
+			PathAppend( atNewTop, atTarget );
+
+			dTgtID = TreeItemFromSql( atNewTop, hNewParent, dTgtID );	//	該当ディレクトリ内を再帰検索
+		}
+		else	//	ファイルの場合
+		{
+			stTreeIns.item.lParam  = 0;
+			stTreeIns.hInsertAfter = TVI_LAST;
+			hNewParent = TreeView_InsertItem( ghTreeWnd, &stTreeIns );
+		}
+
+		//	この時点でdTgtIDが０になることはない？
+
+		dPrvID = dTgtID;
+		ZeroMemory( atTarget, sizeof(atTarget) );
+//		SetLastError(0);
+		dTgtID = SqlTreeNodeSelectID( dTgtID, &type, &dPnID, atTarget, 1 );
+//中でエラー
+		TRACE( TEXT("%4u\t%4u\t%4u\t%s"), dTgtID, type, dPnID, atTarget );
+
+		if( 0 == dTgtID )	bLooping = FALSE;
+		if( dPrntID != dPnID )	bLooping = FALSE;
+	}
+	while( bLooping );
+
+	return dPrvID;
+}
+//-------------------------------------------------------------------------------------------------
+
+#else
+
+//ファイルから引っ張っている・プロファイルモードなら使わないか？
+/*!
+	ディレクトリとファイルをツリービューに展開・再帰に注意セヨ
+	@param[in]	ptRootName	検索するディレクトリ名
+	@param[in]	hTreeParent	対象ディレクトリのツリーアイテム・こいつにぶら下げていく
+	@param[in]	dPrntID		SQLのID・ディレクトリ番号
+	@return		HRESULT		終了状態コード
+*/
+HRESULT TreeItemFind( LPCTSTR ptRootName, HTREEITEM hTreeParent, UINT dPrntID )
+{
+	HANDLE	hFind;
+	TCHAR	atPath[MAX_PATH], atNewTop[MAX_PATH], atTarget[MAX_PATH];
+	BOOL	bRslt;
+	UINT	dPnID = 0;
+
+	WIN32_FIND_DATA	stFindData;
+
+	HTREEITEM	hNewParent, hLastDir = TVI_FIRST;
+	TVINSERTSTRUCT	stTreeIns;
+	SHFILEINFO	stShFileInfo;
+
+	ZeroMemory( &stTreeIns, sizeof(TVINSERTSTRUCT) );
+	stTreeIns.hParent      = hTreeParent;
+	stTreeIns.hInsertAfter = TVI_LAST;
+	stTreeIns.item.mask    = TVIF_TEXT | TVIF_PARAM | TVIF_IMAGE | TVIF_SELECTEDIMAGE;
+
+	ZeroMemory( atTarget, sizeof(atTarget) );
+	StringCchCopy( atTarget, MAX_PATH, ptRootName );
+	PathAppend( atTarget, TEXT("*") );
+
+
+	hFind = FindFirstFile( atTarget, &stFindData );	//	TEXT("*")
+	do{
+		if( lstrcmp( stFindData.cFileName, TEXT("..") ) && lstrcmp( stFindData.cFileName, TEXT(".") ) )
+		{
+			StringCchCopy( atPath, MAX_PATH, ptRootName );
+			PathAppend( atPath, stFindData.cFileName );
+
+			if( stFindData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY )
+			{	//	ディレクトリの場合
+				SHGetFileInfo( atPath, 0, &stShFileInfo, sizeof(SHFILEINFO), (SHGFI_SYSICONINDEX|SHGFI_SMALLICON) );
+				stTreeIns.item.iImage = stShFileInfo.iIcon;
+				SHGetFileInfo( atPath, 0, &stShFileInfo, sizeof(SHFILEINFO), (SHGFI_SYSICONINDEX|SHGFI_SMALLICON|SHGFI_OPENICON) );
+				stTreeIns.item.iSelectedImage = stShFileInfo.iIcon;
+
+				stTreeIns.item.pszText = stFindData.cFileName;
+				stTreeIns.item.lParam  = 1;
+				stTreeIns.hInsertAfter = hLastDir;
+				hNewParent = TreeView_InsertItem( ghTreeWnd, &stTreeIns );
+				hLastDir = hNewParent;
+
+				StringCchCopy( atNewTop, MAX_PATH, ptRootName );
+				PathAppend( atNewTop, stFindData.cFileName );
+
+				TreeItemFind( atNewTop, hNewParent, dPnID );	//	該当ディレクトリ内を再帰検索
+			}
+			else
+			{	//	ファイルの場合
+				bRslt  = PathMatchSpec( stFindData.cFileName, TEXT("*.mlt") );	//	ヒットしたらTRUE
+				bRslt |= PathMatchSpec( stFindData.cFileName, TEXT("*.ast") );	//	ヒットしたらTRUE
+				if( bRslt )	//	20110720	ASTもイケるようにする
+				{
+					SHGetFileInfo( atPath, 0, &stShFileInfo, sizeof(SHFILEINFO), (SHGFI_SYSICONINDEX|SHGFI_SMALLICON) );
+					stTreeIns.item.iImage = stShFileInfo.iIcon;
+					SHGetFileInfo( atPath, 0, &stShFileInfo, sizeof(SHFILEINFO), (SHGFI_SYSICONINDEX|SHGFI_SMALLICON|SHGFI_OPENICON) );
+					stTreeIns.item.iSelectedImage = stShFileInfo.iIcon;
+
+					stTreeIns.hInsertAfter = TVI_LAST;
+					stTreeIns.item.pszText = stFindData.cFileName;
+					stTreeIns.item.lParam  = 0;
+					hNewParent = TreeView_InsertItem( ghTreeWnd, &stTreeIns );
+				}
+			}
+		}
+
+	}while( FindNextFile( hFind, &stFindData ) );
+
+	FindClose( hFind );
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+
+#endif
+
+/*!
+	ツリーのアイテムの名前とＰＡＲＡＭ情報を確保
+	@param[in]	hTrItem	アイテムハンドル
+	@param[out]	ptName	名前を入れるバッファへのポインタ・NULLでも良い
+	@param[in]	cchName	バッファサイズ
+	@return		LPARAM	ＰＡＲＡＭ情報
+*/
+LPARAM TreeItemInfoGet( HTREEITEM hTrItem, LPTSTR ptName, size_t cchName )
+{
+	TCHAR	atBuffer[MAX_PATH];
+	TVITEM	stTvItem;
+
+	ZeroMemory( &stTvItem, sizeof(TVITEM) );
+	ZeroMemory( atBuffer, sizeof(atBuffer) );
+
+	//	名前とディレクトリかファイルかを引っ張り出す
+	stTvItem.hItem      = hTrItem;
+	stTvItem.mask       = TVIF_TEXT | TVIF_PARAM;
+	stTvItem.pszText    = atBuffer;
+	stTvItem.cchTextMax = MAX_PATH;
+	TreeView_GetItem( ghTreeWnd, &stTvItem );
+
+	if( ptName )	//	バッファが有効なら
+	{
+		ZeroMemory( ptName, sizeof(TCHAR) * cchName );
+		StringCchCopy( ptName, cchName, atBuffer );
+	}
+
+	return stTvItem.lParam;
+}
+//-------------------------------------------------------------------------------------------------
+
+/*!
+	ツリーのノーティファイメッセージの処理
+	@param[in]	hWnd		親ウインドウのハンドル
+	@param[in]	pstNmTrView	NOTIFYの詳細
+	@return		処理した内容とか
+*/
+LRESULT TreeNotify( HWND hWnd, LPNMTREEVIEW pstNmTrView )
+{
+	INT		nmCode;
+
+	HTREEITEM	hSelItem;
+
+	nmCode = pstNmTrView->hdr.code;
+
+	//	右クリックはコンテキストメニューへ
+
+	if( TVN_SELCHANGED == nmCode )	//	選択した後
+	{
+		hSelItem = TreeView_GetSelection( ghTreeWnd );	//	選択されてるアイテム
+
+		AaTitleClear(  );	//	ここでクルヤーせないかん
+
+		TreeSelItemProc( hWnd, hSelItem, 0 );
+	}
+
+	return 0;
+}
+//-------------------------------------------------------------------------------------------------
+
+/*!
+	ツリーの選択したアイテムからの処理のチェイン・操作を統合
+	@param[in]	hWnd		親ウインドウのハンドル
+	@param[in]	hSelItem	選択してるアイテム
+	@param[in]	dMode		０主タブで　１副タブで　２編集ビューで　開く　３アイテム追加
+	@return		処理した内容とか
+*/
+INT TreeSelItemProc( HWND hWnd, HTREEITEM hSelItem, UINT dMode )
+{
+	UINT	i;
+	TCHAR	atName[MAX_PATH], atPath[MAX_PATH], atBaseName[MAX_PATH];
+	LPARAM	lParam;
+#ifndef _ORRVW
+	LPARAM	dNumber;
+#endif
+	HTREEITEM	hParentItem;
+
+	MULTIPLEMAA	stMulti;
+
+	if( !(hSelItem) ){	return 0;	}	//	なんか無効なら何もしない
+
+	//	選択されたやつのファイル名、もしくはディレクトリ名確保
+	lParam = TreeItemInfoGet( hSelItem, atName, MAX_PATH );
+
+	if( lParam ){	return 0;	}	//	ディレクトリなら何もしない
+
+	//	選択した名前を確保・ルートにある場合これで適用される
+	if( 0 == dMode )
+	{
+		StringCchCopy( gatBaseName, MAX_PATH, atName );
+		StatusBarMsgSet( 2, atName );	//	ステータスバーにファイル名表示
+	}
+	else
+	{
+		StringCchCopy( atBaseName, MAX_PATH, atName );
+	}
+
+	//	ベース名を、所属するディレクトリ名にする。ルートのファイルならそのまま
+
+	//	上に辿って、ファイルパスを作る
+	for( i = 0; 12 > i; i++ )	//	１２より腐海階層はたどれない
+	{
+		hParentItem = TreeView_GetParent( ghTreeWnd, hSelItem );
+		if( !(hParentItem) )	return 0;	//	ルートの上はない・そして選択もされない
+		if( ghTreeRoot == hParentItem ){	break;	}	//	検索がルートまでイッたら終わり
+
+		TreeItemInfoGet( hParentItem, atPath, MAX_PATH );
+
+		if( 0 == i )	//	初回のみなら、所属するディレクトリ名になる	20110928
+		{
+			if( 0 == dMode ){	StringCchCopy( gatBaseName, MAX_PATH, atPath );	}
+			else{				StringCchCopy( atBaseName, MAX_PATH, atPath );	}
+		}
+
+		//	今のパスを記録していくと、最終的にルート直下のディレクトリ名になる
+		PathAppend( atPath, atName );
+		StringCchCopy( atName, MAX_PATH, atPath );
+
+		hSelItem = hParentItem;
+	}
+
+	//	ルート位置をくっつけてフルパスにする
+	StringCchCopy( atPath, MAX_PATH, gatAARoot );
+	PathAppend( atPath, atName );
+
+	switch( dMode )
+	{
+		default:	//	主タブで開く場合
+		case  0:	AaItemsDoShow( hWnd , atPath, ACT_ALLTREE );	break;	//	そのMLTを開く
+
+		case  1:	//	副タブに開く場合
+			ZeroMemory( &stMulti, sizeof(MULTIPLEMAA) );
+			StringCchCopy( stMulti.atFilePath, MAX_PATH, atPath );
+			StringCchCopy( stMulti.atBase, MAX_PATH, atBaseName );
+			stMulti.dTabNum = 0;	//	初期化・割当は２以降
+
+			gltMultiFiles.push_back( stMulti );
+			TabMultipleAppend( hWnd );
+			break;
+#ifndef _ORRVW
+		case  2:	//	編集ビューで開く場合
+			dNumber = DocFileInflate( atPath  );	//	開いて中身展開
+	#ifdef MULTI_FILE
+			if( dNumber ){	MultiFileTabAppend( dNumber, atPath );	}
+	#endif
+			break;
+
+		//	アイテム追加
+		case  3:	AacItemAdding( hWnd, atPath );	break;
+#endif
+	}
+
+	return 1;
+}
+//-------------------------------------------------------------------------------------------------
+
+/*!
+	選択しているリストの主体ディレクトリ名もしくはファイル名のバッファポインタを確保
+	@return	ポインタ
+*/
+LPTSTR TreeBaseNameGet( VOID )
+{
+	return gatBaseName;
+}
+//-------------------------------------------------------------------------------------------------
+
+
+
+
+/*!
+	タブバーのサイズを確保する
+	@param[in]	pstRect	サイズ入れるアレ
+*/
+VOID MaaTabBarSizeGet( LPRECT pstRect )
+{
+//	RECT	rect;
+	RECT	itRect;
+	LONG	height;
+
+	assert( pstRect );
+
+	pstRect->left   = 0;
+	pstRect->top    = 0;
+
+	TabCtrl_GetItemRect( ghTabWnd, 1, &itRect );
+	itRect.bottom -= itRect.top;
+	itRect.right -= itRect.left;
+	itRect.top = 0;
+	itRect.left = 0;
+	TabCtrl_AdjustRect( ghTabWnd, 0, &itRect );
+	height = itRect.top;
+	GetWindowRect( ghTabWnd, &itRect );
+	itRect.right -= itRect.left;
+
+	pstRect->right  = itRect.right;
+	pstRect->bottom = height;
+
+	//GetWindowRect( ghTabWnd, &rect );
+	//pstRect->right  = rect.right  - rect.left;
+	//pstRect->bottom = rect.bottom - rect.top;
+
+	return;
+}
+//-------------------------------------------------------------------------------------------------
+
+VOID TabBarResize( HWND hWnd, LPRECT pstRect )
+{
+	RECT	tbRect;
+
+	MoveWindow( ghTabWnd, 0, 0, pstRect->right, pstRect->bottom, TRUE );
+	MaaTabBarSizeGet( &tbRect );
+	MoveWindow( ghTabWnd, 0, 0, tbRect.right, tbRect.bottom, TRUE );
+
+	return;
+}
+//-------------------------------------------------------------------------------------------------
+
+/*!
+	タブバーのノーティファイメッセージの処理
+	@param[in]	hWnd		親ウインドウのハンドル
+	@param[in]	pstNmhdr	NOTIFYの詳細
+	@return		処理した内容とか
+*/
+LRESULT TabBarNotify( HWND hWnd, LPNMHDR pstNmhdr )
+{
+	INT		nmCode;
+	INT		curSel;
+
+	NMTREEVIEW	stNmTrView;
+
+	//pstNmhdr->hwndFrom;
+	nmCode   = pstNmhdr->code;
+
+	//	右クリックはコンテキストメニューへ
+
+	if( TCN_SELCHANGE == nmCode )	//	タブをチェンジしたあと
+	{
+		curSel = TabCtrl_GetCurSel( ghTabWnd );
+
+		TRACE( TEXT("TAB sel [%d]"), curSel );
+
+		ShowWindow( ghTreeWnd,  SW_HIDE );
+		ShowWindow( ghFavLtWnd, SW_HIDE );
+
+		AaTitleClear(  );	//	ここで変換して問題ないはず
+
+		if( ACT_ALLTREE == curSel )
+		{
+			ShowWindow( ghTreeWnd, SW_SHOW );
+			gixUseTab = ACT_ALLTREE;
+
+			//	選択を発生させる
+			ZeroMemory( &stNmTrView, sizeof(NMTREEVIEW) );
+			stNmTrView.hdr.hwndFrom = ghTreeWnd;
+			stNmTrView.hdr.idFrom   = IDTV_ITEMTREE;
+			stNmTrView.hdr.code     = TVN_SELCHANGED;
+			//	他は使ってないから０でおｋ
+			TreeNotify( hWnd, &stNmTrView );
+		}
+		else if( ACT_FAVLIST == curSel )
+		{
+			//	オーポンされたときに、全部書換
+			while( ListBox_GetCount( ghFavLtWnd ) ){	ListBox_DeleteString( ghFavLtWnd, 0 );	}
+			SqlFavFolderEnum( FavListFolderNameBack );
+
+			ShowWindow( ghFavLtWnd, SW_SHOW );
+			gixUseTab = ACT_FAVLIST;
+		}
+		else
+		{
+			TabMultipleSelect( hWnd, curSel, 0 );
+		}
+	}
+
+	return 0;
+}
+//-------------------------------------------------------------------------------------------------
+
+/*!
+	副タブはお気にリストのであるか
+	@param[in]	tabSel	選択されたタブ番号
+	@param[out]	ptBase	ベース名を入れるバッファへのポインター・NULL可
+	@param[in]	cchSize	バッファの文字数
+	@return	非０お気にである　０違う
+*/
+UINT TabMultipleIsFavTab( INT tabSel, LPTSTR ptBase, UINT_PTR cchSize )
+{
+	MLTT_ITR	itNulti;
+
+	for( itNulti = gltMultiFiles.begin( ); gltMultiFiles.end( ) != itNulti; itNulti++ )
+	{
+		if( tabSel == itNulti->dTabNum )	//	選択されてるやつをさがす
+		{
+			//	とりあえずコピー
+			if( ptBase ){	StringCchCopy( ptBase, cchSize, itNulti->atBase );	}
+
+			if( NULL == itNulti->atFilePath[0] )	return 1;	//	お気にである
+			else	return 0;	//	戻っておｋ
+		}
+	}
+
+	return 0;	//	ヒットしなかったらとりあえず違うことにする
+}
+//-------------------------------------------------------------------------------------------------
+
+/*!
+	副タブから選択した場合
+	@param[in]	hWnd	ウインドウハンドル
+	@param[in]	tabSel	選択されたタブ番号
+	@param[in]	dMode	０タブ選択した　１編集ビューで開く
+	@return	非０MLT開いた　０なかった
+*/
+INT TabMultipleSelect( HWND hWnd, INT tabSel, UINT dMode )
+{
+	MLTT_ITR	itNulti;
+	TCHAR	atName[MAX_PATH];
+#ifndef _ORRVW
+	LPARAM	dNumber;
+#endif
+
+	if( 0 == dMode )	gixUseTab = tabSel;
+
+
+	for( itNulti = gltMultiFiles.begin( ); gltMultiFiles.end( ) != itNulti; itNulti++ )
+	{
+		if( tabSel == itNulti->dTabNum )	//	選択されてるやつをさがす
+		{
+			if( 0 == dMode )	//	ビューエリアに表示
+			{
+				//	基点ディレクトリをセット
+				StringCchCopy( gatBaseName, MAX_PATH, itNulti->atBase );
+
+				//	ここで、ファイルかお気にかを判断する・atFilePathが空であれば
+				if( NULL == itNulti->atFilePath[0] )	//	お気にである
+				{
+					StringCchCopy( atName, MAX_PATH, gatBaseName );
+					StringCchCat(  atName, MAX_PATH, TEXT("[F]") );
+
+					AaItemsDoShow( hWnd, gatBaseName, ACT_FAVLIST );	//	引っ張ってくる元の指定である
+				}
+				else
+				{
+					//	ファイル名を確保・表示用
+					StringCchCopy( atName, MAX_PATH, itNulti->atFilePath );
+					PathStripPath( atName );
+
+					//	そのMLTを開く・違いが重要
+					AaItemsDoShow( hWnd, itNulti->atFilePath, ACT_SUBITEM );
+				}
+
+				StatusBarMsgSet( 2, atName );	//	ステータスバーにファイル名表示
+			}
+#ifndef _ORRVW
+			else	//	ファイル名を確保して、さらに編集ビュー側で開く処理をする
+			{
+				dNumber = DocFileInflate( itNulti->atFilePath );	//	開いて中身展開
+	#ifdef MULTI_FILE
+				if( dNumber ){	MultiFileTabAppend( dNumber, itNulti->atFilePath );	}
+	#endif
+			}
+#endif
+			return 1;
+		}
+	}
+
+	return 0;
+}
+//-------------------------------------------------------------------------------------------------
+
+/*!
+	表示した天辺位置を記憶する
+	@param[in]	dTop	新しい位置・－１なら、記憶されている位置を返す
+	@return	INT	呼出なら該当する値
+*/
+INT TabMultipleTopMemory( INT dTop )
+{
+	MLTT_ITR	itNulti;
+
+	//	関係ないなら何もしない
+	if( ACT_SUBITEM > gixUseTab )	return 0;
+
+	for( itNulti = gltMultiFiles.begin( ); gltMultiFiles.end( ) != itNulti; itNulti++ )
+	{
+		if( gixUseTab == itNulti->dTabNum )	//	選択されてるやつをさがす
+		{
+			//	値を入れたり出したり
+			if( 0 >  dTop ){	dTop = itNulti->dLastTop;	}
+			else{	itNulti->dLastTop = dTop;	}
+			break;
+		}
+	}
+
+	if( 0 > dTop )	dTop = 0;	//	一応安全対策
+
+	return dTop;
+}
+//-------------------------------------------------------------------------------------------------
+
+/*!
+	複数ファイルをINIに保存する
+	@param[in]	hWnd	ウインドウハンドル
+	@return		HRESULT	終了状態コード
+*/
+HRESULT TabMultipleStore( HWND hWnd )
+{
+	MLTT_ITR	itNulti;
+
+#ifdef MAA_PROFILE
+	//	一旦全消しして書き直ししてる
+	SqlMultiTabDelete(  );
+	for( itNulti = gltMultiFiles.begin( ); gltMultiFiles.end( ) != itNulti; itNulti++ )
+	{
+		SqlMultiTabInsert( itNulti->atFilePath, itNulti->atBase );
+	}
+#else
+	UINT_PTR	iRslt;
+
+	iRslt = gltMultiFiles.size( );
+	InitMultipleFile( INIT_SAVE, iRslt, NULL, NULL );
+	for( i = 0, itNulti = gltMultiFiles.begin( ); gltMultiFiles.end( ) != itNulti; i++, itNulti++ )
+	{
+		InitMultipleFile( INIT_SAVE, i, itNulti->atFilePath, itNulti->atBase );
+	}
+#endif
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+
+/*!
+	複数ファイルをINIから読み込んで再展開する
+	@param[in]	hWnd	ウインドウハンドル
+	@return		HRESULT	終了状態コード
+*/
+HRESULT TabMultipleRestore( HWND hWnd )
+{
+	INT	iCount, i;
+	MULTIPLEMAA	stMulti;
+
+	TabMultipleDeleteAll( hWnd );
+
+#ifdef MAA_PROFILE
+	iCount = SqlTreeCount( 2, NULL );
+#else
+	iCount = InitMultipleFile( INIT_LOAD, 0, NULL, NULL );
+#endif
+	for( i = 0; iCount > i; i++ )
+	{
+		ZeroMemory( &stMulti, sizeof(MULTIPLEMAA) );
+#ifdef MAA_PROFILE
+		SqlMultiTabSelect( i+1, stMulti.atFilePath, stMulti.atBase );
+#else
+		InitMultipleFile( INIT_LOAD, i, stMulti.atFilePath, stMulti.atBase );
+#endif
+		gltMultiFiles.push_back( stMulti );
+		TabMultipleAppend( hWnd );
+	}
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+
+#if 0
+/*!
+	副タブに追加するとき
+	@param[in]	hWnd		親ウインドウのハンドル
+	@param[in]	hSelItem	選択してるアイテム
+	@return	非０開いた　０開けないやつだった
+*/
+INT TabMultipleOpen( HWND hWnd, HTREEITEM hSelItem )
+{
+	UINT	i;
+	TCHAR	atName[MAX_PATH], atPath[MAX_PATH], atBaseName[MAX_PATH];
+	LPARAM	lParam;
+	HTREEITEM	hParentItem;
+
+	MULTIPLEMAA	stMulti;
+
+
+	if( !(hSelItem) ){	return 0;	}	//	なんか無効なら何もしない
+
+	lParam = TreeItemInfoGet( hSelItem, atName, MAX_PATH );
+
+	if( lParam ){	return 0;	}	//	ディレクトリなら何もしない
+
+	//	選択した名前・ルートにある場合これで適用される
+	StringCchCopy( atBaseName, MAX_PATH, atName );
+
+//	StatusBarMsgSet( 2, atName );	//	ステータスバーにファイル名表示
+
+	//	上に辿って、ファイルパスを作る
+	for( i = 0; 12 > i; i++ )	//	１２より腐海階層はたどれない
+	{
+		hParentItem = TreeView_GetParent( ghTreeWnd, hSelItem );
+		if( !(hParentItem) )	return 0;	//	ルートの上はない・そして選択もされない
+		if( ghTreeRoot == hParentItem ){	break;	}	//	検索がルートまでイッたら終わり
+
+		TreeItemInfoGet( hParentItem, atPath, MAX_PATH );
+		StringCchCopy( atBaseName, MAX_PATH, atPath );
+		//	今のパスを記録していくと、最終的にルート直下のディレクトリ名になる
+		PathAppend( atPath, atName );
+		StringCchCopy( atName, MAX_PATH, atPath );
+
+		hSelItem = hParentItem;
+	}
+
+	StringCchCopy( atPath, MAX_PATH, gatAARoot );
+	PathAppend( atPath, atName );
+
+
+
+	ZeroMemory( &stMulti, sizeof(MULTIPLEMAA) );
+	StringCchCopy( stMulti.atBase, MAX_PATH, atBaseName );
+	StringCchCopy( stMulti.atFilePath, MAX_PATH, atPath );
+	stMulti.dTabNum = 0;	//	初期化・割当は２以降
+
+	gltMultiFiles.push_back( stMulti );
+	TabMultipleAppend( hWnd );
+
+	return 1;
+}
+//-------------------------------------------------------------------------------------------------
+#endif
+
+/*!
+	タブを増やす・保持リストにファイル名ぶち込んだら直ちに呼ぶべし
+	@param[in]	hWnd	親ウインドウのハンドル
+	@return		HRESULT	終了状態コード
+*/
+HRESULT TabMultipleAppend( HWND hWnd )
+{
+	TCHAR	atName[MAX_PATH];
+	LONG	tCount;
+//	RECT	itRect;
+	TCITEM	stTcItem;
+
+	MLTT_ITR	itNulti;
+
+
+	itNulti = gltMultiFiles.end( );
+	itNulti--;	//	新しく開くのは末端にあるはず
+	StringCchCopy( atName, MAX_PATH, itNulti->atFilePath );
+	if( NULL !=  atName[0] )	//	ツリービューからなら
+	{
+		PathStripPath( atName );
+		PathRemoveExtension( atName );	//	拡張子を外す
+	}
+	else	//	お気にリストから追加する
+	{
+		StringCchCopy( atName, MAX_PATH, itNulti->atBase );
+		StringCchCat(  atName, MAX_PATH, TEXT("[F]") );
+	}
+
+	ZeroMemory( &stTcItem, sizeof(TCITEM) );
+	stTcItem.mask = TCIF_TEXT | TCIF_PARAM;
+
+	tCount = TabCtrl_GetItemCount( ghTabWnd );
+
+	stTcItem.lParam  = 0;//tCount;ファイルなので０でいい
+	stTcItem.pszText = atName;
+	TabCtrl_InsertItem( ghTabWnd, tCount, &stTcItem );
+
+	itNulti->dTabNum = tCount;
+
+	//TabCtrl_GetItemRect( ghTabWnd, 1, &itRect );
+	//itRect.bottom -= itRect.top;
+	//itRect.right -= itRect.left;
+	//itRect.top = 0;
+	//itRect.left = 0;
+	//TabCtrl_AdjustRect( ghTabWnd, 0, &itRect );
+	//height = itRect.top;
+	//GetWindowRect( ghTabWnd, &itRect );
+	//itRect.right -= itRect.left;
+	//MoveWindow( ghTabWnd, 0, 0, itRect.right, height, TRUE );
+
+	Maa_OnSize( hWnd, 0, 0, 0 );	//	引数は使ってなかったか
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+
+/*!
+	副タブを全部閉じる
+	@param[in]	hWnd	ウインドウハンドル
+	@return		HRESULT	終了状態コード
+*/
+HRESULT TabMultipleDeleteAll( HWND hWnd )
+{
+	INT	ttlSel, i;
+	NMHDR	stNmHdr;
+
+	ttlSel = TabCtrl_GetItemCount( ghTabWnd );
+
+	//	全破壊
+	for( i = 2; ttlSel > i; i++ ){	TabCtrl_DeleteItem( ghTabWnd, i );	}
+
+	gltMultiFiles.clear();
+
+	//	ツリーに選択を戻す
+	TabCtrl_SetCurSel( ghTabWnd, ACT_ALLTREE );
+	stNmHdr.hwndFrom = ghTabWnd;
+	stNmHdr.idFrom   = IDTB_TREESEL;
+	stNmHdr.code     = TCN_SELCHANGE;
+	TabBarNotify( hWnd, &stNmHdr );
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+
+/*!
+	指定のタブを閉じる
+	@param[in]	hWnd	ウインドウハンドル
+	@param[in]	tabSel	タブ番号
+	@return		HRESULT	終了状態コード
+*/
+HRESULT TabMultipleDelete( HWND hWnd, CONST INT tabSel )
+{
+	INT	nowSel, i;
+	NMHDR	stNmHdr;
+	MLTT_ITR	itNulti;
+
+	nowSel = TabCtrl_GetCurSel( ghTabWnd );
+
+	TRACE( TEXT("TAB del [%d][%d]"), nowSel, tabSel );
+
+	TabCtrl_DeleteItem( ghTabWnd, tabSel );
+
+	for( itNulti = gltMultiFiles.begin( ); gltMultiFiles.end( ) != itNulti; itNulti++ )
+	{
+		if( tabSel == itNulti->dTabNum )
+		{
+			gltMultiFiles.erase( itNulti );
+			break;
+		}
+	}
+
+	//	20110808	タブ番号振り直し
+	i = 2;
+	for( itNulti = gltMultiFiles.begin( ); gltMultiFiles.end( ) != itNulti; itNulti++ )
+	{
+		itNulti->dTabNum = i;
+		i++;
+	}
+
+	//	もし、削除タブが開いてるタブだったら・ツリーに選択を戻す
+	if( nowSel == tabSel )
+	{
+		TabCtrl_SetCurSel( ghTabWnd, ACT_ALLTREE );
+		stNmHdr.hwndFrom = ghTabWnd;
+		stNmHdr.idFrom   = IDTB_TREESEL;
+		stNmHdr.code     = TCN_SELCHANGE;
+		TabBarNotify( hWnd, &stNmHdr );
+	}
+
+	Maa_OnSize( hWnd, 0, 0, 0 );	//	引数は使ってなかったか
+
+//この段階では、記録の書き直しはしない
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+
+
+
+/*!
+	お気に入りのリストをコールバックで受け取る
+	@param[in]	dNumber		通し番号かもだ
+	@param[in]	dummy		未使用
+	@param[in]	fake		未使用
+	@param[in]	ptFdrName	文字列
+	@return		処理した内容とか
+*/
+LRESULT CALLBACK FavListFolderNameBack( UINT dNumber, UINT dummy, UINT fake, LPCVOID ptFdrName )
+{
+	INT	iOrder;
+
+	iOrder = ListBox_AddString( ghFavLtWnd, (LPCTSTR)ptFdrName );
+
+	return 1;
+}
+//-------------------------------------------------------------------------------------------------
+
+/*!
+	お気に入りのリストがクルックされたとき
+	@param[in]	hWnd	親ウインドウのハンドル
+	@param[in]	iCode	発生したイベント
+	@return		HRESULT	終了状態コード
+*/
+HRESULT FavListSelected( HWND hWnd, UINT iCode )
+{
+	TCHAR	atFdrName[MAX_PATH];
+	INT	selIndex;
+
+	if( LBN_SELCHANGE == iCode )
+	{
+		selIndex = ListBox_GetCurSel( ghFavLtWnd );
+		if( LB_ERR == selIndex )	return E_OUTOFMEMORY;
+
+		ListBox_GetText( ghFavLtWnd, selIndex, atFdrName );
+
+		StringCchCopy( gatBaseName, MAX_PATH, atFdrName );
+		//	確保したディレクトリ名に該当するＡＡをＳＱＬから引っ張る
+		AaItemsDoShow( hWnd, atFdrName, ACT_FAVLIST );
+	}
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+
+/*!
+	お気に入りの場合はクルックされたときに再描画するか・選択出来るように
+	@param[in]	hWnd	親ウインドウのハンドル
+	@return		HRESULT	終了状態コード
+*/
+HRESULT FavContsRedrawRequest( HWND hWnd )
+{
+	//	関係ないときは何もしない・関係ないときは呼ばないように注意セヨ
+	//	お気にリストをタブに表示したとき、再描画指定を判定する必要が有る
+	if( ACT_FAVLIST == gixUseTab || TabMultipleIsFavTab( gixUseTab, NULL, 0 ) )
+	{
+		AaItemsDoShow( hWnd, gatBaseName, ACT_FAVLIST );
+	}
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+
+/*!
+	全体ツリー、お気に入りリスト、複数ファイル、開いてるヤツを返す
+	@return	INT	開いてる奴の番号
+*/
+INT TreeFavWhichOpen( VOID )
+{
+	return gixUseTab;	//	ACT_ALLTREE	ACT_FAVLIST
+}
+//-------------------------------------------------------------------------------------------------
+
+/*!
+	ホウィール回転が自分の上で発生したか
+	@param[in]	hWnd	親ウインドウハンドル
+	@param[in]	hChdWnd	マウスカーソルの↓にあった子ウインドウ
+	@param[in]	xPos	発生した座標Ｘ
+	@param[in]	yPos	発生した座標Ｙ
+	@param[in]	zDelta	回転量・WHEEL_DELTAの倍数・正の値は前(奥)、負の値は後ろ(手前)へ回された
+	@param[in]	fwKeys	押されてるキー
+	@return		非０自分だった　０関係ないね
+*/
+UINT TreeFavIsUnderCursor( HWND hWnd, HWND hChdWnd, INT xPos, INT yPos, INT zDelta, UINT fwKeys )
+{
+	if( ghTreeWnd == hChdWnd )
+	{
+		FORWARD_WM_MOUSEWHEEL( ghTreeWnd, xPos, yPos, zDelta, fwKeys, PostMessage );
+		TRACE( TEXT("TreeUnderCursor[%d]"), zDelta );
+		return 1;
+	}
+
+	if( ghFavLtWnd == hChdWnd )
+	{
+		FORWARD_WM_MOUSEWHEEL( ghFavLtWnd, xPos, yPos, zDelta, fwKeys, PostMessage );
+		TRACE( TEXT("FavUnderCursor[%d]"), zDelta );
+		return 1;
+	}
+
+	return 0;
+}
+//-------------------------------------------------------------------------------------------------
+
+
+
+
+
