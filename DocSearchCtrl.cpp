@@ -159,10 +159,10 @@ HRESULT FindDialogueOpen( HINSTANCE hInst, HWND hWnd )
 
 /*!
 	検索ダイヤログのプロシージャ
-	@param[in]	hDlg		ダイヤログハンドル
-	@param[in]	message		ウインドウメッセージの識別番号
-	@param[in]	wParam		追加の情報１
-	@param[in]	lParam		追加の情報２
+	@param[in]	hDlg	ダイヤログハンドル
+	@param[in]	message	ウインドウメッセージの識別番号
+	@param[in]	wParam	追加の情報１
+	@param[in]	lParam	追加の情報２
 	@retval 0	メッセージは処理していない
 	@retval no0	なんか処理された
 */

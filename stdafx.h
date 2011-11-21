@@ -91,6 +91,7 @@ static CONST GUID gcstGUID = { 0x66D3E881, 0x972B, 0x458B, { 0x93, 0x5E, 0x9E, 0
 //#define OPEN_HISTORY
 
 //#define FIND_STRINGS	//	文字列検索機能
+//#define FIND_MAA_FILE	//	MAAファイル検索機能
 
 //機能ＯＫ
 #define  MOZI_SCRIPT	//	５０音Script機能

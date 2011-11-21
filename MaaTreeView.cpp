@@ -34,6 +34,10 @@ static  HWND		ghTabWnd;		//!<	選択タブのハンドル
 
 static  HWND		ghFavLtWnd;		//!<	よく使う奴を登録するリストボックス
 
+#ifdef FIND_MAA_FILE
+static  HWND		ghMaaFindDlg;	//!<	MAA検索ダイヤログハンドル
+#endif
+
 static  HWND		ghTreeWnd;		//!<	ツリーのハンドル
 static HTREEITEM	ghTreeRoot;		//!<	ツリーのルートアイテム
 
@@ -62,6 +66,10 @@ HRESULT	TreeItemFind( LPCTSTR, HTREEITEM, UINT );	//!<
 
 INT		TreeSelItemProc( HWND, HTREEITEM, UINT );	//!<	
 
+#ifdef FIND_MAA_FILE
+HRESULT	TreeMaaFileFind( HWND );
+#endif
+
 HRESULT	TabMultipleRestore( HWND );
 INT		TabMultipleSelect( HWND, INT, UINT );	//!<	
 //INT	TabMultipleOpen( HWND , HTREEITEM );	//!<	
@@ -69,7 +77,6 @@ HRESULT	TabMultipleAppend( HWND );				//!<
 HRESULT	TabMultipleDelete( HWND, CONST INT );	//!<	
 
 UINT	TabMultipleIsFavTab( INT, LPTSTR, UINT_PTR );
-
 
 LRESULT	CALLBACK gpfFavListProc( HWND, UINT, WPARAM, LPARAM );	//	
 LRESULT	CALLBACK gpfTreeViewProc( HWND, UINT, WPARAM, LPARAM );	//	
@@ -394,6 +401,9 @@ VOID Maa_OnContextMenu( HWND hWnd, HWND hWndContext, UINT xPos, UINT yPos )
 
 			//	ディレクトリ系を再セット	ディレクトリ設定ダイヤログを開く
 			case IDM_TREE_RECONSTRUCT:	TreeProfileRebuild( hWnd  );	break;
+#ifdef FIND_MAA_FILE
+			case IDM_FINDMAA_DLG_OPEN:	TreeMaaFileFind( hWnd );	break;
+#endif
 #endif
 			case IDM_AATREE_MAINOPEN:	TreeSelItemProc( hWnd, hTvHitItem , 0 );	break;
 			case  IDM_AATREE_SUBADD:	TreeSelItemProc( hWnd, hTvHitItem , 1 );	break;
@@ -598,7 +608,7 @@ UINT TreeItemFromSql( LPCTSTR ptRootName, HTREEITEM hTreeParent, UINT dPrntID )
 	stTreeIns.item.mask    = TVIF_TEXT | TVIF_PARAM | TVIF_IMAGE | TVIF_SELECTEDIMAGE;
 
 	ZeroMemory( atTarget, sizeof(atTarget) );
-	dTgtID = SqlTreeNodeSelectID( dPrntID, &type, &dPnID, atTarget, 1 );
+	dTgtID = SqlTreeNodePickUpID( dPrntID, &type, &dPnID, atTarget, 0x01 );
 	//	無くなったら終わり
 	if( 0 == dTgtID )	return 0;
 	//	この時点でＩＤが異なるのは、ディレクトリ指定だけがあって、中身が無い場合
@@ -640,7 +650,7 @@ UINT TreeItemFromSql( LPCTSTR ptRootName, HTREEITEM hTreeParent, UINT dPrntID )
 		dPrvID = dTgtID;
 		ZeroMemory( atTarget, sizeof(atTarget) );
 //		SetLastError(0);
-		dTgtID = SqlTreeNodeSelectID( dTgtID, &type, &dPnID, atTarget, 1 );
+		dTgtID = SqlTreeNodePickUpID( dTgtID, &type, &dPnID, atTarget, 0x01 );
 //中でエラー
 		TRACE( TEXT("%4u\t%4u\t%4u\t%s"), dTgtID, type, dPnID, atTarget );
 
@@ -906,6 +916,269 @@ LPTSTR TreeBaseNameGet( VOID )
 	return gatBaseName;
 }
 //-------------------------------------------------------------------------------------------------
+
+#ifdef FIND_MAA_FILE
+
+/*!
+	検索してリストビューに入れる
+	@param[in]	hDlg	ダイヤログハンドル
+*/
+HRESULT MaaFindExecute( HWND hDlg )
+{
+	UINT	dCnt, dMax, d;
+	UINT	dItem, dType, dPrntID, dOwnID;
+	UINT	dDmyType, dDmyID;
+	TCHAR	atPattern[MAX_PATH];
+	TCHAR	atFileName[MAX_PATH], atPrntName[MAX_PATH];
+	HWND	hLvWnd, hEdWnd;
+	LVITEM	stLvi;
+
+	hEdWnd = GetDlgItem( hDlg, IDE_MAA_FIND_NAME );
+	hLvWnd = GetDlgItem( hDlg, IDLV_MAA_FINDED_FILE );
+
+	ListView_DeleteAllItems( hLvWnd );
+
+	ZeroMemory( atPattern, sizeof(atPattern) );
+	GetDlgItemText( hDlg, IDE_MAA_FIND_NAME, atPattern, MAX_PATH );
+
+	dCnt = SqlTreeCount( 1, &dMax );
+
+	dOwnID = 0;
+	for( d = 0; dMax > d; d++ )
+	{
+		dOwnID = SqlTreeFileSearch( atPattern, dOwnID );	//	ヒットを確認
+		if( 0 == dOwnID )	break;	//	それ以上無いようなら終わり
+
+		ZeroMemory( atFileName, sizeof(atFileName) );
+		dType   = 0;
+		dPrntID = 0;
+
+		//	該当ＩＤの内容を確認
+		SqlTreeNodePickUpID( dOwnID, &dType, &dPrntID, atFileName, 0x11 );
+		if( FILE_ATTRIBUTE_NORMAL == dType )
+		{
+			//	引っ張った内容ファイル名をリストビューに表示
+			dItem = ListView_GetItemCount( hLvWnd );
+
+			ZeroMemory( &stLvi, sizeof(stLvi) );
+			stLvi.iItem = dItem;
+
+			stLvi.mask     = LVIF_TEXT | LVIF_PARAM;
+			stLvi.pszText  = atFileName;
+			stLvi.lParam   = dOwnID;
+			stLvi.iSubItem = 0;
+			ListView_InsertItem( hLvWnd, &stLvi );
+
+			SqlTreeNodePickUpID( dPrntID, &dDmyType, &dDmyID, atPrntName, 0x11 );
+
+			stLvi.mask     = LVIF_TEXT;
+			stLvi.pszText  = atPrntName;
+			stLvi.iSubItem = 1;
+			ListView_SetItem( hLvWnd, &stLvi );
+		}
+	}
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+
+/*!
+	IDを渡して、該当アイテムのツリーノードハンドルをとる・再帰してる
+*/
+HTREEITEM MaaSearchTreeItem( INT dOwnID )
+{
+	UINT	dItem, dType, dPrntID;
+	UINT	dDmyType, dDmyID;
+	TCHAR	atFileName[MAX_PATH], atCmprName[MAX_PATH];
+	HTREEITEM	hPrntItem, hChildItem, hNextItem;
+
+	ZeroMemory( atFileName, sizeof(atFileName) );
+	dType   = 0;
+	dPrntID = 0;
+
+	//	IDで、SQLから該当アイテムの情報をひっぱる
+	SqlTreeNodePickUpID( dOwnID, &dType, &dPrntID, atFileName, 0x11 );
+
+	if( dPrntID )	//	上が有るようなら、再帰する
+	{
+		hPrntItem = MaaSearchTreeItem( dPrntID );
+	}
+	else	//	上がなかったら、ルートと見なして、ルートを種にしてCHILD検索
+	{
+		hPrntItem = ghTreeRoot;
+	}
+
+	if( !(hPrntItem) )	return NULL;	//	データ無かったら終わる
+
+	//	ツリーノードハンドルが返ってきたら、それを種にしてCHILD検索
+	//	ヒットしたら、該当ツリーノードハンドルを返す
+	hChildItem = TreeView_GetChild( ghTreeWnd, hPrntItem );
+
+	do{
+		//	名前引っ張って atFileName と照合
+		TreeItemInfoGet( hChildItem, atCmprName, MAX_PATH );
+
+		if( !( StrCmp( atFileName, atCmprName ) ) )	break;
+		//	ヒットしたら該当の親ツリーノードを開くか
+
+		hNextItem = TreeView_GetNextSibling( ghTreeWnd, hChildItem );
+		hChildItem = hNextItem;
+
+	}while( hNextItem );
+
+
+	return hChildItem;	//	ヒットしたら、該当ツリーノードハンドルを返す
+}
+//-------------------------------------------------------------------------------------------------
+
+/*!
+	対象のSqlIDを受け取って、該当のツリーアイテムを特定する
+*/
+HRESULT MaaSelectIDfile( HWND hDlg, INT tgtID )
+{
+	HTREEITEM	hTgtItem;
+//	TCHAR	atFileName[MAX_PATH];
+
+//ここで再帰函数を呼び出すとか
+//IDを渡すと、上を確かめて、ツリーノードハンドルを返すようなやつ
+//辿っていって、上がなくなったらルート直下、ルートを種にしてCHILD検索してヒットしたやつを返す。
+	hTgtItem = MaaSearchTreeItem( tgtID );
+#error 検索して開く機能作成中
+	TreeSelItemProc( hDlg, hTgtItem, 0 );
+	//	渡すハンドル、MAAのハンドルにしておかないとまずい？
+
+//	TreeItemInfoGet( hTgtItem, atFileName, MAX_PATH );
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+
+/*!
+	ノーティファイメッセージの処理
+	@param[in]	hDlg		ダイヤログハンドル
+	@param[in]	idFrom		NOTIFYを発生させたコントロールのＩＤ
+	@param[in]	pstNmhdr	NOTIFYの詳細
+	@return		処理した内容とか
+*/
+INT_PTR MaaFindOnNotify( HWND hDlg, INT idFrom, LPNMHDR pstNmhdr )
+{
+	HWND	hLvWnd;
+	INT		iCount, iItem, nmCode;//, iPage;
+	LPNMLISTVIEW	pstNmLv;
+	LVITEM	stLvi;
+
+	if( IDLV_MAA_FINDED_FILE == idFrom )
+	{
+		pstNmLv = (LPNMLISTVIEW)pstNmhdr;
+
+		hLvWnd = pstNmLv->hdr.hwndFrom;
+		nmCode = pstNmLv->hdr.code;
+
+		//	選択されてる項目を確保
+		iItem = ListView_GetNextItem( hLvWnd, -1, LVNI_ALL | LVNI_SELECTED );
+
+		if( 0 >  iItem )	return FALSE;	//	未選択状態なら何もしない
+
+		//	ダブルクルックであった場合
+		if( NM_DBLCLK == nmCode )
+		{
+			ZeroMemory( &stLvi, sizeof(stLvi) );
+			stLvi.mask     = LVIF_PARAM;
+			stLvi.iItem    = iItem;
+			stLvi.iSubItem = 0;
+			ListView_GetItem( hLvWnd, &stLvi );
+
+			MaaSelectIDfile( hDlg, stLvi.lParam );	//	SqlID渡して開くようにする
+		}
+	}
+
+	return TRUE;
+}
+//-------------------------------------------------------------------------------------------------
+
+/*!
+	検索ダイヤログのプロシージャ
+	@param[in]	hDlg	ダイヤログハンドル
+	@param[in]	message	ウインドウメッセージの識別番号
+	@param[in]	wParam	追加の情報１
+	@param[in]	lParam	追加の情報２
+	@retval 0	メッセージは処理していない
+	@retval no0	なんか処理された
+*/
+INT_PTR CALLBACK TreeMaaFindDlgProc( HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam )
+{
+	HWND	hWorkWnd;
+	UINT	id;
+//	HWND	hWndChild;
+	LVCOLUMN	stLvColm;
+
+
+	switch( message )
+	{
+		default:	break;
+
+		case WM_INITDIALOG:
+			hWorkWnd = GetDlgItem( hDlg, IDLV_MAA_FINDED_FILE );
+			ListView_SetExtendedListViewStyle( hWorkWnd, LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES );
+			ZeroMemory( &stLvColm, sizeof(LVCOLUMN) );
+			stLvColm.mask = LVCF_FMT | LVCF_WIDTH | LVCF_TEXT | LVCF_SUBITEM;
+			stLvColm.fmt = LVCFMT_LEFT;
+			stLvColm.pszText = TEXT("ファイル名");	stLvColm.cx = 250;	stLvColm.iSubItem = 0;	ListView_InsertColumn( hWorkWnd, 0, &stLvColm );
+			stLvColm.pszText = TEXT("所属");		stLvColm.cx = 250;	stLvColm.iSubItem = 1;	ListView_InsertColumn( hWorkWnd, 1, &stLvColm );
+			SetFocus( GetDlgItem(hDlg,IDE_MAA_FIND_NAME) );
+			return (INT_PTR)FALSE;
+
+		case WM_COMMAND:
+			id = LOWORD(wParam);
+			hWorkWnd = GetDlgItem( hDlg, IDE_FIND_TEXT );
+			switch( id )
+			{
+				case IDCANCEL:	DestroyWindow( hDlg );	return (INT_PTR)TRUE;
+				case IDOK:		MaaFindExecute( hDlg );	return (INT_PTR)TRUE;	//	検索する
+				default:	break;
+			}
+			break;
+
+		case WM_CLOSE:	DestroyWindow( hDlg );	ghMaaFindDlg = NULL;	return (INT_PTR)TRUE;
+
+		case WM_DESTROY:	return (INT_PTR)TRUE;
+
+		case WM_NOTIFY:		MaaFindOnNotify( hDlg, (INT)(wParam), (LPNMHDR)(lParam) );	return (INT_PTR)TRUE;
+
+	}
+
+	return (INT_PTR)FALSE;
+}
+//-------------------------------------------------------------------------------------------------　λ...
+
+
+
+/*!
+	MAAファイル検索窓の処理
+	@param[in]	hWnd	ウインドウハンドル
+*/
+HRESULT TreeMaaFileFind( HWND hWnd )
+{
+	HINSTANCE	hInst;
+
+	hInst = GetModuleHandle( NULL );
+
+
+	if( ghMaaFindDlg )
+	{
+		SetForegroundWindow( ghMaaFindDlg );
+		return S_OK;
+	}
+
+	ghMaaFindDlg = CreateDialogParam( hInst, MAKEINTRESOURCE(IDD_FIND_MAA_DLG), hWnd, TreeMaaFindDlgProc, 0 );
+
+	ShowWindow( ghMaaFindDlg, SW_SHOW );
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+
+#endif
 
 
 

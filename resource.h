@@ -28,6 +28,7 @@
 #define IDD_PAGE_NAME_DLG               131
 #define IDT_BACKUP_TIMER                132
 #define IDD_FIND_STRING_DLG             133
+#define IDD_FIND_MAA_DLG				134
 #define IDC_AAVIEWER                    209
 #define IDD_PATH_SET                    210
 #define IDSB_STATUSBAR                  211
@@ -313,6 +314,8 @@
 #define IDCB_FIND_TARGET                1222
 #define IDCB_MOD_CRLF_YEN               1223
 #define IDB_FIND_CLEAR                  1224
+#define IDE_MAA_FIND_NAME				1227
+#define IDLV_MAA_FINDED_FILE			1228
 #define IDTV_ITEMTREE                   2000
 #define IDTB_TREESEL                    2001
 #define IDSO_AAITEMS                    2002
@@ -402,6 +405,7 @@
 #define IDM_MENUEDIT_DLG_OPEN           32825
 #define IDM_FIND_DLG_OPEN               32826
 #define IDM_FIND_HIGHLIGHT_OFF          32827
+#define IDM_FINDMAA_DLG_OPEN			32828
 #define IDM_PAGEL_DETAIL                32900
 #define IDM_PAGEL_ADD                   32901
 #define IDM_PAGEL_INSERT                32902

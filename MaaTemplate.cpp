@@ -1035,7 +1035,7 @@ HRESULT TreeLoadDirCheck( HWND hDlg, HWND hTvWnd )
 	for( m = 0; dCacheMax > m; m++ )
 	{
 		ZeroMemory( atName, sizeof(atName) );
-		index = SqlTreeNodeSelectID( index, &dType, &dPrnt, atName, 0 );
+		index = SqlTreeNodePickUpID( index, &dType, &dPrnt, atName, 0x00 );
 		TRACE( TEXT("[%4u]%4u\t%4u\t%4u\t%s"), m, index, dType, dPrnt, atName );
 		if( 0 >= index )	break;	//	データ無くなったら終わり
 
@@ -1082,7 +1082,7 @@ UINT TreeLoadNodeProc( HWND hTvWnd, HTREEITEM hNode, UINT bFixe )
 		}
 		else
 		{	//	入力値を超えた値なので、目標をゲットするには－１する
-			SqlTreeNodeSelectID( param-1, &dType, &dPrID, atName, 0 );
+			SqlTreeNodePickUpID( param-1, &dType, &dPrID, atName, 0x00 );
 			//	チェックがあり、ファイルである場合
 			if( dRslt && (FILE_ATTRIBUTE_NORMAL==dType) ){	count++;	}
 		}

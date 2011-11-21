@@ -71,7 +71,7 @@ BEGIN
         MENUITEM "削除(&D)\tDelete",              IDM_DELETE
         MENUITEM SEPARATOR
         MENUITEM "SJISコピー(&J)",                 IDM_SJISCOPY
-        MENUITEM "投下用に頁全体コピー(&SJIS)\tCtrl + Shift + C", IDM_SJISCOPY_ALL
+        MENUITEM "全体をSJISコピー(&S)\tCtrl + Shift + C", IDM_SJISCOPY_ALL
         MENUITEM SEPARATOR
         MENUITEM "全選択(&A)\tCtrl + A",           IDM_ALLSEL
         MENUITEM "矩形選択(&B)\tCtrl + Alt + B",    IDM_SQSELECT
@@ -255,18 +255,18 @@ IDM_AALIST_POPUP MENU
 BEGIN
     POPUP "複数行テンプレ表示でのアレ"
     BEGIN
-        MENUITEM "ＡＡポップアップ表示(&T)",              IDM_MAA_AATIP_TOGGLE
-        MENUITEM "ＡＡ区切りスタイル切換",                 IDM_MAA_SEP_STYLE_TOGGLE
+        MENUITEM "ＡＡポップアップ表示(&T)",	IDM_MAA_AATIP_TOGGLE
+        MENUITEM "ＡＡ区切りスタイル切換",		IDM_MAA_SEP_STYLE_TOGGLE
         MENUITEM SEPARATOR
-        MENUITEM "編集ビューに通常挿入(&I)",              IDM_MAA_INSERT_EDIT
-        MENUITEM "編集ビューに矩形挿入(&R)",              IDM_MAA_INTERRUPT_EDIT
+        MENUITEM "編集ビューに通常挿入(&I)",	IDM_MAA_INSERT_EDIT
+        MENUITEM "編集ビューに矩形挿入(&R)",	IDM_MAA_INTERRUPT_EDIT
         MENUITEM SEPARATOR
-        MENUITEM "レイヤで開く(&L)",                  IDM_MAA_SET_LAYERBOX
+        MENUITEM "レイヤで開く(&L)",	IDM_MAA_SET_LAYERBOX
         MENUITEM SEPARATOR
-        MENUITEM "コピー(UNI&CODE)",               IDM_MAA_CLIP_UNICODE
-        MENUITEM "コピー(Shift&JIS)",              IDM_MAA_CLIP_SHIFTJIS
+        MENUITEM "コピー(UNI&CODE)",	IDM_MAA_CLIP_UNICODE
+        MENUITEM "コピー(Shift&JIS)",	IDM_MAA_CLIP_SHIFTJIS
         MENUITEM SEPARATOR
-        MENUITEM "削除(&D)",                      IDM_MAA_FAV_DELETE, GRAYED
+        MENUITEM "削除(&D)",	IDM_MAA_FAV_DELETE, GRAYED
     END
 END
 
@@ -274,15 +274,16 @@ IDM_AATREE_POPUP MENU
 BEGIN
     POPUP "複数行テンプレツリーのアレ"
     BEGIN
-        MENUITEM "プロファイル作成／開く(&N)",             IDM_MAA_PROFILE_MAKE
-        MENUITEM "AA一覧ツリーを再構築(&T)",             IDM_TREE_RECONSTRUCT
+        MENUITEM "プロファイル作成／開く(&N)",	IDM_MAA_PROFILE_MAKE
+        MENUITEM "AA一覧ツリーを再構築(&T)",	IDM_TREE_RECONSTRUCT
+        MENUITEM "ファイル名で検索(&F)",		IDM_FINDMAA_DLG_OPEN
+		MENUITEM SEPARATOR
+        MENUITEM "（名称未設定）",			IDM_DUMMY, GRAYED
+        MENUITEM "主タブで開く(&M)",		IDM_AATREE_MAINOPEN
+        MENUITEM "副タブを追加(&S)",		IDM_AATREE_SUBADD
+        MENUITEM "編集ビューに開く(&E)",	IDM_AATREE_GOEDIT
         MENUITEM SEPARATOR
-        MENUITEM "（名称未設定）",                     IDM_DUMMY, GRAYED
-        MENUITEM "主タブで開く(&M)",                  IDM_AATREE_MAINOPEN
-        MENUITEM "副タブを追加(&S)",                  IDM_AATREE_SUBADD
-        MENUITEM "編集ビューに開く(&E)",                IDM_AATREE_GOEDIT
-        MENUITEM SEPARATOR
-        MENUITEM "アイテム追加(&A)",                  IDM_MAA_IADD_OPEN
+        MENUITEM "アイテム追加(&A)",		IDM_MAA_IADD_OPEN
     END
 END
 
@@ -290,9 +291,9 @@ IDM_AATABS_POPUP MENU
 BEGIN
     POPUP "複数行テンプレタブのアレ"
     BEGIN
-        MENUITEM "このタブを閉じる(&Q)",                IDM_AATABS_DELETE
+        MENUITEM "このタブを閉じる(&Q)",	IDM_AATABS_DELETE
         MENUITEM SEPARATOR
-        MENUITEM "編集ビューに開く(&E)",                IDM_AATREE_GOEDIT
+        MENUITEM "編集ビューに開く(&E)",	IDM_AATREE_GOEDIT
     END
 END
 
@@ -721,6 +722,20 @@ BEGIN
     GROUPBOX        "検索条件",IDC_STATIC,6,78,168,42
     CONTROL         "\\n = 改行、\\\\ = \\ として検索（半角で指定）",IDCB_MOD_CRLF_YEN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,90,156,8
 END
+
+
+IDD_FIND_MAA_DLG DIALOG 0, 0, 215, 126
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_TOOLWINDOW
+CAPTION "テンプレートファイル名検索"
+FONT 10, "MS UI Gothic"
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,162,6,48,12
+    EDITTEXT        IDE_MAA_FIND_NAME,6,6,150,12,ES_AUTOHSCROLL
+    CONTROL         "",IDLV_MAA_FINDED_FILE,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_ALIGNLEFT | LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,6,24,204,96
+END
+
+
 
 
 /////////////////////////////////////////////////////////////////////////////

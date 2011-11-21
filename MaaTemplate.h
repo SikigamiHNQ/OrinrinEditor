@@ -102,8 +102,10 @@ HRESULT		SqlTreeProfSelect( LPTSTR, UINT, LPTSTR, UINT );
 UINT		SqlTreeNodeInsert( UINT, UINT, UINT, LPTSTR );
 HRESULT		SqlTreeNodeDelete( UINT );
 //HRESULT		SqlTreeNodeEnum( UINT, BUFFERBACK );
-UINT		SqlTreeNodeSelectID( UINT, PUINT, PUINT, LPTSTR, UINT );
+UINT		SqlTreeNodePickUpID( UINT, PUINT, PUINT, LPTSTR, UINT );
 //UINT		SqlTreeNodeRootSearch( LPTSTR );
+
+UINT		SqlTreeFileSearch( LPTSTR, UINT );
 
 HRESULT		SqlTreeCacheOpenClose( UINT );
 HRESULT		SqlTreeCacheDelID( INT );

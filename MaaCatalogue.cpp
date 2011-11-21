@@ -73,7 +73,7 @@ LRESULT	CALLBACK AacFavInflate( UINT, UINT, UINT, LPCVOID );
 
 /*!
 	MLTファイル名を受け取って、展開処理を進める
-	@param[in]	hWnd		親ウインドウハンドル・NULLなら破壊
+	@param[in]	hWnd		親ウインドウハンドル
 	@param[in]	ptFileName	ファイル名
 	@return		DWORD		確保した個数
 */

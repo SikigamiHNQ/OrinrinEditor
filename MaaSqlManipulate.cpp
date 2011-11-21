@@ -948,13 +948,13 @@ UINT SqlTreeNodeRootSearch( LPTSTR ptDirName )
 /*!
 	ＩＤ指定してリストアップ
 	@param[in]	tgtID	この番号を超えて最初にヒットしたやつを返す
-	@param[out]	pType	ディレクトリかファイルか
+	@param[out]	pType	ディレクトリ(FILE_ATTRIBUTE_DIRECTORY)かファイルか(FILE_ATTRIBUTE_NORMAL)
 	@param[out]	pPrntID	親ツリーノードのSQL的ＩＤ番号
 	@param[out]	ptName	ノードの名称
-	@param[in]	bStyle	非０通常　０ツリーキャッシュ
-	@return	UINT	引っ張ったやつのＩＤ
+	@param[in]	bStyle	0x01通常　0x00ツリーキャッシュ　／　0x10ＩＤ一致　0x00ＩＤ超えた
+	@return	UINT	引っ張ったやつのＩＤ・無かったら０
 */
-UINT SqlTreeNodeSelectID( UINT tgtID, PUINT pType, PUINT pPrntID, LPTSTR ptName, UINT bStyle ) 
+UINT SqlTreeNodePickUpID( UINT tgtID, PUINT pType, PUINT pPrntID, LPTSTR ptName, UINT bStyle ) 
 {
 	CHAR	acQuery[MAX_STRING];
 	INT		rslt;
@@ -963,13 +963,13 @@ UINT SqlTreeNodeSelectID( UINT tgtID, PUINT pType, PUINT pPrntID, LPTSTR ptName,
 
 	sqlite3	*pDB;
 
-	if( bStyle )	pDB = gpDataBase;
-	else			pDB = gpTreeCache;
-
+	if( bStyle & 0x01 ){	pDB = gpDataBase;	}
+	else{					pDB = gpTreeCache;	}
 
 	if( !(pDB) ){	return 0;	}
 
-	StringCchPrintfA( acQuery, MAX_STRING, ("SELECT * FROM TreeNode WHERE id > %d ORDER BY id ASC"), tgtID );
+	if( bStyle & 0x10 ){	StringCchPrintfA( acQuery, MAX_STRING, ("SELECT * FROM TreeNode WHERE id == %u"), tgtID );	}
+	else{	StringCchPrintfA( acQuery, MAX_STRING, ("SELECT * FROM TreeNode WHERE id > %u ORDER BY id ASC"), tgtID );	}
 
 	rslt = sqlite3_prepare( pDB, acQuery, -1, &statement, NULL );
 	if( SQLITE_OK != rslt ){	SQL_DEBUG( pDB );	return 0;	}
@@ -1014,6 +1014,42 @@ HRESULT SqlTreeNodeDelete( UINT bStyle )
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
+
+/*!
+	パヤーンを受け取って、該当するＩＤを返す。
+	@param[in]	ptName	パヤーン
+	@param[in]	dStart	検索開始ＩＤ・このＩＤの次の値から検索開始
+*/
+UINT SqlTreeFileSearch( LPTSTR ptName, UINT dStart )
+{
+	TCHAR	atReqest[SUB_STRING];
+	INT		rslt;
+	UINT	dxID;
+	sqlite3_stmt*	statement;
+
+	if( !(gpDataBase) ){	return 0;	}
+
+
+
+	rslt = sqlite3_prepare( gpDataBase, ("SELECT id FROM TreeNode WHERE nodename LIKE ? AND id > ? ORDER BY id ASC"), -1, &statement, NULL );
+	if( SQLITE_OK != rslt ){	SQL_DEBUG( gpDataBase );	return 0;	}
+
+	sqlite3_reset( statement );
+
+	StringCchPrintf( atReqest, SUB_STRING, TEXT("%%%s%%"), ptName );
+	rslt = sqlite3_bind_text16( statement, 1, atReqest, -1, SQLITE_STATIC );	//	
+	sqlite3_bind_int( statement, 2, dStart );
+
+	rslt = sqlite3_step( statement );
+	if( SQLITE_ROW == rslt ){	dxID = sqlite3_column_int( statement, 0 );	}
+	else{	dxID = 0;	}
+
+	sqlite3_finalize( statement );
+
+	return dxID;
+}
+//-------------------------------------------------------------------------------------------------
+
 
 /*!
 	ツリーキャッシュ用オンメモリＤＢ
@@ -1127,7 +1163,6 @@ UINT SqlTreeCacheInsert( UINT dType, UINT dPrnt, LPTSTR ptName )
 
 
 
-
 /*!
 	副タブ情報を追加
 	@param[in]	ptFilePath	ファイルパス・空なら使用から開いた
@@ -1231,45 +1266,4 @@ HRESULT SqlMultiTabDelete( VOID )
 #endif	//	MAA_PROFILE
 
 
-
-#if 0
-
-HRESULT SqlSearchName( LPTSTR ptName )
-{
-	TCHAR	atQuery[MAX_STRING];
-	TCHAR	atReqest[SUB_STRING], atGetName[SUB_STRING];
-	INT		rslt, i;
-	HRESULT	retRslt;
-	sqlite3_stmt*	statement;
-
-	StringCchPrintf( atQuery, MAX_STRING, TEXT("SELECT username FROM %s WHERE username LIKE ?"), TBNAME_CARDLIST );
-
-	StringCchPrintf( atReqest, SUB_STRING, TEXT("%%%s%%"), ptName );
-
-	if( !(gpDataBase) ){	return E_OUTOFMEMORY;	}
-
-	rslt = sqlite3_prepare16( gpDataBase, atQuery, -1, &statement, NULL );
-	if( SQLITE_OK != rslt ){	SQL_DEBUG( gpDataBase );	return E_FAIL;	}
-
-	sqlite3_reset( statement );
-
-	rslt = sqlite3_bind_text16( statement, 1, atReqest, -1, SQLITE_STATIC );	//	
-
-	for( i = 0; 20 > i; i++ )
-	{
-		rslt = sqlite3_step( statement );
-		if( SQLITE_ROW == rslt )
-		{
-			StringCchPrintf( atGetName, SUB_STRING, TEXT("%s"), (LPCTSTR)sqlite3_column_text16( statement, 0 ) );
-		}
-		else{	break;	}
-	}
-
-	sqlite3_finalize( statement );
-
-	return S_OK;
-}
-
-
-#endif
 
