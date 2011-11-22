@@ -37,12 +37,18 @@ static HINSTANCE	ghInst;		//!<	アプリの実存
 
 static  HWND	ghMainWnd;		//!<	本体ウインドウ
 
-static  HWND	ghMaaWnd;		//!<	このウインドウ
+
+static  HWND	ghMaaWnd;		//!<	このウインドウ・staticを解除してはイケナイ
+
 static  HWND	ghStsBarWnd;	//!<	ステータスバーハンドル
 
 EXTERNED HWND	ghSplitaWnd;	//!<	スプリットバーハンドル
 
 EXTERNED UINT	gbAAtipView;	//!<	非０で、ＡＡツールチップ表示
+
+#ifdef FIND_MAA_FILE
+static  HWND	ghMaaFindDlg;	//!<	MAA検索ダイヤログハンドル
+#endif
 
 #ifdef MAA_PROFILE
 static TCHAR	gatProfilePath[MAX_PATH];	//!<	プロファイルディレクトリ
@@ -790,7 +796,7 @@ INT_PTR CALLBACK TreeProfileDlgProc( HWND hDlg, UINT message, WPARAM wParam, LPA
 					{
 						//	一旦全破壊してルート作り直し
 						TreeView_DeleteAllItems( chTvWnd  );
-						chTreeRoot = TreeView_InsertItem( chTvWnd, &cstRootIns );
+						chTreeRoot = TreeView_InsertItem( chTvWnd, &cstRootIns );	//	ルート作成
 						TreeView_SetCheckState( chTvWnd , chTreeRoot, TRUE );	//	チェキマーク？
 
 						StringCchCopy( ptFolder, MAX_PATH, atTgtDir );	//	文字数キメうち注意
@@ -863,6 +869,7 @@ INT_PTR CALLBACK TreeProfileDlgProc( HWND hDlg, UINT message, WPARAM wParam, LPA
 					SetWindowLong( hDlg, DWL_MSGRESULT, 0 );
 					return (INT_PTR)TRUE;
 				}
+
 			}
 			break;
 
@@ -1174,11 +1181,6 @@ LPTSTR StringLineGet( LPCTSTR ptSource, LPCTSTR *ptNextLn )
 }
 //-------------------------------------------------------------------------------------------------
 
-
-
-
-
-
 /*
 ツリー内からサーチ
 同じ親番号を持つ者内でサーチ・同じディレクトリ内には、単一名しか入らないから、
@@ -1187,4 +1189,207 @@ LPTSTR StringLineGet( LPCTSTR ptSource, LPCTSTR *ptNextLn )
 */
 
 #endif	//	MAA_PROFILE
+
+
+#ifdef FIND_MAA_FILE
+
+
+/*!
+	検索してリストビューに入れる
+	@param[in]	hDlg	ダイヤログハンドル
+*/
+HRESULT MaaFindExecute( HWND hDlg )
+{
+	UINT	dCnt, dMax, d;
+	UINT	dItem, dType, dPrntID, dOwnID;
+	UINT	dDmyType, dDmyID;
+	TCHAR	atPattern[MAX_PATH];
+	TCHAR	atFileName[MAX_PATH], atPrntName[MAX_PATH];
+	HWND	hLvWnd, hEdWnd;
+	LVITEM	stLvi;
+
+	hEdWnd = GetDlgItem( hDlg, IDE_MAA_FIND_NAME );
+	hLvWnd = GetDlgItem( hDlg, IDLV_MAA_FINDED_FILE );
+
+	ListView_DeleteAllItems( hLvWnd );
+
+	ZeroMemory( atPattern, sizeof(atPattern) );
+	GetDlgItemText( hDlg, IDE_MAA_FIND_NAME, atPattern, MAX_PATH );
+
+	dCnt = SqlTreeCount( 1, &dMax );
+
+	dOwnID = 0;
+	for( d = 0; dMax > d; d++ )
+	{
+		dOwnID = SqlTreeFileSearch( atPattern, dOwnID );	//	ヒットを確認
+		if( 0 == dOwnID )	break;	//	それ以上無いようなら終わり
+
+		ZeroMemory( atFileName, sizeof(atFileName) );
+		dType   = 0;
+		dPrntID = 0;
+
+		//	該当ＩＤの内容を確認
+		SqlTreeNodePickUpID( dOwnID, &dType, &dPrntID, atFileName, 0x11 );
+		if( FILE_ATTRIBUTE_NORMAL == dType )
+		{
+			//	引っ張った内容ファイル名をリストビューに表示
+			dItem = ListView_GetItemCount( hLvWnd );
+
+			ZeroMemory( &stLvi, sizeof(stLvi) );
+			stLvi.iItem = dItem;
+
+			stLvi.mask     = LVIF_TEXT | LVIF_PARAM;
+			stLvi.pszText  = atFileName;
+			stLvi.lParam   = dOwnID;
+			stLvi.iSubItem = 0;
+			ListView_InsertItem( hLvWnd, &stLvi );
+
+			SqlTreeNodePickUpID( dPrntID, &dDmyType, &dDmyID, atPrntName, 0x11 );
+
+			stLvi.mask     = LVIF_TEXT;
+			stLvi.pszText  = atPrntName;
+			stLvi.iSubItem = 1;
+			ListView_SetItem( hLvWnd, &stLvi );
+		}
+	}
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+
+
+/*!
+	MAA検索ダイヤログのノーティファイメッセージの処理
+	@param[in]	hDlg		ダイヤログハンドル
+	@param[in]	idFrom		NOTIFYを発生させたコントロールのＩＤ
+	@param[in]	pstNmhdr	NOTIFYの詳細
+	@return		処理した内容とか
+*/
+INT_PTR MaaFindOnNotify( HWND hDlg, INT idFrom, LPNMHDR pstNmhdr )
+{
+	HWND	hLvWnd;
+	INT		iItem, nmCode;
+	LPNMLISTVIEW	pstNmLv;
+	LVITEM			stLvi;
+	HTREEITEM		hTgtItem;
+
+	if( IDLV_MAA_FINDED_FILE == idFrom )
+	{
+		pstNmLv = (LPNMLISTVIEW)pstNmhdr;
+
+		hLvWnd = pstNmLv->hdr.hwndFrom;
+		nmCode = pstNmLv->hdr.code;
+
+		//	選択されてる項目を確保
+		iItem = ListView_GetNextItem( hLvWnd, -1, LVNI_ALL | LVNI_SELECTED );
+
+		if( 0 >  iItem )	return FALSE;	//	未選択状態なら何もしない
+
+		//	ダブルクルックであった場合
+		if( NM_DBLCLK == nmCode )
+		{
+			ZeroMemory( &stLvi, sizeof(stLvi) );
+			stLvi.mask     = LVIF_PARAM;
+			stLvi.iItem    = iItem;
+			stLvi.iSubItem = 0;
+			ListView_GetItem( hLvWnd, &stLvi );
+
+			hTgtItem = MaaSelectIDfile( hDlg, stLvi.lParam );	//	SqlID渡して開くようにする
+
+			if( hTgtItem )
+			{
+				TreeSelItemProc( ghMaaWnd, hTgtItem, 0 );	//	渡すハンドル、MAA窓のハンドルにしておかないとまずい？
+				SetForegroundWindow( ghMaaWnd );
+			}
+		}
+	}
+
+	return TRUE;
+}
+//-------------------------------------------------------------------------------------------------
+
+/*!
+	検索ダイヤログのプロシージャ
+	@param[in]	hDlg	ダイヤログハンドル
+	@param[in]	message	ウインドウメッセージの識別番号
+	@param[in]	wParam	追加の情報１
+	@param[in]	lParam	追加の情報２
+	@retval 0	メッセージは処理していない
+	@retval no0	なんか処理された
+*/
+INT_PTR CALLBACK TreeMaaFindDlgProc( HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam )
+{
+	HWND	hWorkWnd;
+	UINT	id;
+//	HWND	hWndChild;
+	LVCOLUMN	stLvColm;
+
+
+	switch( message )
+	{
+		default:	break;
+
+		case WM_INITDIALOG:
+			hWorkWnd = GetDlgItem( hDlg, IDLV_MAA_FINDED_FILE );
+			ListView_SetExtendedListViewStyle( hWorkWnd, LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES );
+			ZeroMemory( &stLvColm, sizeof(LVCOLUMN) );
+			stLvColm.mask = LVCF_FMT | LVCF_WIDTH | LVCF_TEXT | LVCF_SUBITEM;
+			stLvColm.fmt = LVCFMT_LEFT;
+			stLvColm.pszText = TEXT("ファイル名");	stLvColm.cx = 250;	stLvColm.iSubItem = 0;	ListView_InsertColumn( hWorkWnd, 0, &stLvColm );
+			stLvColm.pszText = TEXT("所属");		stLvColm.cx = 250;	stLvColm.iSubItem = 1;	ListView_InsertColumn( hWorkWnd, 1, &stLvColm );
+			SetFocus( GetDlgItem(hDlg,IDE_MAA_FIND_NAME) );
+			return (INT_PTR)FALSE;
+
+		case WM_COMMAND:
+			id = LOWORD(wParam);
+			hWorkWnd = GetDlgItem( hDlg, IDE_FIND_TEXT );
+			switch( id )
+			{
+				case IDCANCEL:	DestroyWindow( hDlg );	return (INT_PTR)TRUE;
+				case IDOK:		MaaFindExecute( hDlg );	return (INT_PTR)TRUE;	//	検索する
+				default:	break;
+			}
+			break;
+
+		case WM_CLOSE:	DestroyWindow( hDlg );	ghMaaFindDlg = NULL;	return (INT_PTR)TRUE;
+
+		case WM_DESTROY:	return (INT_PTR)TRUE;
+
+		case WM_NOTIFY:		MaaFindOnNotify( hDlg, (INT)(wParam), (LPNMHDR)(lParam) );	return (INT_PTR)TRUE;
+
+	}
+
+	return (INT_PTR)FALSE;
+}
+//-------------------------------------------------------------------------------------------------　λ...
+
+/*!
+	MAAファイル検索窓の処理
+	@param[in]	hWnd	ウインドウハンドル
+*/
+HRESULT TreeMaaFileFind( HWND hWnd )
+{
+	HINSTANCE	hInst;
+
+	hInst = GetModuleHandle( NULL );
+
+
+	if( ghMaaFindDlg )
+	{
+		SetForegroundWindow( ghMaaFindDlg );
+		return S_OK;
+	}
+
+	ghMaaFindDlg = CreateDialogParam( hInst, MAKEINTRESOURCE(IDD_FIND_MAA_DLG), hWnd, TreeMaaFindDlgProc, 0 );
+
+	ShowWindow( ghMaaFindDlg, SW_SHOW );
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+
+
+#endif	//	FIND_MAA_FILE
+
+
 

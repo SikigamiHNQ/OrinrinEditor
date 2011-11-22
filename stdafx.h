@@ -91,7 +91,7 @@ static CONST GUID gcstGUID = { 0x66D3E881, 0x972B, 0x458B, { 0x93, 0x5E, 0x9E, 0
 //#define OPEN_HISTORY
 
 //#define FIND_STRINGS	//	文字列検索機能
-//#define FIND_MAA_FILE	//	MAAファイル検索機能
+#define FIND_MAA_FILE	//	MAAファイル検索機能
 
 //機能ＯＫ
 #define  MOZI_SCRIPT	//	５０音Script機能
@@ -191,6 +191,7 @@ VOID	SqlErrMsgView( sqlite3 *, DWORD );
 #define FONTSZ_NORMAL	16
 #define FONTSZ_REDUCE	12
 
+#define VL_CLASHCOVER	0	//	起動したら１、閉じるときに０にして、CLASHを検知
 #define VL_GROUP_UNDO	1	//	グループアンドゥ
 #define VL_USE_UNICODE	2	//	ユニコードパディング
 #define VL_LAYER_TRANS	3	//	レイヤボックス透明度

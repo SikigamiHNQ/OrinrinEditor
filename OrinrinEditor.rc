@@ -400,7 +400,7 @@ CAPTION "バージョン情報 - Orinrin Editor"
 FONT 9, "MS UI Gothic"
 BEGIN
     ICON            IDI_ORINRINEDITOR,IDC_MYICON,6,6,20,20
-    LTEXT           "Orinrin Editor, Version 0.24.1 Aurora (2011.1118.2230.920)",IDC_STATIC,36,6,168,8,SS_NOPREFIX
+    LTEXT           "Orinrin Editor, Version 0.25 Aurora (2011.1122.2230.920)",IDC_STATIC,36,6,168,8,SS_NOPREFIX
     LTEXT           "Copyright (C) 2011 by SikigamiHNQ",IDC_STATIC,36,18,168,8
     LTEXT           "Site ： お燐ちゃんは俺の嫁．ｃｏｍ",IDC_STATIC,36,30,168,8
     DEFPUSHBUTTON   "OK",IDOK,84,180,48,12,WS_GROUP
@@ -744,8 +744,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 2011,1118,2230,920
- PRODUCTVERSION 0,24,1,920
+ FILEVERSION 2011,1122,2230,920
+ PRODUCTVERSION 0,25,0,920
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -770,8 +770,8 @@ BEGIN
             VALUE "LegalTrademarks", "License : GPLv3"
             VALUE "PrivateBuild", "Build by Visual Studio 2008"
             VALUE "SpecialBuild", "Not Speciality"
-            VALUE "FileVersion", "2011.1118.2230.920"
-            VALUE "ProductVersion", "0.24.1.920"
+            VALUE "FileVersion", "2011.1122.2230.920"
+            VALUE "ProductVersion", "0.25.0.920"
             VALUE "FileDescription", "AsciiArt Editor by Orinrin!"
             VALUE "OriginalFilename", "OrinrinEditor.exe"
             VALUE "InternalName", "Orinrin Editor"

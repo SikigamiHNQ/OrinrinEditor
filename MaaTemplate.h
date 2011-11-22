@@ -4,6 +4,7 @@
 #include "resource.h"
 //-------------------------------------------------------------------------------------------------
 
+#define MAA_VIRTUAL_TREE
 
 #define WMP_PROF_ACT	(WM_APP+100)	
 
@@ -41,7 +42,10 @@ LRESULT		TreeNotify( HWND, LPNMTREEVIEW );	//!<
 LPTSTR		TreeBaseNameGet( VOID );			//!<	
 UINT		TreeFavIsUnderCursor( HWND, HWND, INT, INT, INT, UINT );	//!<	
 INT			TreeFavWhichOpen( VOID );			//!<	
-LPARAM		TreeItemInfoGet( HTREEITEM, LPTSTR, size_t );
+LPARAM		TreeItemInfoGet( HTREEITEM, LPTSTR, size_t );	//!<	
+INT			TreeSelItemProc( HWND, HTREEITEM, UINT );	//!<	
+UINT		TreeNodePathGet( HTREEITEM, LPTSTR );	//!<	
+
 
 LRESULT		CALLBACK FavListFolderNameBack( UINT, UINT, UINT, LPCVOID );	//!<	
 HRESULT		FavListSelected( HWND, UINT );		//!<	
@@ -91,6 +95,13 @@ INT			TreeProfileRebuild( HWND );
 HRESULT		TreeLoadDirCheck( HWND, HWND );
 UINT		TreeIsExistLoad( LPTSTR );
 
+#ifdef FIND_MAA_FILE
+HTREEITEM	MaaSearchTreeItem( INT );
+HTREEITEM	MaaSelectIDfile( HWND, INT );
+#endif
+
+INT			MaaSearchTreeID( HTREEITEM );
+
 //HRESULT		SqlTreeOpenClose( BYTE, LPCTSTR );
 HRESULT		SqlTransactionOnOff( BYTE );
 
@@ -104,8 +115,10 @@ HRESULT		SqlTreeNodeDelete( UINT );
 //HRESULT		SqlTreeNodeEnum( UINT, BUFFERBACK );
 UINT		SqlTreeNodePickUpID( UINT, PUINT, PUINT, LPTSTR, UINT );
 //UINT		SqlTreeNodeRootSearch( LPTSTR );
+UINT		SqlChildNodePickUpID( UINT, UINT, PUINT, LPTSTR );
 
 UINT		SqlTreeFileSearch( LPTSTR, UINT );
+UINT		SqlTreeFileGetOnParent( LPTSTR, UINT );
 
 HRESULT		SqlTreeCacheOpenClose( UINT );
 HRESULT		SqlTreeCacheDelID( INT );

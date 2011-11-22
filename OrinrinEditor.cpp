@@ -26,6 +26,10 @@ If not, see <http://www.gnu.org/licenses/>.
 
 //	TODO:	MAA窓を非使用するオプショッ
 
+//	TODO:	統合したテンプレ窓の幅変更できるように
+
+//	TODO:	最大化で終了したときは、最大化状態を覚えておく方がいい
+
 //	TODO:	MAAで、含んでいるファイルの検索。検索して、そのファイルをタブに表示とか
 //	TODO:	MLTのブックマーク機能・タブ増やすか、ツリーに増やすか
 //検索もツリーにできる？逆に面倒かも
@@ -37,7 +41,6 @@ If not, see <http://www.gnu.org/licenses/>.
 //	TODO:	枠編集のサンプルがおかしいときがある・描画ルーチン治すか
 
 //	TODO:	位置情報のリセット機能・システムメニューに搭載する。
-//	TODO:	最大化で終了したときは、最大化状態を覚えておく方がいい
 
 //	TODO:	保存するとき、同名ファイルがあったら、日時くっつけてバックアップとか
 
@@ -315,7 +318,8 @@ ASDファイル　　壱行が壱コンテンツ
 					プレビューウインドウの位置と大きさを覚えておくようにした
 					枠挿入したときに下の方が更新されないのを修正
 					バグ修正いろいろ
-2011/11/21	0.25	MAAのファイル名検索機能
+2011/11/22	0.25	MAAのファイル名検索機能
+					MAAのツリー展開が早くなった気がする（Viewer込み）
 
 
 
@@ -446,6 +450,8 @@ INT APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 	TCHAR	atArgv[MAX_PATH];
 	LPTSTR	*pptArgs;
 
+	INT		iCode;
+
 #ifdef _DEBUG
 	//_CRTDBG_ALLOC_MEM_DF;		//	指定が必要なフラグ
 	//_CRTDBG_CHECK_ALWAYS_DF;	//	メモリをチェック		_CRTDBG_CHECK_EVERY_128_DF
@@ -493,15 +499,24 @@ INT APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 	GetModuleFileName( hInstance, gatExePath, MAX_PATH );
 	PathRemoveFileSpec( gatExePath );
 
+	StringCchCopy( gatIniPath, MAX_PATH, gatExePath );
+	PathAppend( gatIniPath, INI_FILE );
+
 	DocBackupDirectoryInit( gatExePath );
 	FrameInitialise( gatExePath, hInstance );
 #ifdef MOZI_SCRIPT
 	MoziInitialise( gatExePath, hInstance );
 #endif
-	StringCchCopy( gatIniPath, MAX_PATH, gatExePath );
-	PathAppend( gatIniPath, INI_FILE );
-
 	gbUniPad = 0;
+
+	iCode = InitParamValue( INIT_LOAD, VL_CLASHCOVER, 0 );
+	if( iCode )
+	{
+		iCode = MessageBox( NULL, TEXT("エディタが正しく終了出来なかった気配があるよ。\r\nバックアップが残っているかもしれないから、先に確認してみて！\r\nこのまま起動してもいいかい？　「いいえ」を選ぶと、ここで終了するよ。"), TEXT("ごめんね"), MB_YESNO|MB_ICONWARNING|MB_DEFBUTTON2 );
+		if( IDNO == iCode ){	return 0;	}
+	}
+
+	InitParamValue( INIT_SAVE, VL_CLASHCOVER, 1 );
 
 	// アプリケーションの初期化を実行します:
 	if( !InitInstance( hInstance, nCmdShow , atArgv ) ){	return FALSE;	}
@@ -537,6 +552,8 @@ INT APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 			DispatchMessage(&msg);
 		}
 	}
+
+	InitParamValue( INIT_SAVE, VL_CLASHCOVER, 0 );
 
 	UnregisterHotKey( ghMainWnd, IDHK_THREAD_DROP );
 
@@ -1708,35 +1725,36 @@ INT InitParamValue( UINT dMode, UINT dStyle, INT nValue )
 
 	switch( dStyle )
 	{
+		case  VL_CLASHCOVER:	StringCchCopy( atKeyName, SUB_STRING, TEXT("ClashCover") );		break;
 		case  VL_GROUP_UNDO:	StringCchCopy( atKeyName, SUB_STRING, TEXT("GroupUndo") );		break;
-		case VL_USE_UNICODE:	StringCchCopy( atKeyName, SUB_STRING, TEXT("UseUnicode")  );	break;
-		case VL_LAYER_TRANS:	StringCchCopy( atKeyName, SUB_STRING, TEXT("LayerTrans")  );	break;
-		case VL_RIGHT_SLIDE:	StringCchCopy( atKeyName, SUB_STRING, TEXT("RightSlide")  );	break;
-		case VL_MAA_SPLIT:		StringCchCopy( atKeyName, SUB_STRING, TEXT("MaaSplit") );		break;
-		case VL_SETMETHOD:		StringCchCopy( atKeyName, SUB_STRING, TEXT("MaaMethod") );		break;
-		case VL_UNILISTLAST:	StringCchCopy( atKeyName, SUB_STRING, TEXT("UniListLast") );	break;
-		case VL_MAATIP_VIEW:	StringCchCopy( atKeyName, SUB_STRING, TEXT("MaaToolTip")  );	break;
-		case VL_MAATIP_SIZE:	StringCchCopy( atKeyName, SUB_STRING, TEXT("MaaToolTipSize") );	break;
-		case VL_LINETMP_CLM:	StringCchCopy( atKeyName, SUB_STRING, TEXT("LineTmplClm") );	break;
-		case VL_BRUSHTMP_CLM:	StringCchCopy( atKeyName, SUB_STRING, TEXT("BrushTmplClm") );	break;
-		case VL_UNIRADIX_HEX:	StringCchCopy( atKeyName, SUB_STRING, TEXT("UniRadixHex") );	break;
-		case VL_BACKUP_INTVL:	StringCchCopy( atKeyName, SUB_STRING, TEXT("BackUpIntvl") );	break;
-		case VL_BACKUP_MSGON:	StringCchCopy( atKeyName, SUB_STRING, TEXT("BackUpMsgOn") );	break;
-		case VL_CRLF_CODE:		StringCchCopy( atKeyName, SUB_STRING, TEXT("CrLfCode") );		break;
+		case  VL_USE_UNICODE:	StringCchCopy( atKeyName, SUB_STRING, TEXT("UseUnicode")  );	break;
+		case  VL_LAYER_TRANS:	StringCchCopy( atKeyName, SUB_STRING, TEXT("LayerTrans")  );	break;
+		case  VL_RIGHT_SLIDE:	StringCchCopy( atKeyName, SUB_STRING, TEXT("RightSlide")  );	break;
+		case  VL_MAA_SPLIT:		StringCchCopy( atKeyName, SUB_STRING, TEXT("MaaSplit") );		break;
+		case  VL_SETMETHOD:		StringCchCopy( atKeyName, SUB_STRING, TEXT("MaaMethod") );		break;
+		case  VL_UNILISTLAST:	StringCchCopy( atKeyName, SUB_STRING, TEXT("UniListLast") );	break;
+		case  VL_MAATIP_VIEW:	StringCchCopy( atKeyName, SUB_STRING, TEXT("MaaToolTip")  );	break;
+		case  VL_MAATIP_SIZE:	StringCchCopy( atKeyName, SUB_STRING, TEXT("MaaToolTipSize") );	break;
+		case  VL_LINETMP_CLM:	StringCchCopy( atKeyName, SUB_STRING, TEXT("LineTmplClm") );	break;
+		case  VL_BRUSHTMP_CLM:	StringCchCopy( atKeyName, SUB_STRING, TEXT("BrushTmplClm") );	break;
+		case  VL_UNIRADIX_HEX:	StringCchCopy( atKeyName, SUB_STRING, TEXT("UniRadixHex") );	break;
+		case  VL_BACKUP_INTVL:	StringCchCopy( atKeyName, SUB_STRING, TEXT("BackUpIntvl") );	break;
+		case  VL_BACKUP_MSGON:	StringCchCopy( atKeyName, SUB_STRING, TEXT("BackUpMsgOn") );	break;
+		case  VL_CRLF_CODE:		StringCchCopy( atKeyName, SUB_STRING, TEXT("CrLfCode") );		break;
 	//	case  VL_SPACE_VIEW:	StringCchCopy( atKeyName, SUB_STRING, TEXT("SpaceView") );		break;
 		case  VL_GRID_X_POS:	StringCchCopy( atKeyName, SUB_STRING, TEXT("GridXpos") );		break;
 		case  VL_GRID_Y_POS:	StringCchCopy( atKeyName, SUB_STRING, TEXT("GridYpos") );		break;
-		case VL_GRID_VIEW:		StringCchCopy( atKeyName, SUB_STRING, TEXT("GridView") );		break;
-		case VL_R_RULER_POS:	StringCchCopy( atKeyName, SUB_STRING, TEXT("RightRuler")  );	break;
-		case VL_R_RULER_VIEW:	StringCchCopy( atKeyName, SUB_STRING, TEXT("RitRulerView") );	break;
-		case VL_PAGETIP_VIEW:	StringCchCopy( atKeyName, SUB_STRING, TEXT("PageToolTip") );	break;
-		case VL_PCOMBINE_NM:	StringCchCopy( atKeyName, SUB_STRING, TEXT("PageCombineNM") );	break;
+		case  VL_GRID_VIEW:		StringCchCopy( atKeyName, SUB_STRING, TEXT("GridView") );		break;
+		case  VL_R_RULER_POS:	StringCchCopy( atKeyName, SUB_STRING, TEXT("RightRuler")  );	break;
+		case  VL_R_RULER_VIEW:	StringCchCopy( atKeyName, SUB_STRING, TEXT("RitRulerView") );	break;
+		case  VL_PAGETIP_VIEW:	StringCchCopy( atKeyName, SUB_STRING, TEXT("PageToolTip") );	break;
+		case  VL_PCOMBINE_NM:	StringCchCopy( atKeyName, SUB_STRING, TEXT("PageCombineNM") );	break;
 		case  VL_PDIVIDE_NM:	StringCchCopy( atKeyName, SUB_STRING, TEXT("PageDivideNM") );	break;
 		case  VL_PDELETE_NM:	StringCchCopy( atKeyName, SUB_STRING, TEXT("PageDeleteNM") );	break;
-		case VL_MAASEP_STYLE:	StringCchCopy( atKeyName, SUB_STRING, TEXT("MaaSepLine")  );	break;
-		case VL_PLS_LN_DOCK:	StringCchCopy( atKeyName, SUB_STRING, TEXT("PLstLineDock") );	break;
-	//	case VL_BRUSH_DOCK:		StringCchCopy( atKeyName, SUB_STRING, TEXT("BrushDock") );		break;
-		case VL_SWAP_COPY:		StringCchCopy( atKeyName, SUB_STRING, TEXT("CopyModeSwap") );	break;
+		case  VL_MAASEP_STYLE:	StringCchCopy( atKeyName, SUB_STRING, TEXT("MaaSepLine")  );	break;
+		case  VL_PLS_LN_DOCK:	StringCchCopy( atKeyName, SUB_STRING, TEXT("PLstLineDock") );	break;
+	//	case  VL_BRUSH_DOCK:	StringCchCopy( atKeyName, SUB_STRING, TEXT("BrushDock") );		break;
+		case  VL_SWAP_COPY:		StringCchCopy( atKeyName, SUB_STRING, TEXT("CopyModeSwap") );	break;
 		default:	return nValue;
 	}
 

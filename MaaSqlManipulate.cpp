@@ -990,6 +990,42 @@ UINT SqlTreeNodePickUpID( UINT tgtID, PUINT pType, PUINT pPrntID, LPTSTR ptName,
 //-------------------------------------------------------------------------------------------------
 
 /*!
+	親ＩＤ指定してリストアップ
+	@param[in]	dPrntID	親ＩＤ
+	@param[in]	tgtID	この番号を超えて最初にヒットしたやつを返す
+	@param[out]	pType	ディレクトリ(FILE_ATTRIBUTE_DIRECTORY)かファイルか(FILE_ATTRIBUTE_NORMAL)
+	@param[out]	ptName	ノードの名称
+//	@param[in]	bStyle	0x01通常　0x00ツリーキャッシュ　／　0x10ＩＤ一致　0x00ＩＤ超えた
+	@return	UINT	引っ張ったやつのＩＤ・無かったら０
+*/
+UINT SqlChildNodePickUpID( UINT dPrntID, UINT tgtID, PUINT pType, LPTSTR ptName )
+{
+	CHAR	acQuery[MAX_PATH];
+	INT		rslt;
+	UINT	id = 0, dummy;
+	sqlite3_stmt*	statement;
+
+	StringCchPrintfA( acQuery, MAX_PATH, ("SELECT * FROM TreeNode WHERE parentid == %u AND id > %u ORDER BY id ASC"), dPrntID, tgtID );
+
+	rslt = sqlite3_prepare( gpDataBase, acQuery, -1, &statement, NULL );
+	if( SQLITE_OK != rslt ){	SQL_DEBUG( gpDataBase );	return 0;	}
+	sqlite3_reset( statement );
+	rslt = sqlite3_step( statement );
+	if( SQLITE_ROW == rslt )
+	{
+		id     = sqlite3_column_int( statement, 0 );	//	id
+		*pType = sqlite3_column_int( statement, 1 );	//	type
+		dummy  = sqlite3_column_int( statement, 2 );	//	parentid
+		StringCchCopy( ptName, MAX_PATH, (LPCTSTR)sqlite3_column_text16( statement, 3 ) );	//	nodename
+	}
+
+	sqlite3_finalize( statement );
+
+	return id;
+}
+//-------------------------------------------------------------------------------------------------
+
+/*!
 	ツリーデータを削除
 	@return	HRESULT	終了状態コード
 */
@@ -1029,8 +1065,6 @@ UINT SqlTreeFileSearch( LPTSTR ptName, UINT dStart )
 
 	if( !(gpDataBase) ){	return 0;	}
 
-
-
 	rslt = sqlite3_prepare( gpDataBase, ("SELECT id FROM TreeNode WHERE nodename LIKE ? AND id > ? ORDER BY id ASC"), -1, &statement, NULL );
 	if( SQLITE_OK != rslt ){	SQL_DEBUG( gpDataBase );	return 0;	}
 
@@ -1049,6 +1083,39 @@ UINT SqlTreeFileSearch( LPTSTR ptName, UINT dStart )
 	return dxID;
 }
 //-------------------------------------------------------------------------------------------------
+
+/*!
+	特定の親ＩＤを持つノード名称を探して、該当するＩＤを返す。
+	@param[in]	ptName	パヤーン
+	@param[in]	dPrntID	特定の親ＩＤ
+*/
+UINT SqlTreeFileGetOnParent( LPTSTR ptName, UINT dPrntID )
+{
+	INT		rslt;
+	UINT	dxID;
+	sqlite3_stmt*	statement;
+
+	if( !(gpDataBase) ){	return 0;	}
+
+	rslt = sqlite3_prepare( gpDataBase, ("SELECT id FROM TreeNode WHERE nodename == ? AND parentid == ?"), -1, &statement, NULL );
+	if( SQLITE_OK != rslt ){	SQL_DEBUG( gpDataBase );	return 0;	}
+
+	sqlite3_reset( statement );
+
+	rslt = sqlite3_bind_text16( statement, 1, ptName, -1, SQLITE_STATIC );	//	
+	sqlite3_bind_int( statement, 2, dPrntID );
+
+	rslt = sqlite3_step( statement );
+	if( SQLITE_ROW == rslt ){	dxID = sqlite3_column_int( statement, 0 );	}
+	else{	dxID = 0;	}
+
+	sqlite3_finalize( statement );
+
+	return dxID;
+}
+//-------------------------------------------------------------------------------------------------
+
+
 
 
 /*!

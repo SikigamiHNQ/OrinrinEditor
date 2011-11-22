@@ -30,7 +30,7 @@ typedef struct tagAATITLE
 } AATITLE, *LPAATITLE;
 //-------------------------------------------------------------------------------------------------
 
-#define TITLECBX_HEI	150
+#define TITLECBX_HEI	200
 
 #define SBP_DIRECT		0xFF
 
@@ -126,7 +126,7 @@ HRESULT AaItemsInitialise( HWND hWnd, HINSTANCE hInst, LPRECT ptRect )
 		CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, hWnd, NULL, hInst, NULL );
 
 	//	見出しコンボックス
-	ghComboxWnd = CreateWindowEx( 0, WC_COMBOBOX, TEXT(""), WS_VISIBLE | WS_CHILD | WS_BORDER | WS_VSCROLL | CBS_DROPDOWNLIST,
+	ghComboxWnd = CreateWindowEx( 0, WC_COMBOBOX, TEXT(""), WS_VISIBLE | WS_CHILD | WS_BORDER | WS_VSCROLL | CBS_DROPDOWNLIST | CBS_NOINTEGRALHEIGHT,
 		TREE_WIDTH + SPLITBAR_WIDTH, 0, ptRect->right - TREE_WIDTH - LSSCL_WIDTH, TITLECBX_HEI,
 		hWnd, (HMENU)IDCB_AAITEMTITLE, hInst, NULL );
 	GetClientRect( ghComboxWnd, &rect );
