@@ -49,6 +49,7 @@ BEGIN
         MENUITEM "プロファイル作成／開く(&N)",	IDM_MAA_PROFILE_MAKE
         MENUITEM "AA一覧ツリーを再構築(&T)",	IDM_TREE_RECONSTRUCT
         MENUITEM "一般設定(&G)",				IDM_GENERAL_OPTION
+        MENUITEM "ファイル名で検索(&F)",		IDM_FINDMAA_DLG_OPEN
         MENUITEM SEPARATOR
         MENUITEM "常に手前に表示(&A)",			IDM_TOPMOST_TOGGLE
         MENUITEM SEPARATOR
@@ -113,7 +114,7 @@ CAPTION "バージョン情報 - Orinrin Viewer"
 FONT 9, "MS UI Gothic"
 BEGIN
     ICON            IDI_ORINRINEDITOR,IDC_MYICON,6,6,18,21
-    LTEXT           "Orinrin Viewer, Version 4.1 aurora (2011.1105.1300.920)",IDC_STATIC,36,6,180,8,SS_NOPREFIX
+    LTEXT           "Orinrin Viewer, Version 5 aurora (2011.1124.2200.920)",IDC_STATIC,36,6,180,8,SS_NOPREFIX
     LTEXT           "Copyright (C) 2011 by SikigamiHNQ",IDC_STATIC,36,18,180,8
     LTEXT           "Site ： お燐ちゃんは俺の嫁．ｃｏｍ",IDC_STATIC,36,30,180,8
     DEFPUSHBUTTON   "OK",IDOK,85,180,50,14,WS_GROUP
@@ -154,14 +155,25 @@ BEGIN
     CONTROL         "",IDTV_PRTREE_DIR_TVIEW,"SysTreeView32",TVS_HASBUTTONS | TVS_HASLINES | TVS_LINESATROOT | TVS_DISABLEDRAGDROP | TVS_SHOWSELALWAYS | TVS_CHECKBOXES | WS_BORDER | WS_HSCROLL | WS_TABSTOP,6,24,192,228
 END
 
+IDD_FIND_MAA_DLG DIALOG 0, 0, 215, 126
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_TOOLWINDOW
+CAPTION "テンプレートファイル名検索"
+FONT 10, "MS UI Gothic"
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,162,6,48,12
+    EDITTEXT        IDE_MAA_FIND_NAME,6,6,150,12,ES_AUTOHSCROLL
+    CONTROL         "",IDLV_MAA_FINDED_FILE,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_ALIGNLEFT | LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,6,24,204,96
+END
+
 /////////////////////////////////////////////////////////////////////////////
 //
 //	バージョン情報
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 2011,1105,1300,920
- PRODUCTVERSION 4,1,0,920
+ FILEVERSION 2011,1124,2200,920
+ PRODUCTVERSION 5,0,0,920
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -186,12 +198,12 @@ BEGIN
             VALUE "LegalTrademarks", "License : GPLv3"
             VALUE "PrivateBuild", "Build by Visual Studio 2008"
             VALUE "SpecialBuild", "Not Speciality"
-            VALUE "FileVersion", "2011.1105.1300.920"
-            VALUE "ProductVersion", "4.1.0.920"
-            VALUE "FileDescription", "AsciiArt Viewer Ver4"
+            VALUE "FileVersion", "2011.1124.2200.920"
+            VALUE "ProductVersion", "5.0.0.920"
+            VALUE "FileDescription", "AsciiArt Viewer Ver5"
             VALUE "OriginalFilename", "OrinrinViewer.exe"
             VALUE "InternalName", "Orinrin Viewer"
-            VALUE "ProductName", "Orinrin Viewer 4"
+            VALUE "ProductName", "Orinrin Viewer 5"
         END
     END
 END

@@ -65,9 +65,6 @@ HRESULT	TreeItemFind( LPCTSTR, HTREEITEM, UINT );	//!<
 #endif
 
 
-#ifdef FIND_MAA_FILE
-HRESULT	TreeMaaFileFind( HWND );
-#endif
 
 HRESULT	TabMultipleRestore( HWND );
 INT		TabMultipleSelect( HWND, INT, UINT );	//!<	

@@ -46,6 +46,9 @@ LPARAM		TreeItemInfoGet( HTREEITEM, LPTSTR, size_t );	//!<
 INT			TreeSelItemProc( HWND, HTREEITEM, UINT );	//!<	
 UINT		TreeNodePathGet( HTREEITEM, LPTSTR );	//!<	
 
+#ifdef FIND_MAA_FILE
+HRESULT		TreeMaaFileFind( HWND );
+#endif
 
 LRESULT		CALLBACK FavListFolderNameBack( UINT, UINT, UINT, LPCVOID );	//!<	
 HRESULT		FavListSelected( HWND, UINT );		//!<	

@@ -361,6 +361,9 @@ VOID Maa_OnCommand( HWND hWnd, INT id, HWND hwndCtl, UINT codeNotify )
 		case IDM_GENERAL_OPTION:	//	ê›íË
 			DialogBoxParam( ghInst, MAKEINTRESOURCE(IDD_ORRVWR_OPTION_DLG), hWnd, OptionDlgProc, NULL );
 			break;
+	#ifdef FIND_MAA_FILE
+			case IDM_FINDMAA_DLG_OPEN:	TreeMaaFileFind( hWnd );	break;
+	#endif
 
 	#ifdef MAA_PROFILE
 		case IDM_MAA_PROFILE_MAKE:	TreeProfileOpen( hWnd );	break;
