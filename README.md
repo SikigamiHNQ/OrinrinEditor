@@ -1,58 +1,58 @@
-OrinrinEditor / OrinrinViewer / OrinrinCollector
+﻿OrinrinEditor / OrinrinViewer / OrinrinCollector
 ======================
-�`�`�X�g�[���[�G�f�B�^  
-MLT(AST)�t�@�C���r���[��  
-�R�s�y�ۑ��c�[��
+ＡＡストーリーエディタ  
+MLT(AST)ファイルビューワ  
+コピペ保存ツール
 
-## ���C�Z���X ##
+## ライセンス ##
 General Public License Ver3
 
-## �J���� ##
+## 開発環境 ##
 
-+   **����** �F C����i�ꕔC++�j
-+   **��** �F Visual C++ Express 2008�B2005�ł�2010�ł�����OK
++   **言語** ： C言語（一部C++）
++   **環境** ： Visual C++ Express 2008。2005でも2010でも多分OK
 
-##���C�u������##
+##ライブラリ等##
 ###WindowsDriverKit710###
-[�_�E�\](http://www.microsoft.com/download/en/details.aspx?displaylang=en&id=11800 "WindowsDriverKit710")
+[ダウソ](http://www.microsoft.com/download/en/details.aspx?displaylang=en&id=11800 "WindowsDriverKit710")
 
-    �C���N���[�h�t�@�C���p�X�ɁA"(DDK�t�H���_)\inc\atl71"
-    ���C�u�����t�@�C���p�X�ɁA"(DDK�t�H���_)\lib\atl\i386"��ǉ��B
+    インクルードファイルパスに、"(DDKフォルダ)\inc\atl71"
+    ライブラリファイルパスに、"(DDKフォルダ)\lib\atl\i386"を追加。
 
-    ���O��ATL71�����ǃo�[�W������80
+    名前はATL71だけどバージョンは80
 
-    �����N�ŃG���[���o��Ȃ�A
-    �����J�̒ǉ��̈ˑ��t�@�C���ɁAatlthunk.lib��t����B
+    リンクでエラーが出るなら、
+    リンカの追加の依存ファイルに、atlthunk.libを付ける。
 
-    �v���r���[�Ŏg���Ă�IE�R���|�[�l���g��ATL���v��̂ŁA���̂��߂ɕK�v�B
-    VisualStudio�̏�ʃG�f�B�V�����ɂ�ATL�������Ă�̂ŁA���������ꍇ�͕s�v�B
+    プレビューで使ってるIEコンポーネントにATLが要るので、そのために必要。
+    VisualStudioの上位エディションにはATLが入ってるので、そういう場合は不要。
 
 ###SQLite3###
-[�_�E�\](http://www.sqlite.org/ "SQLite3" )  
+[ダウソ](http://www.sqlite.org/ "SQLite3" )  
 
-    Win32-DLL�ƁAsource�Ɋ܂܂�Ă���header���K�v�B  
-    sqlite3.h�Asqlite3.lib ���v���W�F�N�g�ɉ�����K�v������B  
-    lib�̗p�ӂ̎d���̓O�[�O���搶���m���Ă���B
+    Win32-DLLと、sourceに含まれているheaderが必要。  
+    sqlite3.h、sqlite3.lib をプロジェクトに加える必要がある。  
+    libの用意の仕方はグーグル先生が知っている。
 
 ###ImgCtl.dll###
-[�_�E�\](http://www.ruche-home.net/ "ImgCtl.dll")
+[ダウソ](http://www.ruche-home.net/ "ImgCtl.dll")
 
-    imgctl.h�Aimgctl.dll ���K�v�B
+    imgctl.h、imgctl.dll が必要。
 
-##�R���p�C�����@##
-VC++��WDK��o�^���āASQLite3��ImgCtl���v���W�F�N�g�ɎQ����������A  
-�r���h����΂����B  
-Editor��Viewer�́A�\�[�X�̑唼�����L���Ă邪�A�����ɃR���p�C���͂ł��Ȃ��B  
-�ǂ��炩�̃v���W�F�N�g���A�����[�h���Ă������A������r���h���邱�ƁB  
-�����N�G���[���o����A�N���[�����čēx����Ă݂�B  
-Collector�͋����ő��v�Ȃ͂��B  
+##コンパイル方法##
+VC++にWDKを登録して、SQLite3とImgCtlをプロジェクトに参加させたら、  
+ビルドすればおｋ。  
+EditorとViewerは、ソースの大半を共有してるが、同時にコンパイルはできない。  
+どちらかのプロジェクトをアンロードしておくか、一つずつリビルドすること。  
+リンクエラーが出たら、クリーンして再度やってみる。  
+Collectorは共同で大丈夫なはず。  
 
-##�A����##
-+  [������΂̃X��](http://jbbs.livedoor.jp/bbs/read.cgi/otaku/12368/1318151605/ "������΂̃X��")  
-���������C���B�o�C�i���z�z�͂�����B���X���ɐi��ł�ꍇ�A��  
+##連絡先##
++  [したらばのスレ](http://jbbs.livedoor.jp/bbs/read.cgi/otaku/12368/1318151605/ "したらばのスレ")  
+ここがメイン。バイナリ配布はこちら。次スレに進んでる場合アリ  
 +  IRC  
-irc.2ch.net�@#yaruo  
-��ɋ��邱�Ƃ�������������Ȃ��B
+irc.2ch.net　#yaruo  
+夜に居ることが多いかもしれない。
 
 
  
