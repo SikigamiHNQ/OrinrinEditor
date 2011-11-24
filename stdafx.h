@@ -93,8 +93,9 @@ static CONST GUID gcstGUID = { 0x66D3E881, 0x972B, 0x458B, { 0x93, 0x5E, 0x9E, 0
 //#define FIND_STRINGS	//	文字列検索機能
 #define FIND_MAA_FILE	//	MAAファイル検索機能
 
+#define MAIN_SPLITBAR	//	DOCKINGしてたらメイン窓にスプリットバー
+
 //機能ＯＫ
-#define  MOZI_SCRIPT	//	５０音Script機能
 #define CONTEXT_EDIT	//	右クリメニュー編集
 #define MAA_PROFILE		//	ツリー構成をプロファイルする機能
 #define MULTI_FILE		//	複数ファイルの同時展開
@@ -226,6 +227,10 @@ VOID	SqlErrMsgView( sqlite3 *, DWORD );
 #define VS_PROFILE_NAME	32	//	
 #define VS_PAGE_FORMAT	33	//	頁番号挿入の文字列テンプレ
 #define VL_SWAP_COPY	34	//	コピー標準をSJISにするか
+#define VL_MAIN_SPLIT	35	//	メインのスプリットバーの右からの位置
+#define VL_MAXIMISED	36	//	最大化で終わったか？
+
+//増やしたら、函数内に取扱つくっておくこと
 
 #define CLRV_BASICPEN	101
 #define CLRV_BASICBK	102

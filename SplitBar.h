@@ -12,4 +12,4 @@
 ATOM	SplitBarClass( HINSTANCE );
 HWND	SplitBarCreate( HINSTANCE, HWND, INT, INT, INT );
 VOID	SplitBarPosGet( HWND, LPRECT );
-VOID	SplitBarResize( HWND, LPRECT );
+LONG	SplitBarResize( HWND, LPRECT );

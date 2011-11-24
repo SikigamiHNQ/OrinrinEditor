@@ -52,6 +52,12 @@ static WNDPROC	gpfOrigPageToolProc;
 static HIMAGELIST	ghPgLstImgLst;
 
 extern INT	gbTmpltDock;		//	頁・壱行テンプレのドッキング
+
+
+#ifdef MAIN_SPLITBAR
+extern  HWND	ghMainSplitWnd;	//!<	メインのスプリットバーハンドル
+extern  LONG	grdSplitPos;	//!<	スプリットバーの、左側の、画面右からのオフセット
+#endif
 //-------------------------------------------------------------------------------------------------
 
 //	ツールバー・新規作成とか
@@ -118,7 +124,9 @@ HWND PageListInitialise( HINSTANCE hInstance, HWND hParentWnd, LPRECT pstFrame )
 	UINT		ici, resnum;
 	HBITMAP		hImg, hMsq;
 
-
+#ifdef MAIN_SPLITBAR
+	INT			spPos;
+#endif
 	WNDCLASSEX	wcex;
 	RECT	wdRect, clRect, rect;
 
@@ -157,11 +165,14 @@ HWND PageListInitialise( HINSTANCE hInstance, HWND hParentWnd, LPRECT pstFrame )
 
 	if( gbTmpltDock )	//	メーンウィンドーにドッキュする
 	{
+#ifdef MAIN_SPLITBAR
+		spPos = grdSplitPos - SPLITBAR_WIDTH;	//	右からのオフセット
+#endif
 		hPrWnd    = hParentWnd;
 		dwExStyle = 0;
 		dwStyle   = WS_CHILD | WS_VISIBLE;
 		rect = *pstFrame;	//	クライヤントに使える領域
-		rect.left  = rect.right - PLIST_DOCK;
+		rect.left  = rect.right - spPos;
 		rect.right = PLIST_DOCK;
 		rect.bottom >>= 1;
 	}
@@ -582,8 +593,8 @@ VOID PageListResize( HWND hPrntWnd, LPRECT pstFrame )
 //gbTmpltDock
 
 	rect = *pstFrame;	//	クライヤントに使える領域
-	rect.left  = rect.right - PLIST_DOCK;
-	rect.right = PLIST_DOCK;
+	rect.left  = rect.right - (grdSplitPos - SPLITBAR_WIDTH);
+	rect.right = (grdSplitPos - SPLITBAR_WIDTH);
 	rect.bottom >>= 1;
 
 	SetWindowPos( ghPageWnd, HWND_TOP, rect.left, rect.top, rect.right, rect.bottom, SWP_SHOWWINDOW );

@@ -676,11 +676,9 @@ UINT		SqnAppendSquare( LPUNDOBUFF, UINT, LPTSTR, LPPOINT, INT, UINT );
 
 HRESULT		UnicodeRadixExchange( LPVOID );
 
-#ifdef MOZI_SCRIPT
 INT			MoziInitialise( LPTSTR, HINSTANCE );
 HWND		MoziScripterCreate( HINSTANCE, HWND );
 HRESULT		MoziMoveFromView( HWND, UINT );
-#endif
 
 #ifdef FIND_STRINGS
 HRESULT		FindDialogueOpen( HINSTANCE, HWND );

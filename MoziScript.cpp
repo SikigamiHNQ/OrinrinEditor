@@ -58,7 +58,7 @@ IDD_MOZI_SCRIPT_DLG
 
 */
 
-#ifdef MOZI_SCRIPT
+
 
 
 #define MOZISCRIPT_CLASS	TEXT("MOZISCRIPT_CLASS")
@@ -1756,4 +1756,4 @@ HRESULT MoziSqlItemDeleteAll( VOID )
 }
 //-------------------------------------------------------------------------------------------------
 
-#endif
+

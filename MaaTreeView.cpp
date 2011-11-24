@@ -305,11 +305,11 @@ VOID Maa_OnContextMenu( HWND hWnd, HWND hWndContext, UINT xPos, UINT yPos )
 	TCHAR	atText[MAX_PATH], atName[MAX_PATH];
 	LPARAM	lPrm;
 	UINT_PTR	cchSize;
-//#ifndef _ORRVW
+#ifndef _ORRVW
 	LONG_PTR	rdExStyle;
+#endif
 	TCHAR	atSelName[MAX_PATH], atMenuStr[MAX_PATH];
 	MULTIPLEMAA	stMulti;
-//#endif
 	POINT			stPost;
 	TVHITTESTINFO	stTvHitInfo;
 	TCHITTESTINFO	stTcHitInfo;

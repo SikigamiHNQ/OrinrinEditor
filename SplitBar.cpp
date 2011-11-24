@@ -201,7 +201,7 @@ VOID Spt_OnLButtonUp( HWND hWnd, INT x, INT y, UINT keyFlags )
 		//wWidth  = stRect.right  - stRect.left;
 
 		//	サイズ変更発生を親ウインドウに送信
-		FORWARD_WM_SIZE( hPrWnd, keyFlags, x,	y, PostMessage );
+		FORWARD_WM_SIZE( hPrWnd, SIZE_RESTORED, x, y, PostMessage );
 	}
 
 	SetWindowLongPtr( hWnd, GWLP_USERDATA, 0 );
@@ -239,8 +239,9 @@ VOID SplitBarPosGet( HWND hSplitWnd, LPRECT ptRect )
 	画面サイズが変わったのでサイズ変更
 	@param[in]	hSplitWnd	対象のスプリットバーハンドル
 	@param[in]	ptRect		クライアント領域
+	@return		画面左からの位置
 */
-VOID SplitBarResize( HWND hSplitWnd, LPRECT ptRect )
+LONG SplitBarResize( HWND hSplitWnd, LPRECT ptRect )
 {
 	RECT	rect;
 
@@ -251,7 +252,7 @@ VOID SplitBarResize( HWND hSplitWnd, LPRECT ptRect )
 	InvalidateRect( hSplitWnd, NULL, TRUE );
 	UpdateWindow( hSplitWnd );
 
-	return;
+	return rect.left;
 }
 //-------------------------------------------------------------------------------------------------
 

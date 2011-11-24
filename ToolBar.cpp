@@ -64,21 +64,14 @@ static TBBUTTON gstEditTBInfo[] = {
 };
 
 //	挿入
-#ifdef MOZI_SCRIPT
 #define  TB_INSERT_ITEMS	6
-#else
-#define  TB_INSERT_ITEMS	4
-#endif
 static TBBUTTON gstInsertTBInfo[] = {
 	{  0, IDM_IN_UNI_SPACE,		TBSTATE_ENABLED,	TBSTYLE_DROPDOWN | TBSTYLE_AUTOSIZE,	0,	0 },	//	
 	{  1, IDM_INSTAG_COLOUR,	TBSTATE_ENABLED,	TBSTYLE_DROPDOWN | TBSTYLE_AUTOSIZE,	0,	0 },	//	
 	{  2, IDM_FRMINSBOX_OPEN,	TBSTATE_ENABLED,	TBSTYLE_DROPDOWN | TBSTYLE_AUTOSIZE,	0,	0 },	//	
-	{  3, IDM_USERINS_NA,		TBSTATE_ENABLED,	TBSTYLE_DROPDOWN | TBSTYLE_AUTOSIZE,	0,	0 } 	//	
-#ifdef MOZI_SCRIPT
-	,
-	{  0, 0,					TBSTATE_ENABLED,	TBSTYLE_SEP,		0,	0 },
-	{  4, IDM_MOZI_SCR_OPEN,	TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,	0,	0 } 	//	
-#endif
+	{  3, IDM_USERINS_NA,		TBSTATE_ENABLED,	TBSTYLE_DROPDOWN | TBSTYLE_AUTOSIZE,	0,	0 },	//	
+	{  0, 0,					TBSTATE_ENABLED,	TBSTYLE_SEP,							0,	0 },
+	{  4, IDM_MOZI_SCR_OPEN,	TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,						0,	0 } 	//	
 };
 
 //	整形
@@ -304,9 +297,7 @@ VOID ToolBarCreate( HWND hWnd, HINSTANCE lcInst )
 	StringCchCopy( atBuff, MAX_STRING, TEXT("色変更タグ") );			gstInsertTBInfo[ 1].iString = SendMessage( ghInsertTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
 	StringCchCopy( atBuff, MAX_STRING, TEXT("枠") );					gstInsertTBInfo[ 2].iString = SendMessage( ghInsertTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
 	StringCchCopy( atBuff, MAX_STRING, TEXT("ユーザ定義") );			gstInsertTBInfo[ 3].iString = SendMessage( ghInsertTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-#ifdef MOZI_SCRIPT
 	StringCchCopy( atBuff, MAX_STRING, TEXT("文字ＡＡ変換ボックス") );	gstInsertTBInfo[ 5].iString = SendMessage( ghInsertTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-#endif
 	SendMessage( ghInsertTBWnd , TB_ADDBUTTONS, (WPARAM)TB_INSERT_ITEMS, (LPARAM)&gstInsertTBInfo );	//	ツールバーにボタンを挿入
 	SendMessage( ghInsertTBWnd, TB_AUTOSIZE, 0, 0 );	//	ボタンのサイズに合わせてツールバーをリサイズ
 

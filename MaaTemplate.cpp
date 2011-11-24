@@ -289,7 +289,7 @@ BOOLEAN Maa_OnCreate( HWND hWnd, LPCREATESTRUCT lpCreateStruct )
 	MaaTabBarSizeGet( &tbRect );
 
 	//	設定からスプリットバーの位置を引っ張る
-	spPos = InitParamValue( INIT_LOAD, VL_MAA_SPLIT, 150 );
+	spPos = InitParamValue( INIT_LOAD, VL_MAA_SPLIT, TMPL_DOCK );
 	ghSplitaWnd = SplitBarCreate( lcInst, hWnd, spPos, tbRect.bottom, rect.bottom - tbRect.bottom );
 
 	AaItemsInitialise( hWnd, lcInst, &rect );	//	MLTの中身表示ビューつくる
@@ -724,7 +724,7 @@ INT_PTR CALLBACK TreeProfileDlgProc( HWND hDlg, UINT message, WPARAM wParam, LPA
 	static HTREEITEM	chTreeRoot;
 	static TVINSERTSTRUCT	cstRootIns;
 
-
+	HWND	hWorkWnd;
 	TCHAR	atTgtDir[MAX_PATH];
 	INT		id;
 
@@ -749,6 +749,12 @@ INT_PTR CALLBACK TreeProfileDlgProc( HWND hDlg, UINT message, WPARAM wParam, LPA
 			ptFolder = (LPTSTR)lParam;
 
 			cbAct = FALSE;
+
+			hWorkWnd = GetDlgItem( hDlg, IDPB_PRTREE_PROGRESS );
+			SendMessage( hWorkWnd, PBM_SETRANGE32, 0, 0xFF );
+			SendMessage( hWorkWnd, PBM_SETPOS, 0, 0 );
+			SendMessage( hWorkWnd, PBM_SETSTEP, 1, 0 );
+			ShowWindow( hWorkWnd, SW_HIDE );
 
 			Edit_SetText( GetDlgItem(hDlg,IDE_PRTREE_DIR), ptFolder );
 

@@ -97,6 +97,11 @@ extern INT		gbTmpltDock;	//	ページ窓のドッキング
 
 //@@コピー処理
 extern  UINT	gbCpModSwap;	//	SJISとユニコードコピーを入れ替える
+
+#ifdef MAIN_SPLITBAR
+extern  HWND	ghMainSplitWnd;	//	メインのスプリットバーハンドル
+extern  LONG	grdSplitPos;	//	スプリットバーの、左側の、画面右からのオフセット
+#endif
 //-------------------------------------------------------------------------------------------------
 
 //	使用する色
@@ -223,17 +228,20 @@ VOID AaFontCreate( UINT bMode )
 */
 HWND ViewInitialise( HINSTANCE hInstance, HWND hParentWnd, LPRECT pstFrame, LPTSTR ptArgv )
 {
-	TCHAR	atFile[MAX_PATH];
+	TCHAR		atFile[MAX_PATH];
 	WNDCLASSEX	wcex;
-	RECT	vwRect, rect;
+	RECT		vwRect, rect;
 
-	LOGFONT	stFont;
+	LOGFONT		stFont;
 
-	INT		iNewPage;
+	INT			iNewPage;
 #ifdef MULTI_FILE
-	INT		iFiles, i;
-	LPARAM	dNumber;
-	BOOLEAN	bOpen = FALSE;
+	INT			iFiles, i;
+	LPARAM		dNumber;
+	BOOLEAN		bOpen = FALSE;
+#endif
+#ifdef MAIN_SPLITBAR
+	INT			spPos;
 #endif
 
 	ghInst = hInstance;
@@ -309,8 +317,15 @@ HWND ViewInitialise( HINSTANCE hInstance, HWND hParentWnd, LPRECT pstFrame, LPTS
 
 	ghPrntWnd =  hParentWnd;	//	親ウインドウハンドル記録
 
+
 	rect = *pstFrame;
-	if( gbTmpltDock ){	rect.right -= PLIST_DOCK;	};
+	if( gbTmpltDock )
+	{
+#ifdef MAIN_SPLITBAR
+		spPos = grdSplitPos;	//	右からのオフセット
+#endif
+		rect.right -= spPos;
+	};
 
 	ghViewWnd = CreateWindowEx( 0, EDIT_VIEW_CLASS, NULL, WS_CHILD | WS_VISIBLE | WS_VSCROLL | WS_HSCROLL,
 		rect.left, rect.top, rect.right, rect.bottom, hParentWnd, NULL, hInstance, NULL);
@@ -445,6 +460,7 @@ COLORREF ViewBackColourGet( LPVOID pVoid )
 */
 HRESULT ViewSizeMove( HWND hPrntWnd, LPRECT pstFrame )
 {
+	LONG	iLeftPos;
 	RECT	rect;
 
 	//	左上の位置を調整
@@ -452,13 +468,23 @@ HRESULT ViewSizeMove( HWND hPrntWnd, LPRECT pstFrame )
 
 	if( gbTmpltDock )
 	{
+#ifdef MAIN_SPLITBAR
+		iLeftPos = SplitBarResize( ghMainSplitWnd, pstFrame );	//	スプリットバー
+		grdSplitPos = rect.right - iLeftPos;
+#endif
 		PageListResize( hPrntWnd, pstFrame );
 		LineTmpleResize( hPrntWnd, pstFrame );
 		BrushTmpleResize( hPrntWnd, pstFrame );
 
+#ifdef MAIN_SPLITBAR
+		rect.right -= grdSplitPos;
+		InitParamValue( INIT_SAVE, VL_MAIN_SPLIT, grdSplitPos );
+#else
 		rect.right -= PLIST_DOCK;
+#endif
 	};
 
+	//	ビューのサイズ変更
 	SetWindowPos( ghViewWnd, HWND_TOP, rect.left, rect.top, rect.right, rect.bottom, SWP_SHOWWINDOW );
 
 	GetClientRect( ghViewWnd, &rect );
@@ -2032,10 +2058,8 @@ VOID OperationOnCommand( HWND hWnd, INT id, HWND hWndCtl, UINT codeNotify )
 		//	トレス機能窓開く
 		case  IDM_TRACE_MODE_ON:	TraceDialogueOpen( ghInst, hWnd );	break;
 
-#ifdef MOZI_SCRIPT
 		//	文字スクリプト窓開く
 		case  IDM_MOZI_SCR_OPEN:	MoziScripterCreate( ghInst , hWnd );	break;
-#endif
 
 #ifndef MAA_PROFILE
 		//Profileモードなら外すようにする

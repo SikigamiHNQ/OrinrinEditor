@@ -26,6 +26,11 @@ extern HFONT	ghAaFont;		//	AA用フォント
 
 extern INT		gbTmpltDock;	//	テンプレのドッキング
 
+#ifdef MAIN_SPLITBAR
+extern  HWND	ghMainSplitWnd;	//	メインのスプリットバーハンドル
+extern  LONG	grdSplitPos;	//	スプリットバーの、左側の、画面右からのオフセット
+#endif
+
 static HIMAGELIST	ghBrushImgLst;
 
 static  UINT	gbBrushMode;	//!<	非零ブラシモード
@@ -85,6 +90,9 @@ HWND BrushTmpleInitialise( HINSTANCE hInstance, HWND hParentWnd, LPRECT pstFrame
 	TCHAR		atBuffer[MAX_STRING];
 
 	HBITMAP	hImg, hMsq;
+#ifdef MAIN_SPLITBAR
+	INT			spPos;
+#endif
 
 	WNDCLASSEX	wcex;
 	RECT		wdRect, clRect, rect, cbxRect, tbRect, mtbRect;
@@ -140,12 +148,15 @@ HWND BrushTmpleInitialise( HINSTANCE hInstance, HWND hParentWnd, LPRECT pstFrame
 
 	if( gbTmpltDock )
 	{
+#ifdef MAIN_SPLITBAR
+		spPos = grdSplitPos - SPLITBAR_WIDTH;	//	右からのオフセット
+#endif
 		hPrWnd    = hParentWnd;
 		dwExStyle = 0;
 		dwStyle   = WS_CHILD;
 
 		rect = *pstFrame;	//	クライヤントに使える領域
-		rect.left  = rect.right - PLIST_DOCK;
+		rect.left  = rect.right - spPos;
 		rect.right = PLIST_DOCK;
 		rect.bottom >>= 1;
 		rect.top    += rect.bottom;
@@ -285,8 +296,8 @@ VOID BrushTmpleResize( HWND hPrntWnd, LPRECT pstFrame )
 	if( !(ghBrTmplWnd) )	return;
 
 	rect = *pstFrame;	//	クライヤントに使える領域
-	rect.left    = rect.right - PLIST_DOCK;
-	rect.right   = PLIST_DOCK;
+	rect.left    = rect.right - (grdSplitPos - SPLITBAR_WIDTH);
+	rect.right   = (grdSplitPos - SPLITBAR_WIDTH);
 	rect.bottom >>= 1;
 	rect.top    += rect.bottom;
 

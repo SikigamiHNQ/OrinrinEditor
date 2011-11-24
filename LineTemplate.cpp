@@ -21,6 +21,11 @@ extern HFONT	ghNameFont;		//	ファイルタブ用フォント
 
 extern INT		gbTmpltDock;	//	頁・壱行テンプレのドッキング
 
+#ifdef MAIN_SPLITBAR
+extern  HWND	ghMainSplitWnd;	//	メインのスプリットバーハンドル
+extern  LONG	grdSplitPos;	//	スプリットバーの、左側の、画面右からのオフセット
+#endif
+
 static  ATOM	gTmpleAtom;		//!<	
 static  HWND	ghTmpleWnd;		//!<	このウインドウハンドル
 
@@ -79,6 +84,9 @@ HWND LineTmpleInitialise( HINSTANCE hInstance, HWND hParentWnd, LPRECT pstFrame 
 	UINT_PTR	dItems, i;
 	DWORD		dwExStyle, dwStyle;
 	HWND		hPrWnd;
+#ifdef MAIN_SPLITBAR
+	INT			spPos;
+#endif
 
 	TTTOOLINFO	stToolInfo;
 	LVCOLUMN	stLvColm;
@@ -120,12 +128,15 @@ HWND LineTmpleInitialise( HINSTANCE hInstance, HWND hParentWnd, LPRECT pstFrame 
 
 	if( gbTmpltDock )
 	{
+#ifdef MAIN_SPLITBAR
+		spPos = grdSplitPos - SPLITBAR_WIDTH;	//	右からのオフセット
+#endif
 		hPrWnd    = hParentWnd;
 		dwExStyle = 0;
 		dwStyle   = WS_CHILD | WS_VISIBLE;
 
 		rect = *pstFrame;	//	クライヤントに使える領域
-		rect.left  = rect.right - PLIST_DOCK;
+		rect.left  = rect.right - spPos;
 		rect.right = PLIST_DOCK;
 		rect.bottom >>= 1;
 		rect.top    += rect.bottom;
@@ -260,14 +271,14 @@ VOID LineTmpleResize( HWND hPrntWnd, LPRECT pstFrame )
 	RECT	rect, tbRect;
 
 	rect = *pstFrame;	//	クライヤントに使える領域
-	rect.left    = rect.right - PLIST_DOCK;
-	rect.right   = PLIST_DOCK;
+	rect.left    = rect.right - (grdSplitPos - SPLITBAR_WIDTH);
+	rect.right   = (grdSplitPos - SPLITBAR_WIDTH);
 	rect.bottom >>= 1;
 	rect.top    += rect.bottom;
 
 	GetWindowRect( ghDockTabWnd, &tbRect );
 	tbRect.left    = rect.left;
-	tbRect.right   = PLIST_DOCK;
+	tbRect.right   = (grdSplitPos - SPLITBAR_WIDTH);
 	tbRect.bottom -= tbRect.top;
 	tbRect.top     = rect.top;
 	MoveWindow( ghDockTabWnd, tbRect.left, tbRect.top, tbRect.right, tbRect.bottom, TRUE );

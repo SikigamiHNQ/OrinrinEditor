@@ -269,11 +269,12 @@
 #define IDE_PRTREE_DIR                  1102
 #define IDB_PRTREE_DIR_REF              1103
 #define IDTV_PRTREE_DIR_TVIEW           1104
-#define IDRB_CRLF_STRB                  1105
-#define IDRB_CRLF_2CH_YY                1106
-#define IDE_RIGHT_RULER_POS             1107
-#define IDE_GRID_X_POS                  1108
-#define IDE_GRID_Y_POS                  1109
+#define IDPB_PRTREE_PROGRESS			1105
+#define IDRB_CRLF_STRB                  1106
+#define IDRB_CRLF_2CH_YY                1107
+#define IDE_RIGHT_RULER_POS             1108
+#define IDE_GRID_X_POS                  1109
+#define IDE_GRID_Y_POS                  1110
 #define IDE_MSC_EDITBOX                 1111
 #define IDB_MSC_VWINSERT                1112
 #define IDB_MSC_USELAYER                1113

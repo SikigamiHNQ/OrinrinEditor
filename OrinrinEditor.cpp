@@ -26,8 +26,6 @@ If not, see <http://www.gnu.org/licenses/>.
 
 //	TODO:	MAA窓を非使用するオプショッ
 
-//	TODO:	統合したテンプレ窓の幅変更できるように
-
 //	TODO:	最大化で終了したときは、最大化状態を覚えておく方がいい
 
 //	TODO:	MAAで、含んでいるファイルの検索。検索して、そのファイルをタブに表示とか
@@ -109,13 +107,12 @@ If not, see <http://www.gnu.org/licenses/>.
 //	TODO:	ファイル内容統計機能が欲しい。全バイト数、頁数とか
 //	TODO:	Ctrl+Kの統計機能
 
-
-
-
-
 //	TODO:	ファイルタブの[変更]が重い？変更したら、弐回目以降は書かないように
 //みてるファイル変えたときのステータスバーの書き直しに注意
 
+
+//外部スクリプトはどのように実現するか。Rubyの組込とかつかえない？
+//(д)EditはFreePascal？
 
 
 
@@ -147,12 +144,8 @@ If not, see <http://www.gnu.org/licenses/>.
 //@@コピー処理
 
 //OK?
-//	TODO:	多重起動防止いれる	二重起動すると副タブ情報がおかしくなる？
-//	TODO:	プレビューウインドウの大きさ変更覚えておく
-//	TODO:	最大化状態で文字ＡＡ呼び出すと、画面外にイッちゃう
+//	TODO:	統合したテンプレ窓の幅変更できるように
 //	TODO:	枠挿入（非BOX）したら、ずれた分の描画更新がされてない
-
-//	TODO:	Ctrl＋上下キーでLine Templateのページ切り替え
 
 //	TODO:	ブラシや壱行テンプレ、マウスオーバーツールチップで、横幅ドット数表示させたい
 
@@ -320,9 +313,11 @@ ASDファイル　　壱行が壱コンテンツ
 					プレビューウインドウの位置と大きさを覚えておくようにした
 					枠挿入したときに下の方が更新されないのを修正
 					バグ修正いろいろ
-2011/11/22	0.25	MAAのファイル名検索機能
+2011/11/24	0.25	MAAのファイル名検索機能
 					MAAのツリー展開が早くなった気がする（Viewer込み）
-
+					メイン窓のテンプレエリアのサイズ可変になった
+					最大化状態を覚えておくようにした
+					バグ修正いろいろ
 
 
 ページリストは、クリックしてもフォーカス移らないようにした
@@ -377,6 +372,11 @@ EXTERNED HWND	ghMaaWnd;		//!<	複数行ＡＡテンプレ
 EXTERNED HWND	ghPgVwWnd;		//!<	ページリスト
 EXTERNED HWND	ghLnTmplWnd;	//!<	壱行テンプレ
 EXTERNED HWND	ghBrTmplWnd;	//!<	ブラシテンプレ
+
+#ifdef MAIN_SPLITBAR
+EXTERNED HWND	ghMainSplitWnd;	//!<	メインのスプリットバーハンドル
+EXTERNED LONG	grdSplitPos;	//!<	スプリットバーの、左側の、画面右からのオフセット
+#endif
 
 EXTERNED UINT	gbUniPad;		//!<	パディングにユニコードをつかって、ドットを見せないようにする
 EXTERNED UINT	gbUniRadixHex;	//!<	ユニコード数値参照が１６進数であるか
@@ -506,9 +506,8 @@ INT APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 
 	DocBackupDirectoryInit( gatExePath );
 	FrameInitialise( gatExePath, hInstance );
-#ifdef MOZI_SCRIPT
 	MoziInitialise( gatExePath, hInstance );
-#endif
+
 	gbUniPad = 0;
 
 	iCode = InitParamValue( INIT_LOAD, VL_CLASHCOVER, 0 );
@@ -614,15 +613,22 @@ BOOL InitInstance( HINSTANCE hInstance, INT nCmdShow, LPTSTR ptArgv )
 {
 	HWND	hWnd;
 	RECT	rect, wnRect;
+	INT		isMaxim = 0, sptBuf = PLIST_DOCK;
+//	DWORD	dwStyle;
 
 #ifdef MAA_PROFILE
 	HMENU	hSubMenu;
 #endif
 
+//#ifdef MAIN_SPLITBAR
+//	INT	spPos;
+//#endif
+
 	ghInst = hInstance;	//	グローバル変数にインスタンス処理を格納します。
 
 	SplitBarClass( hInstance );	//	スプリットバーの準備
 
+	isMaxim = InitParamValue( INIT_LOAD, VL_MAXIMISED, 0 );
 
 	InitWindowPos( INIT_LOAD, WDP_MVIEW, &rect );
 	if( 0 == rect.right || 0 == rect.bottom )	//	幅高さが０はデータ無し
@@ -691,9 +697,23 @@ BOOL InitInstance( HINSTANCE hInstance, INT nCmdShow, LPTSTR ptArgv )
 
 	AaFontCreate( 1 );
 
+
 	AppClientAreaCalc( &rect  );	//	
 
 	SqnSetting(  );
+
+#ifdef MAIN_SPLITBAR
+	if( gbTmpltDock )
+	{
+		//	設定からスプリットバーの位置を引っ張る
+		grdSplitPos = InitParamValue( INIT_LOAD, VL_MAIN_SPLIT, PLIST_DOCK );
+		if( grdSplitPos < SPLITBAR_WIDTH || rect.right <= grdSplitPos ){	grdSplitPos = PLIST_DOCK;	}
+		sptBuf = grdSplitPos;
+
+		ghMainSplitWnd = SplitBarCreate( hInstance, hWnd, rect.right - grdSplitPos, rect.top, rect.bottom );
+	}
+	else{	ghMainSplitWnd = NULL;	grdSplitPos = 0;	}
+#endif
 
 	ghPgVwWnd = PageListInitialise( hInstance, hWnd, &rect );
 
@@ -725,7 +745,16 @@ BOOL InitInstance( HINSTANCE hInstance, INT nCmdShow, LPTSTR ptArgv )
 	ghBrTmplWnd = BrushTmpleInitialise( hInstance, hWnd, &rect, ghMaaWnd );
 
 
-	ShowWindow( hWnd, nCmdShow );
+	if( isMaxim )
+	{
+		ShowWindow( hWnd, SW_MAXIMIZE );
+		AppClientAreaCalc( &rect  );	//	
+		grdSplitPos = sptBuf;
+		SetWindowPos( ghMainSplitWnd, HWND_TOP, rect.right - grdSplitPos, rect.top, 0, 0, SWP_NOSIZE );
+		Cls_OnSize( hWnd, SIZE_MINIMIZED, rect.right, rect.top );
+	}
+	else{	ShowWindow( hWnd, nCmdShow );	}
+
 	UpdateWindow( hWnd );
 
 	return TRUE;
@@ -1103,18 +1132,36 @@ VOID Cls_OnSize( HWND hWnd, UINT state, INT cx, INT cy )
 		return;
 	}
 
-	if( SIZE_MINIMIZED == ccState && ccState != state )
+	if( SIZE_MINIMIZED == ccState &&  ccState != state )	//	最小化から復帰
 	{
-		ShowWindow( ghMaaWnd,    SW_SHOW );
+		ShowWindow( ghMaaWnd, SW_SHOW );
 		if( !(gbTmpltDock) )
 		{
 			ShowWindow( ghPgVwWnd,   SW_SHOW );
 			ShowWindow( ghLnTmplWnd, SW_SHOW );
 			ShowWindow( ghBrTmplWnd, SW_SHOW );
 		}
+		ccState = SIZE_RESTORED;
 	}
 
-	ccState = state;
+	if( SIZE_MAXIMIZED == state )	//	最大化時
+	{
+		AppClientAreaCalc( &rect  );	//	右に併せて移動
+		SetWindowPos( ghMainSplitWnd, HWND_TOP, rect.right - grdSplitPos, rect.top, 0, 0, SWP_NOSIZE );
+
+		ccState = SIZE_MAXIMIZED;
+	}
+
+	if( SIZE_RESTORED == state &&  SIZE_MAXIMIZED == ccState )	//	最大化から復帰か
+	{
+		if( !(IsZoomed( hWnd ) ) )	//	まだ最大化中なら、スプリットバー調整のはず
+		{
+			AppClientAreaCalc( &rect  );	//	右に併せて移動
+			SetWindowPos( ghMainSplitWnd, HWND_TOP, rect.right - grdSplitPos, rect.top, 0, 0, SWP_NOSIZE );
+
+			ccState = SIZE_RESTORED;
+		}
+	}
 
 	MoveWindow( ghStsBarWnd, 0, 0, 0, 0, TRUE );	//	ステータスバーは勝手に位置とか調整されるのでこれでいい
 
@@ -1144,17 +1191,13 @@ VOID Cls_OnMove( HWND hWnd, INT x, INT y )
 	{
 		LayerMoveFromView( hWnd, SIZE_MINIMIZED );
 		FrameMoveFromView( hWnd, SIZE_MINIMIZED );
-#ifdef MOZI_SCRIPT
 		MoziMoveFromView( hWnd, SIZE_MINIMIZED );
-#endif
 	}
 	else
 	{
 		LayerMoveFromView( hWnd, SIZE_RESTORED );
 		FrameMoveFromView( hWnd, SIZE_RESTORED );
-#ifdef MOZI_SCRIPT
 		MoziMoveFromView( hWnd, SIZE_RESTORED );
-#endif
 	}
 
 	return;
@@ -1190,9 +1233,8 @@ VOID Cls_OnDestroy( HWND hWnd )
 
 	FrameInitialise( NULL, NULL );
 
-#ifdef MOZI_SCRIPT
 	MoziInitialise( NULL, NULL );
-#endif
+
 #ifdef CONTEXT_EDIT
 	CntxEditInitialise( NULL, NULL );
 #endif
@@ -1201,11 +1243,17 @@ VOID Cls_OnDestroy( HWND hWnd )
 	dwStyle = GetWindowStyle( hWnd );
 	if( !(dwStyle & WS_MINIMIZE) )
 	{
-		//	最大化してたら記録しない？
-		GetWindowRect( ghMainWnd, &rect );
-		rect.right  = rect.right  - rect.left;
-		rect.bottom = rect.bottom - rect.top;
-		InitWindowPos( INIT_SAVE, WDP_MVIEW, &rect );//終了時保存
+		if( dwStyle & WS_MAXIMIZE ){	InitParamValue( INIT_SAVE, VL_MAXIMISED, 1 );	}
+		else
+		{
+			//	最大化してたら記録しない
+			GetWindowRect( ghMainWnd, &rect );
+			rect.right  = rect.right  - rect.left;
+			rect.bottom = rect.bottom - rect.top;
+			InitWindowPos( INIT_SAVE, WDP_MVIEW, &rect );//終了時保存
+
+			InitParamValue( INIT_SAVE, VL_MAXIMISED, 0 );
+		}
 
 		if( !(gbTmpltDock) )
 		{
@@ -1757,6 +1805,8 @@ INT InitParamValue( UINT dMode, UINT dStyle, INT nValue )
 		case  VL_PLS_LN_DOCK:	StringCchCopy( atKeyName, SUB_STRING, TEXT("PLstLineDock") );	break;
 	//	case  VL_BRUSH_DOCK:	StringCchCopy( atKeyName, SUB_STRING, TEXT("BrushDock") );		break;
 		case  VL_SWAP_COPY:		StringCchCopy( atKeyName, SUB_STRING, TEXT("CopyModeSwap") );	break;
+		case  VL_MAIN_SPLIT:	StringCchCopy( atKeyName, SUB_STRING, TEXT("MainSplit") );		break;
+		case  VL_MAXIMISED:		StringCchCopy( atKeyName, SUB_STRING, TEXT("Maximised") );		break;
 		default:	return nValue;
 	}
 
