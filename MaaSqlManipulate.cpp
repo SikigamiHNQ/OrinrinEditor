@@ -565,7 +565,7 @@ HRESULT SqlTreeTableCreate( LPTSTR ptProfName )
 	//	プロフ情報
 	CONST CHAR	cacProfilesTable[] = { ("CREATE TABLE Profiles ( id INTEGER PRIMARY KEY, profname TEXT NOT NULL, rootpath TEXT NULL)") };
 	//	初期プロフ名作成
-	CONST TCHAR	catProfInsFmt[] = { TEXT("INSERT INTO Profiles( profname ) VALUES( '%s' )") };
+	CONST TCHAR	catProfInsFmt[] = { TEXT("INSERT INTO Profiles ( profname ) VALUES( '%s' )") };
 	//	ツリー情報
 	CONST CHAR	cacTreeNodeTable[] = { ("CREATE TABLE TreeNode ( id INTEGER PRIMARY KEY, type INTEGER NOT NULL, parentid INTEGER NOT NULL, nodename TEXT NOT NULL )") };
 	//	副タブ情報
@@ -1088,6 +1088,7 @@ UINT SqlTreeFileSearch( LPTSTR ptName, UINT dStart )
 	特定の親ＩＤを持つノード名称を探して、該当するＩＤを返す。
 	@param[in]	ptName	パヤーン
 	@param[in]	dPrntID	特定の親ＩＤ
+	@return	ヒットしたＩＤ・無かったら０
 */
 UINT SqlTreeFileGetOnParent( LPTSTR ptName, UINT dPrntID )
 {

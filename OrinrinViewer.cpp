@@ -36,6 +36,11 @@ TEXT("もし受け取っていなければ、<http://www.gnu.org/licenses/> をご覧ください。\
 static  UINT	gdUseMode;		//!<	挿入レイヤクリップ指示・設定に注意
 static  HWND	ghMaaWnd;		//!<	作られたウインドウハンドル
 static TCHAR	gatIniPath[MAX_PATH];	//!<	ＩＮＩファイルの位置
+
+#ifdef FIND_MAA_FILE
+extern  HWND	ghMaaFindDlg;	//!<	MAA検索ダイヤログハンドル
+#endif
+
 //------------------------------------------------------------------------------------------------------------------------
 
 BOOLEAN	SelectFolderDlg( HWND, LPTSTR, UINT_PTR );
@@ -93,6 +98,17 @@ INT APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 	{
 		msRslt = GetMessage( &msg, NULL, 0, 0 );
 		if( 1 != msRslt )	break;
+
+#ifdef FIND_MAA_FILE	//	MAA検索ダイヤログ
+		if( ghMaaFindDlg )
+		{	//トップに来てるかどうか判断する
+			if( ghMaaFindDlg == GetForegroundWindow(  ) )
+			{
+		//		if( TranslateAccelerator( ghMaaFindDlg, hAccelTable, &msg ) )	continue;
+				if( IsDialogMessage( ghMaaFindDlg, &msg ) )	continue;
+			}
+		}
+#endif
 
 //		if( !TranslateAccelerator( msg.hwnd, hAccelTable, &msg ) )
 //		{

@@ -21,16 +21,17 @@ If not, see <http://www.gnu.org/licenses/>.
 
 
 
+//	TODO:	「矩形選択」と「部分抽出」の両方にチェックを入れた状態でドラッグすると落ちる
+
+//	TODO:	MAAプロファイル、構築ダイヤログで、リストアップしたら、登録済みのやつにチェキしていく
 
 //	TODO:	バックアップ機能の強化・上書き保存したらバックアップとか・頁新規作成したら保存
 
 //	TODO:	MAA窓を非使用するオプショッ
 
-//	TODO:	最大化で終了したときは、最大化状態を覚えておく方がいい
-
-//	TODO:	MAAで、含んでいるファイルの検索。検索して、そのファイルをタブに表示とか
 //	TODO:	MLTのブックマーク機能・タブ増やすか、ツリーに増やすか
-//検索もツリーにできる？逆に面倒かも
+
+//	TODO:	枠機能で、複数行パーツを使いたい
 
 //	TODO:	開いてる副タブを全部閉じる機能
 
@@ -80,7 +81,6 @@ If not, see <http://www.gnu.org/licenses/>.
 
 //	TODO:	使用履歴をファイル出力できるように
 
-//	TODO:	「矩形選択」と「部分抽出」の両方にチェックを入れた状態でドラッグすると落ちる
 
 //	TODO:	リバーの、状態リセットが必要
 
@@ -144,6 +144,8 @@ If not, see <http://www.gnu.org/licenses/>.
 //@@コピー処理
 
 //OK?
+//	TODO:	最大化で終了したときは、最大化状態を覚えておく方がいい
+//	TODO:	MAAで、含んでいるファイルの検索。検索して、そのファイルをタブに表示とか
 //	TODO:	統合したテンプレ窓の幅変更できるように
 //	TODO:	枠挿入（非BOX）したら、ずれた分の描画更新がされてない
 
@@ -313,11 +315,12 @@ ASDファイル　　壱行が壱コンテンツ
 					プレビューウインドウの位置と大きさを覚えておくようにした
 					枠挿入したときに下の方が更新されないのを修正
 					バグ修正いろいろ
-2011/11/24	0.25	MAAのファイル名検索機能
+2011/11/25	0.25	MAAのファイル名検索機能
 					MAAのツリー展開が早くなった気がする（Viewer込み）
+					プロファイル構築で、既存のプロフと一致するならチェキするようにした（Viewer込み）
+					プロファイル作るときの時間が短縮できた気がする（Viewer込み）
 					メイン窓のテンプレエリアのサイズ可変になった
 					最大化状態を覚えておくようにした
-					バグ修正いろいろ
 
 
 ページリストは、クリックしてもフォーカス移らないようにした
@@ -401,6 +404,10 @@ static vector<OPENHIST>	gvcOpenHist;	//!<	ファイル開いた履歴
 extern  HWND	ghFindDlg;		//	検索ダイヤログのハンドル
 #endif
 extern  HWND	ghMoziWnd;		//	文字ＡＡ変換ダイヤログのハンドル
+
+#ifdef FIND_MAA_FILE
+extern  HWND	ghMaaFindDlg;	//	MAA検索ダイヤログハンドル
+#endif
 
 extern  HWND	ghViewWnd;		//	ビュー
 
@@ -537,13 +544,23 @@ INT APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 		msRslt = GetMessage( &msg, NULL, 0, 0 );
 		if( 1 != msRslt )	break;
 
-#ifdef FIND_STRINGS
+#ifdef FIND_STRINGS	//	文字列検索ダイヤログ
 		if( ghFindDlg )
 		{	//トップに来てるかどうか判断する
 			if( ghFindDlg == GetForegroundWindow(  ) )
 			{
 				if( TranslateAccelerator( ghFindDlg, hAccelTable, &msg ) )	continue;
 				if( IsDialogMessage( ghFindDlg, &msg ) )	continue;
+			}
+		}
+#endif
+#ifdef FIND_MAA_FILE	//	MAA検索ダイヤログ
+		if( ghMaaFindDlg )
+		{	//トップに来てるかどうか判断する
+			if( ghMaaFindDlg == GetForegroundWindow(  ) )
+			{
+				if( TranslateAccelerator( ghMaaFindDlg, hAccelTable, &msg ) )	continue;
+				if( IsDialogMessage( ghMaaFindDlg, &msg ) )	continue;
 			}
 		}
 #endif
@@ -646,13 +663,13 @@ BOOL InitInstance( HINSTANCE hInstance, INT nCmdShow, LPTSTR ptArgv )
 
 	if( !hWnd ){	return FALSE;	}
 
-	gbUniPad = InitParamValue( INIT_LOAD, VL_USE_UNICODE, 0 );
+	gbUniPad = InitParamValue( INIT_LOAD, VL_USE_UNICODE, 1 );	//	ユニコ空白　１使う　０使わない
 
 	gbUniRadixHex = InitParamValue( INIT_LOAD, VL_UNIRADIX_HEX, 1 );
 
 	gdBUInterval = InitParamValue( INIT_LOAD, VL_BACKUP_INTVL, 3 );
-	gbAutoBUmsg  = InitParamValue( INIT_LOAD, VL_BACKUP_MSGON, 1 );
-	gbCrLfCode   = InitParamValue( INIT_LOAD, VL_CRLF_CODE, 0 );
+	gbAutoBUmsg  = InitParamValue( INIT_LOAD, VL_BACKUP_MSGON, 1 );	//	
+	gbCrLfCode   = InitParamValue( INIT_LOAD, VL_CRLF_CODE, 0 );	//	０したらば　１YY
 
 	gbTmpltDock  = InitParamValue( INIT_LOAD, VL_PLS_LN_DOCK, 1 );	//	０独立　１くっつける
 
@@ -2142,28 +2159,28 @@ INT_PTR CALLBACK OptionDlgProc( HWND hDlg, UINT message, WPARAM wParam, LPARAM l
 			StringCchPrintf( atBuff, SUB_STRING, TEXT("%d"), dValue );
 			Edit_SetText( GetDlgItem(hDlg,IDE_AUTO_BU_INTVL), atBuff );
 			//	自動保存メッセージ
-			dValue = InitParamValue( INIT_LOAD, VL_BACKUP_MSGON, 1 );
-			CheckDlgButton( hDlg, IDCB_AUTOBU_MSG_ON, dValue ? BST_CHECKED : BST_UNCHECKED );
+			//dValue = InitParamValue( INIT_LOAD, VL_BACKUP_MSGON, 1 );
+			CheckDlgButton( hDlg, IDCB_AUTOBU_MSG_ON, gbAutoBUmsg ? BST_CHECKED : BST_UNCHECKED );
 
 			//	改行コード選択
-			dValue = InitParamValue( INIT_LOAD, VL_CRLF_CODE, 0 );
-			CheckRadioButton( hDlg, IDRB_CRLF_STRB, IDRB_CRLF_2CH_YY, dValue ? IDRB_CRLF_2CH_YY : IDRB_CRLF_STRB );
+			//dValue = InitParamValue( INIT_LOAD, VL_CRLF_CODE, 0 );
+			CheckRadioButton( hDlg, IDRB_CRLF_STRB, IDRB_CRLF_2CH_YY, gbCrLfCode ? IDRB_CRLF_2CH_YY : IDRB_CRLF_STRB );
 
 			//	空白ユニコードパディング
-			dValue = InitParamValue( INIT_LOAD, VL_USE_UNICODE, 0 );
-			CheckDlgButton( hDlg, IDCB_USE_UNISPACE_SET, dValue ? BST_CHECKED : BST_UNCHECKED );
+			//dValue = InitParamValue( INIT_LOAD, VL_USE_UNICODE, 1 );
+			CheckDlgButton( hDlg, IDCB_USE_UNISPACE_SET, gbUniPad ? BST_CHECKED : BST_UNCHECKED );
 
 			//	ユニコード１６進数
-			dValue = InitParamValue( INIT_LOAD, VL_UNIRADIX_HEX, 1 );
-			CheckDlgButton( hDlg, IDCB_UNIRADIX_HEX, dValue ? BST_CHECKED : BST_UNCHECKED );
+			//dValue = InitParamValue( INIT_LOAD, VL_UNIRADIX_HEX, 1 );
+			CheckDlgButton( hDlg, IDCB_UNIRADIX_HEX, gbUniRadixHex ? BST_CHECKED : BST_UNCHECKED );
 
 			//	グループアンドゥ
 			dValue = InitParamValue( INIT_LOAD, VL_GROUP_UNDO, 1 );
 			CheckDlgButton( hDlg, IDCB_GROUPUNDO_SET, dValue ? BST_CHECKED : BST_UNCHECKED );
 
 			//	コピー標準スタイル
-			dValue = InitParamValue( INIT_LOAD, VL_SWAP_COPY, 0 );	//	０ユニコード　１SJIS
-			CheckDlgButton( hDlg, IDCB_COPY_STYLE_SWAP, dValue ? BST_CHECKED : BST_UNCHECKED );
+			//dValue = InitParamValue( INIT_LOAD, VL_SWAP_COPY, 0 );	//	０ユニコード　１SJIS
+			CheckDlgButton( hDlg, IDCB_COPY_STYLE_SWAP, gbCpModSwap ? BST_CHECKED : BST_UNCHECKED );
 
 			//	ドッキングスタイル
 			dValue = InitParamValue( INIT_LOAD, VL_PLS_LN_DOCK, 1 );

@@ -96,7 +96,6 @@ INT			TreeProfileMake( HWND, LPTSTR );
 INT			TreeProfileOpen( HWND );
 INT			TreeProfileRebuild( HWND );
 HRESULT		TreeLoadDirCheck( HWND, HWND );
-UINT		TreeIsExistLoad( LPTSTR );
 
 #ifdef FIND_MAA_FILE
 HTREEITEM	MaaSearchTreeItem( INT );

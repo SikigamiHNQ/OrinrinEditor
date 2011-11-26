@@ -47,7 +47,7 @@ EXTERNED HWND	ghSplitaWnd;	//!<	スプリットバーハンドル
 EXTERNED UINT	gbAAtipView;	//!<	非０で、ＡＡツールチップ表示
 
 #ifdef FIND_MAA_FILE
-static  HWND	ghMaaFindDlg;	//!<	MAA検索ダイヤログハンドル
+EXTERNED HWND	ghMaaFindDlg;	//!<	MAA検索ダイヤログハンドル
 #endif
 
 #ifdef MAA_PROFILE
@@ -59,22 +59,24 @@ static CONST INT	giStbRoom[] = { 250 , 350 , -1 };
 //-------------------------------------------------------------------------------------------------
 
 LRESULT	CALLBACK MaaTmpltWndProc( HWND, UINT, WPARAM, LPARAM );
-BOOLEAN	Maa_OnCreate( HWND, LPCREATESTRUCT );		//!<	WM_CREATE の処理・固定Editとかつくる
-VOID	Maa_OnCommand( HWND , INT, HWND, UINT );	//!<	WM_COMMAND の処理
-VOID	Maa_OnPaint( HWND );						//!<	WM_PAINT の処理・枠線描画とか
-VOID	Maa_OnDestroy( HWND );						//!<	WM_DESTROY の処理・BRUSHとかのオブジェクトの破壊を忘れないように
+BOOLEAN	Maa_OnCreate( HWND, LPCREATESTRUCT );			//!<	WM_CREATE の処理・固定Editとかつくる
+VOID	Maa_OnCommand( HWND , INT, HWND, UINT );		//!<	WM_COMMAND の処理
+VOID	Maa_OnPaint( HWND );							//!<	WM_PAINT の処理・枠線描画とか
+VOID	Maa_OnDestroy( HWND );							//!<	WM_DESTROY の処理・BRUSHとかのオブジェクトの破壊を忘れないように
 LRESULT	Maa_OnNotify( HWND , INT, LPNMHDR );			//!<	
 VOID	Maa_OnDrawItem( HWND, CONST DRAWITEMSTRUCT * );	//!<	
 VOID	Maa_OnMeasureItem( HWND, MEASUREITEMSTRUCT * );	//!<	
 
 #ifdef MAA_PROFILE
+#define TREEPROF_AUTOCHECK
+
 INT_PTR	CALLBACK TreeProfileDlgProc( HWND, UINT, WPARAM, LPARAM );	//!<	
-HRESULT	TreeProfListUp( HWND, LPTSTR, HTREEITEM, UINT, INT );	//!<	
-
-UINT	TreeLoadNodeProc( HWND, HTREEITEM, UINT );	//!<	
-
-VOID	TreeProfCheckState( HWND, HTREEITEM, UINT );	//!<	
-
+HRESULT	TreeProfListUp( HWND, HWND, LPTSTR, HTREEITEM, UINT, INT );	//!<	
+UINT	TreeLoadNodeProc( HWND, HWND, HTREEITEM, UINT );					//!<	
+VOID	TreeProfCheckState( HWND, HTREEITEM, UINT );				//!<	
+#ifdef TREEPROF_AUTOCHECK
+UINT	TreeProfCheckExistent( HWND, LPTSTR, HWND, HTREEITEM, UINT );		//!<	
+#endif
 #endif
 //-------------------------------------------------------------------------------------------------
 
@@ -129,6 +131,9 @@ HWND MaaTmpltInitialise( HINSTANCE hInstance, HWND hParentWnd, LPRECT pstFrame )
 
 	RegisterClassEx( &wcex );
 
+#ifdef FIND_MAA_FILE
+	ghMaaFindDlg = NULL;	//	初期化
+#endif
 
 #ifdef _ORRVW
 	SplitBarClass( hInstance );	//	スプリットバーの準備
@@ -780,11 +785,12 @@ INT_PTR CALLBACK TreeProfileDlgProc( HWND hDlg, UINT message, WPARAM wParam, LPA
 			SqlTreeCacheOpenClose( M_CREATE );
 
 			//	開いたとき、ルートフォルダ指定が有効なら、自動リストアップして、ディレクトリを確認してチェック付ける
-			if( NULL != ptFolder[0] )
-			{
-				TreeProfListUp( chTvWnd, ptFolder, chTreeRoot, 0, 1 );
-				TreeView_Expand( chTvWnd, chTreeRoot, TVE_EXPAND );
-			}
+			//if( NULL != ptFolder[0] )
+			//{
+			//	TreeProfListUp( hDlg, chTvWnd, ptFolder, chTreeRoot, 0, 1 );
+			//	TreeView_Expand( chTvWnd, chTreeRoot, TVE_EXPAND );
+			//}
+			//開けたときにやると重い
 			return (INT_PTR)TRUE;
 
 
@@ -806,11 +812,23 @@ INT_PTR CALLBACK TreeProfileDlgProc( HWND hDlg, UINT message, WPARAM wParam, LPA
 						//	一旦全破壊してルート作り直し
 						TreeView_DeleteAllItems( chTvWnd  );
 						chTreeRoot = TreeView_InsertItem( chTvWnd, &cstRootIns );	//	ルート作成
+#ifndef TREEPROF_AUTOCHECK
 						TreeView_SetCheckState( chTvWnd , chTreeRoot, TRUE );	//	チェキマーク？
+#endif
+						UpdateWindow( chTvWnd );
 
 						StringCchCopy( ptFolder, MAX_PATH, atTgtDir );	//	文字数キメうち注意
-						TreeProfListUp( chTvWnd, atTgtDir, chTreeRoot, 0, 1 );
+
+						hWorkWnd = GetDlgItem( hDlg, IDPB_PRTREE_PROGRESS );
+						SendMessage( hWorkWnd, PBM_SETPOS, 0, 0 );
+						ShowWindow( hWorkWnd, SW_SHOW );
+						TreeProfListUp( hDlg, chTvWnd, atTgtDir, chTreeRoot, 0, 1 );
 						TreeView_Expand( chTvWnd, chTreeRoot, TVE_EXPAND );
+#ifdef TREEPROF_AUTOCHECK
+						//	今のルートと、PROFILEのルートを確認して、同じなら、チェックを付けていく
+						TreeProfCheckExistent( hDlg, atTgtDir, chTvWnd, chTreeRoot, 0 );
+#endif
+						ShowWindow( hWorkWnd, SW_HIDE );
 					}
 					return (INT_PTR)TRUE;
 
@@ -881,24 +899,108 @@ INT_PTR CALLBACK TreeProfileDlgProc( HWND hDlg, UINT message, WPARAM wParam, LPA
 
 			}
 			break;
-
-
-		//case WM_ACTIVATE:
-		//	TRACE( TEXT("WM_ACTIVATE") );
-		//	if( !(cbAct) )	PostMessage( hDlg, WMP_PROF_ACT, 0, 0 );
-		//	cbAct = TRUE;
-		//	break;
-		//	うごかねぇ、なんでやねん
-		//case WMP_PROF_ACT:
-		//	TreeProfCheckState( chTvWnd, chTreeRoot, FALSE );
-		//	break;
 	}
 
 	return (INT_PTR)FALSE;
 }
 //-------------------------------------------------------------------------------------------------
 
-//	再帰で、以下のツリーのチャックのON/OFFする
+/*!
+	呼ばれる度に、プログレスバーを増やす
+	@param[in]	hDlg	ダイヤログハンドル
+*/
+VOID TreeProfProgressUp( HWND hDlg )
+{
+	HWND	hProgWnd;
+	UINT	pos;
+
+	hProgWnd = GetDlgItem( hDlg, IDPB_PRTREE_PROGRESS );
+
+	pos = SendMessage( hProgWnd, PBM_GETPOS, 0, 0 );
+	pos++;
+	pos &= 0xFF;
+	SendMessage( hProgWnd, PBM_SETPOS, pos, 0 );
+	UpdateWindow( hProgWnd );
+
+	return;
+}
+//-------------------------------------------------------------------------------------------------
+
+#ifdef TREEPROF_AUTOCHECK
+/*!
+	既存のプロフの内容チェキを再現する・再帰
+	@param[in]	ptTgDir	選択してるディレクトリ・プロフのと違うなら何もしない・NULLなら確認しない
+	@param[in]	hTvWnd	ツリービューハンドル
+	@param[in]	hNode	確認するノード
+	@param[in]	sqlID	親ノードのsqlID・ルートは０
+	@return	チェックした回数
+*/
+UINT TreeProfCheckExistent( HWND hDlg, LPTSTR ptTgDir, HWND hTvWnd, HTREEITEM hNode, UINT sqlID )
+{
+	UINT		checked = 0, tgtID;
+	TCHAR		atProfRoot[MAX_PATH];
+	TCHAR		atName[MAX_PATH];
+	HTREEITEM	hItem, hRoot;
+	TVITEM		stItem;
+
+	if( ptTgDir )	//	ここが有効なのはルートの時のみ
+	{
+		ZeroMemory( atProfRoot, sizeof(atProfRoot) );
+		SqlTreeProfSelect( NULL, 0, atProfRoot, MAX_PATH );
+		//	異なるなら何もしない
+		if( StrCmp( atProfRoot, ptTgDir ) )	return 0;
+
+		//ルートなので、Childから始める
+		hRoot = hNode;
+		hItem = TreeView_GetChild( hTvWnd , hNode );	//	子ノードを確認
+		hNode = hItem;
+		if( !(hNode) )	return 0;
+		sqlID = 0;	//	問題無いはず
+	}
+
+	do{
+		//	自ノードの名称確認して、親IDと一緒にデータひっぱる
+		ZeroMemory( &stItem, sizeof(TVITEM) );
+		stItem.mask       = TVIF_HANDLE | TVIF_TEXT;
+		stItem.hItem      = hNode;
+		stItem.pszText    = atName;
+		stItem.cchTextMax = MAX_PATH;
+		TreeView_GetItem( hTvWnd, &stItem );
+		tgtID = SqlTreeFileGetOnParent( atName, sqlID );
+		//	ここでＩＤ有効であれば、プロフに含まれている
+		if( tgtID )
+		{
+			checked++;
+			TreeView_SetCheckState( hTvWnd, hNode, TRUE );
+			//	ディレクトリのチェックが有効でなければ、その下は何も無い
+			hItem = TreeView_GetChild( hTvWnd , hNode );	//	子ノードを確認
+			//	存在してたら下の階層をチェック
+			if( hItem ){	checked += TreeProfCheckExistent( hDlg, NULL , hTvWnd, hItem, tgtID );	}
+		}
+
+		//	終わったら次にいく
+		hItem = TreeView_GetNextSibling( hTvWnd, hNode );
+		hNode = hItem;
+
+		TreeProfProgressUp( hDlg );
+	}
+	while( hNode );
+
+	if( ptTgDir )	//	ここが有効なのはルートの時のみ
+	{
+		if( checked ){	TreeView_SetCheckState( hTvWnd, hRoot, TRUE );	}
+	}
+
+	return checked;
+}
+//-------------------------------------------------------------------------------------------------
+#endif
+/*!
+	再帰で、以下のツリーのチャックのON/OFFする
+	@param[in]	hTvWnd	ツリービューハンドル
+	@param[in]	hNode	確認するノード
+	@param[in]	bCheck	ON/OFFのセット
+*/
 VOID TreeProfCheckState( HWND hTvWnd, HTREEITEM hNode, UINT bCheck )
 {
 	HTREEITEM	hItem;
@@ -933,7 +1035,7 @@ VOID TreeProfCheckState( HWND hTvWnd, HTREEITEM hNode, UINT bCheck )
 	@param[in]	fCheck	１全チャックする　０ＳＱＬに既存ならチェキ　－１チョックしない
 	@return		HRESULT	終了状態コード
 */
-HRESULT TreeProfListUp( HWND hTvWnd, LPTSTR ptRoot, HTREEITEM hTreePr, UINT dPrntID, INT fCheck )
+HRESULT TreeProfListUp( HWND hDlg, HWND hTvWnd, LPTSTR ptRoot, HTREEITEM hTreePr, UINT dPrntID, INT fCheck )
 {
 	HANDLE	hFind;
 	TCHAR	atPath[MAX_PATH], atNewTop[MAX_PATH], atTarget[MAX_PATH];
@@ -959,6 +1061,8 @@ HRESULT TreeProfListUp( HWND hTvWnd, LPTSTR ptRoot, HTREEITEM hTreePr, UINT dPrn
 	do{
 		if( lstrcmp( stFindData.cFileName, TEXT("..") ) && lstrcmp( stFindData.cFileName, TEXT(".") ) )
 		{
+			TreeProfProgressUp( hDlg );
+
 			StringCchCopy( atPath, MAX_PATH, ptRoot );
 			PathAppend( atPath, stFindData.cFileName );
 
@@ -978,12 +1082,13 @@ HRESULT TreeProfListUp( HWND hTvWnd, LPTSTR ptRoot, HTREEITEM hTreePr, UINT dPrn
 				hNewParent = TreeView_InsertItem( hTvWnd, &stTreeIns );
 				hLastDir = hNewParent;
 
+#ifndef TREEPROF_AUTOCHECK
 				TreeView_SetCheckState( hTvWnd , hNewParent, TRUE );	//	チェキマーク？
-
+#endif
 				StringCchCopy( atNewTop, MAX_PATH, ptRoot );
 				PathAppend( atNewTop, stFindData.cFileName );
 
-				TreeProfListUp( hTvWnd, atNewTop, hNewParent, dPnID, fCheck );	//	該当ディレクトリ内を再帰検索
+				TreeProfListUp( hDlg, hTvWnd, atNewTop, hNewParent, dPnID, fCheck );	//	該当ディレクトリ内を再帰検索
 
 			}
 			else
@@ -998,7 +1103,9 @@ HRESULT TreeProfListUp( HWND hTvWnd, LPTSTR ptRoot, HTREEITEM hTreePr, UINT dPrn
 					stTreeIns.hInsertAfter = TVI_LAST;
 					hNewParent = TreeView_InsertItem( hTvWnd, &stTreeIns );
 
+#ifndef TREEPROF_AUTOCHECK
 					TreeView_SetCheckState( hTvWnd , hNewParent, TRUE );	//	チェキマーク？
+#endif
 				}
 			}
 		}
@@ -1024,25 +1131,34 @@ HRESULT TreeLoadDirCheck( HWND hDlg, HWND hTvWnd )
 	UINT	dCacheMax, dCacheCnt, m, count;
 	UINT	dType, dPrnt, index, logoa;
 	TCHAR	atName[MAX_PATH];
+	HWND	hWorkWnd;
 
 	hTreeRoot = TreeView_GetRoot( hTvWnd  );	//	とりやえずルート確保
 	//	ルートは関係ないので、直下を調べる
 	hItem = TreeView_GetChild( hTvWnd, hTreeRoot );	//	子ノードを確認
 
+
+	hWorkWnd = GetDlgItem( hDlg, IDPB_PRTREE_PROGRESS );
+	SendMessage( hWorkWnd, PBM_SETPOS, 0, 0 );
+	ShowWindow( hWorkWnd, SW_SHOW );
+
 	//	チェック状況を確認・ファイルのチェックが無いならヤバイ
-	count = TreeLoadNodeProc( hTvWnd, hItem, 0 );
+	count = TreeLoadNodeProc( hDlg, hTvWnd, hItem, 0 );
 	TRACE( TEXT("%u"), count );
 	if( 0 == count )
 	{
+		ShowWindow( hWorkWnd, SW_HIDE );
 		MessageBox( hDlg, TEXT("ファイルが一つも選択されていないのです。\r\nこのままだと使えないのです。"), TEXT("あぅあぅ"), MB_OK | MB_ICONERROR );
 		return E_ABORT;
 	}
 
-	TreeLoadNodeProc( hTvWnd, hItem, 1 );
+	TreeLoadNodeProc( hDlg, hTvWnd, hItem, 1 );
 
 	Edit_GetText( GetDlgItem(hDlg,IDE_PRTREE_DIR), atTgtDir, MAX_PATH );
 
 	//	ツリーデータの入れ替え
+	SqlTransactionOnOff( TRUE );	//	トランザクション開始
+
 	SqlTreeProfUpdate( NULL, atTgtDir );	//	ルートパスを変更
 	SqlTreeNodeDelete(  1 );	//	ファイルから構築する場合、SQLの中身を空にしてから
 
@@ -1056,7 +1172,13 @@ HRESULT TreeLoadDirCheck( HWND hDlg, HWND hTvWnd )
 		if( 0 >= index )	break;	//	データ無くなったら終わり
 
 		logoa = SqlTreeNodeInsert( index, dType, dPrnt, atName );
+
+		TreeProfProgressUp( hDlg );
 	}
+
+	ShowWindow( hWorkWnd, SW_HIDE );
+
+	SqlTransactionOnOff( FALSE );	//	トランザクション終了
 
 	return S_OK;
 }
@@ -1068,7 +1190,7 @@ HRESULT TreeLoadDirCheck( HWND hDlg, HWND hTvWnd )
 	@param[in]	hNode	チェキる基点ノード
 	@param[in]	bFixe	非０実際に操作　０Check状況の確認
 */
-UINT TreeLoadNodeProc( HWND hTvWnd, HTREEITEM hNode, UINT bFixe )
+UINT TreeLoadNodeProc( HWND hDlg, HWND hTvWnd, HTREEITEM hNode, UINT bFixe )
 {
 	TCHAR		atName[MAX_PATH];
 	INT			param;
@@ -1106,31 +1228,19 @@ UINT TreeLoadNodeProc( HWND hTvWnd, HTREEITEM hNode, UINT bFixe )
 		hItem = TreeView_GetChild( hTvWnd , hNode );	//	子ノードを確認
 
 		//	存在してたら下の階層をチェック
-		if( hItem ){	count += TreeLoadNodeProc( hTvWnd, hItem, bFixe );	}
+		if( hItem ){	count += TreeLoadNodeProc( hDlg, hTvWnd, hItem, bFixe );	}
 
 		//	終わったら次にいく
 		hItem = TreeView_GetNextSibling( hTvWnd, hNode );
 		hNode = hItem;
+
+		TreeProfProgressUp( hDlg );
 	}
 	while( hNode );
 
 	return count;
 }
 //-------------------------------------------------------------------------------------------------
-
-/*!
-	対象のディレクトリがCheckにあるか
-	@param[in]	ptDir	確認したいディレクトリ名のみ
-	@return		UINT	非０アリ　０無し
-*/
-UINT TreeIsExistLoad( LPTSTR ptDir )
-{
-
-
-	return 0;
-}
-//-------------------------------------------------------------------------------------------------
-
 
 /*!
 	パスを受け取って、先頭のでゅれくとりをコピーする
@@ -1356,6 +1466,12 @@ INT_PTR CALLBACK TreeMaaFindDlgProc( HWND hDlg, UINT message, WPARAM wParam, LPA
 			{
 				case IDCANCEL:	DestroyWindow( hDlg );	return (INT_PTR)TRUE;
 				case IDOK:		MaaFindExecute( hDlg );	return (INT_PTR)TRUE;	//	検索する
+
+				case IDM_PASTE:	SendMessage( hWorkWnd, WM_PASTE, 0, 0 );	return (INT_PTR)TRUE;
+				case IDM_COPY:	SendMessage( hWorkWnd, WM_COPY,  0, 0 );	return (INT_PTR)TRUE;
+				case IDM_CUT:	SendMessage( hWorkWnd, WM_CUT,   0, 0 );	return (INT_PTR)TRUE;
+				case IDM_UNDO:	SendMessage( hWorkWnd, WM_UNDO,  0, 0 );	return (INT_PTR)TRUE;
+
 				default:	break;
 			}
 			break;
