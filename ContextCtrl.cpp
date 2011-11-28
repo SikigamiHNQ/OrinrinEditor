@@ -5,6 +5,18 @@
 	@date	2011/11/07
 */
 
+/*
+Orinrin Editor : AsciiArt Story Editor for Japanese Only
+Copyright (C) 2011 Orinrin/SikigamiHNQ
+
+This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+See the GNU General Public License for more details.
+You should have received a copy of the GNU General Public License along with this program.
+If not, see <http://www.gnu.org/licenses/>.
+*/
+//-------------------------------------------------------------------------------------------------
+
 #include "stdafx.h"
 #include "OrinrinEditor.h"
 //-------------------------------------------------------------------------------------------------
@@ -238,7 +250,7 @@ HRESULT CntxEditInitialise( LPTSTR ptCurrent, HINSTANCE hInstance )
 /*!
 	できあがってるコンテキストメニューを外部で使う
 */
-HMENU CntxtMenuGet( VOID )
+HMENU CntxMenuGet( VOID )
 {
 	return ghPopupMenu;
 }
@@ -316,12 +328,19 @@ VOID CntxEditBuild( VOID )
 			}
 		}
 	}
- 
-
- 
-
 
 	return;
+}
+//-------------------------------------------------------------------------------------------------
+
+/*!
+	コンテキストメニューのSJISとユニコードのアレを入れ替える
+*/
+HRESULT CntxMenuCopySwap( VOID )
+{
+	CntxEditBuild(  );	//	ていうかBuildし直しでいい
+
+	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 
@@ -479,12 +498,18 @@ VOID CntxDlgAllListUp( HWND hDlg )
 	{
 		StringCchCopy( atItem, SUB_STRING, gstContextItem[d].atString );
 
-		if( IDM_MN_UNISPACE     == gstContextItem[d].dCommandoID || 
-			IDM_MN_COLOUR_SEL   == gstContextItem[d].dCommandoID || 
-			IDM_MN_INSFRAME_SEL == gstContextItem[d].dCommandoID || 
-			IDM_MN_USER_REFS    == gstContextItem[d].dCommandoID )
+		if( IDM_MN_UNISPACE == gstContextItem[d].dCommandoID || 
+		IDM_MN_COLOUR_SEL   == gstContextItem[d].dCommandoID || 
+		IDM_MN_INSFRAME_SEL == gstContextItem[d].dCommandoID || 
+		IDM_MN_USER_REFS    == gstContextItem[d].dCommandoID )
 		{
 			StringCchCat( atItem, SUB_STRING, TEXT("（サブメニュー展開）") );
+		}
+
+		if( gbCpModSwap )	//	コピーモード入替
+		{
+			if( IDM_COPY     ==  gstContextItem[d].dCommandoID )	StringCchCopy( atItem, SUB_STRING, TEXT("SJISコピ－") );
+			if( IDM_SJISCOPY ==  gstContextItem[d].dCommandoID )	StringCchCopy( atItem, SUB_STRING, TEXT("Unicodeコピ－") );
 		}
 
 		stLvi.iItem = d;
@@ -526,12 +551,18 @@ VOID CntxDlgBuildListUp( HWND hDlg )
 		{
 			StringCchCopy( atItem, SUB_STRING, itMnItm->atString );
 
-			if( IDM_MN_UNISPACE     == itMnItm->dCommandoID || 
-				IDM_MN_COLOUR_SEL   == itMnItm->dCommandoID || 
-				IDM_MN_INSFRAME_SEL == itMnItm->dCommandoID || 
-				IDM_MN_USER_REFS    == itMnItm->dCommandoID )
+			if( IDM_MN_UNISPACE == itMnItm->dCommandoID || 
+			IDM_MN_COLOUR_SEL   == itMnItm->dCommandoID || 
+			IDM_MN_INSFRAME_SEL == itMnItm->dCommandoID || 
+			IDM_MN_USER_REFS    == itMnItm->dCommandoID )
 			{
 				StringCchCat( atItem, SUB_STRING, TEXT("　　[＞") );
+			}
+
+			if( gbCpModSwap )	//	コピーモード入替
+			{
+				if( IDM_COPY     == itMnItm->dCommandoID )	StringCchCopy( atItem, SUB_STRING, TEXT("SJISコピ－") );
+				if( IDM_SJISCOPY == itMnItm->dCommandoID )	StringCchCopy( atItem, SUB_STRING, TEXT("Unicodeコピ－") );
 			}
 		}
 

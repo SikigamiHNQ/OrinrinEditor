@@ -5,6 +5,18 @@
 	@date	2011/05/20
 */
 
+/*
+Orinrin Editor : AsciiArt Story Editor for Japanese Only
+Copyright (C) 2011 Orinrin/SikigamiHNQ
+
+This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+See the GNU General Public License for more details.
+You should have received a copy of the GNU General Public License along with this program.
+If not, see <http://www.gnu.org/licenses/>.
+*/
+//-------------------------------------------------------------------------------------------------
+
 #include "stdafx.h"
 #include "OrinrinEditor.h"
 //-------------------------------------------------------------------------------------------------
@@ -614,6 +626,9 @@ LRESULT PageListNotify( HWND hWnd, LPNMLISTVIEW pstLv )
 	HWND	hLvWnd;
 	INT		iCount, iItem, nmCode;//, iPage;
 
+	DWORD	lvClmn;
+	INT		lvLine;
+	LPNMLVCUSTOMDRAW	pstDraw;
 
 	hLvWnd = pstLv->hdr.hwndFrom;
 	nmCode = pstLv->hdr.code;
@@ -640,6 +655,38 @@ LRESULT PageListNotify( HWND hWnd, LPNMLISTVIEW pstLv )
 			{
 				DocModifyContent( TRUE );
 			}
+		}
+	}
+
+
+//カスタムドロー・サブクラスの中だと上手くいかない・Why?
+	if( NM_CUSTOMDRAW == nmCode )
+	{
+		pstDraw = (LPNMLVCUSTOMDRAW)pstLv;
+
+		//	ここで扱う処理内容を返す。いわゆる初回登録
+		if( pstDraw->nmcd.dwDrawStage == CDDS_PREPAINT ){		return CDRF_NOTIFYSUBITEMDRAW;	}
+		if( pstDraw->nmcd.dwDrawStage == CDDS_ITEMPREPAINT ){	return CDRF_NOTIFYSUBITEMDRAW;	}
+
+		if( pstDraw->nmcd.dwDrawStage == (CDDS_ITEMPREPAINT|CDDS_SUBITEM) )//(CDDS_ITEMPREPAINT|CDDS_SUBITEM)
+		{
+			lvLine = pstDraw->nmcd.dwItemSpec;	//	行
+			lvClmn = pstDraw->iSubItem;			//	カラム
+
+			//	再描画せずともリヤルに変わる
+			if( 2 == lvClmn )
+			{
+				if( PAGE_BYTE_MAX < gstFile.vcCont.at( lvLine ).dByteSz )
+					pstDraw->clrTextBk = 0x000000FF;
+				else
+					pstDraw->clrTextBk = 0xFF000000;
+			}
+			else
+			{
+				pstDraw->clrTextBk = 0xFF000000;	//	これでデフォ色指定
+			}
+
+			return CDRF_NEWFONT;
 		}
 	}
 
@@ -1210,6 +1257,7 @@ LRESULT Plv_OnNotify( HWND hWnd, INT idFrom, LPNMHDR pstNmhdr )
 	INT				dBytes;
 	UINT_PTR		rdLength;
 	LPNMTTDISPINFO	pstDispInfo;
+
 
 	if( TTN_GETDISPINFO == pstNmhdr->code )	//	ツールチップの内容の問い合わせだったら
 	{

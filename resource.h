@@ -482,6 +482,7 @@
 #define IDM_MOZI_SETTING                33010
 #define IDM_MOZI_ADVANCE                33011
 #define IDM_MOZI_LISTDEL                33012
+#define IDM_AATABS_ALLDELETE			33013
 #define IDC_STATIC                      -1
 
 // Next default values for new objects

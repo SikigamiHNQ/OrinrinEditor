@@ -5,6 +5,18 @@
 	@date	2011/04/15
 */
 
+/*
+Orinrin Editor : AsciiArt Story Editor for Japanese Only
+Copyright (C) 2011 Orinrin/SikigamiHNQ
+
+This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+See the GNU General Public License for more details.
+You should have received a copy of the GNU General Public License along with this program.
+If not, see <http://www.gnu.org/licenses/>.
+*/
+//-------------------------------------------------------------------------------------------------
+
 #include "stdafx.h"
 #include "OrinrinEditor.h"
 //-------------------------------------------------------------------------------------------------
@@ -712,11 +724,13 @@ LRESULT CALLBACK ViewWndProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lPa
 /* void Cls_OnKillFocus(HWND hwnd, HWND hwndNewFocus) */
 		case WM_KILLFOCUS:
 			TRACE( TEXT("VIEW_WM_KILLFOCUS[0x%X][0x%X]"), wParam, lParam );
+			ViewHideCaret(  );
 			break;
 
 /* void Cls_OnActivate(HWND hwnd, UINT state, HWND hwndActDeact, BOOL fMinimized) */
 		case WM_ACTIVATE:
 			TRACE( TEXT("VIEW_WM_ACTIVATE[0x%X][0x%X]"), wParam, lParam );
+			if( WA_INACTIVE == LOWORD(wParam) ){	ViewHideCaret(  );	}
 			break;
 
 		case WM_IME_NOTIFY:
@@ -1016,7 +1030,7 @@ VOID Evw_OnContextMenu( HWND hWnd, HWND hWndContext, UINT xPos, UINT yPos )
 	TRACE( TEXT("VIEW_WM_CONTEXTMENU %d x %d"), posX, posY );
 
 #ifdef CONTEXT_EDIT
-	hSubMenu = CntxtMenuGet(  );
+	hSubMenu = CntxMenuGet(  );
 #else
 	hMenu = LoadMenu( GetModuleHandle(NULL), MAKEINTRESOURCE(IDC_VIEWPOPUPMENU) );
 	hSubMenu = GetSubMenu( hMenu, 0 );

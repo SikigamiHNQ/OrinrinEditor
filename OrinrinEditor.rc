@@ -289,12 +289,13 @@ END
 
 IDM_AATABS_POPUP MENU 
 BEGIN
-    POPUP "複数行テンプレタブのアレ"
-    BEGIN
-        MENUITEM "このタブを閉じる(&Q)",	IDM_AATABS_DELETE
-        MENUITEM SEPARATOR
-        MENUITEM "編集ビューに開く(&E)",	IDM_AATREE_GOEDIT
-    END
+	POPUP "複数行テンプレタブのアレ"
+	BEGIN
+		MENUITEM "このタブを閉じる(&Q)",		IDM_AATABS_DELETE
+		MENUITEM "全ての副タブを閉じる(&A)",	IDM_AATABS_ALLDELETE
+		MENUITEM SEPARATOR
+		MENUITEM "編集ビューに開く(&E)",		IDM_AATREE_GOEDIT
+	END
 END
 
 IDM_LAYERBOX_POPUP MENU 
@@ -400,7 +401,7 @@ CAPTION "バージョン情報 - Orinrin Editor"
 FONT 9, "MS UI Gothic"
 BEGIN
     ICON            IDI_ORINRINEDITOR,IDC_MYICON,6,6,20,20
-    LTEXT           "Orinrin Editor, Version 0.25 Aurora (2011.1125.2230.920)",IDC_STATIC,36,6,168,8,SS_NOPREFIX
+    LTEXT           "Orinrin Editor, Version 0.25 Aurora (2011.1128.2000.920)",IDC_STATIC,36,6,168,8,SS_NOPREFIX
     LTEXT           "Copyright (C) 2011 by SikigamiHNQ",IDC_STATIC,36,18,168,8
     LTEXT           "Site ： お燐ちゃんは俺の嫁．ｃｏｍ",IDC_STATIC,36,30,168,8
     DEFPUSHBUTTON   "OK",IDOK,84,180,48,12,WS_GROUP
@@ -728,7 +729,7 @@ END
 IDD_FIND_MAA_DLG DIALOG 0, 0, 215, 126
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_TOOLWINDOW
-CAPTION "テンプレートファイル名検索"
+CAPTION "複数行テンプレートファイル名検索"
 FONT 10, "MS UI Gothic"
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,162,6,48,12
@@ -745,7 +746,7 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 2011,1125,2230,920
+ FILEVERSION 2011,1128,2000,920
  PRODUCTVERSION 0,25,0,920
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
@@ -769,11 +770,11 @@ BEGIN
             VALUE "CompanyName", "I love 2ch, Yaruo and TohoProject"
             VALUE "LegalCopyright", "Copyright (C) 2011 SikigamiHNQ"
             VALUE "LegalTrademarks", "License : GPLv3"
-            VALUE "PrivateBuild", "Build by Visual Studio 2008"
+            VALUE "PrivateBuild", "Build by Visual C++ 2008 Express"
             VALUE "SpecialBuild", "Not Speciality"
-            VALUE "FileVersion", "2011.1125.2230.920"
+            VALUE "FileVersion", "2011.1128.2000.920"
             VALUE "ProductVersion", "0.25.0.920"
-            VALUE "FileDescription", "AsciiArt Editor by Orinrin!"
+            VALUE "FileDescription", "AsciiArt Story Editor by Orinrin!"
             VALUE "OriginalFilename", "OrinrinEditor.exe"
             VALUE "InternalName", "Orinrin Editor"
             VALUE "ProductName", "Orinrin Editor"

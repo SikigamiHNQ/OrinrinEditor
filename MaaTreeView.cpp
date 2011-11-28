@@ -4,6 +4,17 @@
 	@author	SikigamiHNQ
 	@date	2011/06/22
 */
+
+/*
+Orinrin Editor : AsciiArt Story Editor for Japanese Only
+Copyright (C) 2011 Orinrin/SikigamiHNQ
+
+This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+See the GNU General Public License for more details.
+You should have received a copy of the GNU General Public License along with this program.
+If not, see <http://www.gnu.org/licenses/>.
+*/
 //-------------------------------------------------------------------------------------------------
 
 
@@ -301,7 +312,7 @@ VOID Maa_OnContextMenu( HWND hWnd, HWND hWndContext, UINT xPos, UINT yPos )
 {
 	HMENU	hMenu, hSubMenu;
 	UINT	dRslt;
-	INT		curSel;
+	INT		curSel, iRslt;
 	TCHAR	atText[MAX_PATH], atName[MAX_PATH];
 	LPARAM	lPrm;
 	UINT_PTR	cchSize;
@@ -456,7 +467,10 @@ VOID Maa_OnContextMenu( HWND hWnd, HWND hWndContext, UINT xPos, UINT yPos )
 		{
 			case  IDM_AATABS_DELETE:	TabMultipleDelete( hWnd, curSel );	break;
 			case  IDM_AATREE_GOEDIT:	TabMultipleSelect( hWnd, curSel, 1 );	break;
-				//	ツリー側とはアプローチが違うから注意
+			//	ツリー側とはアプローチが違うから注意
+			case  IDM_AATABS_ALLDELETE:	
+				iRslt = MessageBox( hWnd, TEXT("全ての副タブを閉じようとしているのです。\r\n本当に閉じちゃうのですか？"), TEXT("操作確認なのです"), MB_YESNO | MB_ICONQUESTION | MB_DEFBUTTON2 );
+				if( IDYES == iRslt ){	TabMultipleDeleteAll( hWnd );	}
 			default:	break;
 		}
 
@@ -1581,7 +1595,26 @@ HRESULT TabMultipleDelete( HWND hWnd, CONST INT tabSel )
 }
 //-------------------------------------------------------------------------------------------------
 
+/*!
+	検索ウインドウからの選択の処理をする
+	@param[in]	hWnd	MAAのウインドウハンドルであること
+*/
+HRESULT TabMultipleCtrlFromFind( HWND hWnd )
+{
+	NMHDR	stNmHdr;
 
+	//ここに来る前に、ツリー内で該当ノードが選択済
+
+	//	選択タブチェンジして、ツリーの選択を発生させる
+	TabCtrl_SetCurSel( ghTabWnd, ACT_ALLTREE );
+	stNmHdr.hwndFrom = ghTabWnd;
+	stNmHdr.idFrom   = IDTB_TREESEL;
+	stNmHdr.code     = TCN_SELCHANGE;
+	TabBarNotify( hWnd, &stNmHdr );
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
 
 /*!
 	お気に入りのリストをコールバックで受け取る

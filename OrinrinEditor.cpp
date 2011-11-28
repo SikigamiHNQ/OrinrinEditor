@@ -6,7 +6,7 @@
 */
 
 /*
-Orinrin Editor : AsciiArt Editor for Japanese Only
+Orinrin Editor : AsciiArt Story Editor for Japanese Only
 Copyright (C) 2011 Orinrin/SikigamiHNQ
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -14,36 +14,53 @@ This program is distributed in the hope that it will be useful, but WITHOUT ANY 
 See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with this program.
 If not, see <http://www.gnu.org/licenses/>.
-
-大日本帝国公用語は↓を見られたい
 */
+//-------------------------------------------------------------------------------------------------
 
+//	大日本帝国公用語は↓を見られたい
 
-
+//	TODO:	SQLのINSERT、prepareは重い。クエリつくって、resetしながら回すのがいいんじゃ
 
 //	TODO:	「矩形選択」と「部分抽出」の両方にチェックを入れた状態でドラッグすると落ちる
 
-//	TODO:	MAAプロファイル、構築ダイヤログで、リストアップしたら、登録済みのやつにチェキしていく
+//	TODO:	頁分割したら容量表示がおかしい
+//	TODO:	ページ分割処理、改行の数とかおかしい？
 
 //	TODO:	バックアップ機能の強化・上書き保存したらバックアップとか・頁新規作成したら保存
 
+//	TODO:	保存するとき、同名ファイルがあったら、日時くっつけてバックアップとか
+
+//	TODO:	Safariのリーディングリストみたいな機能。エフェクト合成のときとか、気になるAAを
+//いくつか登録しておき、右クリとかで呼び出せるようにしておく。終わったらリセットとか、削除とか。
+//MAAから取り込む、クリップボードから取り込む、とかできるといいかも。取り込みはドラッグドロップできない？
+//MLT/ASTにエクスポート、みたいなことも出来ると良い。機能自体はオンメモリでいい。UseItLater的なもの。
+//リストの中身の確認どうするか。なんとかしてサムネイル表示を？
+
+
+//	TODO:	MAA内容をサムネ表示することは？
+
 //	TODO:	MAA窓を非使用するオプショッ
 
-//	TODO:	MLTのブックマーク機能・タブ増やすか、ツリーに増やすか
+//	TODO:	MLTのブックマーク機能・タブ増やすか、ツリーに増やすか・副タブじゃいけない？
 
 //	TODO:	枠機能で、複数行パーツを使いたい
 
-//	TODO:	開いてる副タブを全部閉じる機能
+//	TODO:	頁リスト、直前に選択していた頁を灰色にしておく機能
 
-//	TODO:	頁分割したら容量表示がおかしい
+//	TODO:	メインスプリットバーの位置情報リセットが居るかも
+
+//	TODO:	ファイル内容統計機能が欲しい。全バイト数、頁数とか
+
+//	TODO:	Ctrl+Kの統計機能・PageListの項目増やして対処・Ctrl+Kでリフレッシュとか
+//	連続半角とか、行末空白とか・いろんな情報をだす・リヤルタイムだと重いので操作でリフレッシュ
 
 //	TODO:	枠挿入したら、右が妙に空く。ユニコ使うときは、調整開けは不要か
 
 //	TODO:	枠編集のサンプルがおかしいときがある・描画ルーチン治すか
 
-//	TODO:	位置情報のリセット機能・システムメニューに搭載する。
+//	TODO:	トレス機能、点滅コントラスト？と輝度調整の幅が狭いのがちょいと苦しいらしい
 
-//	TODO:	保存するとき、同名ファイルがあったら、日時くっつけてバックアップとか
+//	TODO:	位置情報のリセット機能・システムメニューに搭載する
 
 //	TODO:	使用のアレ、別MLTに同じAAが有ったらハッシュが同じってことでラリってまう。どうしよう
 
@@ -67,12 +84,10 @@ If not, see <http://www.gnu.org/licenses/>.
 
 //	TODO:	ファイルを開き直す機能
 
-
-//	TODO:	DocBadSpaceCheck内の更新指令の最適化が必要
-
-
 //	TODO:	起動中に、ラインテンプレートのリストを開く＆再読み込みできるようにして欲しい
 //	Brushも同じか。右クリメニューで
+
+//	TODO:	DocBadSpaceCheck内の更新指令の最適化が必要
 
 //	TODO:	テンプレの「常に最前面に表示」Orinrinediterを表示している時だけ最前面に来るように
 //もしくは、メイン窓に統合とか
@@ -95,8 +110,6 @@ If not, see <http://www.gnu.org/licenses/>.
 
 //	TODO:	テンプレのコンボックスを、リストボックス型と切り替えられるとか
 
-//	TODO:	ツリー構築中に、プログレスバーだす
-
 //	TODO:	お気にリスト、グループを一括削除する機能
 
 
@@ -104,8 +117,6 @@ If not, see <http://www.gnu.org/licenses/>.
 
 //	TODO:	色をGUIで変更できるように
 
-//	TODO:	ファイル内容統計機能が欲しい。全バイト数、頁数とか
-//	TODO:	Ctrl+Kの統計機能
 
 //	TODO:	ファイルタブの[変更]が重い？変更したら、弐回目以降は書かないように
 //みてるファイル変えたときのステータスバーの書き直しに注意
@@ -141,13 +152,16 @@ If not, see <http://www.gnu.org/licenses/>.
 
 //	ファイルを読み込むとランタイムエラーでることがある・なんか変更してから？
 
-//@@コピー処理
 
 //OK?
 //	TODO:	最大化で終了したときは、最大化状態を覚えておく方がいい
-//	TODO:	MAAで、含んでいるファイルの検索。検索して、そのファイルをタブに表示とか
 //	TODO:	統合したテンプレ窓の幅変更できるように
-//	TODO:	枠挿入（非BOX）したら、ずれた分の描画更新がされてない
+//	TODO:	MAAで、含んでいるファイルの検索。検索して、そのファイルをタブに表示とか
+//	TODO:	副タブを選択した状態で検索で新しいファイルを開くと、上のタブリストは副タブが選択されたまま
+//「全て」に戻す方が親切かな
+//	TODO:	検索から開くと、見出しドロップダウンがリセットされてない
+//	TODO:	MAAプロファイル、構築ダイヤログで、リストアップしたら、登録済みのやつにチェキしていく
+//	TODO:	開いてる副タブを全部閉じる機能・TabMultipleDeleteAllを呼べばいい
 
 //	TODO:	ブラシや壱行テンプレ、マウスオーバーツールチップで、横幅ドット数表示させたい
 
@@ -315,13 +329,15 @@ ASDファイル　　壱行が壱コンテンツ
 					プレビューウインドウの位置と大きさを覚えておくようにした
 					枠挿入したときに下の方が更新されないのを修正
 					バグ修正いろいろ
-2011/11/25	0.25	MAAのファイル名検索機能
+2011/11/28	0.25	MAAのファイル名検索機能
 					MAAのツリー展開が早くなった気がする（Viewer込み）
 					プロファイル構築で、既存のプロフと一致するならチェキするようにした（Viewer込み）
 					プロファイル作るときの時間が短縮できた気がする（Viewer込み）
 					メイン窓のテンプレエリアのサイズ可変になった
 					最大化状態を覚えておくようにした
+					4096バイト超えたら、頁リストのバイト数のところ赤くするようにした
 
+更新日時注意
 
 ページリストは、クリックしてもフォーカス移らないようにした
 
@@ -663,17 +679,17 @@ BOOL InitInstance( HINSTANCE hInstance, INT nCmdShow, LPTSTR ptArgv )
 
 	if( !hWnd ){	return FALSE;	}
 
-	gbUniPad = InitParamValue( INIT_LOAD, VL_USE_UNICODE, 1 );	//	ユニコ空白　１使う　０使わない
+	gbUniPad      = InitParamValue( INIT_LOAD, VL_USE_UNICODE,  1 );	//	ユニコ空白　１使う　０使わない
 
 	gbUniRadixHex = InitParamValue( INIT_LOAD, VL_UNIRADIX_HEX, 1 );
 
-	gdBUInterval = InitParamValue( INIT_LOAD, VL_BACKUP_INTVL, 3 );
-	gbAutoBUmsg  = InitParamValue( INIT_LOAD, VL_BACKUP_MSGON, 1 );	//	
-	gbCrLfCode   = InitParamValue( INIT_LOAD, VL_CRLF_CODE, 0 );	//	０したらば　１YY
+	gdBUInterval  = InitParamValue( INIT_LOAD, VL_BACKUP_INTVL, 3 );
+	gbAutoBUmsg   = InitParamValue( INIT_LOAD, VL_BACKUP_MSGON, 1 );	//	
+	gbCrLfCode    = InitParamValue( INIT_LOAD, VL_CRLF_CODE, 0 );		//	０したらば　１YY
 
-	gbTmpltDock  = InitParamValue( INIT_LOAD, VL_PLS_LN_DOCK, 1 );	//	０独立　１くっつける
+	gbTmpltDock   = InitParamValue( INIT_LOAD, VL_PLS_LN_DOCK,  1 );	//	０独立　１くっつける
 
-	gbCpModSwap  = InitParamValue( INIT_LOAD, VL_SWAP_COPY, 0 );	//	０ユニコード　１SJIS
+	gbCpModSwap   = InitParamValue( INIT_LOAD, VL_SWAP_COPY, 0 );		//	０ユニコード　１SJIS
 
 
 	ghMainWnd = hWnd;
@@ -757,9 +773,10 @@ BOOL InitInstance( HINSTANCE hInstance, INT nCmdShow, LPTSTR ptArgv )
 		SetTimer( hWnd, IDT_BACKUP_TIMER, (gdBUInterval * 60000), NULL );
 	}
 
-	ghMaaWnd = MaaTmpltInitialise( hInstance, hWnd, &wnRect );
+	ghBrTmplWnd = BrushTmpleInitialise( hInstance, hWnd, &rect, ghMaaWnd );	//	ブラシ窓
 
-	ghBrTmplWnd = BrushTmpleInitialise( hInstance, hWnd, &rect, ghMaaWnd );
+
+	ghMaaWnd = MaaTmpltInitialise( hInstance, hWnd, &wnRect );
 
 
 	if( isMaxim )
@@ -2032,18 +2049,27 @@ HRESULT WindowFocusChange( INT nowWnd, INT iDir )
 {
 	INT	nextWnd;
 
-	nextWnd = nowWnd + iDir;
-	if( 0 >= nextWnd )			nextWnd = WND_TAIL;	//	WND_BRUSH
-	if( WND_TAIL < nextWnd )	nextWnd = WND_MAIN;
+	if( gbTmpltDock )	//	くっついたら二つだけ
+	{
+		if( WND_MAIN == nowWnd )	nextWnd = WND_MAAT;
+		else						nextWnd = WND_MAIN;
+	}
+	else
+	{
+		nextWnd = nowWnd + iDir;
+		if( 0 >= nextWnd )			nextWnd = WND_BRUSH;	//	WND_BRUSH
+		if( WND_BRUSH < nextWnd )	nextWnd = WND_MAIN;
+		//	末端に注意・多分もう増えないと思う
+	}
 
 	switch( nextWnd )
 	{
 		default:
-		case  1:	SetForegroundWindow( ghMainWnd );	break;
-		case  2:	SetForegroundWindow( ghMaaWnd );	break;
-		case  3:	SetForegroundWindow( ghPgVwWnd );	break;
-		case  4:	SetForegroundWindow( ghLnTmplWnd );	break;
-		case  5:	SetForegroundWindow( ghBrTmplWnd );	break;
+		case WND_MAIN:	SetForegroundWindow( ghMainWnd );	break;
+		case WND_MAAT:	SetForegroundWindow( ghMaaWnd );	break;
+		case WND_PAGE:	SetForegroundWindow( ghPgVwWnd );	break;
+		case WND_LINE:	SetForegroundWindow( ghLnTmplWnd );	break;
+		case WND_BRUSH:	SetForegroundWindow( ghBrTmplWnd );	break;
 	}
 
 	return S_OK;
@@ -2089,6 +2115,8 @@ HRESULT OptionDialogueOpen( VOID )
 			ModifyMenu( hSubMenu, IDM_COPY,     MF_BYCOMMAND | MFT_STRING, IDM_COPY,     TEXT("Unicodeコピー(&C)\tCtrl + C") );
 			ModifyMenu( hSubMenu, IDM_SJISCOPY, MF_BYCOMMAND | MFT_STRING, IDM_SJISCOPY, TEXT("SJISコピ－(&J)") );
 		}
+
+		CntxMenuCopySwap(  );
 	}
 
 	return S_OK;

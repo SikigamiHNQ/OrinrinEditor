@@ -1,5 +1,21 @@
-//	Entity.h
-//	実体参照一覧・大文字小文字に注意セヨ
+/*! @file
+	@brief 実体参照一覧です・大文字小文字に注意されたし
+	このファイルは Entity.h です。
+	@author	SikigamiHNQ
+	@date	2011/00/00
+*/
+
+/*
+Orinrin Editor : AsciiArt Story Editor for Japanese Only
+Copyright (C) 2011 Orinrin/SikigamiHNQ
+
+This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+See the GNU General Public License for more details.
+You should have received a copy of the GNU General Public License along with this program.
+If not, see <http://www.gnu.org/licenses/>.
+*/
+//-------------------------------------------------------------------------------------------------
 
 typedef struct tagENTITYLIST
 {

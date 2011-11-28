@@ -5,8 +5,17 @@
 	@date	2011/06/21
 */
 
-//	TODO:	MLTとかの壱行見出しがつかえないか・ASTでもつかえない？
+/*
+Orinrin Editor : AsciiArt Story Editor for Japanese Only
+Copyright (C) 2011 Orinrin/SikigamiHNQ
 
+This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+See the GNU General Public License for more details.
+You should have received a copy of the GNU General Public License along with this program.
+If not, see <http://www.gnu.org/licenses/>.
+*/
+//-------------------------------------------------------------------------------------------------
 
 /*
 
@@ -809,8 +818,8 @@ INT_PTR CALLBACK TreeProfileDlgProc( HWND hDlg, UINT message, WPARAM wParam, LPA
 					Edit_GetText( GetDlgItem(hDlg,IDE_PRTREE_DIR), atTgtDir, MAX_PATH );
 					if( NULL != atTgtDir[0] )
 					{
-						//	一旦全破壊してルート作り直し
-						TreeView_DeleteAllItems( chTvWnd  );
+						TreeView_DeleteAllItems( chTvWnd  );	//	一旦全破壊してルート作り直し
+						SqlTreeNodeDelete(  0 );	//	キャッシュも破壊
 						chTreeRoot = TreeView_InsertItem( chTvWnd, &cstRootIns );	//	ルート作成
 #ifndef TREEPROF_AUTOCHECK
 						TreeView_SetCheckState( chTvWnd , chTreeRoot, TRUE );	//	チェキマーク？
@@ -1160,7 +1169,7 @@ HRESULT TreeLoadDirCheck( HWND hDlg, HWND hTvWnd )
 	SqlTransactionOnOff( TRUE );	//	トランザクション開始
 
 	SqlTreeProfUpdate( NULL, atTgtDir );	//	ルートパスを変更
-	SqlTreeNodeDelete(  1 );	//	ファイルから構築する場合、SQLの中身を空にしてから
+	SqlTreeNodeDelete(  1 );	//	ファイルから構築する場合、本体SQLの中身を空にしてから
 
 	dCacheCnt = SqlTreeCount( 3, &dCacheMax );
 	index = 0;
@@ -1414,11 +1423,16 @@ INT_PTR MaaFindOnNotify( HWND hDlg, INT idFrom, LPNMHDR pstNmhdr )
 			ListView_GetItem( hLvWnd, &stLvi );
 
 			hTgtItem = MaaSelectIDfile( hDlg, stLvi.lParam );	//	SqlID渡して開くようにする
+			//	ツリーのを選択状態にしている
 
 			if( hTgtItem )
 			{
-				TreeSelItemProc( ghMaaWnd, hTgtItem, 0 );	//	渡すハンドル、MAA窓のハンドルにしておかないとまずい？
 				SetForegroundWindow( ghMaaWnd );
+
+				//	ここで、タブ選択からチェインさせればいい
+				TabMultipleCtrlFromFind( ghMaaWnd );
+				//AaTitleClear(  );	//	ここでクルヤーせないかん
+				//TreeSelItemProc( ghMaaWnd, hTgtItem, 0 );	//	渡すハンドル、MAA窓のハンドルにしておかないとまずい？
 			}
 		}
 	}
