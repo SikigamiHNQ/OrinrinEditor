@@ -879,7 +879,7 @@ INT DocInputFromClipboard( PINT pNowDot, PINT pdLine, PINT pdMozi )
 	ptString = DocClipboardDataGet( &dStyle );
 	if( !(ptString) )
 	{
-		NotifyBalloonExist( NULL, TEXT("有効なデータがないのです。あぅあぅ"), TEXT("貼付られないのです"), NIIF_INFO );
+		NotifyBalloonExist( TEXT("有効なデータがないのです。あぅあぅ"), TEXT("貼付られないのです"), NIIF_INFO );
 		return 0;
 	}
 

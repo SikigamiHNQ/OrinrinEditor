@@ -1133,7 +1133,7 @@ INT ViewLetterWidthGet( TCHAR ch )
 	@param[in]	ptStr	数えたい文字列
 	@return		幅ドット数・０ならエラー
 */
-INT ViewStringWidthGet( LPTSTR ptStr )
+INT ViewStringWidthGet( LPCTSTR ptStr )
 {
 	SIZE	stSize;
 	UINT	cchSize;
@@ -1153,6 +1153,56 @@ INT ViewStringWidthGet( LPTSTR ptStr )
 	ReleaseDC( ghViewWnd, hdc );
 
 	return stSize.cx;
+}
+//-------------------------------------------------------------------------------------------------
+
+/*!
+	文字列をうけとって、行数と最大ドット幅を計算
+	@param[in]	ptText	チェキりたいユニコード文字列受け取る
+	@param[out]	piLine	行数返す
+	@return		最大ドット数
+*/
+INT TextViewSizeGet( LPCTSTR ptText, PINT piLine )
+{
+	UINT_PTR	cchSize, i;
+	INT		xDot, yLine, dMaxDot;
+
+	wstring	wString;
+
+	StringCchLength( ptText, STRSAFE_MAX_CCH, &cchSize );
+
+	yLine = 1;	dMaxDot = 0;
+	for( i = 0; cchSize > i; i++ )
+	{
+		if( CC_CR == ptText[i] && CC_LF == ptText[i+1] )	//	改行であったら
+		{
+			//	ドット数確認
+			xDot = ViewStringWidthGet( wString.c_str() );
+			if( dMaxDot < xDot )	dMaxDot = xDot;
+
+			wString.clear( );
+			i++;		//	0x0D,0x0Aだから、壱文字飛ばすのがポイント
+			yLine++;	//	改行したから行数数える
+		}
+		else if( CC_TAB == ptText[i] )
+		{
+			//	タブは無かったことにする
+		}
+		else
+		{
+			wString += ptText[i];
+		}
+	}
+
+	if( 1 <= wString.size() )	//	最終行確認
+	{
+		//	ドット数確認
+		xDot = ViewStringWidthGet( wString.c_str() );
+		if( dMaxDot < xDot )	dMaxDot = xDot;
+	}
+
+	if( piLine )	*piLine = yLine;	//	空行だったとしても１行はある
+	return dMaxDot;
 }
 //-------------------------------------------------------------------------------------------------
 
@@ -1932,6 +1982,13 @@ UINT ViewMaaMaterialise( LPSTR pcCont, UINT cbSize, UINT dMode )
 		DocClipboardDataSet( pcCont, (cbSize + 1), D_SJIS );
 		return uRslt;
 	}
+#ifdef DRAUGHT_STYLE
+	if( MAA_DRAUGHT == dMode )	//	ドラフトボードに追加
+	{
+		DraughtItemAdding( pcCont );
+		return uRslt;
+	}
+#endif
 
 	xDot = 0;
 
@@ -2190,6 +2247,9 @@ VOID OperationOnCommand( HWND hWnd, INT id, HWND hWndCtl, UINT codeNotify )
 		//	全SJISコピー
 		case IDM_SJISCOPY_ALL:	DocPageAllCopy( D_SJIS );	break;
 
+		//	選択範囲をドラフトボードへ
+		case IDM_COPY_TO_DRAUGHT:	DraughtItemAddFromSelect( gbSqSelect  );	break;
+
 		//	カーソル位置の操作も必要・ポインタ渡しして中で弄る
 		case IDM_PASTE:			DocInputFromClipboard( &gdDocXdot, &gdDocLine, &gdDocMozi );	break;
 
@@ -2359,6 +2419,8 @@ VOID OperationOnCommand( HWND hWnd, INT id, HWND hWndCtl, UINT codeNotify )
 		//	Ctrl+PageUpDownでファイルタブを移動
 		case  IDM_FILE_PREV:	MultiFileTabSlide( -1 );	break;
 		case  IDM_FILE_NEXT:	MultiFileTabSlide(  1 );	break;
+
+		case IDM_DRAUGHT_OPEN:	DraughtWindowCreate( GetModuleHandle(NULL) , hWnd );	break;
 
 		case IDM_TESTCODE:
 			TRACE( TEXT("機能テスト") );

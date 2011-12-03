@@ -346,7 +346,7 @@ HRESULT		AaItemsTipSizeChange( INT, UINT );
 
 #ifndef _ORRVW
 
-LPSTR		SjisEncodeAlloc( LPTSTR );
+LPSTR		SjisEncodeAlloc( LPCTSTR );
 
 ATOM		InitWndwClass( HINSTANCE );
 BOOL		InitInstance( HINSTANCE, INT, LPTSTR );
@@ -356,7 +356,7 @@ HRESULT		StatusBarSetText( INT, LPCTSTR );
 HRESULT		StatusBarSetTextInt( INT, INT );
 
 HRESULT		MenuItemCheckOnOff( UINT, UINT );
-HRESULT		NotifyBalloonExist( HWND, LPTSTR, LPTSTR, DWORD );
+HRESULT		NotifyBalloonExist( LPTSTR, LPTSTR, DWORD );
 
 HRESULT		BrushModeToggle( VOID );
 
@@ -435,8 +435,10 @@ HRESULT		ViewFrameInsert( INT );
 HRESULT		ViewMaaItemsModeSet( UINT );
 
 INT			ViewLetterWidthGet( TCHAR );
-INT			ViewStringWidthGet( LPTSTR );
+INT			ViewStringWidthGet( LPCTSTR );
 HRESULT		ViewNowPosStatus( VOID );
+
+INT			TextViewSizeGet( LPCTSTR, PINT );
 
 HRESULT		ViewRedrawSetLine( INT );
 HRESULT		ViewRedrawSetRect( LPRECT );
@@ -707,4 +709,13 @@ HRESULT		FindHighlightOff( VOID );
 #endif
 
 #endif	//	NOT _ORRVW
+
+//ViewerÇ≈Ç‡óLÇËÅH
+#ifdef DRAUGHT_STYLE
+HRESULT	DraughtInitialise( HINSTANCE, HWND );
+HWND	DraughtWindowCreate( HINSTANCE, HWND );
+
+UINT	DraughtItemAddFromSelect( UINT );
+UINT	DraughtItemAdding( LPSTR );
+#endif
 

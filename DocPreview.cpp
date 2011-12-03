@@ -391,7 +391,7 @@ HRESULT PreviewVisibalise( INT iNowPage )
 		}
 		else
 		{
-			NotifyBalloonExist( NULL, TEXT("あぅあぅ、IEコンポーネントを初期化出来なかったのです。あぅあぅ"), TEXT("あぅあぅ"), NIIF_ERROR );
+			NotifyBalloonExist( TEXT("あぅあぅ、IEコンポーネントを初期化出来なかったのです。あぅあぅ"), TEXT("あぅあぅ"), NIIF_ERROR );
 			hRslt = E_ACCESSDENIED;
 		}
 	}
@@ -565,7 +565,7 @@ HRESULT PreviewPageWrite( INT iViewPage )
 
 	if( !(gpcHtmlHdr) )
 	{
-		NotifyBalloonExist( NULL, TEXT("プレビュー用テンプレートファイルが見つからないのです。あぅあぅ"), TEXT("あぅあぅ"), NIIF_ERROR );
+		NotifyBalloonExist( TEXT("プレビュー用テンプレートファイルが見つからないのです。あぅあぅ"), TEXT("あぅあぅ"), NIIF_ERROR );
 		return E_HANDLE;
 	}
 

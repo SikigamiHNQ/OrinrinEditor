@@ -226,7 +226,7 @@ HRESULT DocFileBackup( HWND hWnd )
 		hFile = CreateFile( atFilePath, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL );
 		if( INVALID_HANDLE_VALUE == hFile )
 		{
-			NotifyBalloonExist( NULL, TEXT("あぅあぅ、バックアップ出来なかったのです。あぅあぅ"), TEXT("あぅあぅ"), NIIF_ERROR );
+			NotifyBalloonExist( TEXT("あぅあぅ、バックアップ出来なかったのです。あぅあぅ"), TEXT("あぅあぅ"), NIIF_ERROR );
 			//	gbAutoBUmsg	バックアップ出来なかったメッセージは常に表示がいいか
 			return E_HANDLE;
 		}
@@ -284,7 +284,7 @@ HRESULT DocFileBackup( HWND hWnd )
 #ifdef MULTI_FILE
 	}
 #endif
-	if( gbAutoBUmsg ){	NotifyBalloonExist( NULL, TEXT("作業中のファイルをバックアップ保存したのです。あぅあぅ"), TEXT("あぅあぅ"), NIIF_INFO );	}
+	if( gbAutoBUmsg ){	NotifyBalloonExist( TEXT("作業中のファイルをバックアップ保存したのです。あぅあぅ"), TEXT("あぅあぅ"), NIIF_INFO );	}
 
 	return S_OK;
 }
@@ -518,7 +518,7 @@ HRESULT DocFileSave( HWND hWnd, UINT bStyle )
 #endif
 		AppTitleChange( atFilePath );
 		StringCchPrintf( atBuffer, MAX_STRING, TEXT("拡張子を %s にして保存したのです。あぅあぅ"), aatExte[ddExten] );
-		NotifyBalloonExist( NULL, atBuffer, TEXT("拡張子を変更したのです"), NIIF_INFO );
+		NotifyBalloonExist( atBuffer, TEXT("拡張子を変更したのです"), NIIF_INFO );
 	}
 	else
 	{
@@ -532,7 +532,7 @@ HRESULT DocFileSave( HWND hWnd, UINT bStyle )
 			AppTitleChange( atFilePath );
 		}
 
-		NotifyBalloonExist( NULL, TEXT("保存したのです。あぅあぅ"), TEXT("ファイル出力したのです"), NIIF_INFO );
+		NotifyBalloonExist( TEXT("保存したのです。あぅあぅ"), TEXT("ファイル出力したのです"), NIIF_INFO );
 	}
 
 	return 0;

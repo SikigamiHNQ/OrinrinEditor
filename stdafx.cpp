@@ -335,7 +335,7 @@ LPTSTR SjisDecodeAlloc( LPSTR pcBuff )
 	@param[in]	ptTexts	ユニコード文字列バッファのポインター
 	@return		確保したSJIS文字列バッファのポインター・freeセヨ
 */
-LPSTR SjisEncodeAlloc( LPTSTR ptTexts )
+LPSTR SjisEncodeAlloc( LPCTSTR ptTexts )
 {
 	TCHAR	atMozi[2];
 	CHAR	acSjis[10];

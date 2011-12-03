@@ -719,7 +719,7 @@ INT DocDiffAdjBaseSet( INT yLine )
 	gdDiffLock = dDot;
 
 	StringCchPrintf( atMessage, MAX_STRING, TEXT("調整基準位置を %d ドットに設定したですぅ"), dDot );
-	NotifyBalloonExist( NULL, atMessage, TEXT("ロックオン"), NIIF_INFO );
+	NotifyBalloonExist( atMessage, TEXT("ロックオン"), NIIF_INFO );
 
 	return dDot;
 }
@@ -747,7 +747,7 @@ INT DocDiffAdjExec( PINT pxDot, INT yLine )
 	dTgtDot = DocLineStateCheckWithDot( *pxDot, yLine, &dBgnDot, &dEndDot, &dBgnCnt, &dRngCnt, &bIsSpace );
 	if( !(bIsSpace) )
 	{
-		NotifyBalloonExist( NULL, TEXT("連続するスペースの部分にカーソルを当てるですぅ"), TEXT("調整不可能"), NIIF_ERROR );
+		NotifyBalloonExist( TEXT("連続するスペースの部分にカーソルを当てるですぅ"), TEXT("調整不可能"), NIIF_ERROR );
 		return 0;
 	}
 	//今現在の空白幅を確認
@@ -763,7 +763,7 @@ INT DocDiffAdjExec( PINT pxDot, INT yLine )
 
 	if( 41 > dTgtDot )	//	ユニコード使うなら確認しなくても大丈夫？
 	{
-		NotifyBalloonExist( NULL, TEXT("もう少し幅がないと調整できないですぅ"), TEXT("狭すぎ"), NIIF_ERROR );
+		NotifyBalloonExist( TEXT("もう少し幅がないと調整できないですぅ"), TEXT("狭すぎ"), NIIF_ERROR );
 		return 0;
 	}
 
@@ -773,7 +773,7 @@ INT DocDiffAdjExec( PINT pxDot, INT yLine )
 
 	if( !(PtPlus) )
 	{
-		NotifyBalloonExist( NULL, TEXT("調整出来なかったですぅ"), TEXT("自動調整失敗"), NIIF_ERROR );
+		NotifyBalloonExist( TEXT("調整出来なかったですぅ"), TEXT("自動調整失敗"), NIIF_ERROR );
 		return 0;
 	}
 
@@ -1288,7 +1288,7 @@ HRESULT DocRightSlide( PINT pXdot, INT dLine )
 	dPaDot = dSliDot - dRitDot;
 	if( 0 > dPaDot )
 	{
-		NotifyBalloonExist( NULL, TEXT("あぅあぅ、はみ出してるみたいなのです。あぅあぅ"), TEXT("あぅあぅ"), NIIF_ERROR );
+		NotifyBalloonExist( TEXT("あぅあぅ、はみ出してるみたいなのです。あぅあぅ"), TEXT("あぅあぅ"), NIIF_ERROR );
 		return E_FAIL;
 	}
 

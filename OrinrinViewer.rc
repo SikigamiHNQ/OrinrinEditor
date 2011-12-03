@@ -73,6 +73,7 @@ BEGIN
     POPUP "複数行テンプレタブのアレ"
     BEGIN
         MENUITEM "このタブを閉じる(&Q)",	IDM_AATABS_DELETE
+		MENUITEM "全ての副タブを閉じる(&A)",	IDM_AATABS_ALLDELETE
     END
 END
 
@@ -114,7 +115,7 @@ CAPTION "バージョン情報 - Orinrin Viewer"
 FONT 9, "MS UI Gothic"
 BEGIN
     ICON            IDI_ORINRINEDITOR,IDC_MYICON,6,6,18,21
-    LTEXT           "Orinrin Viewer, Version 5 aurora (2011.1128.2000.920)",IDC_STATIC,36,6,180,8,SS_NOPREFIX
+    LTEXT           "Orinrin Viewer, Version 5 aurora (2011.1125.2230.920)",IDC_STATIC,36,6,180,8,SS_NOPREFIX
     LTEXT           "Copyright (C) 2011 by SikigamiHNQ",IDC_STATIC,36,18,180,8
     LTEXT           "Site ： お燐ちゃんは俺の嫁．ｃｏｍ",IDC_STATIC,36,30,180,8
     DEFPUSHBUTTON   "OK",IDOK,85,180,50,14,WS_GROUP
@@ -174,7 +175,7 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 2011,1128,2000,920
+ FILEVERSION 2011,1125,2230,920
  PRODUCTVERSION 5,0,0,920
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
@@ -200,7 +201,7 @@ BEGIN
             VALUE "LegalTrademarks", "License : GPLv3"
             VALUE "PrivateBuild", "Build by Visual Studio 2008"
             VALUE "SpecialBuild", "Not Speciality"
-            VALUE "FileVersion", "2011.1128.2000.920"
+            VALUE "FileVersion", "2011.1125.2230.920"
             VALUE "ProductVersion", "5.0.0.920"
             VALUE "FileDescription", "AsciiArt Viewer Ver5"
             VALUE "OriginalFilename", "OrinrinViewer.exe"

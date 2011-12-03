@@ -689,6 +689,10 @@ VOID Aai_OnContextMenu( HWND hWnd, HWND hWndContext, UINT xPos, UINT yPos )
 #endif
 	hSubMenu = GetSubMenu( hMenu, 0 );
 
+#ifndef DRAUGHT_STYLE
+	DeleteMenu( hSubMenu, IDM_DRAUGHT_ADDING, MF_BYCOMMAND );
+#endif
+
 	//	お気にリストのみ、削除を有効に、変更すること・標準で無効にしておく
 	if( ACT_FAVLIST == dOpen )
 	{	EnableMenuItem( hSubMenu, IDM_MAA_FAV_DELETE , MF_ENABLED );	}
@@ -721,7 +725,9 @@ VOID Aai_OnContextMenu( HWND hWnd, HWND hWndContext, UINT xPos, UINT yPos )
 #endif
 		case IDM_MAA_CLIP_UNICODE:		AaItemsDoSelect( hWnd, MAA_UNICLIP );	break;
 		case IDM_MAA_CLIP_SHIFTJIS:		AaItemsDoSelect( hWnd, MAA_SJISCLIP );	break;
-
+#ifdef DRAUGHT_STYLE
+		case IDM_DRAUGHT_ADDING:		AaItemsDoSelect( hWnd, MAA_DRAUGHT );	break;
+#endif
 		case IDM_MAA_AATIP_TOGGLE:
 			gbAAtipView = gbAAtipView ? FALSE : TRUE;
 			InitParamValue( INIT_SAVE, VL_MAATIP_VIEW, gbAAtipView );

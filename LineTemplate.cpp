@@ -216,7 +216,7 @@ HWND LineTmpleInitialise( HINSTANCE hInstance, HWND hParentWnd, LPRECT pstFrame 
 	//	リストビューツールチップ
 	ghLnLvTipWnd = CreateWindowEx( WS_EX_TOPMOST, TOOLTIPS_CLASS, NULL, TTS_NOPREFIX | TTS_ALWAYSTIP,
 		CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, ghTmpleWnd, NULL, hInstance, NULL );
-	SetWindowFont( ghLnLvTipWnd, GetStockFont(DEFAULT_GUI_FONT), FALSE );
+//	SetWindowFont( ghLnLvTipWnd, GetStockFont(DEFAULT_GUI_FONT), FALSE );
 
 	//	ツールチップをコールバックで割り付け
 	ZeroMemory( &stToolInfo, sizeof(TTTOOLINFO) );

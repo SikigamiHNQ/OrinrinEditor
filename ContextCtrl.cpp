@@ -45,7 +45,7 @@ const static CONTEXTITEM	gstContextItem[] =
 /* 3*/	{  TEXT("名前を付けて保存"),			TEXT("Ctrl + Alt + S"),	IDM_RENAMESAVE		},
 /* 4*/	{  TEXT("現在頁を画像にして保存"),		TEXT(""),				IDM_IMAGE_SAVE		},
 /* 5*/	{  TEXT("一般設定"),					TEXT(""),				IDM_GENERAL_OPTION	},
-/* 6*/	{  TEXT("（セパレータ）"),				TEXT(""),				0,					},
+/* 6*/	{  TEXT("（セパレータ）"),				TEXT(""),				0					},
 /* 7*/	{  TEXT("元に戻す"),	/*編集*/		TEXT("Ctrl + Z"),			IDM_UNDO			},
 /* 8*/	{  TEXT("やり直し"),					TEXT("Ctrl + Y"),			IDM_REDO			},
 /* 9*/	{  TEXT("切り取り"),					TEXT("Ctrl + X"),			IDM_CUT				},
@@ -59,7 +59,7 @@ const static CONTEXTITEM	gstContextItem[] =
 		{  TEXT("レイヤボックス"),				TEXT("Alt + Space"),		IDM_LAYERBOX		},
 		{  TEXT("部分抽出モード"),				TEXT(""),					IDM_EXTRACTION_MODE	},
 		{  TEXT("次の行以降を新頁に分割"),		TEXT(""),					IDM_PAGEL_DIVIDE	},
-/*20*/	{  TEXT("（セパレータ）"),				TEXT(""),					0,					},
+/*20*/	{  TEXT("（セパレータ）"),				TEXT(""),					0					},
 		{  TEXT("ユニコード空白"),	/*挿入*/	TEXT(""),	IDM_MN_UNISPACE		},//サブメニューダミー
 		{  TEXT(" 1 dot SPACE"),				TEXT(""),	IDM_IN_01SPACE		},
 		{  TEXT(" 2 dot SPACE"),				TEXT(""),	IDM_IN_02SPACE		},
@@ -91,7 +91,7 @@ const static CONTEXTITEM	gstContextItem[] =
 		{  TEXT("文字ＡＡ変換ボックス"),		TEXT(""),			IDM_MOZI_SCR_OPEN		},
 /*50*/	{  TEXT("ユーザ定義"),					TEXT(""),			IDM_MN_USER_REFS		},//サブメニューダミー
 		{  TEXT("各頁に通し番号を入れる"),		TEXT(""),			IDM_PAGENUM_DLG_OPEN	},
-		{  TEXT("（セパレータ）"),				TEXT(""),			0,						},
+		{  TEXT("（セパレータ）"),				TEXT(""),			0						},
 		{  TEXT("右揃え線"),	/*整形*/		TEXT("Ctrl + Alt + R"),		IDM_RIGHT_GUIDE_SET	},
 		{  TEXT("行頭に全角空白追加"),			TEXT("Ctrl + I"),			IDM_INS_TOPSPACE	},
 /*55*/	{  TEXT("行頭空白削除"),				TEXT("Ctrl + U"),			IDM_DEL_TOPSPACE	},
@@ -106,20 +106,22 @@ const static CONTEXTITEM	gstContextItem[] =
 		{  TEXT("全体を１ドット左へ"),			TEXT("Alt + Shift + ←"),	IDM_DECR_DOT_LINES	},
 /*65*/	{  TEXT("調整基準ロック"),				TEXT("Ctrl + Alt + W"),		IDM_DOTDIFF_LOCK	},
 		{  TEXT("カーソル位置で調整"),			TEXT("Ctrl + Alt + E"),		IDM_DOTDIFF_ADJT	},
-		{  TEXT("（セパレータ）"),				TEXT(""),					0,					},
-		{  TEXT("空白を表示"),	/*表示*/		TEXT(""),	IDM_SPACE_VIEW_TOGGLE,	},
-		{  TEXT("グリッド線を表示"),			TEXT(""),	IDM_GRID_VIEW_TOGGLE,	},
-/*70*/	{  TEXT("右ガイド線を表示"),			TEXT(""),	IDM_RIGHT_RULER_TOGGLE,	},
-		{  TEXT("複数行テンプレート"),			TEXT(""),	IDM_MAATMPLE_VIEW,		},
-		{  TEXT("頁一覧"),						TEXT(""),	IDM_PAGELIST_VIEW,		},
-		{  TEXT("壱行テンプレート"),			TEXT(""),	IDM_LINE_TEMPLATE,		},
-		{  TEXT("塗り潰しブラシ"),				TEXT(""),	IDM_BRUSH_PALETTE,		},
-/*75*/	{  TEXT("ユニコード表"),				TEXT(""),	IDM_UNI_PALETTE,		},
-		{  TEXT("トレスモード"),				TEXT(""),	IDM_TRACE_MODE_ON,		},
-		{  TEXT("プレビュー"),					TEXT(""),	IDM_ON_PREVIEW,			},
-/*78*/	{  TEXT("（セパレータ）"),				TEXT(""),	0,						}
+		{  TEXT("（セパレータ）"),				TEXT(""),					0					},
+		{  TEXT("空白を表示"),	/*表示*/		TEXT(""),	IDM_SPACE_VIEW_TOGGLE	},
+		{  TEXT("グリッド線を表示"),			TEXT(""),	IDM_GRID_VIEW_TOGGLE	},
+/*70*/	{  TEXT("右ガイド線を表示"),			TEXT(""),	IDM_RIGHT_RULER_TOGGLE	},
+		{  TEXT("複数行テンプレート"),			TEXT(""),	IDM_MAATMPLE_VIEW		},
+		{  TEXT("頁一覧"),						TEXT(""),	IDM_PAGELIST_VIEW		},
+		{  TEXT("壱行テンプレート"),			TEXT(""),	IDM_LINE_TEMPLATE		},
+		{  TEXT("塗り潰しブラシ"),				TEXT(""),	IDM_BRUSH_PALETTE		},
+/*75*/	{  TEXT("ユニコード表"),				TEXT(""),	IDM_UNI_PALETTE			},
+		{  TEXT("トレスモード"),				TEXT(""),	IDM_TRACE_MODE_ON		},
+		{  TEXT("プレビュー"),					TEXT(""),	IDM_ON_PREVIEW			},
+		{  TEXT("（セパレータ）"),				TEXT(""),	0						},
+		{  TEXT("ドラフトボードを開く"),		TEXT("Ctrl + Space"),	IDM_DRAUGHT_OPEN	},
+/*80*/	{  TEXT("選択範囲をドラフトボードへ"),	TEXT(""),				IDM_COPY_TO_DRAUGHT }
 };
-#define ALL_ITEMS	79
+#define ALL_ITEMS	81
 
 #define DEF_ITEMS	13
 const static UINT	gadDefItem[] =

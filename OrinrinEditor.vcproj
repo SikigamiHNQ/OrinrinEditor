@@ -216,6 +216,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\DraughtBoard.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\FrameCtrl.cpp"
 				>
 			</File>
@@ -313,6 +317,10 @@
 			</File>
 			<File
 				RelativePath=".\ViewSelect.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ViewTrace.cpp"
 				>
 			</File>
 		</Filter>

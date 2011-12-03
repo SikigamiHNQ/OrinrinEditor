@@ -1527,7 +1527,8 @@ HRESULT TabMultipleDeleteAll( HWND hWnd )
 	ttlSel = TabCtrl_GetItemCount( ghTabWnd );
 
 	//	‘S”j‰ó
-	for( i = 2; ttlSel > i; i++ ){	TabCtrl_DeleteItem( ghTabWnd, i );	}
+//	for( i = 2; ttlSel > i; i++ ){	TabCtrl_DeleteItem( ghTabWnd, i );	}ŠÔˆá‚¢
+	for( i = (ttlSel-1); 2 <= i; i-- ){	TabCtrl_DeleteItem( ghTabWnd, i );	}
 
 	gltMultiFiles.clear();
 

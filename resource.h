@@ -28,7 +28,7 @@
 #define IDD_PAGE_NAME_DLG               131
 #define IDT_BACKUP_TIMER                132
 #define IDD_FIND_STRING_DLG             133
-#define IDD_FIND_MAA_DLG				134
+#define IDD_FIND_MAA_DLG                134
 #define IDC_AAVIEWER                    209
 #define IDD_PATH_SET                    210
 #define IDSB_STATUSBAR                  211
@@ -39,6 +39,7 @@
 #define IDM_AAVIEW_POPUP                216
 #define IDM_MULTIFILE_POPUP             217
 #define IDM_TEMPLATE_POPUP              218
+#define IDM_DRAUGHT_POPUP               219
 #define IDD_GENERAL_OPTION_DLG          220
 #define IDD_TRACEADJUST_DLG             221
 #define IDD_TRACEADJUST_DLG2            222
@@ -269,7 +270,7 @@
 #define IDE_PRTREE_DIR                  1102
 #define IDB_PRTREE_DIR_REF              1103
 #define IDTV_PRTREE_DIR_TVIEW           1104
-#define IDPB_PRTREE_PROGRESS			1105
+#define IDPB_PRTREE_PROGRESS            1105
 #define IDRB_CRLF_STRB                  1106
 #define IDRB_CRLF_2CH_YY                1107
 #define IDE_RIGHT_RULER_POS             1108
@@ -293,6 +294,11 @@
 #define IDE_MZSCR_INTERVAL              1136
 #define IDUD_MZSCR_INTERVAL             1137
 #define IDCB_MZSCR_TRANSPARENT          1138
+#define IDRB_DRT_INS_EDIT               1141
+#define IDRB_DRT_INTRPT_EDIT            1142
+#define IDRB_DRT_SET_LAYER              1143
+#define IDRB_DRT_CLIP_UNI               1144
+#define IDRB_DRT_CLIP_SJIS              1145
 #define IDS_MC_MSG1                     1191
 #define IDS_MC_MSG2                     1192
 #define IDCB_MC_CHECKBOX                1193
@@ -315,8 +321,8 @@
 #define IDCB_FIND_TARGET                1222
 #define IDCB_MOD_CRLF_YEN               1223
 #define IDB_FIND_CLEAR                  1224
-#define IDE_MAA_FIND_NAME				1227
-#define IDLV_MAA_FINDED_FILE			1228
+#define IDE_MAA_FIND_NAME               1227
+#define IDLV_MAA_FINDED_FILE            1228
 #define IDTV_ITEMTREE                   2000
 #define IDTB_TREESEL                    2001
 #define IDSO_AAITEMS                    2002
@@ -406,7 +412,20 @@
 #define IDM_MENUEDIT_DLG_OPEN           32825
 #define IDM_FIND_DLG_OPEN               32826
 #define IDM_FIND_HIGHLIGHT_OFF          32827
-#define IDM_FINDMAA_DLG_OPEN			32828
+#define IDM_FINDMAA_DLG_OPEN            32828
+#define IDM_DRAUGHT_OPEN                32831
+#define IDM_DRAUGHT_CLOSE               32832
+#define IDM_DRAUGHT_ADDING              32833
+#define IDM_DRAUGHT_DELETE              32834
+#define IDM_DRAUGHT_ALLDELETE           32835
+#define IDM_DRAUGHT_EXPORT              32836
+#define IDM_DRAUGHT_IMPORT              32837
+#define IDM_DRAUGHT_INSERTEDIT          32838
+#define IDM_DRAUGHT_INTERRUPTEDIT       32839
+#define IDM_DRAUGHT_LAYERBOX            32840
+#define IDM_DRAUGHT_UNICLIP             32841
+#define IDM_DRAUGHT_SJISCLIP            32842
+#define IDM_COPY_TO_DRAUGHT				32843
 #define IDM_PAGEL_DETAIL                32900
 #define IDM_PAGEL_ADD                   32901
 #define IDM_PAGEL_INSERT                32902
@@ -482,7 +501,7 @@
 #define IDM_MOZI_SETTING                33010
 #define IDM_MOZI_ADVANCE                33011
 #define IDM_MOZI_LISTDEL                33012
-#define IDM_AATABS_ALLDELETE			33013
+#define IDM_AATABS_ALLDELETE            33013
 #define IDC_STATIC                      -1
 
 // Next default values for new objects

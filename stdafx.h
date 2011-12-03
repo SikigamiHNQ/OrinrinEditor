@@ -106,11 +106,12 @@ static CONST GUID gcstGUID = { 0x66D3E881, 0x972B, 0x458B, { 0x93, 0x5E, 0x9E, 0
 //#define OPEN_HISTORY
 
 //#define FIND_STRINGS	//	文字列検索機能
-#define FIND_MAA_FILE	//	MAAファイル検索機能
 
-#define MAIN_SPLITBAR	//	DOCKINGしてたらメイン窓にスプリットバー
+#define DRAUGHT_STYLE
 
 //機能ＯＫ
+#define FIND_MAA_FILE	//	MAAファイル検索機能
+#define MAIN_SPLITBAR	//	DOCKINGしてたらメイン窓にスプリットバー
 #define CONTEXT_EDIT	//	右クリメニュー編集
 #define MAA_PROFILE		//	ツリー構成をプロファイルする機能
 #define MULTI_FILE		//	複数ファイルの同時展開
@@ -244,6 +245,7 @@ VOID	SqlErrMsgView( sqlite3 *, DWORD );
 #define VL_SWAP_COPY	34	//	コピー標準をSJISにするか
 #define VL_MAIN_SPLIT	35	//	メインのスプリットバーの右からの位置
 #define VL_MAXIMISED	36	//	最大化で終わったか？
+#define VL_DRAUGHT_MODE	37	//	ドラフトボードクリックのデフォ動作
 
 //増やしたら、函数内に取扱つくっておくこと
 
@@ -283,6 +285,7 @@ VOID	SqlErrMsgView( sqlite3 *, DWORD );
 #define MAA_LAYERED		2
 #define MAA_UNICLIP		3
 #define MAA_SJISCLIP	4
+#define MAA_DRAUGHT		5
 
 
 //	指示コード・かぶらないように

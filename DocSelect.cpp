@@ -33,8 +33,7 @@ extern  UINT	gbUniPad;		//	ƒpƒfƒBƒ“ƒO‚Éƒ†ƒjƒR[ƒh‚ð‚Â‚©‚Á‚ÄAƒhƒbƒg‚ðŒ©‚¹‚È‚¢‚æ‚
 
 extern  UINT	gbCrLfCode;		//	‰üsƒR[ƒhF‚O‚µ‚½‚ç‚ÎE”ñ‚O‚x‚x 
 
-//@@ƒRƒs[ˆ—
-extern  UINT	gbCpModSwap;	//	SJIS‚Æƒ†ƒjƒR[ƒhƒRƒs[‚ð“ü‚ê‘Ö‚¦‚é
+extern  UINT	gbCpModSwap;	//	SJIS‚Æƒ†ƒjƒR[ƒhƒRƒs[‚ð“ü‚ê‘Ö‚¦‚é	//@@ƒRƒs[ˆ—
 
 static INT		gdSelByte;		//!<	‘I‘ð”ÍˆÍ‚ÌƒoƒCƒg”
 //-------------------------------------------------------------------------------------------------
@@ -603,7 +602,7 @@ INT DocSelectTextGetAlloc( UINT bStyle, LPVOID *pText, LPPOINT *pstPt )
 	if( pstPt )
 	{
 		iLn = k - d + 1;	//	s‚Ì”
-		pstPoint = (LPPOINT)malloc( iLn * sizeof(POINT) );
+		if( 0 < iLn ){	pstPoint = (LPPOINT)malloc( iLn * sizeof(POINT) );	}
 		*pstPt = pstPoint;
 	}
 

@@ -19,6 +19,9 @@ If not, see <http://www.gnu.org/licenses/>.
 
 //	大日本帝国公用語は↓を見られたい
 
+//	TODO:	副タブ全閉じが不全・Viewerに入ってない
+//全閉じ、プロファイルの入れ替え時にも発生・この時の状況を確認せよ
+
 //	TODO:	SQLのINSERT、prepareは重い。クエリつくって、resetしながら回すのがいいんじゃ
 
 //	TODO:	「矩形選択」と「部分抽出」の両方にチェックを入れた状態でドラッグすると落ちる
@@ -28,20 +31,19 @@ If not, see <http://www.gnu.org/licenses/>.
 
 //	TODO:	バックアップ機能の強化・上書き保存したらバックアップとか・頁新規作成したら保存
 
+//	TODO:	台詞用Enter機能。Shift+Enterとかで、改行挿入ではなく、その行の末端からの直前の
+//空白の位置＝文章の開始地点まで、次の行に空白を入れて、そこにカーソル移動。台詞挿入に使える。
+//下行がなければ、改行して空白。既存の文字列に引っかかるなら、カーソル移動のみ
+
 //	TODO:	保存するとき、同名ファイルがあったら、日時くっつけてバックアップとか
 
-//	TODO:	Safariのリーディングリストみたいな機能。エフェクト合成のときとか、気になるAAを
-//いくつか登録しておき、右クリとかで呼び出せるようにしておく。終わったらリセットとか、削除とか。
-//MAAから取り込む、クリップボードから取り込む、とかできるといいかも。取り込みはドラッグドロップできない？
-//MLT/ASTにエクスポート、みたいなことも出来ると良い。機能自体はオンメモリでいい。UseItLater的なもの。
-//リストの中身の確認どうするか。なんとかしてサムネイル表示を？
+//	TODO:	Safariのリーディングリストみたいな機能。
 
+//	TODO:	MLTのブックマーク機能・タブ増やすか、ツリーに増やすか・副タブじゃいけない？
 
 //	TODO:	MAA内容をサムネ表示することは？
 
 //	TODO:	MAA窓を非使用するオプショッ
-
-//	TODO:	MLTのブックマーク機能・タブ増やすか、ツリーに増やすか・副タブじゃいけない？
 
 //	TODO:	枠機能で、複数行パーツを使いたい
 
@@ -59,6 +61,12 @@ If not, see <http://www.gnu.org/licenses/>.
 //	TODO:	枠編集のサンプルがおかしいときがある・描画ルーチン治すか
 
 //	TODO:	トレス機能、点滅コントラスト？と輝度調整の幅が狭いのがちょいと苦しいらしい
+//	TODO:	トレスモード窓に、グリッドON/OFFを付ける
+//	TODO:	トレスモード、各入力値は直入力できるように
+//	TODO:	トレスモードボタンは、TOGGLEできるようにする
+//	TODO:	トレスの１画面、２画面切り替えモード
+//	TODO:	トレスの２画面だと、背景絵はどっちのペインでも表示出来るようにしたい
+//	TODO:	トレスで、画像をつまんで直接移動できるように
 
 //	TODO:	位置情報のリセット機能・システムメニューに搭載する
 
@@ -101,11 +109,6 @@ If not, see <http://www.gnu.org/licenses/>.
 
 //	TODO:	よく使うユニコードを纏めておけないか、ユーザ定義でいいんじゃね
 
-//	TODO:	トレスモード窓に、グリッドON/OFFを付ける
-//	TODO:	トレスモード、各入力値は直入力できるように
-//	TODO:	トレスモードボタンは、TOGGLEできるようにする
-//	TODO:	トレスの１画面、２画面切り替えモード
-//	TODO:	トレスで、画像をつまんで直接移動できるように
 
 
 //	TODO:	テンプレのコンボックスを、リストボックス型と切り替えられるとか
@@ -336,6 +339,7 @@ ASDファイル　　壱行が壱コンテンツ
 					メイン窓のテンプレエリアのサイズ可変になった
 					最大化状態を覚えておくようにした
 					4096バイト超えたら、頁リストのバイト数のところ赤くするようにした
+2011/12/03	0.26	ドラフトボード機能
 
 更新日時注意
 
@@ -423,6 +427,10 @@ extern  HWND	ghMoziWnd;		//	文字ＡＡ変換ダイヤログのハンドル
 
 #ifdef FIND_MAA_FILE
 extern  HWND	ghMaaFindDlg;	//	MAA検索ダイヤログハンドル
+#endif
+
+#ifdef DRAUGHT_STYLE
+extern  UINT	gdClickMode;	//
 #endif
 
 extern  HWND	ghViewWnd;		//	ビュー
@@ -705,27 +713,33 @@ BOOL InitInstance( HINSTANCE hInstance, INT nCmdShow, LPTSTR ptArgv )
 	hSubMenu = GetSubMenu( ghMenu, 0 );
 	DeleteMenu( hSubMenu, IDM_TREE_RECONSTRUCT, MF_BYCOMMAND );
 #endif
+
+	hSubMenu = GetSubMenu( ghMenu, 1 );	//	編集
+	if( gbCpModSwap )
+	{
+		ModifyMenu( hSubMenu, IDM_COPY,     MF_BYCOMMAND | MFT_STRING, IDM_COPY,     TEXT("SJISコピ－(&C)\tCtrl + C") );
+		ModifyMenu( hSubMenu, IDM_SJISCOPY, MF_BYCOMMAND | MFT_STRING, IDM_SJISCOPY, TEXT("Unicodeコピ－(&J)") );
+	}
+#ifndef FIND_STRINGS
+	DeleteMenu( hSubMenu, IDM_FIND_DLG_OPEN, MF_BYCOMMAND );
+	DeleteMenu( hSubMenu, IDM_FIND_HIGHLIGHT_OFF, MF_BYCOMMAND );
+	DeleteMenu( hSubMenu, 19, MF_BYPOSITION );	//	削除順番注意
+#endif
+#ifndef DRAUGHT_STYLE
+	DeleteMenu( hSubMenu, IDM_COPY_TO_DRAUGHT, MF_BYCOMMAND );
+#endif
+
+	hSubMenu = GetSubMenu( ghMenu, 4 );	//	表示
 	if( gbTmpltDock )
 	{
-		hSubMenu = GetSubMenu( ghMenu, 4 );
 		DeleteMenu( hSubMenu, IDM_PAGELIST_VIEW, MF_BYCOMMAND );
 		DeleteMenu( hSubMenu, IDM_LINE_TEMPLATE, MF_BYCOMMAND );
 		DeleteMenu( hSubMenu, IDM_BRUSH_PALETTE, MF_BYCOMMAND );
 	}
-
-	if( gbCpModSwap )
-	{
-		hSubMenu = GetSubMenu( ghMenu, 1 );
-		ModifyMenu( hSubMenu, IDM_COPY,     MF_BYCOMMAND | MFT_STRING, IDM_COPY,     TEXT("SJISコピ－(&C)\tCtrl + C") );
-		ModifyMenu( hSubMenu, IDM_SJISCOPY, MF_BYCOMMAND | MFT_STRING, IDM_SJISCOPY, TEXT("Unicodeコピ－(&J)") );
-	}
-
-#ifndef FIND_STRINGS
-	hSubMenu = GetSubMenu( ghMenu, 1 );
-	DeleteMenu( hSubMenu, IDM_FIND_DLG_OPEN, MF_BYCOMMAND );
-	DeleteMenu( hSubMenu, IDM_FIND_HIGHLIGHT_OFF, MF_BYCOMMAND );
-	DeleteMenu( hSubMenu, 18, MF_BYPOSITION );
+#ifndef DRAUGHT_STYLE
+	DeleteMenu( hSubMenu, IDM_DRAUGHT_ADDING, MF_BYCOMMAND );
 #endif
+
 
 
 	AaFontCreate( 1 );
@@ -778,6 +792,9 @@ BOOL InitInstance( HINSTANCE hInstance, INT nCmdShow, LPTSTR ptArgv )
 
 	ghMaaWnd = MaaTmpltInitialise( hInstance, hWnd, &wnRect );
 
+#ifdef DRAUGHT_STYLE
+	DraughtInitialise( hInstance, hWnd );
+#endif
 
 	if( isMaxim )
 	{
@@ -1239,7 +1256,7 @@ VOID Cls_OnMove( HWND hWnd, INT x, INT y )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	ウインドウを閉じるときに発生。デバイスコンテキストとか確保した画面構造のメモリとかも終了。
+	ウインドウを閉じるときに発生。デバイスコンテキストとか全部終了。
 	@param[in]	hWnd	親ウインドウのハンドル
 	@return		無し
 */
@@ -1268,6 +1285,10 @@ VOID Cls_OnDestroy( HWND hWnd )
 	FrameInitialise( NULL, NULL );
 
 	MoziInitialise( NULL, NULL );
+
+#ifdef DRAUGHT_STYLE
+	DraughtInitialise( NULL, NULL );
+#endif
 
 #ifdef CONTEXT_EDIT
 	CntxEditInitialise( NULL, NULL );
@@ -1841,6 +1862,7 @@ INT InitParamValue( UINT dMode, UINT dStyle, INT nValue )
 		case  VL_SWAP_COPY:		StringCchCopy( atKeyName, SUB_STRING, TEXT("CopyModeSwap") );	break;
 		case  VL_MAIN_SPLIT:	StringCchCopy( atKeyName, SUB_STRING, TEXT("MainSplit") );		break;
 		case  VL_MAXIMISED:		StringCchCopy( atKeyName, SUB_STRING, TEXT("Maximised") );		break;
+		case  VL_DRAUGHT_MODE:	StringCchCopy( atKeyName, SUB_STRING, TEXT("DraughtDefault") );	break;
 		default:	return nValue;
 	}
 
@@ -2229,6 +2251,19 @@ INT_PTR CALLBACK OptionDlgProc( HWND hDlg, UINT message, WPARAM wParam, LPARAM l
 				case MAA_SJISCLIP:	id =  IDRB_SEL_CLIP_SJIS;	break;
 			}
 			CheckRadioButton( hDlg, IDRB_SEL_INS_EDIT, IDRB_SEL_CLIP_SJIS, id );
+
+#ifdef DRAUGHT_STYLE
+			//	ドラフトボードでクリックしたときの動作
+			switch( gdClickMode )
+			{
+				case MAA_INSERT:	id =  IDRB_DRT_INS_EDIT;	break;
+				case MAA_INTERRUPT:	id =  IDRB_DRT_INTRPT_EDIT;	break;
+				case MAA_LAYERED:	id =  IDRB_DRT_SET_LAYER;	break;
+				case MAA_UNICLIP:	id =  IDRB_DRT_CLIP_UNI;	break;
+				case MAA_SJISCLIP:	id =  IDRB_DRT_CLIP_SJIS;	break;
+			}
+			CheckRadioButton( hDlg, IDRB_DRT_INS_EDIT, IDRB_DRT_CLIP_SJIS, id );
+#endif
 			return (INT_PTR)TRUE;
 
 		case WM_COMMAND:
@@ -2331,6 +2366,16 @@ INT_PTR CALLBACK OptionDlgProc( HWND hDlg, UINT message, WPARAM wParam, LPARAM l
 					else{	dValue = MAA_INSERT;	}	//	IDRB_SEL_INS_EDIT
 					InitParamValue( INIT_SAVE, VL_SETMETHOD, dValue );
 					ViewMaaItemsModeSet( dValue );	//	MAAにも設定おくる
+
+#ifdef DRAUGHT_STYLE
+					//	ドラフトボードの操作
+					if( IsDlgButtonChecked( hDlg, IDRB_DRT_INTRPT_EDIT )  ){	gdClickMode = MAA_INTERRUPT;	}
+					else if( IsDlgButtonChecked( hDlg, IDRB_DRT_SET_LAYER ) ){	gdClickMode = MAA_LAYERED;		}
+					else if( IsDlgButtonChecked( hDlg, IDRB_DRT_CLIP_UNI ) ){	gdClickMode = MAA_UNICLIP;		}
+					else if( IsDlgButtonChecked( hDlg, IDRB_DRT_CLIP_SJIS ) ){	gdClickMode = MAA_SJISCLIP;		}
+					else{	gdClickMode = MAA_INSERT;	}	//	IDRB_DRT_INS_EDIT
+					InitParamValue( INIT_SAVE, VL_DRAUGHT_MODE, gdClickMode );
+#endif
 					//	ＯＫなら閉じちゃう
 					if( IDOK == id ){	EndDialog( hDlg, IDOK );	}
 					return (INT_PTR)TRUE;
@@ -2631,13 +2676,12 @@ HRESULT MultiFileTabClose( VOID )
 #ifdef USE_NOTIFYICON
 /*!
 	タスクトレイアイコンにばりゅ～んめせーじを載せる
-	@param[in]	hWnd	ウインドウハンドル・大域変数使うので未使用
 	@param[in]	ptInfo	バルーンの本文
 	@param[in]	ptTitle	バルーンのタイトル
 	@param[in]	dIconTy	くっつくアイコン、１情報、２警告、３エラー
 	@return		HRESULT	終了状態コード
 */
-HRESULT NotifyBalloonExist( HWND hWnd, LPTSTR ptInfo, LPTSTR ptTitle, DWORD dIconTy )
+HRESULT NotifyBalloonExist( LPTSTR ptInfo, LPTSTR ptTitle, DWORD dIconTy )
 {
 	NOTIFYICONDATA	nid;
 

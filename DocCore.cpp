@@ -1775,7 +1775,7 @@ HRESULT DocThreadDropCopy( VOID )
 
 	StringCchPrintf( atTitle, 64, TEXT("%d 頁をコピーしたのです。あぅ"), gixDropPage + 1 );
 
-	NotifyBalloonExist( NULL, atInfo, atTitle, NIIF_INFO );
+	NotifyBalloonExist( atInfo, atTitle, NIIF_INFO );
 
 	FREE( pcString );
 

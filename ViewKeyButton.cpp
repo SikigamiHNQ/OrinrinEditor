@@ -737,7 +737,7 @@ HRESULT ViewBrushFilling( VOID )
 	ptBuff = BrushStringMake( dTgDot, gatBrushPtn );
 	if( !(ptBuff) )
 	{
-		NotifyBalloonExist( NULL, TEXT("ブラシを選んでおいて欲しいのです。あぅあぅ"), TEXT("あぅあぅ"), NIIF_INFO );
+		NotifyBalloonExist( TEXT("ブラシを選んでおいて欲しいのです。あぅあぅ"), TEXT("あぅあぅ"), NIIF_INFO );
 		return E_OUTOFMEMORY;
 	}
 

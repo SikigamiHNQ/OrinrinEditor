@@ -269,7 +269,7 @@ HWND BrushTmpleInitialise( HINSTANCE hInstance, HWND hParentWnd, LPRECT pstFrame
 	//	リストビューツールチップ
 	ghBrLvTipWnd = CreateWindowEx( WS_EX_TOPMOST, TOOLTIPS_CLASS, NULL, TTS_NOPREFIX | TTS_ALWAYSTIP,
 		CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, ghBrTmplWnd, NULL, hInstance, NULL );
-	SetWindowFont( ghBrLvTipWnd, GetStockFont(DEFAULT_GUI_FONT), FALSE );
+//	SetWindowFont( ghBrLvTipWnd, GetStockFont(DEFAULT_GUI_FONT), FALSE );
 
 	//	ツールチップをコールバックで割り付け
 	ZeroMemory( &stToolInfo, sizeof(TTTOOLINFO) );
