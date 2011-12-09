@@ -50,6 +50,8 @@ BEGIN
         MENUITEM "AA一覧ツリーを再構築(&T)",	IDM_TREE_RECONSTRUCT
         MENUITEM "一般設定(&G)",				IDM_GENERAL_OPTION
         MENUITEM "ファイル名で検索(&F)",		IDM_FINDMAA_DLG_OPEN
+		MENUITEM SEPARATOR
+		MENUITEM "ドラフトボード表示(&B)",		IDM_DRAUGHT_OPEN
         MENUITEM SEPARATOR
         MENUITEM "常に手前に表示(&A)",			IDM_TOPMOST_TOGGLE
         MENUITEM SEPARATOR
@@ -63,8 +65,10 @@ IDM_AATREE_POPUP MENU
 BEGIN
     POPUP "複数行テンプレツリーのアレ"
     BEGIN
-        MENUITEM "主タブで開く(&M)",	IDM_AATREE_MAINOPEN
-        MENUITEM "副タブを追加(&S)",	IDM_AATREE_SUBADD
+        MENUITEM "主タブで開く(&M)",		IDM_AATREE_MAINOPEN
+        MENUITEM "副タブを追加(&S)",		IDM_AATREE_SUBADD
+		MENUITEM SEPARATOR
+		MENUITEM "ドラフトボード表示(&B)",	IDM_DRAUGHT_OPEN
     END
 END
 
@@ -84,22 +88,44 @@ BEGIN
         MENUITEM "ＡＡポップアップ表示(&T)",	IDM_MAA_AATIP_TOGGLE
 		MENUITEM "ＡＡ区切りスタイル切換",		IDM_MAA_SEP_STYLE_TOGGLE
         MENUITEM SEPARATOR
-        MENUITEM "コピー(&UNICODE)",			IDM_MAA_CLIP_UNICODE
+		MENUITEM "サムネイル一覧表示(&H)",		IDM_MAA_THUMBNAIL_OPEN
+		MENUITEM SEPARATOR
+		MENUITEM "ドラフトボード表示(&B)",		IDM_DRAUGHT_OPEN
+        MENUITEM "ドラフトボードに追加(&G)",	IDM_DRAUGHT_ADDING
+        MENUITEM SEPARATOR
+        MENUITEM "コピー(UNI&CODE)",			IDM_MAA_CLIP_UNICODE
         MENUITEM "コピー(&ShiftJIS)",			IDM_MAA_CLIP_SHIFTJIS
         MENUITEM SEPARATOR
         MENUITEM "削除(&D)",					IDM_MAA_FAV_DELETE, GRAYED
     END
 END
 
+IDM_DRAUGHT_POPUP MENU
+BEGIN
+    POPUP "ドラフトボードのアレ"
+    BEGIN
+        MENUITEM "コピー(UNI&CODE)",			IDM_DRAUGHT_UNICLIP
+        MENUITEM "コピー(Shift&JIS)",			IDM_DRAUGHT_SJISCLIP
+        MENUITEM SEPARATOR
+        MENUITEM "アイテムを削除(&D)",			IDM_DRAUGHT_DELETE
+        MENUITEM SEPARATOR
+        MENUITEM "全内容をエクスポート(&E)",	IDM_DRAUGHT_EXPORT, GRAYED
+        MENUITEM SEPARATOR
+        MENUITEM "全内容を削除(&K)",			IDM_DRAUGHT_ALLDELETE
+        MENUITEM "ドラフトボードを閉じる(&Q)",	IDM_DRAUGHT_CLOSE
+    END
+END
 
 /////////////////////////////////////////////////////////////////////////////
 //
 //	アクセロリータ
 //
 
-IDC_ORINRINVIEWER ACCELERATORS 
+IDC_ORINRINVIEWER ACCELERATORS
 BEGIN
-    VK_SPACE,       IDM_TESTCODE,           VIRTKEY, ALT, NOINVERT
+	"F",			IDM_FINDMAA_DLG_OPEN,	VIRTKEY, CONTROL, NOINVERT
+	"T",			IDM_MAA_THUMBNAIL_OPEN,	VIRTKEY, CONTROL, NOINVERT
+	VK_SPACE,		IDM_DRAUGHT_OPEN,		VIRTKEY, CONTROL, NOINVERT
 END
 
 
@@ -115,7 +141,7 @@ CAPTION "バージョン情報 - Orinrin Viewer"
 FONT 9, "MS UI Gothic"
 BEGIN
     ICON            IDI_ORINRINEDITOR,IDC_MYICON,6,6,18,21
-    LTEXT           "Orinrin Viewer, Version 5 aurora (2011.1125.2230.920)",IDC_STATIC,36,6,180,8,SS_NOPREFIX
+    LTEXT           "Orinrin Viewer, Version 6 Aurora (2011.1209.2400.920)",IDC_STATIC,36,6,180,8,SS_NOPREFIX
     LTEXT           "Copyright (C) 2011 by SikigamiHNQ",IDC_STATIC,36,18,180,8
     LTEXT           "Site ： お燐ちゃんは俺の嫁．ｃｏｍ",IDC_STATIC,36,30,180,8
     DEFPUSHBUTTON   "OK",IDOK,85,180,50,14,WS_GROUP
@@ -138,7 +164,7 @@ BEGIN
     CONTROL         "通常",IDRB_POPUP_NOMAL,"Button",BS_AUTORADIOBUTTON | WS_GROUP,84,36,42,8
     CONTROL         "縮小",IDRB_POPUP_REDUCE,"Button",BS_AUTORADIOBUTTON,138,36,30,8
     CONTROL         "表示する",IDCB_POPUP_VISIBLE,"Button",BS_AUTOCHECKBOX | WS_GROUP | WS_TABSTOP,186,36,48,8
-    GROUPBOX        "複数行テンプレをクルックしたときの動作",IDC_STATIC,6,60,258,30
+    GROUPBOX        "複数行テンプレをクリックしたときの動作",IDC_STATIC,6,60,258,30
     CONTROL         "コピー（ユニコード）",IDRB_SEL_CLIP_UNI,"Button",BS_AUTORADIOBUTTON | WS_GROUP,102,72,72,12
     CONTROL         "コピー（ShiftJIS）",IDRB_SEL_CLIP_SJIS,"Button",BS_AUTORADIOBUTTON,12,72,72,12
 END
@@ -175,8 +201,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 2011,1125,2230,920
- PRODUCTVERSION 5,0,0,920
+ FILEVERSION 2011,1207,2100,920
+ PRODUCTVERSION 6,0,0,920
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -201,12 +227,12 @@ BEGIN
             VALUE "LegalTrademarks", "License : GPLv3"
             VALUE "PrivateBuild", "Build by Visual Studio 2008"
             VALUE "SpecialBuild", "Not Speciality"
-            VALUE "FileVersion", "2011.1125.2230.920"
-            VALUE "ProductVersion", "5.0.0.920"
-            VALUE "FileDescription", "AsciiArt Viewer Ver5"
+            VALUE "FileVersion", "2011.1209.2400.920"
+            VALUE "ProductVersion", "6.0.0.920"
+            VALUE "FileDescription", "AsciiArt Viewer Ver6"
             VALUE "OriginalFilename", "OrinrinViewer.exe"
             VALUE "InternalName", "Orinrin Viewer"
-            VALUE "ProductName", "Orinrin Viewer 5"
+            VALUE "ProductName", "Orinrin Viewer 6"
         END
     END
 END

@@ -45,6 +45,7 @@ UINT		Maa_OnMouseWheel( HWND, INT, INT, INT, UINT );	//!<
 VOID		Maa_OnContextMenu( HWND, HWND, UINT, UINT );	//!<	
 VOID		Maa_OnChar( HWND, TCHAR, INT );
 VOID		Maa_OnSize( HWND , UINT, INT, INT );		//!<	
+VOID		Maa_OnCommand( HWND , INT, HWND, UINT );		//!<	WM_COMMAND ‚Ìˆ—
 
 #ifdef _ORRVW
 INT_PTR	CALLBACK OptionDlgProc( HWND, UINT, WPARAM, LPARAM );
@@ -66,9 +67,7 @@ LPARAM		TreeItemInfoGet( HTREEITEM, LPTSTR, size_t );	//!<
 INT			TreeSelItemProc( HWND, HTREEITEM, UINT );	//!<	
 UINT		TreeNodePathGet( HTREEITEM, LPTSTR );	//!<	
 
-#ifdef FIND_MAA_FILE
 HRESULT		TreeMaaFileFind( HWND );
-#endif
 
 LRESULT		CALLBACK FavListFolderNameBack( UINT, UINT, UINT, LPCVOID );	//!<	
 HRESULT		FavListSelected( HWND, UINT );		//!<	
@@ -95,7 +94,6 @@ VOID		Aai_OnVScroll( HWND , HWND, UINT, INT );	//!<
 
 DWORD		AacAssembleFile( HWND, LPTSTR );	//!<	
 HRESULT		AacMatrixClear( VOID  );			//!<	
-LPSTR		AacAsciiArtGet( DWORD );			//!<	
 DWORD		AacAssembleSql( HWND, LPCTSTR );	//!<	
 
 #ifndef _ORRVW
@@ -112,6 +110,7 @@ UINT		SqlFavCount( LPCTSTR, PUINT );	//!<
 HRESULT		SqlFavArtEnum( LPCTSTR, BUFFERBACK );	//!<	
 HRESULT		SqlFavUpload( LPTSTR, DWORD, LPSTR, UINT );	//!<	
 HRESULT		SqlFavDelete( LPTSTR, DWORD );	//!<	
+HRESULT		SqlFavFolderDelete( LPTSTR );	//!<	
 
 #ifdef MAA_PROFILE
 
@@ -120,10 +119,8 @@ INT			TreeProfileOpen( HWND );
 INT			TreeProfileRebuild( HWND );
 HRESULT		TreeLoadDirCheck( HWND, HWND );
 
-#ifdef FIND_MAA_FILE
 HTREEITEM	MaaSearchTreeItem( INT );
 HTREEITEM	MaaSelectIDfile( HWND, INT );
-#endif
 
 INT			MaaSearchTreeID( HTREEITEM );
 

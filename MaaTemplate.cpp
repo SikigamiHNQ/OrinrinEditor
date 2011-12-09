@@ -55,9 +55,7 @@ EXTERNED HWND	ghSplitaWnd;	//!<	スプリットバーハンドル
 
 EXTERNED UINT	gbAAtipView;	//!<	非０で、ＡＡツールチップ表示
 
-#ifdef FIND_MAA_FILE
 EXTERNED HWND	ghMaaFindDlg;	//!<	MAA検索ダイヤログハンドル
-#endif
 
 #ifdef MAA_PROFILE
 static TCHAR	gatProfilePath[MAX_PATH];	//!<	プロファイルディレクトリ
@@ -69,7 +67,6 @@ static CONST INT	giStbRoom[] = { 250 , 350 , -1 };
 
 LRESULT	CALLBACK MaaTmpltWndProc( HWND, UINT, WPARAM, LPARAM );
 BOOLEAN	Maa_OnCreate( HWND, LPCREATESTRUCT );			//!<	WM_CREATE の処理・固定Editとかつくる
-VOID	Maa_OnCommand( HWND , INT, HWND, UINT );		//!<	WM_COMMAND の処理
 VOID	Maa_OnPaint( HWND );							//!<	WM_PAINT の処理・枠線描画とか
 VOID	Maa_OnDestroy( HWND );							//!<	WM_DESTROY の処理・BRUSHとかのオブジェクトの破壊を忘れないように
 LRESULT	Maa_OnNotify( HWND , INT, LPNMHDR );			//!<	
@@ -140,9 +137,7 @@ HWND MaaTmpltInitialise( HINSTANCE hInstance, HWND hParentWnd, LPRECT pstFrame )
 
 	RegisterClassEx( &wcex );
 
-#ifdef FIND_MAA_FILE
 	ghMaaFindDlg = NULL;	//	初期化
-#endif
 
 #ifdef _ORRVW
 	SplitBarClass( hInstance );	//	スプリットバーの準備
@@ -329,6 +324,15 @@ VOID Maa_OnCommand( HWND hWnd, INT id, HWND hwndCtl, UINT codeNotify )
 		//	リストスタティックでのクリックはここにくる
 		case IDSO_AAITEMS:	TRACE( TEXT("static") );	break;
 
+#if defined( DRAUGHT_STYLE ) && defined( _ORRVW )
+		//	ドラフトボードオーポン
+		case IDM_DRAUGHT_OPEN:	DraughtWindowCreate( GetModuleHandle(NULL), ghMaaWnd, 0 );	break;
+#endif
+#ifdef THUMBNAIL_STYLE
+		//	サムネイルオーポン
+		case IDM_MAA_THUMBNAIL_OPEN:	DraughtWindowCreate( GetModuleHandle(NULL), ghMaaWnd, 1 );	break;
+#endif
+
 		case IDLB_FAVLIST:	FavListSelected( hWnd, codeNotify );	break;
 
 		case IDM_TOPMOST_TOGGLE:	//	常時最全面と通常ウインドウのトグル
@@ -375,9 +379,6 @@ VOID Maa_OnCommand( HWND hWnd, INT id, HWND hwndCtl, UINT codeNotify )
 		case IDM_GENERAL_OPTION:	//	設定
 			DialogBoxParam( ghInst, MAKEINTRESOURCE(IDD_ORRVWR_OPTION_DLG), hWnd, OptionDlgProc, NULL );
 			break;
-	#ifdef FIND_MAA_FILE
-			case IDM_FINDMAA_DLG_OPEN:	TreeMaaFileFind( hWnd );	break;
-	#endif
 
 	#ifdef MAA_PROFILE
 		case IDM_MAA_PROFILE_MAKE:	TreeProfileOpen( hWnd );	break;
@@ -387,7 +388,9 @@ VOID Maa_OnCommand( HWND hWnd, INT id, HWND hwndCtl, UINT codeNotify )
 		case  IDM_WINDOW_CHANGE:	WindowFocusChange( WND_MAAT,  1 );	break;
 		case  IDM_WINDOW_CHG_RVRS:	WindowFocusChange( WND_MAAT, -1 );	break;
 #endif
-
+		//	Ｅコンテキスト・アクセロリータ　Ｖメニュー・アクセロリータ
+		case IDM_FINDMAA_DLG_OPEN:	TreeMaaFileFind( hWnd );	break;
+		//全文検索できるか？
 		default:	break;
 	}
 
@@ -1319,9 +1322,6 @@ LPTSTR StringLineGet( LPCTSTR ptSource, LPCTSTR *ptNextLn )
 #endif	//	MAA_PROFILE
 
 
-#ifdef FIND_MAA_FILE
-
-
 /*!
 	検索してリストビューに入れる
 	@param[in]	hDlg	ダイヤログハンドル
@@ -1526,9 +1526,5 @@ HRESULT TreeMaaFileFind( HWND hWnd )
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-
-
-#endif	//	FIND_MAA_FILE
-
 
 

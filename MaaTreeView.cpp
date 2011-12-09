@@ -193,7 +193,8 @@ LRESULT CALLBACK gpfFavListProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 
 	switch( msg )
 	{
-		HANDLE_MSG( hWnd, WM_CHAR, Maa_OnChar );		//	
+		HANDLE_MSG( hWnd, WM_CHAR,    Maa_OnChar  );	//	
+		HANDLE_MSG( hWnd, WM_COMMAND, Maa_OnCommand );	//	アクセロリータ用
 
 		case WM_MOUSEWHEEL:
 			ulRslt = Maa_OnMouseWheel( hWnd, (int)(short)LOWORD(lParam), (int)(short)HIWORD(lParam), (int)(short)HIWORD(wParam), (UINT)(short)LOWORD(wParam) );
@@ -222,7 +223,8 @@ LRESULT CALLBACK gpfTreeViewProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPa
 
 	switch( msg )
 	{
-		HANDLE_MSG( hWnd, WM_CHAR, Maa_OnChar );		//	
+		HANDLE_MSG( hWnd, WM_CHAR,    Maa_OnChar  );	//	
+		HANDLE_MSG( hWnd, WM_COMMAND, Maa_OnCommand );	//	アクセロリータ用
 
 		case WM_MOUSEWHEEL:
 			ulRslt = Maa_OnMouseWheel( hWnd, (int)(short)LOWORD(lParam), (int)(short)HIWORD(lParam), (int)(short)HIWORD(wParam), (UINT)(short)LOWORD(wParam) );
@@ -248,7 +250,9 @@ LRESULT	CALLBACK gpfTabMultiProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPa
 {
 	switch( msg )
 	{
-		HANDLE_MSG( hWnd, WM_CHAR, Maa_OnChar );
+		HANDLE_MSG( hWnd, WM_CHAR,    Maa_OnChar  );	
+		HANDLE_MSG( hWnd, WM_COMMAND, Maa_OnCommand );	//	アクセロリータ用
+
 		default:	break;
 	}
 
@@ -319,7 +323,7 @@ VOID Maa_OnContextMenu( HWND hWnd, HWND hWndContext, UINT xPos, UINT yPos )
 #ifndef _ORRVW
 	LONG_PTR	rdExStyle;
 #endif
-	TCHAR	atSelName[MAX_PATH], atMenuStr[MAX_PATH];
+	TCHAR	atSelName[MAX_PATH], atMenuStr[MAX_PATH], atMenuStr2[MAX_PATH];
 	MULTIPLEMAA	stMulti;
 	POINT			stPost;
 	TVHITTESTINFO	stTvHitInfo;
@@ -334,7 +338,6 @@ VOID Maa_OnContextMenu( HWND hWnd, HWND hWndContext, UINT xPos, UINT yPos )
 
 	TRACE( TEXT("MAAコンテキストメニュー") );
 
-//#ifndef _ORRVW
 	//	お気にリストボックスのコンテキスト
 	if( ghFavLtWnd == hWndContext )
 	{
@@ -346,27 +349,42 @@ VOID Maa_OnContextMenu( HWND hWnd, HWND hWndContext, UINT xPos, UINT yPos )
 		if( 0 > curSel )	return;
 
 		ListBox_GetText( ghFavLtWnd, curSel, atSelName );
-		StringCchPrintf( atMenuStr, MAX_PATH, TEXT("[ %s ]で副タブを追加"), atSelName );
+		StringCchPrintf( atMenuStr,  MAX_PATH, TEXT("[ %s ]で副タブを追加"), atSelName );
+		StringCchPrintf( atMenuStr2, MAX_PATH, TEXT("[ %s ]グループを削除"), atSelName );
+
+
 
 		hMenu = CreatePopupMenu(  );
 		//	お気にリストのセットを副タブに表示する機能
 		AppendMenu( hMenu, MF_STRING, IDM_AATREE_SUBADD, atMenuStr );
+		AppendMenu( hMenu, MF_SEPARATOR, 0, TEXT("----") );
+		AppendMenu( hMenu, MF_STRING, IDM_MAA_FAVFLDR_DELETE, atMenuStr2 );
 
 		dRslt = TrackPopupMenu( hMenu, TPM_RETURNCMD, stPost.x, stPost.y, 0, hWnd, NULL );
-		if( IDM_AATREE_SUBADD == dRslt )
+		switch( dRslt )
 		{
-			ZeroMemory( &stMulti, sizeof(MULTIPLEMAA) );
-			StringCchCopy( stMulti.atBase, MAX_PATH, atSelName );
-			//	atFilePathを空にすることで、使用リストからってことで
-			stMulti.dTabNum = 0;	//	初期化・割当は２以降
+			case IDM_AATREE_SUBADD:
+				ZeroMemory( &stMulti, sizeof(MULTIPLEMAA) );
+				StringCchCopy( stMulti.atBase, MAX_PATH, atSelName );
+				//	atFilePathを空にすることで、使用リストからってことで
+				stMulti.dTabNum = 0;	//	初期化・割当は２以降
 
-			gltMultiFiles.push_back( stMulti );
-			TabMultipleAppend( hWnd );
+				gltMultiFiles.push_back( stMulti );
+				TabMultipleAppend( hWnd );
+				break;
+
+			case IDM_MAA_FAVFLDR_DELETE:	//	お気に入りリストを基点ごと削除
+				SqlFavFolderDelete( atSelName );
+				//	再描画
+				while( ListBox_GetCount( ghFavLtWnd ) ){	ListBox_DeleteString( ghFavLtWnd, 0 );	}
+				SqlFavFolderEnum( FavListFolderNameBack );
+				break;
+
+			default:	break;
 		}
 		DestroyMenu( hMenu );
 		return;
 	}
-//#endif
 
 	//	ツリービューのコンテキスト
 	if( ghTreeWnd == hWndContext )
@@ -408,9 +426,8 @@ VOID Maa_OnContextMenu( HWND hWnd, HWND hWndContext, UINT xPos, UINT yPos )
 
 			//	ディレクトリ系を再セット	ディレクトリ設定ダイヤログを開く
 			case IDM_TREE_RECONSTRUCT:	TreeProfileRebuild( hWnd  );	break;
-#ifdef FIND_MAA_FILE
+
 			case IDM_FINDMAA_DLG_OPEN:	TreeMaaFileFind( hWnd );	break;
-#endif
 #endif
 			case IDM_AATREE_MAINOPEN:	TreeSelItemProc( hWnd, hTvHitItem , 0 );	break;
 			case  IDM_AATREE_SUBADD:	TreeSelItemProc( hWnd, hTvHitItem , 1 );	break;
@@ -821,8 +838,6 @@ INT MaaSearchTreeID( HTREEITEM hItem )
 }
 //-------------------------------------------------------------------------------------------------
 
-#ifdef FIND_MAA_FILE
-
 /*!
 	IDを渡して、該当アイテムのツリーノードハンドルをとる・再帰
 	@param[in]	dOwnID	検索したいノードのSqlID
@@ -898,7 +913,7 @@ HTREEITEM MaaSelectIDfile( HWND hDlg, INT tgtID )
 }
 //-------------------------------------------------------------------------------------------------
 
-#endif
+
 
 
 

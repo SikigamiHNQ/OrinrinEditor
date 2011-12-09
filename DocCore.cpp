@@ -1584,7 +1584,7 @@ LPSTR DocPageTextPreviewAlloc( INT iPage, PINT pdBytes )
 {
 	//	SJISの場合は、ユニコード文字は&#dddd;で確保される
 
-	UINT_PTR	iLines, i, iLetters;//, j;
+	UINT_PTR	iLines, i, iLetters;
 	INT_PTR		iSize;
 	LPSTR	pcText = NULL;
 	CHAR	acEntity[10];
@@ -1624,11 +1624,7 @@ LPSTR DocPageTextPreviewAlloc( INT iPage, PINT pdBytes )
 		}
 
 //全行に改行あってかまわない？
-//		if( iLines > (i+1) )
-//		{
-			srString +=  string( "<br>" );
-//			srString +=  string( CH_CRLFA );
-//		}
+		srString +=  string( "<br>" );
 	}
 
 	iSize = srString.size( ) + 1;	//	NULLターミネータ分足す

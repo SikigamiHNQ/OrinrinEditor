@@ -493,6 +493,27 @@ HRESULT SqlFavDelete( LPTSTR ptBaseName, DWORD dHash )
 }
 //-------------------------------------------------------------------------------------------------
 
+/*!
+	お気に入りリストを基点ごと削除
+	@param[in]	ptBaseName	基点ディレクトリ名
+	@return		HRESULT		終了状態コード
+*/
+HRESULT SqlFavFolderDelete( LPTSTR ptBaseName )
+{
+	CONST CHAR	acFolderDelete[] = { ("DELETE FROM ArtList WHERE folder == ?") };
+	INT		rslt;
+	sqlite3_stmt	*statement;
+
+	rslt = sqlite3_prepare( gpDataBase, acFolderDelete, -1, &statement, NULL );
+	if( SQLITE_OK != rslt ){	SQL_DEBUG( gpDataBase );	return E_OUTOFMEMORY;	}
+	sqlite3_reset( statement );
+	sqlite3_bind_text16( statement, 1, ptBaseName, -1, SQLITE_STATIC );	//	folder
+	rslt = sqlite3_step( statement );
+	sqlite3_finalize( statement );
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
 
 
 

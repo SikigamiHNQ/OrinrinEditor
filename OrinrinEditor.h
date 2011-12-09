@@ -212,6 +212,7 @@ typedef struct tagOPERATELOG
 
 } OPERATELOG, *LPOPERATELOG;
 typedef vector<OPERATELOG>::iterator	OPSQ_ITR;
+//-----------------------------
 
 typedef struct tagUNDOBUFF
 {
@@ -222,6 +223,7 @@ typedef struct tagUNDOBUFF
 	vector<OPERATELOG>	vcOpeSqn;	//!<	操作ログ本体
 
 } UNDOBUFF, *LPUNDOBUFF;
+//-----------------------------
 
 
 //	壱文字の情報・受け渡しにも使う
@@ -235,6 +237,7 @@ typedef struct tagLETTER
 
 } LETTER, *LPLETTER;
 typedef vector<LETTER>::iterator	LTR_ITR;
+//-----------------------------
 
 //	壱行の管理
 typedef struct tagONELINE
@@ -254,6 +257,7 @@ typedef struct tagONELINE
 
 } ONELINE, *LPONELINE;
 typedef vector<ONELINE>::iterator	LINE_ITR;
+//-----------------------------
 
 //	SPLITページ壱分
 typedef struct tagONEPAGE
@@ -272,6 +276,7 @@ typedef struct tagONEPAGE
 
 } ONEPAGE, *LPONEPAGE;
 typedef vector<ONEPAGE>::iterator	PAGE_ITR;
+//-----------------------------
 
 //	一つのファイル保持
 typedef struct tagONEFILE
@@ -290,11 +295,11 @@ typedef struct tagONEFILE
 	vector<ONEPAGE>	vcCont;	//!<	ページを保持する
 
 } ONEFILE, *LPONEFILE;
-//-----------------------------
 
 #ifdef MULTI_FILE
 typedef list<ONEFILE>::iterator	FILES_ITR;
 #endif
+//-----------------------------
 
 //	複数ファイル扱うなら、さらにコレを包含すればいい？
 
@@ -306,12 +311,39 @@ typedef struct tagAATEMPLATE
 	vector<wstring>	vcItems;	//!<	テンプレ文字列本体
 
 } AATEMPLATE, *LPAATEMPLATE;
+//-----------------------------
+
 
 //-------------------------------------------------------------------------------------------------
 
 typedef UINT (CALLBACK* PAGELOAD)(LPTSTR, LPTSTR, INT);
 
 #endif	//	NOT _ORRVW
+
+
+//	MaaCatalogue.cppから移動
+//!	MLTの保持
+typedef struct tagAAMATRIX
+{
+	CHAR	acAstName[MAX_STRING];	//!<	ASTの場合、頁名称を持っておく
+
+	UINT	ixNum;	//!<	通し番号０インデックス
+	DWORD	cbItem;	//!<	AAのバイト数
+
+	LPSTR	pcItem;	//!<	読み込んだAAを保持しておくポインタ・SJIS形式のままでいいか？
+
+	//	サムネ用
+	INT		iMaxDot;	//!<	横幅最大ドット数
+	INT		iLines;		//!<	使用行数
+
+	SIZE	stSize;		//!<	ピクセルサイズ
+//	HDC		hThumbDC;	//!<	サムネイル用デバイスコンテキスト
+	HBITMAP	hThumbBmp;	//!<	サムネイル用ビットマップハンドル
+//	HBITMAP	hOldBmp;	//!<	復帰用
+
+} AAMATRIX, *LPAAMATRIX;
+typedef vector<AAMATRIX>::iterator	MAAM_ITR;	
+//-----------------------------
 
 //-------------------------------------------------------------------------------------------------
 
@@ -331,6 +363,7 @@ HRESULT		InitParamString( UINT, UINT, LPTSTR );
 BOOLEAN		SelectDirectoryDlg( HWND, LPTSTR, UINT_PTR );
 
 UINT		ViewMaaMaterialise( LPSTR, UINT, UINT );
+INT			ViewStringWidthGet( LPCTSTR );
 
 LPTSTR		SjisDecodeAlloc( LPSTR );
 LPSTR		SjisEntityExchange( LPCSTR );
@@ -342,7 +375,6 @@ HWND		MaaTmpltInitialise( HINSTANCE, HWND, LPRECT );
 VOID		MaaTabBarSizeGet( LPRECT  );	//!<	
 
 HRESULT		AaItemsTipSizeChange( INT, UINT );
-
 
 #ifndef _ORRVW
 
@@ -399,16 +431,11 @@ INT_PTR		FrameEditDialogue( HINSTANCE, HWND, UINT );
 HWND		FrameInsBoxCreate( HINSTANCE, HWND );
 HRESULT		FrameMoveFromView( HWND, UINT );
 
-
-#ifdef CONTEXT_EDIT
-
 HRESULT		CntxEditInitialise( LPTSTR, HINSTANCE );
 HRESULT		CntxEditDlgOpen( HWND );
 HMENU		CntxMenuGet( VOID );
 HRESULT		CntxMenuCopySwap( VOID );
 
-
-#endif
 
 #ifdef MULTI_FILE
 HRESULT		MultiFileTabFirst( LPTSTR );
@@ -435,10 +462,7 @@ HRESULT		ViewFrameInsert( INT );
 HRESULT		ViewMaaItemsModeSet( UINT );
 
 INT			ViewLetterWidthGet( TCHAR );
-INT			ViewStringWidthGet( LPCTSTR );
 HRESULT		ViewNowPosStatus( VOID );
-
-INT			TextViewSizeGet( LPCTSTR, PINT );
 
 HRESULT		ViewRedrawSetLine( INT );
 HRESULT		ViewRedrawSetRect( LPRECT );
@@ -713,9 +737,21 @@ HRESULT		FindHighlightOff( VOID );
 //Viewerでも有り？
 #ifdef DRAUGHT_STYLE
 HRESULT	DraughtInitialise( HINSTANCE, HWND );
-HWND	DraughtWindowCreate( HINSTANCE, HWND );
+HWND	DraughtWindowCreate( HINSTANCE, HWND, UINT );
 
 UINT	DraughtItemAddFromSelect( UINT );
 UINT	DraughtItemAdding( LPSTR );
+
+UINT	DraughtAaImageing( LPAAMATRIX );
+
+
+INT		TextViewSizeGet( LPCTSTR, PINT );
+
 #endif
+
+#ifdef THUMBNAIL_STYLE
+INT_PTR	AacItemCount( UINT );
+HBITMAP	AacArtImageGet( INT, LPSIZE );
+#endif
+LPSTR	AacAsciiArtGet( DWORD );			//!<	
 

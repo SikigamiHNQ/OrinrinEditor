@@ -42,6 +42,10 @@ MAAのサムネ表示にも使うなら、スクロールバー考慮。呼出キーバインドも考える。Ctrl+
 #include "OrinrinEditor.h"
 //-------------------------------------------------------------------------------------------------
 
+//	TODO:	サムネがDCリソース食い過ぎか。非表示のは積極的にOFFるほうがよさそう
+//もしくはサムネサイズに縮小して保持するか
+//ＤＣまで要らない、ＢＭＰだけでいいかも
+
 #define DRAUGHT_BOARD_CLASS	TEXT("DRAUGHT_BOARD")
 
 //	一枚のパネルサイズ・小さいか？
@@ -55,18 +59,20 @@ MAAのサムネ表示にも使うなら、スクロールバー考慮。呼出キーバインドも考える。Ctrl+
 
 #ifdef DRAUGHT_STYLE
 
-typedef struct tagDRAUGHTITEM
-{
-	LPSTR	pcAaText;	//!<	AA文字列・Sjisで確保
-	INT		iMaxDot;	//!<	横幅最大ドット数
-	INT		iLines;		//!<	使用行数
-
-	SIZE	stSize;		//!<	ピクセルサイズ
-	HDC		hThumbDC;	//!<	サムネイル用デバイスコンテキスト
-	HBITMAP	hThumbBmp;	//!<	サムネイル用ビットマップハンドル
-	HBITMAP	hOldBmp;	//!<	復帰用
-
-} DRAUGHTITEM, *LPDRAUGHTITEM;
+//	MAAのと共通でいける
+//typedef struct tagDRAUGHTITEM
+//{
+//	LPSTR	pcAaText;	//!<	AA文字列・Sjisで確保
+//
+//	INT		iMaxDot;	//!<	横幅最大ドット数
+//	INT		iLines;		//!<	使用行数
+//
+//	SIZE	stSize;		//!<	ピクセルサイズ
+//	HDC		hThumbDC;	//!<	サムネイル用デバイスコンテキスト
+//	HBITMAP	hThumbBmp;	//!<	サムネイル用ビットマップハンドル
+//	HBITMAP	hOldBmp;	//!<	復帰用
+//
+//} DRAUGHTITEM, *LPDRAUGHTITEM;
 //-------------------------------------------------------------------------------------------------
 
 extern HFONT	ghAaFont;		//	AA用フォント
@@ -84,8 +90,13 @@ static HPEN		ghLinePen;
 
 static INT		giTarget;		//!<	クルックしたアイテム番号・－１で無し
 
-static vector<DRAUGHTITEM>	gvcDrtItems;	//!<	
-typedef vector<DRAUGHTITEM>::iterator	DRTI_ITR;	//!<	
+#ifdef THUMBNAIL_STYLE
+static  UINT	gbThumb;		//!<	サムネ状態であるか
+static  LONG	gdVwTop;		//!<	表示されてる一番左上の行番号０インデックス
+static  HWND	ghScrBarWnd;	//!<	サムネ用スクロールバァー
+#endif
+static vector<AAMATRIX>	gvcDrtItems;	//!<	
+//typedef vector<DRAUGHTITEM>::iterator	DRTI_ITR;	//!<	
 //-------------------------------------------------------------------------------------------------
 
 INT		DraughtTargetItemSet( LPPOINT );	//!<	
@@ -94,14 +105,16 @@ INT		DraughtItemDelete( CONST INT  );	//!<
 HRESULT	DraughtItemUse( INT );	//!<	
 
 LRESULT CALLBACK DraughtProc( HWND, UINT, WPARAM, LPARAM );
-VOID	Drt_OnCommand( HWND , INT, HWND, UINT );	//!<	
-VOID	Drt_OnPaint( HWND );						//!<	
-//VOID	Drt_OnSize( HWND , UINT, INT, INT );		//!<	
-LRESULT	Drt_OnNotify( HWND , INT, LPNMHDR );		//!<	
-VOID	Drt_OnLButtonUp( HWND, INT, INT, UINT );	//!<	
-VOID	Drt_OnContextMenu( HWND, HWND, UINT, UINT );//!<	
-VOID	Drt_OnDestroy( HWND );						//!<	
-VOID	Drt_OnKillFocus( HWND, HWND );				//!<	
+VOID	Drt_OnCommand( HWND , INT, HWND, UINT );		//!<	
+VOID	Drt_OnPaint( HWND );							//!<	
+//VOID	Drt_OnSize( HWND , UINT, INT, INT );			//!<	
+LRESULT	Drt_OnNotify( HWND , INT, LPNMHDR );			//!<	
+VOID	Drt_OnLButtonUp( HWND, INT, INT, UINT );		//!<	
+VOID	Drt_OnContextMenu( HWND, HWND, UINT, UINT );	//!<	
+VOID	Drt_OnDestroy( HWND );							//!<	
+VOID	Drt_OnKillFocus( HWND, HWND );					//!<	
+VOID	Drt_OnVScroll( HWND , HWND, UINT, INT );		//!<	
+VOID	Drt_OnMouseWheel( HWND, INT, INT, INT, UINT );	//!<	
 
 //-------------------------------------------------------------------------------------------------
 
@@ -136,9 +149,11 @@ HRESULT DraughtInitialise( HINSTANCE hInstance, HWND hPtWnd )
 
 		ghNonItemDC = NULL;
 
-		//	クルック動作指定ロード・デフォ動作はユニコクリップ
-		gdClickMode = InitParamValue( INIT_LOAD, VL_DRAUGHT_MODE, 3 );
+#ifndef _ORRVW
+		//	クルック動作指定ロード・デフォ動作はSJISクリップ
+		gdClickMode = InitParamValue( INIT_LOAD, VL_DRAUGHT_MODE, 4 );
 		//	Viewerの場合はコピーモードに従う
+#endif
 	}
 	else
 	{
@@ -161,14 +176,24 @@ HRESULT DraughtInitialise( HINSTANCE hInstance, HWND hPtWnd )
 
 /*!
 	表示用ウインドウを作る
+	@param[in]	hInstance	アプリのインスタンス
+	@param[in]	hPtWnd		メイン窓ウインドウハンドル
+	@param[in]	bThumb		非０MAAのサムネ表示として呼ばれた
+	@return	作ったウインドウのハンドル
 */
-HWND DraughtWindowCreate( HINSTANCE hInstance, HWND hPtWnd )
+HWND DraughtWindowCreate( HINSTANCE hInstance, HWND hPtWnd, UINT bThumb )
 {
 	INT_PTR	iItems;
-	INT		iRslt;
+	INT		iRslt, iScWid = 0;
 	HDC		hdc;
 
 	RECT	wdRect, rect;
+
+#ifdef THUMBNAIL_STYLE
+	INT		iLines, iStep = 0;
+	LONG	rigOffs = 0;
+	SCROLLINFO	stScrollInfo;
+#endif
 
 	if( !(hPtWnd ) )	//	破壊する・いらない？
 	{
@@ -180,22 +205,61 @@ HWND DraughtWindowCreate( HINSTANCE hInstance, HWND hPtWnd )
 	//	已に出来ていたらそのまま返す
 	if( ghDraughtWnd  ){	UpdateWindow( ghDraughtWnd );	return ghDraughtWnd;	}
 
-	iItems = gvcDrtItems.size( );	//	現在個数
+	gbThumb = bThumb;
+
+	iItems = gvcDrtItems.size( );	//	現在個数・ここでは使わない
 
 	GetWindowRect( hPtWnd, &wdRect );
 	rect.left   = wdRect.left + 32;	//	オフセット値に特に意味はない
 	rect.top    = wdRect.top  + 32;
 	rect.right  = THM_WIDTH  * TPNL_HORIZ;
 	rect.bottom = THM_HEIGHT * TPNL_VERTI;
-	
-	//	ウインドウ作成
-	ghDraughtWnd = CreateWindowEx( WS_EX_CLIENTEDGE | WS_EX_TOOLWINDOW | WS_EX_TOPMOST,
-		DRAUGHT_BOARD_CLASS, TEXT("Draught Board"), WS_POPUP | WS_VISIBLE,
+
+#ifdef THUMBNAIL_STYLE
+	if( gbThumb )	//	サムネモード
+	{
+		gdVwTop = 0;
+
+		iItems = AacItemCount( 0  );	//	現在個数・スクロールバーの刻み設定につかう
+		if( 0 >= iItems )	return NULL;	//	アイテム開いてないなら何もしない
+
+		iLines = (iItems + (TPNL_HORIZ-1)) / TPNL_HORIZ;	//	行数・切り上げ処理
+
+		iStep = iLines - TPNL_VERTI;	//	すくろるば～の刻み数
+		if( 0 > iStep ){	iStep = 0;	}
+
+		rigOffs = rect.right;
+
+		iScWid = GetSystemMetrics( SM_CXVSCROLL );	//	垂直スクロールバーの幅確保
+		rect.right += iScWid;
+	}
+#endif
+
+	//	ウインドウ作成	TOPMOSTいるか？	
+	ghDraughtWnd = CreateWindowEx( WS_EX_TOOLWINDOW,// | WS_EX_TOPMOST | WS_EX_CLIENTEDGE,
+		DRAUGHT_BOARD_CLASS, TEXT("Draught Board"), WS_POPUP | WS_VISIBLE | WS_BORDER,
 		rect.left, rect.top, rect.right, rect.bottom, NULL, NULL, hInstance, NULL );
 
-	if( !(ghNonItemDC) )
+#ifdef THUMBNAIL_STYLE
+	if( gbThumb )	//	サムネモード
 	{
-		//	描画用ビットマップ作成
+		//	一覧のスクロールバー
+		ghScrBarWnd = CreateWindowEx( 0, WC_SCROLLBAR, TEXT("scroll"), WS_VISIBLE | WS_CHILD | SBS_VERT,
+			rigOffs, 0, iScWid, rect.bottom, ghDraughtWnd, (HMENU)IDSB_DRT_THUM_SCROLL, hInstance, NULL );
+
+		ZeroMemory( &stScrollInfo, sizeof(SCROLLINFO) );
+		stScrollInfo.cbSize = sizeof(SCROLLINFO);
+		stScrollInfo.fMask = SIF_ALL | SIF_DISABLENOSCROLL;
+		stScrollInfo.nMax  = iStep;
+		stScrollInfo.nPos  = 0;
+		stScrollInfo.nPage = 1;
+		stScrollInfo.nTrackPos = 0;
+		SetScrollInfo( ghScrBarWnd, SB_CTL, &stScrollInfo, TRUE );
+	}
+#endif
+
+	if( !(ghNonItemDC) )	//	穴埋め描画用ビットマップ作成
+	{
 		hdc = GetDC( ghDraughtWnd );
 
 		ghNonItemDC  = CreateCompatibleDC( hdc );
@@ -244,8 +308,8 @@ LRESULT CALLBACK DraughtProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lPa
 		HANDLE_MSG( hWnd, WM_CONTEXTMENU, Drt_OnContextMenu );
 		HANDLE_MSG( hWnd, WM_DESTROY,     Drt_OnDestroy );
 		HANDLE_MSG( hWnd, WM_KILLFOCUS,   Drt_OnKillFocus );
-
-//		case WM_MOUSEWHEEL:	SendMessage( , WM_MOUSEWHEEL, wParam, lParam );	return 0;
+		HANDLE_MSG( hWnd, WM_VSCROLL,     Drt_OnVScroll );	
+		HANDLE_MSG( hWnd, WM_MOUSEWHEEL,  Drt_OnMouseWheel );		//	
 
 //		case WM_CLOSE:	ShowWindow( ghDraughtWnd, SW_HIDE );	return 0;
 
@@ -276,9 +340,9 @@ VOID Drt_OnCommand( HWND hWnd, INT id, HWND hWndCtl, UINT codeNotify )
 		case IDM_DRAUGHT_SJISCLIP:	DraughtItemUse( id );	DestroyWindow( hWnd );	break;
 
 		case IDM_DRAUGHT_DELETE:	DraughtItemDelete( giTarget );	InvalidateRect( hWnd , NULL, TRUE );	break;
-
+#ifndef _ORRVW
 		case IDM_DRAUGHT_EXPORT:	NotifyBalloonExist( TEXT("未実装なのです・・・"), TEXT("あぅあぅ"), NIIF_ERROR );	break;
-
+#endif
 		case IDM_DRAUGHT_ALLDELETE:	DraughtItemDelete( -1 );	DestroyWindow( hWnd );	break;
 
 		case IDM_DRAUGHT_CLOSE:		DestroyWindow( hWnd );	break;
@@ -296,42 +360,86 @@ VOID Drt_OnCommand( HWND hWnd, INT id, HWND hWndCtl, UINT codeNotify )
 VOID Drt_OnPaint( HWND hWnd )
 {
 	PAINTSTRUCT	ps;
-	HDC			hdc;
+	HDC			hdc, hAaDC;
+	HBITMAP		hOldBmp, hBmp;
 	UINT		x = 0, y = 0;
 	INT_PTR		iItems;
-	SIZE		stSize;
+	SIZE		stSize, stOrgSize;
 
-	DRTI_ITR	itItem;
+	MAAM_ITR	itItem;
 
 
 	hdc = BeginPaint( hWnd, &ps );
 
 	SetStretchBltMode( hdc, HALFTONE );
 
-	iItems = gvcDrtItems.size( );
-
-	itItem = gvcDrtItems.begin();
-	for( y = 0; TPNL_VERTI > y; y++ )
+#ifdef THUMBNAIL_STYLE
+	if( gbThumb )	//	サムネモード
 	{
-		for( x = 0; TPNL_HORIZ > x; x++ )
-		{
-			if( itItem != gvcDrtItems.end() )
-			{
-				stSize = itItem->stSize;
-				DraughtAspectKeeping( &stSize, TRUE );
+		iItems = gdVwTop * TPNL_HORIZ;
 
-				StretchBlt( hdc, (x * THM_WIDTH), (y * THM_HEIGHT), stSize.cx, stSize.cy,	//	コピー先ＤＣ、左上ＸＹ、幅、高さ
-					itItem->hThumbDC, 0, 0, itItem->stSize.cx, itItem->stSize.cy,	//	コピー元ＤＣ、左上ＸＹ、幅、高さ
-					SRCCOPY );	//	ラスタオペレーションコード
-					//	((x+1) * THM_WIDTH)	((y+1) * THM_HEIGHT)
-				itItem++;
-			}
-			else
+		for( y = 0; TPNL_VERTI > y; y++ )
+		{
+			for( x = 0; TPNL_HORIZ > x; x++ )
 			{
-				BitBlt( hdc, (x * THM_WIDTH), (y * THM_HEIGHT), THM_WIDTH, THM_HEIGHT, ghNonItemDC, 0, 0, SRCCOPY );
+				hBmp = AacArtImageGet( iItems, &stSize );
+				if( hBmp )
+				{
+					stOrgSize = stSize;
+					DraughtAspectKeeping( &stSize, TRUE );
+
+					hAaDC = CreateCompatibleDC( hdc );
+					hOldBmp = SelectBitmap( hAaDC, hBmp );
+
+					StretchBlt( hdc, (x * THM_WIDTH), (y * THM_HEIGHT), stSize.cx, stSize.cy,	//	コピー先ＤＣ、左上ＸＹ、幅、高さ
+						hAaDC, 0, 0, stOrgSize.cx, stOrgSize.cy,	//	コピー元ＤＣ、左上ＸＹ、幅、高さ
+						SRCCOPY );	//	ラスタオペレーションコード
+					iItems++;
+
+					SelectBitmap( hAaDC, hOldBmp );
+					DeleteDC( hAaDC );
+				}
+				else
+				{
+					BitBlt( hdc, (x * THM_WIDTH), (y * THM_HEIGHT), THM_WIDTH, THM_HEIGHT, ghNonItemDC, 0, 0, SRCCOPY );
+				}
 			}
 		}
 	}
+	else
+	{
+#endif
+		itItem = gvcDrtItems.begin();
+
+		for( y = 0; TPNL_VERTI > y; y++ )
+		{
+			for( x = 0; TPNL_HORIZ > x; x++ )
+			{
+				if( itItem != gvcDrtItems.end() )
+				{
+					stSize = itItem->stSize;
+					DraughtAspectKeeping( &stSize, TRUE );
+
+					hAaDC = CreateCompatibleDC( hdc );
+					hOldBmp = SelectBitmap( hAaDC, itItem->hThumbBmp );
+
+					StretchBlt( hdc, (x * THM_WIDTH), (y * THM_HEIGHT), stSize.cx, stSize.cy,	//	コピー先ＤＣ、左上ＸＹ、幅、高さ
+						hAaDC, 0, 0, itItem->stSize.cx, itItem->stSize.cy,	//	コピー元ＤＣ、左上ＸＹ、幅、高さ
+						SRCCOPY );	//	ラスタオペレーションコード	//	itItem->hThumbDC
+					itItem++;
+
+					SelectBitmap( hAaDC, hOldBmp );
+					DeleteDC( hAaDC );
+				}
+				else
+				{
+					BitBlt( hdc, (x * THM_WIDTH), (y * THM_HEIGHT), THM_WIDTH, THM_HEIGHT, ghNonItemDC, 0, 0, SRCCOPY );
+				}
+			}
+		}
+#ifdef THUMBNAIL_STYLE
+	}
+#endif
 
 	for( y = 1; TPNL_HORIZ > y; y++ )
 	{
@@ -398,9 +506,11 @@ VOID Drt_OnLButtonUp( HWND hWnd, INT x, INT y, UINT keyFlags )
 
 	switch( gdClickMode )
 	{
+#ifndef _ORRVW
 		case  0:	id = IDM_DRAUGHT_INSERTEDIT;	break;
 		case  1:	id = IDM_DRAUGHT_INTERRUPTEDIT;	break;
 		case  2:	id = IDM_DRAUGHT_LAYERBOX;	break;
+#endif
 		default:
 		case  3:	id = IDM_DRAUGHT_UNICLIP;	break;
 		case  4:	id = IDM_DRAUGHT_SJISCLIP;	break;
@@ -454,12 +564,116 @@ VOID Drt_OnContextMenu( HWND hWnd, HWND hWndContext, UINT xPos, UINT yPos )
 */
 VOID Drt_OnDestroy( HWND hWnd )
 {
-
-	ghDraughtWnd = 0;
+	ghDraughtWnd = NULL;
+	ghScrBarWnd  = NULL;
 
 	return;
 }
 //-------------------------------------------------------------------------------------------------
+
+
+/*!
+	ホイール大回転
+	@param[in]	hWnd	ウインドウハンドル
+	@param[in]	xPos	スクリーンＸ座標
+	@param[in]	yPos	スクリーンＹ座標
+	@param[in]	zDelta	回転量・１２０単位・WHEEL_DELTA
+	@param[in]	fwKeys	他に押されていたキー
+*/
+VOID Drt_OnMouseWheel( HWND hWnd, INT xPos, INT yPos, INT zDelta, UINT fwKeys )
+{
+	UINT	dCode;
+
+//	HWND	hChdWnd;
+//	POINT	stPoint;
+
+	TRACE( TEXT("POS[%d x %d] DELTA[%d] K[%X]"), xPos, yPos, zDelta, fwKeys );
+	//	fwKeys	SHIFT 0x4, CTRL 0x8
+
+	if( 0 < zDelta )		dCode = SB_LINEUP;
+	else if( 0 > zDelta )	dCode = SB_LINEDOWN;
+	else					dCode = SB_ENDSCROLL;
+
+	Drt_OnVScroll( hWnd, ghScrBarWnd, dCode, 1 );	//	posは多分未使用
+
+	return;
+}
+//-------------------------------------------------------------------------------------------------
+
+/*!
+	スクロールの処理
+	@param[in]	hWnd	ウインドウハンドル
+	@param[in]	hwndCtl	スクロールバーのウインドウハンドル
+	@param[in]	code	動作状態コード
+	@param[in]	pos		つまみの位置
+	@return		処理した内容とか
+*/
+VOID Drt_OnVScroll( HWND hWnd, HWND hwndCtl, UINT code, INT pos )
+{
+	INT	maePos;
+	SCROLLINFO	stScrollInfo;
+
+//	if( ghScrBarWnd != hwndCtl )	return;
+
+	//	状態をくやしく
+	ZeroMemory( &stScrollInfo, sizeof(SCROLLINFO) );
+	stScrollInfo.cbSize = sizeof(SCROLLINFO);
+	stScrollInfo.fMask = SIF_ALL;
+	GetScrollInfo( ghScrBarWnd, SB_CTL, &stScrollInfo );
+
+	maePos = gdVwTop;
+
+	switch( code )	//	スクロール方向に合わせて内容をずらす
+	{
+		case SB_TOP:
+			gdVwTop = 0;
+			break;
+
+		case SB_LINEUP:
+			gdVwTop--;
+			if( 0 > gdVwTop )	gdVwTop = 0;
+			break;
+
+		case SB_PAGEUP:
+			gdVwTop -= 3;
+			if( 0 > gdVwTop )	gdVwTop = 0;
+			break;
+
+		case SB_LINEDOWN:
+			gdVwTop++;
+			if( stScrollInfo.nMax <=  gdVwTop ){	gdVwTop = stScrollInfo.nMax;	}
+			break;
+
+		case SB_PAGEDOWN:
+			gdVwTop += 3;
+			if( stScrollInfo.nMax <=  gdVwTop ){	gdVwTop = stScrollInfo.nMax;	}
+			break;
+
+		case SB_BOTTOM:
+			gdVwTop = stScrollInfo.nMax;
+			break;
+
+		case SB_THUMBTRACK:
+			gdVwTop = stScrollInfo.nTrackPos;
+			break;
+
+		default:	return;
+	}
+	//	変化ないならなにもせんでいい
+	if( maePos == gdVwTop  )	return;
+
+	InvalidateRect( ghDraughtWnd, NULL, TRUE );
+	UpdateWindow( ghDraughtWnd );	//	リアルタイム描画に必要
+
+	stScrollInfo.fMask = SIF_POS;
+	stScrollInfo.nPos  = gdVwTop;
+	SetScrollInfo( ghScrBarWnd, SB_CTL, &stScrollInfo, TRUE );
+
+	return;
+}
+//-------------------------------------------------------------------------------------------------
+
+#ifndef _ORRVW
 
 /*!
 	編集の選択範囲からいただく
@@ -554,6 +768,7 @@ UINT DraughtItemAddFromSelect( UINT bSqSel )
 	return yLine;
 }
 //-------------------------------------------------------------------------------------------------
+#endif
 
 /*!
 	AAテキストを確保して取り込む
@@ -562,56 +777,21 @@ UINT DraughtItemAddFromSelect( UINT bSqSel )
 */
 UINT DraughtItemAdding( LPSTR pcArts )
 {
-	UINT_PTR	cbSize, cchSize;
-	LPTSTR		ptTextaa;
-	DRAUGHTITEM	stItem;
+	UINT_PTR	cbSize;
+	AAMATRIX	stItem;
 
-	RECT	rect;
 	INT_PTR	iItems;
-	INT		iRslt, iYdot, iXdot, iLine;
-	HDC		hdc;
+
 
 	StringCchLengthA( pcArts, STRSAFE_MAX_CCH, &cbSize );
 
-	stItem.pcAaText = (LPSTR)malloc( (cbSize + 1) );
-	ZeroMemory( stItem.pcAaText, (cbSize + 1) );
-	StringCchCopyA( stItem.pcAaText, (cbSize + 1), pcArts );
+	stItem.pcItem = (LPSTR)malloc( (cbSize + 1) );
+	ZeroMemory( stItem.pcItem, (cbSize + 1) );
+	StringCchCopyA( stItem.pcItem, (cbSize + 1), pcArts );
 
-	ptTextaa = SjisDecodeAlloc( pcArts );
-	StringCchLength( ptTextaa, STRSAFE_MAX_CCH, &cchSize );
 
-	//	元ＡＡのサイズ確定が必要
-	iXdot = TextViewSizeGet( ptTextaa, &iLine );
-	iYdot = iLine * LINE_HEIGHT;
+	DraughtAaImageing( &stItem );
 
-	stItem.iMaxDot = iXdot;
-	stItem.iLines  = iLine;
-
-	if( THM_WIDTH >  iXdot )	iXdot = THM_WIDTH;
-	if( THM_HEIGHT > iYdot )	iYdot = THM_HEIGHT;
-
-	stItem.stSize.cx = iXdot;
-	stItem.stSize.cy = iYdot;
-
-	SetRect( &rect, 0, 0, iXdot, iYdot );
-	//	あんまり大きいなら、左上限定とか？
-
-	//	描画用ビットマップ作成
-	hdc = GetDC( ghDraughtWnd );
-
-	//	サムネ用BMP・これはフルサイズ
-	stItem.hThumbDC  = CreateCompatibleDC( hdc );
-	stItem.hThumbBmp = CreateCompatibleBitmap( hdc, rect.right, rect.bottom );
-	stItem.hOldBmp   = SelectBitmap( stItem.hThumbDC, stItem.hThumbBmp );
-	SelectFont( stItem.hThumbDC, ghAaFont );
-
-	ReleaseDC( ghDraughtWnd, hdc );
-
-	iRslt = PatBlt( stItem.hThumbDC, 0, 0, rect.right, rect.bottom, WHITENESS );
-
-	iRslt = DrawText( stItem.hThumbDC, ptTextaa, cchSize, &rect, DT_LEFT | DT_NOPREFIX | DT_NOCLIP | DT_WORDBREAK );
-
-	SelectFont( stItem.hThumbDC, GetStockFont(DEFAULT_GUI_FONT) );
 
 	gvcDrtItems.push_back( stItem );
 
@@ -622,9 +802,65 @@ UINT DraughtItemAdding( LPSTR pcArts )
 
 	}while( (TPNL_HORIZ * TPNL_VERTI) < iItems );
 
+	return iItems;
+}
+//-------------------------------------------------------------------------------------------------
+
+/*!
+	ＡＡのサムネ用イメージを作る
+*/
+UINT DraughtAaImageing( LPAAMATRIX pstItem )
+{
+	UINT_PTR	cchSize;
+	LPTSTR		ptTextaa;
+	INT		iRslt, iYdot, iXdot, iLine;
+	HDC		hdc, hMemDC;
+	HBITMAP	hOldBmp;
+	RECT	rect;
+
+
+
+	ptTextaa = SjisDecodeAlloc( pstItem->pcItem );
+	StringCchLength( ptTextaa, STRSAFE_MAX_CCH, &cchSize );
+
+	//	元ＡＡのサイズ確定が必要
+	iXdot = TextViewSizeGet( ptTextaa, &iLine );
+	iYdot = iLine * LINE_HEIGHT;
+
+	pstItem->iMaxDot = iXdot;
+	pstItem->iLines  = iLine;
+
+	if( THM_WIDTH >  iXdot )	iXdot = THM_WIDTH;
+	if( THM_HEIGHT > iYdot )	iYdot = THM_HEIGHT;
+
+	pstItem->stSize.cx = iXdot;
+	pstItem->stSize.cy = iYdot;
+
+	SetRect( &rect, 0, 0, iXdot, iYdot );
+	//	あんまり大きいなら、左上限定とか？
+
+	//	描画用ビットマップ作成
+	hdc = GetDC( ghDraughtWnd );
+
+	//	サムネ用BMP・これはフルサイズ	//	pstItem->hThumbDC	pstItem->hOldBmp
+	hMemDC = CreateCompatibleDC( hdc );
+	pstItem->hThumbBmp = CreateCompatibleBitmap( hdc, rect.right, rect.bottom );
+	hOldBmp = SelectBitmap( hMemDC, pstItem->hThumbBmp );
+	SelectFont( hMemDC, ghAaFont );
+
+	ReleaseDC( ghDraughtWnd, hdc );
+
+	iRslt = PatBlt( hMemDC, 0, 0, rect.right, rect.bottom, WHITENESS );
+
+	iRslt = DrawText( hMemDC, ptTextaa, cchSize, &rect, DT_LEFT | DT_NOPREFIX | DT_NOCLIP | DT_WORDBREAK );
+
+	SelectFont( hMemDC, GetStockFont(DEFAULT_GUI_FONT) );
+	SelectBitmap( hMemDC, hOldBmp );
+	DeleteDC( hMemDC );
+
 	FREE( ptTextaa );
 
-	return iItems;
+	return 0;
 }
 //-------------------------------------------------------------------------------------------------
 
@@ -633,33 +869,62 @@ UINT DraughtItemAdding( LPSTR pcArts )
 */
 HRESULT DraughtItemUse( INT id )
 {
-	INT_PTR		iItems, i;
+	LPSTR		pcAaItem;
+	INT_PTR		iItems, i, iOffset, iTarget;
 	UINT_PTR	cbSize;
 	UINT		dMode;
-	DRTI_ITR	itItem;
+	MAAM_ITR	itItem;
 
-	iItems = gvcDrtItems.size( );	//	現在個数
-	if( 0 >= iItems )	return E_OUTOFMEMORY;
-
-	for( i = 0, itItem = gvcDrtItems.begin(); gvcDrtItems.end() != itItem; i++, itItem++ )
+#ifdef THUMBNAIL_STYLE
+	if( gbThumb )	//	サムネモード
 	{
-		if( giTarget == i )	//	ヒット
+		iOffset = gdVwTop * TPNL_HORIZ;
+		iTarget = iOffset + giTarget;
+
+		pcAaItem = AacAsciiArtGet( iTarget );
+		if( !(pcAaItem) )	return E_OUTOFMEMORY;
+
+		switch( id )
 		{
-			switch( id )
-			{
-				case IDM_DRAUGHT_INSERTEDIT:	dMode = MAA_INSERT;		break;
-				case IDM_DRAUGHT_INTERRUPTEDIT:	dMode = MAA_INTERRUPT;	break;
-				case IDM_DRAUGHT_LAYERBOX:		dMode = MAA_LAYERED;	break;
-				default:
-				case IDM_DRAUGHT_UNICLIP:		dMode = MAA_UNICLIP;	break;
-				case IDM_DRAUGHT_SJISCLIP:		dMode = MAA_SJISCLIP;	break;
-			}
-			StringCchLengthA( itItem->pcAaText, STRSAFE_MAX_CCH, &cbSize );
-
-			ViewMaaMaterialise( itItem->pcAaText, cbSize, dMode );
+			case IDM_DRAUGHT_INSERTEDIT:	dMode = MAA_INSERT;		break;
+			case IDM_DRAUGHT_INTERRUPTEDIT:	dMode = MAA_INTERRUPT;	break;
+			case IDM_DRAUGHT_LAYERBOX:		dMode = MAA_LAYERED;	break;
+			default:
+			case IDM_DRAUGHT_UNICLIP:		dMode = MAA_UNICLIP;	break;
+			case IDM_DRAUGHT_SJISCLIP:		dMode = MAA_SJISCLIP;	break;
 		}
-	}
+		StringCchLengthA( pcAaItem, STRSAFE_MAX_CCH, &cbSize );
 
+		ViewMaaMaterialise( pcAaItem, cbSize, dMode );
+		FREE(pcAaItem);
+	}
+	else
+	{
+#endif
+		iItems = gvcDrtItems.size( );	//	現在個数
+		if( 0 >= iItems )	return E_OUTOFMEMORY;
+
+		for( i = 0, itItem = gvcDrtItems.begin(); gvcDrtItems.end() != itItem; i++, itItem++ )
+		{
+			if( giTarget == i )	//	ヒット
+			{
+				switch( id )
+				{
+					case IDM_DRAUGHT_INSERTEDIT:	dMode = MAA_INSERT;		break;
+					case IDM_DRAUGHT_INTERRUPTEDIT:	dMode = MAA_INTERRUPT;	break;
+					case IDM_DRAUGHT_LAYERBOX:		dMode = MAA_LAYERED;	break;
+					default:
+					case IDM_DRAUGHT_UNICLIP:		dMode = MAA_UNICLIP;	break;
+					case IDM_DRAUGHT_SJISCLIP:		dMode = MAA_SJISCLIP;	break;
+				}
+				StringCchLengthA( itItem->pcItem, STRSAFE_MAX_CCH, &cbSize );
+
+				ViewMaaMaterialise( itItem->pcItem, cbSize, dMode );
+			}
+		}
+#ifdef THUMBNAIL_STYLE
+	}
+#endif
 	return E_INVALIDARG;
 }
 //-------------------------------------------------------------------------------------------------
@@ -673,7 +938,7 @@ INT DraughtItemDelete( CONST INT iTarget )
 {
 	INT_PTR	iItems, i;
 	INT		delCnt;
-	DRTI_ITR	itItem;
+	MAAM_ITR	itItem;
 
 	iItems = gvcDrtItems.size( );	//	現在個数
 	if( 0 >= iItems )	return 0;
@@ -683,10 +948,10 @@ INT DraughtItemDelete( CONST INT iTarget )
 	{
 		if( iTarget == i || 0 > iTarget )
 		{
-			FREE( itItem->pcAaText );
-			SelectBitmap( itItem->hThumbDC, itItem->hOldBmp );
+			FREE( itItem->pcItem );
+		//	SelectBitmap( itItem->hThumbDC, itItem->hOldBmp );
 			DeleteBitmap( itItem->hThumbBmp );
-			DeleteDC( itItem->hThumbDC );
+		//	DeleteDC( itItem->hThumbDC );
 			delCnt++;
 
 			if( iTarget == i )
@@ -794,6 +1059,57 @@ DOUBLE DraughtAspectKeeping( LPSIZE pstSize, UINT bOrgRem )
 	pstSize->cy = iZomHei;
 
 	return ddPercent;
+}
+//-------------------------------------------------------------------------------------------------
+
+
+/*!
+	文字列をうけとって、行数と最大ドット幅を計算
+	@param[in]	ptText	チェキりたいユニコード文字列受け取る
+	@param[out]	piLine	行数返す
+	@return		最大ドット数
+*/
+INT TextViewSizeGet( LPCTSTR ptText, PINT piLine )
+{
+	UINT_PTR	cchSize, i;
+	INT		xDot, yLine, dMaxDot;
+
+	wstring	wString;
+
+	StringCchLength( ptText, STRSAFE_MAX_CCH, &cchSize );
+
+	yLine = 1;	dMaxDot = 0;
+	for( i = 0; cchSize > i; i++ )
+	{
+		if( CC_CR == ptText[i] && CC_LF == ptText[i+1] )	//	改行であったら
+		{
+			//	ドット数確認
+			xDot = ViewStringWidthGet( wString.c_str() );
+			if( dMaxDot < xDot )	dMaxDot = xDot;
+
+			wString.clear( );
+			i++;		//	0x0D,0x0Aだから、壱文字飛ばすのがポイント
+			yLine++;	//	改行したから行数数える
+		}
+		else if( CC_TAB == ptText[i] )
+		{
+			//	タブは無かったことにする
+		}
+		else
+		{
+			wString += ptText[i];
+		}
+	}
+
+	if( 1 <= wString.size() )	//	最終行確認
+	{
+		//	ドット数確認
+		xDot = ViewStringWidthGet( wString.c_str() );
+		if( dMaxDot < xDot )	dMaxDot = xDot;
+	}
+
+	if( piLine )	*piLine = yLine;	//	空行だったとしても１行はある
+	return dMaxDot;
 }
 //-------------------------------------------------------------------------------------------------
 

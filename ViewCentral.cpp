@@ -1018,9 +1018,7 @@ VOID Evw_OnVScroll( HWND hWnd, HWND hWndCtl, UINT code, INT pos )
 VOID Evw_OnContextMenu( HWND hWnd, HWND hWndContext, UINT xPos, UINT yPos )
 {
 	INT	posX, posY;
-#ifndef CONTEXT_EDIT
-	HMENU	hMenu;
-#endif
+
 	HMENU	hSubMenu;
 	UINT	dRslt;
 
@@ -1029,33 +1027,17 @@ VOID Evw_OnContextMenu( HWND hWnd, HWND hWndContext, UINT xPos, UINT yPos )
 
 	TRACE( TEXT("VIEW_WM_CONTEXTMENU %d x %d"), posX, posY );
 
-#ifdef CONTEXT_EDIT
+
 	hSubMenu = CntxMenuGet(  );
-#else
-	hMenu = LoadMenu( GetModuleHandle(NULL), MAKEINTRESOURCE(IDC_VIEWPOPUPMENU) );
-	hSubMenu = GetSubMenu( hMenu, 0 );
-#endif
 
 	CheckMenuItem( hSubMenu , IDM_SQSELECT,           gbSqSelect   ? MF_CHECKED : MF_UNCHECKED );
 	CheckMenuItem( hSubMenu , IDM_SPACE_VIEW_TOGGLE,  gdSpaceView  ? MF_CHECKED : MF_UNCHECKED );
 	CheckMenuItem( hSubMenu , IDM_GRID_VIEW_TOGGLE,   gbGridView   ? MF_CHECKED : MF_UNCHECKED );
 	CheckMenuItem( hSubMenu , IDM_RIGHT_RULER_TOGGLE, gbRitRlrView ? MF_CHECKED : MF_UNCHECKED );
 
-#ifndef CONTEXT_EDIT
-//@@コピー処理
-	if( gbCpModSwap )	//	コピーモード入替
-	{
-		ModifyMenu( hSubMenu, IDM_COPY,     MF_BYCOMMAND | MFT_STRING, IDM_COPY, TEXT("SJISコピ－(&C)") );
-		ModifyMenu( hSubMenu, IDM_SJISCOPY, MF_BYCOMMAND | MFT_STRING, IDM_SJISCOPY, TEXT("Unicodeコピ－(&J)") );
-	}
-#endif
-
 	FrameNameModifyPopUp( hSubMenu, 1 );	//	枠の名前を挿入
 
 	dRslt = TrackPopupMenu( hSubMenu, TPM_RETURNCMD, posX, posY, 0, hWnd, NULL );	//	TPM_CENTERALIGN | TPM_VCENTERALIGN | 
-#ifndef CONTEXT_EDIT
-	DestroyMenu( hMenu );
-#endif
 	//	選択せずで０か－１？、選択したらそのメニューのＩＤが戻るようにセット
 
 	//	それぞれの処理に飛ばす
@@ -1153,56 +1135,6 @@ INT ViewStringWidthGet( LPCTSTR ptStr )
 	ReleaseDC( ghViewWnd, hdc );
 
 	return stSize.cx;
-}
-//-------------------------------------------------------------------------------------------------
-
-/*!
-	文字列をうけとって、行数と最大ドット幅を計算
-	@param[in]	ptText	チェキりたいユニコード文字列受け取る
-	@param[out]	piLine	行数返す
-	@return		最大ドット数
-*/
-INT TextViewSizeGet( LPCTSTR ptText, PINT piLine )
-{
-	UINT_PTR	cchSize, i;
-	INT		xDot, yLine, dMaxDot;
-
-	wstring	wString;
-
-	StringCchLength( ptText, STRSAFE_MAX_CCH, &cchSize );
-
-	yLine = 1;	dMaxDot = 0;
-	for( i = 0; cchSize > i; i++ )
-	{
-		if( CC_CR == ptText[i] && CC_LF == ptText[i+1] )	//	改行であったら
-		{
-			//	ドット数確認
-			xDot = ViewStringWidthGet( wString.c_str() );
-			if( dMaxDot < xDot )	dMaxDot = xDot;
-
-			wString.clear( );
-			i++;		//	0x0D,0x0Aだから、壱文字飛ばすのがポイント
-			yLine++;	//	改行したから行数数える
-		}
-		else if( CC_TAB == ptText[i] )
-		{
-			//	タブは無かったことにする
-		}
-		else
-		{
-			wString += ptText[i];
-		}
-	}
-
-	if( 1 <= wString.size() )	//	最終行確認
-	{
-		//	ドット数確認
-		xDot = ViewStringWidthGet( wString.c_str() );
-		if( dMaxDot < xDot )	dMaxDot = xDot;
-	}
-
-	if( piLine )	*piLine = yLine;	//	空行だったとしても１行はある
-	return dMaxDot;
 }
 //-------------------------------------------------------------------------------------------------
 
@@ -2420,7 +2352,8 @@ VOID OperationOnCommand( HWND hWnd, INT id, HWND hWndCtl, UINT codeNotify )
 		case  IDM_FILE_PREV:	MultiFileTabSlide( -1 );	break;
 		case  IDM_FILE_NEXT:	MultiFileTabSlide(  1 );	break;
 
-		case IDM_DRAUGHT_OPEN:	DraughtWindowCreate( GetModuleHandle(NULL) , hWnd );	break;
+		//	Ctrl+Spaceでドラフトボード
+		case IDM_DRAUGHT_OPEN:	DraughtWindowCreate( GetModuleHandle(NULL), hWnd, 0 );	break;
 
 		case IDM_TESTCODE:
 			TRACE( TEXT("機能テスト") );

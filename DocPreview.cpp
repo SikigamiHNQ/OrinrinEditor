@@ -548,11 +548,10 @@ HRESULT PreviewPageWrite( INT iViewPage )
 	VARIANT		*param;
 	SAFEARRAY	*sfArray;
 
-//	UINT_PTR	szHdr, szFtr, szSpr, szDocs, szSed;
 	UINT_PTR	szSize;
 	INT		szCont, bstrLen;
 	INT_PTR	iPage, i;
-	LPSTR	pcContent;//, pcDocs, pcRed;
+	LPSTR	pcContent;
 
 	CHAR	acSeper[MAX_STRING];
 	BSTR	bstr;
@@ -570,20 +569,10 @@ HRESULT PreviewPageWrite( INT iViewPage )
 	}
 
 	//	表示内容をＳＪＩＳでつくる
-
 	GetLocalTime( &stTime );
-
-//	StringCchLengthA( gpcHtmlHdr, STRSAFE_MAX_CCH, &szHdr );
-//	StringCchLengthA( gpcHtmlFtr, STRSAFE_MAX_CCH, &szFtr );
-//	StringCchLengthA( gacResFooterFmt, MAX_STRING, &szSed );
 
 	if( 0 >  iViewPage )	//	全プレ
 	{
-//		szDocs = szHdr + szFtr + 2;
-//		pcDocs = (LPSTR)malloc( szDocs );
-//		ZeroMemory( pcDocs, szDocs );
-
-//		StringCchCopyA( pcDocs, szDocs, gpcHtmlHdr );
 		asString  = string( gpcHtmlHdr );
 
 		iPage = DocPageCount(  );
@@ -593,16 +582,9 @@ HRESULT PreviewPageWrite( INT iViewPage )
 				stTime.wYear, stTime.wMonth, stTime.wDay,
 				gcacWeek[stTime.wDayOfWeek],
 				stTime.wHour, stTime.wMinute, stTime.wSecond );
-//			StringCchLengthA( acSeper, MAX_STRING, &szSpr );
 
 			pcContent = DocPageTextPreviewAlloc( i, &szCont );
 
-//			szDocs += (szSpr + szCont + szSed + 1);
-//			pcRed  = (LPSTR)realloc( pcDocs, szDocs );
-//			pcDocs = pcRed;
-//			StringCchCatA(  pcDocs, szDocs, acSeper );
-//			StringCchCatA(  pcDocs, szDocs, pcContent );
-//			StringCchCatA(  pcDocs, szDocs, gacResFooterFmt );
 			asString += string( acSeper );
 			asString += string( pcContent );
 			asString += string( gacResFooterFmt );
@@ -610,7 +592,6 @@ HRESULT PreviewPageWrite( INT iViewPage )
 			FREE(pcContent);
 		}
 
-//		StringCchCatA(  pcDocs, szDocs, gpcHtmlFtr );
 		asString += string( gpcHtmlFtr );
 	}
 	else
@@ -619,19 +600,9 @@ HRESULT PreviewPageWrite( INT iViewPage )
 			stTime.wYear, stTime.wMonth, stTime.wDay,
 			gcacWeek[stTime.wDayOfWeek],
 			stTime.wHour, stTime.wMinute, stTime.wSecond );
-//		StringCchLengthA( acSeper, MAX_STRING, &szSpr );
 
 		pcContent = DocPageTextPreviewAlloc( iViewPage, &szCont );
 
-//		szDocs = szHdr + szSpr + szCont + szFtr + szSed + 2;
-//		pcDocs = (LPSTR)malloc( szDocs );
-//		ZeroMemory( pcDocs, szDocs );
-
-//		StringCchCopyA( pcDocs, szDocs, gpcHtmlHdr );
-//		StringCchCatA(  pcDocs, szDocs, acSeper );
-//		StringCchCatA(  pcDocs, szDocs, pcContent );
-//		StringCchCatA(  pcDocs, szDocs, gacResFooterFmt );
-//		StringCchCatA(  pcDocs, szDocs, gpcHtmlFtr );
 		asString  = string( gpcHtmlHdr );
 		asString += string( acSeper );
 		asString += string( pcContent );
@@ -642,8 +613,6 @@ HRESULT PreviewPageWrite( INT iViewPage )
 	}
 
 	//	BSTRに必要なサイズ確認
-	//szSize = strlen(pcDocs);
-	//bstrLen = MultiByteToWideChar( CP_ACP, 0, pcDocs, szSize, NULL, 0 );
 	szSize = asString.size( );
 	bstrLen = MultiByteToWideChar( CP_ACP, 0, asString.c_str( ), szSize, NULL, 0 );
 
@@ -651,12 +620,7 @@ HRESULT PreviewPageWrite( INT iViewPage )
 	bstr = SysAllocStringLen( NULL, bstrLen );
 
 	//	BSTRにブチこむ
-//	MultiByteToWideChar( CP_ACP, 0, pcDocs, szSize, bstr, bstrLen );
 	MultiByteToWideChar( CP_ACP, 0, asString.c_str( ), szSize, bstr, bstrLen );
-
-//	FREE(pcDocs);
-
-//	bstr = SysAllocString( ptBuff );
 
 	sfArray = SafeArrayCreateVector( VT_VARIANT, 0, 1 );
 			
@@ -674,9 +638,6 @@ HRESULT PreviewPageWrite( INT iViewPage )
 	hRslt = gpDocument->close( );
 
 cleanup:
-//	SysFreeString( bstr );	//	SafeArrayDestroyが中でやってくれる？
-//	if( sfArray != NULL ){	SafeArrayDestroy( sfArray );	}
-
 	if( bstr )
 	{
 		SysFreeString( bstr );
@@ -686,11 +647,7 @@ cleanup:
 		hRslt = SafeArrayUnaccessData( sfArray );
 	}
 
-	if( sfArray )
-	{
-		SafeArrayDestroy( sfArray );
-	}
-
+	if( sfArray ){	SafeArrayDestroy( sfArray );	}
 
 	return hRslt;
 }

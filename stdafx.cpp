@@ -146,9 +146,9 @@ TCHAR UniRefCheck( LPSTR pcStr )
 
 	for( i = 0; 10 > i; i++ )
 	{
-		if( NULL == pcStr[i] )	return 0x0000;	//	末端だった場合
-
 		if( ';' == pcStr[i] )	break;	//	末端確認
+
+		if( NULL == pcStr[i] )	return 0x0000;	//	末端だった場合
 
 		if( bXcode )
 		{
@@ -207,6 +207,7 @@ LPSTR SjisEntityExchange( LPCSTR pcMoto )
 
 				if( 1 == rp )
 				{
+					if( 0 > acSrp[1] )	break;	//	isalphaにマイナス値でおちる？
 					if( !( isalpha( acSrp[1] ) ) )	break;
 				}
 			}

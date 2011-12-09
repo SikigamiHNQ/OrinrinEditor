@@ -37,10 +37,13 @@ static  UINT	gdUseMode;		//!<	挿入レイヤクリップ指示・設定に注意
 static  HWND	ghMaaWnd;		//!<	作られたウインドウハンドル
 static TCHAR	gatIniPath[MAX_PATH];	//!<	ＩＮＩファイルの位置
 
-#ifdef FIND_MAA_FILE
 extern  HWND	ghMaaFindDlg;	//!<	MAA検索ダイヤログハンドル
-#endif
 
+extern HFONT	ghAaFont;		//!<	表示用のフォント
+
+#ifdef DRAUGHT_STYLE
+extern  UINT	gdClickMode;	//
+#endif
 //------------------------------------------------------------------------------------------------------------------------
 
 BOOLEAN	SelectFolderDlg( HWND, LPTSTR, UINT_PTR );
@@ -62,7 +65,7 @@ INT APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 
 	//	TODO: ここにコードを挿入してください。
 	MSG		msg;
-//	HACCEL	hAccelTable;
+	HACCEL	hAccelTable;
 	INT		msRslt;
 
 #ifdef _DEBUG
@@ -87,11 +90,16 @@ INT APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 
 	gdUseMode = InitParamValue( INIT_LOAD, VL_SETMETHOD, MAA_SJISCLIP );
 
-	// アプリケーションの初期化を実行します:
+	//	アプリケーションの初期化を実行します:
 	ghMaaWnd = MaaTmpltInitialise( hInstance, GetDesktopWindow(), NULL );
 	if( !(ghMaaWnd) )	return (-1);
 
-//	hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_ORINRINVIEWER));
+#ifdef DRAUGHT_STYLE
+	DraughtInitialise( hInstance, ghMaaWnd );
+	gdClickMode = gdUseMode;
+#endif
+
+	hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_ORINRINVIEWER));
 
 	//	メインメッセージループ
 	for(;;)
@@ -99,22 +107,21 @@ INT APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 		msRslt = GetMessage( &msg, NULL, 0, 0 );
 		if( 1 != msRslt )	break;
 
-#ifdef FIND_MAA_FILE	//	MAA検索ダイヤログ
+		//	MAA検索ダイヤログ
 		if( ghMaaFindDlg )
 		{	//トップに来てるかどうか判断する
 			if( ghMaaFindDlg == GetForegroundWindow(  ) )
 			{
-		//		if( TranslateAccelerator( ghMaaFindDlg, hAccelTable, &msg ) )	continue;
+				if( TranslateAccelerator( ghMaaFindDlg, hAccelTable, &msg ) )	continue;
 				if( IsDialogMessage( ghMaaFindDlg, &msg ) )	continue;
 			}
 		}
-#endif
 
-//		if( !TranslateAccelerator( msg.hwnd, hAccelTable, &msg ) )
-//		{
+		if( !TranslateAccelerator( msg.hwnd, hAccelTable, &msg ) )
+		{
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
-//		}
+		}
 	}
 
 	return (int)msg.wParam;
@@ -356,8 +363,7 @@ HRESULT InitMaaFldrOpen( UINT dMode, LPTSTR ptFile )
 //-------------------------------------------------------------------------------------------------
 #endif
 
-#pragma endregion
-
+#pragma endregion	//	("設定内容読書")
 
 
 #pragma region ("クリップする処理")
@@ -464,7 +470,7 @@ UINT ViewMaaMaterialise( LPSTR pcCont, UINT cbSize, UINT dMode )
 	return uRslt;
 }
 //-------------------------------------------------------------------------------------------------
-#pragma endregion
+#pragma endregion	//	("クリップする処理")
 
 
 #pragma region ("設定ダイヤログ")
@@ -552,7 +558,9 @@ INT_PTR CALLBACK OptionDlgProc( HWND hDlg, UINT message, WPARAM wParam, LPARAM l
 					else{	dValue = MAA_SJISCLIP;	}
 					InitParamValue( INIT_SAVE, VL_SETMETHOD, dValue );
 					gdUseMode = dValue;
-
+#ifdef DRAUGHT_STYLE
+					gdClickMode = gdUseMode;
+#endif
 					//	ＯＫなら閉じちゃう
 					if( IDOK == id ){	EndDialog( hDlg, IDOK );	}
 					return (INT_PTR)TRUE;
@@ -622,7 +630,35 @@ BOOLEAN SelectDirectoryDlg( HWND hWnd, LPTSTR ptSelFolder, UINT_PTR cchLen )
 	return TRUE;
 }
 //-------------------------------------------------------------------------------------------------
-#pragma endregion
+#pragma endregion	//	("設定ダイヤログ")
+
+/*!
+	文字列のドット幅を数える
+	@param[in]	ptStr	数えたい文字列
+	@return		幅ドット数・０ならエラー
+*/
+INT ViewStringWidthGet( LPCTSTR ptStr )
+{
+	SIZE	stSize;
+	UINT	cchSize;
+	HDC		hdc= GetDC( ghMaaWnd );
+	HFONT	hFtOld;
+
+	StringCchLength( ptStr, STRSAFE_MAX_CCH, &cchSize );
+
+	if( 0 >= cchSize )	return 0;	//	異常事態
+
+	hFtOld = SelectFont( hdc, ghAaFont );
+
+	GetTextExtentPoint32( hdc, ptStr, cchSize, &stSize );
+
+	SelectFont( hdc, hFtOld );
+
+	ReleaseDC( ghMaaWnd, hdc );
+
+	return stSize.cx;
+}
+//-------------------------------------------------------------------------------------------------
 
 
 #ifdef _DEBUG

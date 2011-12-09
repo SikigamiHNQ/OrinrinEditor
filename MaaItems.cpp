@@ -61,7 +61,11 @@ static  HWND	ghScrollWnd;		//!<	スクロールバー
 
 static  LONG	gixNowSel;			//!<	マウスカーソルがあるところのインデックス
 
-static HFONT	ghFont;				//!<	表示用のフォント
+#ifdef _ORRVW
+EXTERNED HFONT	ghAaFont;			//!<	表示用のフォント
+#else
+static HFONT	ghAaFont;			//!<	表示用のフォント
+#endif
 static HFONT	ghTipFont;			//!<	ツールチップ用
 //static HBRUSH	ghOddBox, ghEvenBox;
 
@@ -114,7 +118,7 @@ HRESULT AaItemsInitialise( HWND hWnd, HINSTANCE hInst, LPRECT ptRect )
 		free( gptTipBuffer );
 		SetWindowFont( ghItemsWnd, GetStockFont(DEFAULT_GUI_FONT), FALSE );
 		SetWindowFont( ghToolTipWnd, GetStockFont(DEFAULT_GUI_FONT), FALSE );
-		DeleteFont( ghFont );
+		DeleteFont( ghAaFont );
 		DeleteFont( ghTipFont );
 		DeletePen( ghSepPen );
 		return S_FALSE;
@@ -164,9 +168,9 @@ HRESULT AaItemsInitialise( HWND hWnd, HINSTANCE hInst, LPRECT ptRect )
 	stScrollInfo.fMask = SIF_DISABLENOSCROLL;
 	SetScrollInfo( ghScrollWnd, SB_CTL, &stScrollInfo, TRUE );
 
-	ghFont = CreateFont( FONTSZ_NORMAL, 0, 0, 0, FW_REGULAR, FALSE, FALSE, FALSE, DEFAULT_CHARSET, OUT_OUTLINE_PRECIS, CLIP_DEFAULT_PRECIS, PROOF_QUALITY, VARIABLE_PITCH, TEXT("ＭＳ Ｐゴシック") );
+	ghAaFont = CreateFont( FONTSZ_NORMAL, 0, 0, 0, FW_REGULAR, FALSE, FALSE, FALSE, DEFAULT_CHARSET, OUT_OUTLINE_PRECIS, CLIP_DEFAULT_PRECIS, PROOF_QUALITY, VARIABLE_PITCH, TEXT("ＭＳ Ｐゴシック") );
 	//	フォントの高さ	平均幅	文字送りの方向とX軸との角度	ベースラインとX軸との角度	文字の太さ(0~1000まで・400=nomal)	イタリック体	アンダーライン	ストライクアウト	文字セット	出力精度	クリッピング精度	出力品質	固定幅か可変幅	フォント名
-	SetWindowFont( ghItemsWnd, ghFont, TRUE );
+	SetWindowFont( ghItemsWnd, ghAaFont, TRUE );
 
 	//	圧迫しないように、9pt文字も用意してみる
 	ttSize = InitParamValue( INIT_LOAD, VL_MAATIP_SIZE, 16 );	//	サイズ確認
@@ -725,9 +729,7 @@ VOID Aai_OnContextMenu( HWND hWnd, HWND hWndContext, UINT xPos, UINT yPos )
 #endif
 		case IDM_MAA_CLIP_UNICODE:		AaItemsDoSelect( hWnd, MAA_UNICLIP );	break;
 		case IDM_MAA_CLIP_SHIFTJIS:		AaItemsDoSelect( hWnd, MAA_SJISCLIP );	break;
-#ifdef DRAUGHT_STYLE
-		case IDM_DRAUGHT_ADDING:		AaItemsDoSelect( hWnd, MAA_DRAUGHT );	break;
-#endif
+
 		case IDM_MAA_AATIP_TOGGLE:
 			gbAAtipView = gbAAtipView ? FALSE : TRUE;
 			InitParamValue( INIT_SAVE, VL_MAATIP_VIEW, gbAAtipView );
@@ -738,6 +740,17 @@ VOID Aai_OnContextMenu( HWND hWnd, HWND hWndContext, UINT xPos, UINT yPos )
 			InitParamValue( INIT_SAVE, VL_MAASEP_STYLE, gbLineSep );
 			InvalidateRect( ghItemsWnd, NULL, TRUE );
 			break;
+
+#ifdef DRAUGHT_STYLE
+		case IDM_DRAUGHT_ADDING:		AaItemsDoSelect( hWnd, MAA_DRAUGHT );	break;
+#ifdef _ORRVW
+		case IDM_DRAUGHT_OPEN:			Maa_OnCommand( hWnd, IDM_DRAUGHT_OPEN, NULL, 0 );	break;
+#endif
+#endif
+
+#ifdef THUMBNAIL_STYLE
+		case IDM_MAA_THUMBNAIL_OPEN:	Maa_OnCommand( hWnd , IDM_MAA_THUMBNAIL_OPEN, NULL, 0 );	break;
+#endif
 	}
 
 	return;

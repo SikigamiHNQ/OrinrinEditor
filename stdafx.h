@@ -108,11 +108,10 @@ static CONST GUID gcstGUID = { 0x66D3E881, 0x972B, 0x458B, { 0x93, 0x5E, 0x9E, 0
 //#define FIND_STRINGS	//	文字列検索機能
 
 #define DRAUGHT_STYLE
+#define THUMBNAIL_STYLE
 
 //機能ＯＫ
-#define FIND_MAA_FILE	//	MAAファイル検索機能
 #define MAIN_SPLITBAR	//	DOCKINGしてたらメイン窓にスプリットバー
-#define CONTEXT_EDIT	//	右クリメニュー編集
 #define MAA_PROFILE		//	ツリー構成をプロファイルする機能
 #define MULTI_FILE		//	複数ファイルの同時展開
 

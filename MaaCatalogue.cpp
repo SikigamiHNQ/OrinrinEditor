@@ -18,7 +18,7 @@ If not, see <http://www.gnu.org/licenses/>.
 //-------------------------------------------------------------------------------------------------
 
 #include "stdafx.h"
-
+#include "OrinrinEditor.h"
 #include "MaaTemplate.h"
 //-------------------------------------------------------------------------------------------------
 
@@ -50,18 +50,8 @@ _
 #define MLT_SEPARATER	("[SPLIT]")
 #define AST_SEPARATER	("[AA]")
 
+//	構造体定義・OrinrinEditor.hへ移動
 
-
-//!	MLTの保持
-typedef struct tagAAMATRIX
-{
-	UINT	ixNum;	//!<	通し番号０インデックス
-	DWORD	cbItem;	//!<	AAのバイト数
-	LPSTR	pcItem;	//!<	読み込んだAAを保持しておくポインタ・SJIS形式のままでいいか？
-
-	CHAR	acAstName[MAX_STRING];	//!<	ASTファイルの名称を持っておく
-
-} AAMATRIX, *LPAAMATRIX;
 //-------------------------------------------------------------------------------------------------
 
 static  vector<AAMATRIX>	gvcArts;	//!<	開いたAAの保持
@@ -164,8 +154,8 @@ DWORD AacInflateAst( LPSTR pcTotal, DWORD cbTotal )
 		cbItem  = pcStart - pcCaret;	//	名前部分の文字数
 		cbItem -= 3;	//	]rn
 
-		//	名前確保
-		if( 0 < cbItem )
+	
+		if( 0 < cbItem )	//	名前確保
 		{
 			StringCchCopyNA( stAAbuf.acAstName, MAX_STRING, pcCaret, cbItem );
 			AaTitleAddString( iNumber, stAAbuf.acAstName );
@@ -367,6 +357,59 @@ UINT AacTitleCheck( LPAAMATRIX pstItem )
 }
 //-------------------------------------------------------------------------------------------------
 
+#ifdef THUMBNAIL_STYLE
+/*!
+	確保してるアイテム数を返す
+*/
+INT_PTR AacItemCount( UINT reserve )
+{
+	return gvcArts.size();
+}
+//-------------------------------------------------------------------------------------------------
+
+/*!
+	通し番号を受けて、HBITMAPとサイズを返す
+	@param[in]	iNumber	通し番号０インデックス
+	@param[out]	pstSize	大きさ
+	@return	HBITMAP	AAの内容のビットマップを返す。已にあるならそのまま、アイテムないならNULL
+*/
+HBITMAP AacArtImageGet( INT iNumber, LPSIZE pstSize )
+{
+	INT_PTR		iItems, i;
+	MAAM_ITR	itArts;
+
+	pstSize->cx = 0;
+	pstSize->cy = 0;
+
+	iItems = gvcArts.size( );
+	if( iItems <= iNumber ){	return NULL;	}	//	はみ出しの場合
+
+	itArts = gvcArts.begin();
+	for( i = 0; iNumber >  i; i++ ){	itArts++;	}
+
+
+	//	確保済の場合	hThumbDC
+	if( itArts->hThumbBmp )
+	{
+		pstSize->cx = itArts->stSize.cx;
+		pstSize->cy = itArts->stSize.cy;
+
+		return	itArts->hThumbBmp;
+	}
+
+
+	//	未確保の場合
+	DraughtAaImageing( &(*itArts) );
+
+	pstSize->cx = itArts->stSize.cx;
+	pstSize->cy = itArts->stSize.cy;
+
+	return itArts->hThumbBmp;
+}
+//-------------------------------------------------------------------------------------------------
+
+#endif
+
 /*!
 	通し番号を受けて、内容を返す
 	@param[in]	iNumber	通し番号０インデックス
@@ -376,6 +419,39 @@ LPSTR AacAsciiArtGet( DWORD iNumber )
 {
 	size_t	items;
 	LPSTR	pcBuff;
+
+//#error やらない夫・コスプレ・１７３か４ &の後の処理がおかしい？ SjisEntityExchangeか
+/*
+　　　 　 　 　 　 ／￣￣＼
+　　　 　 　 　 ／　　 _ノ　　＼
+　　　 　 　 　 |　　　 （ ●）（●）
+　　　 　 　 　 |　　　　 （__人__）
+　　　　　　　　|　　　　　｀ ⌒´ﾉ
+　　　 　 　　　 |　　　　　　 　 }
+　　　　 ｎ　　　ヽ　　　　　 　 }
+　⊂ﾆ￢　ヽ　　ヽ､.,＿＿ __ノ｀
+　　　乂_ヽ人 　/f=}ー'´{=}.　｀ヽ　 ｀
+　　　　辷壬ｽノ ｛^^￣｀^^´乂　 ＼
+　　　　　ヽ　　　人　　　　　ﾃ ＼ 　＼e8＿,
+　　　　　　 ｀¨´　 ﾑ、＿,.≠｀ヽ、＼g9&ﾟ　 ｦ
+　　　　　　　　 ／　　　　　　　　＼　ヽ)ー'´
+　　　　　 　 ／　ヾ、　　／　　　　 ｀ヽ､
+　　　　　 ／　　　　￣´　　　　　　　　　）
+　　　　 〈　　　　　　　　　　　　　　　 ／
+　　 　 　 ＼　　　 　 　 　 　 　 　 ／
+　　　　　　　｀ー‐r― i---t― '"
+　　　　　 　 　 　 |　　|ヽ　 ｀ー,‐､-　､＿
+　　　　　 　 　 　 ﾄ--'|　｀ ､＿ﾉ　}　　 　 ､｀!
+　　　　　 　 　 　 ﾄ--'|　　　　 ￣｀`ー､　ﾉ {
+　　　　　　　　　　| 　 |　　　　　　　　　l/　 }
+　 　 　 　 　 　 　 | 　 |　　　　　　　 　 {＿/
+　　　　　　　 　 　 | 　 !
+　　　　　　　　　　 l 　 |
+　　　　　　　　　　ﾉ　 人
+　　 　 　 　 　 ／　／　 j
+　　　　　　　r'´￣´,／ｰ'
+　　　　　　 └一'´
+*/
 
 	items = gvcArts.size( );
 	if( items <= iNumber )	return NULL;
@@ -394,14 +470,19 @@ LPSTR AacAsciiArtGet( DWORD iNumber )
 */
 HRESULT AacMatrixClear( VOID )
 {
-	size_t	szItem, i;
-
-	szItem = gvcArts.size();	//	個数確認して
+	MAAM_ITR	itArts;
 
 	//	先に領域を開放
-	for( i = 0; szItem > i; i++ )
+	for( itArts = gvcArts.begin(); itArts != gvcArts.end(); itArts++ )
 	{
-		free( gvcArts.at( i ).pcItem );
+		FREE( itArts->pcItem );
+
+		if( itArts->hThumbBmp )
+		{
+	//		SelectBitmap( itArts->hThumbDC, itArts->hOldBmp );
+			DeleteBitmap( itArts->hThumbBmp );
+	//		DeleteDC( itArts->hThumbDC );
+		}
 	}
 
 	gvcArts.clear();	//	そして全破棄
@@ -486,6 +567,3 @@ LRESULT CALLBACK AacFavInflate( UINT dLength, UINT dummy, UINT fake, LPCVOID pcC
 //-------------------------------------------------------------------------------------------------
 
 
-
-	
-		

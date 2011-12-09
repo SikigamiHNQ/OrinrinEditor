@@ -21,12 +21,7 @@ If not, see <http://www.gnu.org/licenses/>.
 #include "OrinrinEditor.h"
 //-------------------------------------------------------------------------------------------------
 
-#ifdef CONTEXT_EDIT
-
-//	作成中
-
 //	ユーザ定義とか枠とかは、サブメニュー用のダミーアイテムを用意する
-
 
 typedef struct tagCONTEXTITEM
 {
@@ -717,4 +712,3 @@ VOID CntxDlgItemSpinDown( HWND hDlg )
 }
 //-------------------------------------------------------------------------------------------------
 
-#endif

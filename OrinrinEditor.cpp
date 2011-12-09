@@ -19,8 +19,10 @@ If not, see <http://www.gnu.org/licenses/>.
 
 //	大日本帝国公用語は↓を見られたい
 
-//	TODO:	副タブ全閉じが不全・Viewerに入ってない
+//	TODO:	副タブ全閉じが不全・Viewerに入ってない＜OKか？
 //全閉じ、プロファイルの入れ替え時にも発生・この時の状況を確認せよ
+
+//	TODO:	DraughtモードのサムネがDCリソース食い過ぎか。＜減ったかも
 
 //	TODO:	SQLのINSERT、prepareは重い。クエリつくって、resetしながら回すのがいいんじゃ
 
@@ -37,11 +39,8 @@ If not, see <http://www.gnu.org/licenses/>.
 
 //	TODO:	保存するとき、同名ファイルがあったら、日時くっつけてバックアップとか
 
-//	TODO:	Safariのリーディングリストみたいな機能。
-
 //	TODO:	MLTのブックマーク機能・タブ増やすか、ツリーに増やすか・副タブじゃいけない？
 
-//	TODO:	MAA内容をサムネ表示することは？
 
 //	TODO:	MAA窓を非使用するオプショッ
 
@@ -165,6 +164,9 @@ If not, see <http://www.gnu.org/licenses/>.
 //	TODO:	検索から開くと、見出しドロップダウンがリセットされてない
 //	TODO:	MAAプロファイル、構築ダイヤログで、リストアップしたら、登録済みのやつにチェキしていく
 //	TODO:	開いてる副タブを全部閉じる機能・TabMultipleDeleteAllを呼べばいい
+//	TODO:	Safariのリーディングリストみたいな機能。
+//	TODO:	MAA内容をサムネ表示することは？
+
 
 //	TODO:	ブラシや壱行テンプレ、マウスオーバーツールチップで、横幅ドット数表示させたい
 
@@ -339,7 +341,8 @@ ASDファイル　　壱行が壱コンテンツ
 					メイン窓のテンプレエリアのサイズ可変になった
 					最大化状態を覚えておくようにした
 					4096バイト超えたら、頁リストのバイト数のところ赤くするようにした
-2011/12/03	0.26	ドラフトボード機能
+2011/12/06	0.26	ドラフトボード機能
+					MAAサムネイル機能
 
 更新日時注意
 
@@ -425,9 +428,7 @@ extern  HWND	ghFindDlg;		//	検索ダイヤログのハンドル
 #endif
 extern  HWND	ghMoziWnd;		//	文字ＡＡ変換ダイヤログのハンドル
 
-#ifdef FIND_MAA_FILE
 extern  HWND	ghMaaFindDlg;	//	MAA検索ダイヤログハンドル
-#endif
 
 #ifdef DRAUGHT_STYLE
 extern  UINT	gdClickMode;	//
@@ -553,10 +554,7 @@ INT APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 	// アプリケーションの初期化を実行します:
 	if( !InitInstance( hInstance, nCmdShow , atArgv ) ){	return FALSE;	}
 
-#ifdef CONTEXT_EDIT
 	CntxEditInitialise( gatExePath, hInstance );
-#endif
-
 
 	RegisterHotKey( ghMainWnd, IDHK_THREAD_DROP, MOD_CONTROL | MOD_SHIFT, VK_D );
 
@@ -578,7 +576,7 @@ INT APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 			}
 		}
 #endif
-#ifdef FIND_MAA_FILE	//	MAA検索ダイヤログ
+		//	MAA検索ダイヤログ
 		if( ghMaaFindDlg )
 		{	//トップに来てるかどうか判断する
 			if( ghMaaFindDlg == GetForegroundWindow(  ) )
@@ -587,7 +585,7 @@ INT APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 				if( IsDialogMessage( ghMaaFindDlg, &msg ) )	continue;
 			}
 		}
-#endif
+
 		if( !TranslateAccelerator( msg.hwnd, hAccelTable, &msg ) )
 		{
 			TranslateMessage(&msg);
@@ -1290,9 +1288,7 @@ VOID Cls_OnDestroy( HWND hWnd )
 	DraughtInitialise( NULL, NULL );
 #endif
 
-#ifdef CONTEXT_EDIT
 	CntxEditInitialise( NULL, NULL );
-#endif
 
 	//	ウインドウの状態を確認して、最小化状態なら記録しない
 	dwStyle = GetWindowStyle( hWnd );
