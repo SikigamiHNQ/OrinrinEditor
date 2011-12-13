@@ -324,7 +324,7 @@ VOID Maa_OnCommand( HWND hWnd, INT id, HWND hwndCtl, UINT codeNotify )
 		//	リストスタティックでのクリックはここにくる
 		case IDSO_AAITEMS:	TRACE( TEXT("static") );	break;
 
-#if defined( DRAUGHT_STYLE ) && defined( _ORRVW )
+#if defined( DRAUGHT_STYLE )
 		//	ドラフトボードオーポン
 		case IDM_DRAUGHT_OPEN:	DraughtWindowCreate( GetModuleHandle(NULL), ghMaaWnd, 0 );	break;
 #endif

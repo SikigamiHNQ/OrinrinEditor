@@ -1,11 +1,11 @@
-//	Microsoft Visual C++ で生成されたリソース スクリプトです。
+// Microsoft Visual C++ generated resource script.
 //
 #include "resource.h"
 
 #define APSTUDIO_READONLY_SYMBOLS
 /////////////////////////////////////////////////////////////////////////////
 //
-//	TEXTINCLUDE 2 リソースから生成されました。
+// Generated from the TEXTINCLUDE 2 resource.
 //
 #ifndef APSTUDIO_INVOKED
 #include "targetver.h"
@@ -18,9 +18,8 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-//
-//	日本語
-//
+// 日本語 resources
+
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_JPN)
 #ifdef _WIN32
 LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
@@ -29,109 +28,110 @@ LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
 
 /////////////////////////////////////////////////////////////////////////////
 //
-//	アイコン
+// Icon
 //
 
-//	アプリケーションのアイコンをすべてのシステム上で維持するために、
-//	最も小さいID値のアイコンが最初に配置されます。
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
 IDI_ORINRINEDITOR       ICON                    "OrinrinEditor.ico"
 IDI_SMALL               ICON                    "OrinrinEditor.ico"
 
 /////////////////////////////////////////////////////////////////////////////
 //
-//	メニュー
+// Menu
 //
 
-IDC_ORINRINVIEWER MENU
+IDC_ORINRINVIEWER MENU 
 BEGIN
     POPUP "機能(&F)"
     BEGIN
-        MENUITEM "プロファイル作成／開く(&N)",	IDM_MAA_PROFILE_MAKE
-        MENUITEM "AA一覧ツリーを再構築(&T)",	IDM_TREE_RECONSTRUCT
-        MENUITEM "一般設定(&G)",				IDM_GENERAL_OPTION
-        MENUITEM "ファイル名で検索(&F)",		IDM_FINDMAA_DLG_OPEN
-		MENUITEM SEPARATOR
-		MENUITEM "ドラフトボード表示(&B)",		IDM_DRAUGHT_OPEN
+        MENUITEM "プロファイル作成／開く(&N)",             IDM_MAA_PROFILE_MAKE
+        MENUITEM "AA一覧ツリーを再構築(&T)",             IDM_TREE_RECONSTRUCT
+        MENUITEM "一般設定(&G)",                    IDM_GENERAL_OPTION
+        MENUITEM "ファイル名で検索(&F)",                IDM_FINDMAA_DLG_OPEN
         MENUITEM SEPARATOR
-        MENUITEM "常に手前に表示(&A)",			IDM_TOPMOST_TOGGLE
+        MENUITEM "ドラフトボード表示(&B)",               IDM_DRAUGHT_OPEN
         MENUITEM SEPARATOR
-        MENUITEM "バージョン情報(&I)",			IDM_ABOUT
+        MENUITEM "常に手前に表示(&A)",                 IDM_TOPMOST_TOGGLE
         MENUITEM SEPARATOR
-        MENUITEM "終了(&Q)",					IDM_EXIT
+        MENUITEM "バージョン情報(&I)",                 IDM_ABOUT
+        MENUITEM SEPARATOR
+        MENUITEM "終了(&Q)",                      IDM_EXIT
     END
 END
 
-IDM_AATREE_POPUP MENU
+IDM_AATREE_POPUP MENU 
 BEGIN
     POPUP "複数行テンプレツリーのアレ"
     BEGIN
-        MENUITEM "主タブで開く(&M)",		IDM_AATREE_MAINOPEN
-        MENUITEM "副タブを追加(&S)",		IDM_AATREE_SUBADD
-		MENUITEM SEPARATOR
-		MENUITEM "ドラフトボード表示(&B)",	IDM_DRAUGHT_OPEN
+        MENUITEM "主タブで開く(&M)",                  IDM_AATREE_MAINOPEN
+        MENUITEM "副タブを追加(&S)",                  IDM_AATREE_SUBADD
+        MENUITEM SEPARATOR
+        MENUITEM "ドラフトボード表示(&B)",               IDM_DRAUGHT_OPEN
     END
 END
 
-IDM_AATABS_POPUP MENU
+IDM_AATABS_POPUP MENU 
 BEGIN
     POPUP "複数行テンプレタブのアレ"
     BEGIN
-        MENUITEM "このタブを閉じる(&Q)",	IDM_AATABS_DELETE
-		MENUITEM "全ての副タブを閉じる(&A)",	IDM_AATABS_ALLDELETE
+        MENUITEM "このタブを閉じる(&Q)",                IDM_AATABS_DELETE
+        MENUITEM "全ての副タブを閉じる(&A)",              IDM_AATABS_ALLDELETE
     END
 END
 
-IDM_AAVIEW_POPUP MENU
+IDM_AAVIEW_POPUP MENU 
 BEGIN
     POPUP "複数行テンプレ表示でのアレ"
     BEGIN
-        MENUITEM "ＡＡポップアップ表示(&T)",	IDM_MAA_AATIP_TOGGLE
-		MENUITEM "ＡＡ区切りスタイル切換",		IDM_MAA_SEP_STYLE_TOGGLE
+        MENUITEM "ドラフトボード表示(&B)",               IDM_DRAUGHT_OPEN
+        MENUITEM "ドラフトボードに追加(&G)",              IDM_DRAUGHT_ADDING
         MENUITEM SEPARATOR
-		MENUITEM "サムネイル一覧表示(&H)",		IDM_MAA_THUMBNAIL_OPEN
-		MENUITEM SEPARATOR
-		MENUITEM "ドラフトボード表示(&B)",		IDM_DRAUGHT_OPEN
-        MENUITEM "ドラフトボードに追加(&G)",	IDM_DRAUGHT_ADDING
+        MENUITEM "コピー(UNI&CODE)",               IDM_MAA_CLIP_UNICODE
+        MENUITEM "コピー(&ShiftJIS)",              IDM_MAA_CLIP_SHIFTJIS
         MENUITEM SEPARATOR
-        MENUITEM "コピー(UNI&CODE)",			IDM_MAA_CLIP_UNICODE
-        MENUITEM "コピー(&ShiftJIS)",			IDM_MAA_CLIP_SHIFTJIS
+        MENUITEM "削除(&D)",                      IDM_MAA_FAV_DELETE, GRAYED
         MENUITEM SEPARATOR
-        MENUITEM "削除(&D)",					IDM_MAA_FAV_DELETE, GRAYED
+        MENUITEM "サムネイル一覧表示(&H)",               IDM_MAA_THUMBNAIL_OPEN
+        MENUITEM SEPARATOR
+        MENUITEM "ＡＡポップアップ表示(&T)",              IDM_MAA_AATIP_TOGGLE
+        MENUITEM "ＡＡ区切りスタイル切換",                 IDM_MAA_SEP_STYLE_TOGGLE
     END
 END
 
-IDM_DRAUGHT_POPUP MENU
+IDM_DRAUGHT_POPUP MENU 
 BEGIN
     POPUP "ドラフトボードのアレ"
     BEGIN
-        MENUITEM "コピー(UNI&CODE)",			IDM_DRAUGHT_UNICLIP
-        MENUITEM "コピー(Shift&JIS)",			IDM_DRAUGHT_SJISCLIP
+        MENUITEM "コピー(UNI&CODE)",               IDM_DRAUGHT_UNICLIP
+        MENUITEM "コピー(Shift&JIS)",              IDM_DRAUGHT_SJISCLIP
         MENUITEM SEPARATOR
-        MENUITEM "アイテムを削除(&D)",			IDM_DRAUGHT_DELETE
+        MENUITEM "アイテムを削除(&D)",                 IDM_DRAUGHT_DELETE
         MENUITEM SEPARATOR
-        MENUITEM "全内容をエクスポート(&E)",	IDM_DRAUGHT_EXPORT, GRAYED
+        MENUITEM "全内容をエクスポート(&E)",              IDM_DRAUGHT_EXPORT, GRAYED
         MENUITEM SEPARATOR
-        MENUITEM "全内容を削除(&K)",			IDM_DRAUGHT_ALLDELETE
-        MENUITEM "ドラフトボードを閉じる(&Q)",	IDM_DRAUGHT_CLOSE
+        MENUITEM "全内容を削除(&K)",                  IDM_DRAUGHT_ALLDELETE
+        MENUITEM "ドラフトボードを閉じる(&Q)",             IDM_DRAUGHT_CLOSE
     END
 END
 
+
 /////////////////////////////////////////////////////////////////////////////
 //
-//	アクセロリータ
+// Accelerator
 //
 
-IDC_ORINRINVIEWER ACCELERATORS
+IDC_ORINRINVIEWER ACCELERATORS 
 BEGIN
-	"F",			IDM_FINDMAA_DLG_OPEN,	VIRTKEY, CONTROL, NOINVERT
-	"T",			IDM_MAA_THUMBNAIL_OPEN,	VIRTKEY, CONTROL, NOINVERT
-	VK_SPACE,		IDM_DRAUGHT_OPEN,		VIRTKEY, CONTROL, NOINVERT
+    "F",            IDM_FINDMAA_DLG_OPEN,   VIRTKEY, CONTROL, NOINVERT
+    "T",            IDM_MAA_THUMBNAIL_OPEN, VIRTKEY, CONTROL, NOINVERT
+    VK_SPACE,       IDM_DRAUGHT_OPEN,       VIRTKEY, CONTROL, NOINVERT
 END
 
 
 /////////////////////////////////////////////////////////////////////////////
 //
-//	ダイアログ
+// Dialog
 //
 
 IDD_ORRVWR_ABOUTBOX DIALOG  0, 0, 222, 196
@@ -141,18 +141,18 @@ CAPTION "バージョン情報 - Orinrin Viewer"
 FONT 9, "MS UI Gothic"
 BEGIN
     ICON            IDI_ORINRINEDITOR,IDC_MYICON,6,6,18,21
-    LTEXT           "Orinrin Viewer, Version 6 Aurora (2011.1209.2400.920)",IDC_STATIC,36,6,180,8,SS_NOPREFIX
+    LTEXT           "Orinrin Viewer, Version 6 Aurora (2011.1213.2200.920)",IDC_STATIC,36,6,180,8,SS_NOPREFIX
     LTEXT           "Copyright (C) 2011 by SikigamiHNQ",IDC_STATIC,36,18,180,8
     LTEXT           "Site ： お燐ちゃんは俺の嫁．ｃｏｍ",IDC_STATIC,36,30,180,8
     DEFPUSHBUTTON   "OK",IDOK,85,180,50,14,WS_GROUP
     EDITTEXT        IDE_ABOUT_DISP,6,42,210,132,ES_MULTILINE | ES_READONLY | NOT WS_BORDER,WS_EX_STATICEDGE
 END
 
-IDD_ORRVWR_OPTION_DLG DIALOG 0, 0, 270, 113
+IDD_ORRVWR_OPTION_DLG DIALOGEX 0, 0, 270, 113
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_TOOLWINDOW
 CAPTION "設定いろいろ"
-FONT 10, "MS UI Gothic"
+FONT 10, "MS UI Gothic", 0, 0, 0x0
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,114,96,42,12
     PUSHBUTTON      "キャンセル",IDCANCEL,168,96,42,12
@@ -165,10 +165,10 @@ BEGIN
     CONTROL         "縮小",IDRB_POPUP_REDUCE,"Button",BS_AUTORADIOBUTTON,138,36,30,8
     CONTROL         "表示する",IDCB_POPUP_VISIBLE,"Button",BS_AUTOCHECKBOX | WS_GROUP | WS_TABSTOP,186,36,48,8
     GROUPBOX        "複数行テンプレをクリックしたときの動作",IDC_STATIC,6,60,258,30
-    CONTROL         "コピー（ユニコード）",IDRB_SEL_CLIP_UNI,"Button",BS_AUTORADIOBUTTON | WS_GROUP,102,72,72,12
+    CONTROL         "コピー（Unicode）",IDRB_SEL_CLIP_UNI,"Button",BS_AUTORADIOBUTTON | WS_GROUP,90,72,72,12
     CONTROL         "コピー（ShiftJIS）",IDRB_SEL_CLIP_SJIS,"Button",BS_AUTORADIOBUTTON,12,72,72,12
+    CONTROL         "ドラフトボード追加",IDRB_SEL_DRAUGHT,"Button",BS_AUTORADIOBUTTON,174,72,72,12
 END
-
 
 IDD_PROFILE_TREESEL_DLG DIALOG  0, 0, 203, 275
 STYLE DS_SETFONT | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
@@ -178,13 +178,13 @@ FONT 10, "MS UI Gothic"
 BEGIN
     EDITTEXT        IDE_PRTREE_DIR,6,6,120,12,ES_AUTOHSCROLL
     PUSHBUTTON      "参照",IDB_PRTREE_DIR_REF,126,6,24,12
-    DEFPUSHBUTTON	"リストアップ",IDB_PRTREE_LISTUP,156,6,42,12
+    DEFPUSHBUTTON   "リストアップ",IDB_PRTREE_LISTUP,156,6,42,12
     CONTROL         "",IDPB_PRTREE_PROGRESS,"msctls_progress32",PBS_SMOOTH,6,24,192,8
     CONTROL         "",IDTV_PRTREE_DIR_TVIEW,"SysTreeView32",TVS_HASBUTTONS | TVS_HASLINES | TVS_LINESATROOT | TVS_DISABLEDRAGDROP | TVS_SHOWSELALWAYS | TVS_CHECKBOXES | WS_BORDER | WS_HSCROLL | WS_TABSTOP,6,32,192,220
-    PUSHBUTTON		"構築",IDOK,77,258,48,12
+    PUSHBUTTON      "構築",IDOK,77,258,48,12
 END
 
-IDD_FIND_MAA_DLG DIALOG 0, 0, 215, 126
+IDD_FIND_MAA_DLG DIALOG  0, 0, 215, 126
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_TOOLWINDOW
 CAPTION "テンプレートファイル名検索"
@@ -195,13 +195,14 @@ BEGIN
     CONTROL         "",IDLV_MAA_FINDED_FILE,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_ALIGNLEFT | LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,6,24,204,96
 END
 
+
 /////////////////////////////////////////////////////////////////////////////
 //
-//	バージョン情報
+// Version
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 2011,1207,2100,920
+ FILEVERSION 2011,1213,2200,920
  PRODUCTVERSION 6,0,0,920
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
@@ -227,7 +228,7 @@ BEGIN
             VALUE "LegalTrademarks", "License : GPLv3"
             VALUE "PrivateBuild", "Build by Visual Studio 2008"
             VALUE "SpecialBuild", "Not Speciality"
-            VALUE "FileVersion", "2011.1209.2400.920"
+            VALUE "FileVersion", "2011.1213.2200.920"
             VALUE "ProductVersion", "6.0.0.920"
             VALUE "FileDescription", "AsciiArt Viewer Ver6"
             VALUE "OriginalFilename", "OrinrinViewer.exe"
@@ -271,7 +272,7 @@ END
 
 /////////////////////////////////////////////////////////////////////////////
 //
-//	ストリングテーブル
+// String Table
 //
 
 STRINGTABLE 
@@ -280,7 +281,7 @@ BEGIN
     IDC_ORINRINVIEWER       "ORINRINVIEWER"
 END
 
-#endif    //	日本語
+#endif    // 日本語 resources
 /////////////////////////////////////////////////////////////////////////////
 
 
@@ -288,10 +289,10 @@ END
 #ifndef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
 //
-//	TEXTINCLUDE 3 リソースから生成されました。
+// Generated from the TEXTINCLUDE 3 resource.
 //
 
 
 /////////////////////////////////////////////////////////////////////////////
-#endif    //	APSTUDIO_INVOKED でない場合
+#endif    // not APSTUDIO_INVOKED
 

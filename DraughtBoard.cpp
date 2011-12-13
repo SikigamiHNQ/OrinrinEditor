@@ -339,6 +339,8 @@ VOID Drt_OnCommand( HWND hWnd, INT id, HWND hWndCtl, UINT codeNotify )
 		case IDM_DRAUGHT_UNICLIP:
 		case IDM_DRAUGHT_SJISCLIP:	DraughtItemUse( id );	DestroyWindow( hWnd );	break;
 
+		case IDM_THUMB_DRAUGHT_ADD:	DraughtItemUse( id );	break;	//	Draught追加なら閉じない方がいいだろう
+
 		case IDM_DRAUGHT_DELETE:	DraughtItemDelete( giTarget );	InvalidateRect( hWnd , NULL, TRUE );	break;
 #ifndef _ORRVW
 		case IDM_DRAUGHT_EXPORT:	NotifyBalloonExist( TEXT("未実装なのです・・・"), TEXT("あぅあぅ"), NIIF_ERROR );	break;
@@ -548,6 +550,17 @@ VOID Drt_OnContextMenu( HWND hWnd, HWND hWndContext, UINT xPos, UINT yPos )
 
 	hMenu = LoadMenu( GetModuleHandle(NULL), MAKEINTRESOURCE(IDM_DRAUGHT_POPUP) );
 	hSubMenu = GetSubMenu( hMenu, 0 );
+
+#ifdef THUMBNAIL_STYLE
+	if( gbThumb )	//	サムネ側なら
+	{
+		DeleteMenu( hSubMenu, IDM_DRAUGHT_ALLDELETE, MF_BYCOMMAND );	//	全削除を破壊
+		DeleteMenu( hSubMenu, IDM_DRAUGHT_EXPORT,    MF_BYCOMMAND );	//	エクスポートを破壊
+		ModifyMenu( hSubMenu, IDM_DRAUGHT_CLOSE,     MF_BYCOMMAND | MFT_STRING, IDM_DRAUGHT_CLOSE, TEXT("サムネイルを閉じる(&Q)") );
+
+		ModifyMenu( hSubMenu, IDM_DRAUGHT_DELETE,    MF_BYCOMMAND | MFT_STRING, IDM_THUMB_DRAUGHT_ADD, TEXT("ドラフトボードに追加(&D)") );
+	}
+#endif
 
 	dRslt = TrackPopupMenu( hSubMenu, 0, stPoint.x, stPoint.y, 0, hWnd, NULL );
 	//	選択せずで０か－１？、TPM_RETURNCMD無かったら、選択したらそのメニューのＩＤでWM_COMMANDが発行
@@ -892,6 +905,8 @@ HRESULT DraughtItemUse( INT id )
 			default:
 			case IDM_DRAUGHT_UNICLIP:		dMode = MAA_UNICLIP;	break;
 			case IDM_DRAUGHT_SJISCLIP:		dMode = MAA_SJISCLIP;	break;
+
+			case IDM_THUMB_DRAUGHT_ADD:		dMode = MAA_DRAUGHT;	break;
 		}
 		StringCchLengthA( pcAaItem, STRSAFE_MAX_CCH, &cbSize );
 

@@ -50,7 +50,7 @@
 #define IDD_PAGENUMBER_DLG              230
 #define IDD_MAA_IADD_DLG                231
 #define IDD_CONTEXT_ITEM_DLG            232
-#define IDM_AAFAVS_POPUP				233
+#define IDM_AAFAVS_POPUP                233
 #define IDBMPQ_MAIN_TB_FIRST            301
 #define IDBMP_FILE_NEW                  301
 #define IDBMQ_FILE_NEW                  302
@@ -243,10 +243,11 @@
 #define IDRB_SEL_SET_LAYER              1070
 #define IDRB_SEL_CLIP_UNI               1071
 #define IDRB_SEL_CLIP_SJIS              1072
-#define IDE_ABOUT_DISP                  1073
+#define IDRB_SEL_DRAUGHT                1073
 #define IDRB_POPUP_NOMAL                1074
 #define IDRB_POPUP_REDUCE               1075
 #define IDCB_POPUP_VISIBLE              1076
+#define IDE_ABOUT_DISP                  1077
 #define IDSL_TRC_HRIZ_POS               1081
 #define IDE_TRC_HRIZ_VALUE              1082
 #define IDSL_TRC_VART_POS               1083
@@ -300,7 +301,7 @@
 #define IDRB_DRT_SET_LAYER              1143
 #define IDRB_DRT_CLIP_UNI               1144
 #define IDRB_DRT_CLIP_SJIS              1145
-#define IDSB_DRT_THUM_SCROLL			1146
+#define IDSB_DRT_THUM_SCROLL            1146
 #define IDS_MC_MSG1                     1191
 #define IDS_MC_MSG2                     1192
 #define IDCB_MC_CHECKBOX                1193
@@ -360,7 +361,7 @@
 #define IDM_MAA_AATIP_TOGGLE            32729
 #define IDM_MAA_PROFILE_MAKE            32730
 #define IDM_MAA_SEP_STYLE_TOGGLE        32731
-#define IDM_MAA_FAVFLDR_DELETE			32732
+#define IDM_MAA_FAVFLDR_DELETE          32732
 #define IDM_DUMMY                       32768
 #define IDM_NEWFILE                     32771
 #define IDM_OPEN                        32772
@@ -428,8 +429,9 @@
 #define IDM_DRAUGHT_LAYERBOX            32840
 #define IDM_DRAUGHT_UNICLIP             32841
 #define IDM_DRAUGHT_SJISCLIP            32842
-#define IDM_COPY_TO_DRAUGHT				32843
-#define IDM_MAA_THUMBNAIL_OPEN			32844
+#define IDM_COPY_TO_DRAUGHT             32843
+#define IDM_MAA_THUMBNAIL_OPEN          32844
+#define IDM_THUMB_DRAUGHT_ADD           32845
 #define IDM_PAGEL_DETAIL                32900
 #define IDM_PAGEL_ADD                   32901
 #define IDM_PAGEL_INSERT                32902

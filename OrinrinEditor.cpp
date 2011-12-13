@@ -19,10 +19,26 @@ If not, see <http://www.gnu.org/licenses/>.
 
 //	大日本帝国公用語は↓を見られたい
 
-//	TODO:	副タブ全閉じが不全・Viewerに入ってない＜OKか？
-//全閉じ、プロファイルの入れ替え時にも発生・この時の状況を確認せよ
 
-//	TODO:	DraughtモードのサムネがDCリソース食い過ぎか。＜減ったかも
+//	TODO:	「一般設定」の「複数行テンプレをクリックしたときの動作」でドラフトボード追加も欲しい
+
+//	TODO:	エディタウィンドウが前面に出ててもCtrl-T押したらサムネイル表示したらいいじゃない
+//	同様に、MAA側でもCtrl+Spaceでドラフトでるように
+
+//	TODO:	ファイル切り替えても、カーソル位置覚えておく
+
+//	TODO:	デカいファイル開いたら時間かかる（1000コマとか）
+//逐次読み込みにするとか、先読みしたらvector確保してからいれるとか
+//vectorじゃなくlistにするとか？
+//壱行毎のサイズ確認して、確保してからブチ込むとか
+
+//	TODO:	複数ファイルタブ、マウスオーバーでフルパス表示
+
+//	TODO:	起動時に、閉じたときのファイルを復元するかどうか選択できるように
+
+//	TODO:	デカいファイル開こうとしたときはメッセージ出すとか
+
+//	TODO:	MAAのファイル名検索、フォルダも検索出来るように？開くときは？
 
 //	TODO:	SQLのINSERT、prepareは重い。クエリつくって、resetしながら回すのがいいんじゃ
 
@@ -166,6 +182,8 @@ If not, see <http://www.gnu.org/licenses/>.
 //	TODO:	開いてる副タブを全部閉じる機能・TabMultipleDeleteAllを呼べばいい
 //	TODO:	Safariのリーディングリストみたいな機能。
 //	TODO:	MAA内容をサムネ表示することは？
+//	TODO:	サムネの右メニューにいらんのがある。開くときに調整を
+//	TODO:	サムネ表示から直接ドラフトボードに追加できるように
 
 
 //	TODO:	ブラシや壱行テンプレ、マウスオーバーツールチップで、横幅ドット数表示させたい
@@ -341,8 +359,9 @@ ASDファイル　　壱行が壱コンテンツ
 					メイン窓のテンプレエリアのサイズ可変になった
 					最大化状態を覚えておくようにした
 					4096バイト超えたら、頁リストのバイト数のところ赤くするようにした
-2011/12/06	0.26	ドラフトボード機能
-					MAAサムネイル機能
+2011/12/13	0.26	ドラフトボード機能（Viewer込み）
+					MAAサムネイル機能（Viewer込み）
+					MAAの使用のグループ一括削除（Viewer込み）
 
 更新日時注意
 
@@ -2245,8 +2264,9 @@ INT_PTR CALLBACK OptionDlgProc( HWND hDlg, UINT message, WPARAM wParam, LPARAM l
 				case MAA_LAYERED:	id =  IDRB_SEL_SET_LAYER;	break;
 				case MAA_UNICLIP:	id =  IDRB_SEL_CLIP_UNI;	break;
 				case MAA_SJISCLIP:	id =  IDRB_SEL_CLIP_SJIS;	break;
+				case MAA_DRAUGHT:	id =  IDRB_SEL_DRAUGHT;		break;
 			}
-			CheckRadioButton( hDlg, IDRB_SEL_INS_EDIT, IDRB_SEL_CLIP_SJIS, id );
+			CheckRadioButton( hDlg, IDRB_SEL_INS_EDIT, IDRB_SEL_DRAUGHT, id );
 
 #ifdef DRAUGHT_STYLE
 			//	ドラフトボードでクリックしたときの動作
@@ -2359,6 +2379,7 @@ INT_PTR CALLBACK OptionDlgProc( HWND hDlg, UINT message, WPARAM wParam, LPARAM l
 					else if( IsDlgButtonChecked( hDlg, IDRB_SEL_SET_LAYER ) ){	dValue = MAA_LAYERED;	}
 					else if( IsDlgButtonChecked( hDlg, IDRB_SEL_CLIP_UNI ) ){	dValue = MAA_UNICLIP;	}
 					else if( IsDlgButtonChecked( hDlg, IDRB_SEL_CLIP_SJIS ) ){	dValue = MAA_SJISCLIP;	}
+					else if( IsDlgButtonChecked( hDlg, IDRB_SEL_DRAUGHT ) ){	dValue = MAA_DRAUGHT;	}
 					else{	dValue = MAA_INSERT;	}	//	IDRB_SEL_INS_EDIT
 					InitParamValue( INIT_SAVE, VL_SETMETHOD, dValue );
 					ViewMaaItemsModeSet( dValue );	//	MAAにも設定おくる

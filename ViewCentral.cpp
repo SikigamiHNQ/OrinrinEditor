@@ -2355,6 +2355,9 @@ VOID OperationOnCommand( HWND hWnd, INT id, HWND hWndCtl, UINT codeNotify )
 		//	Ctrl+Spaceでドラフトボード
 		case IDM_DRAUGHT_OPEN:	DraughtWindowCreate( GetModuleHandle(NULL), hWnd, 0 );	break;
 
+		//	Ctrl+Tでサムネイル
+		case IDM_MAA_THUMBNAIL_OPEN:	DraughtWindowCreate( GetModuleHandle(NULL), hWnd, 1 );	break;
+
 		case IDM_TESTCODE:
 			TRACE( TEXT("機能テスト") );
 			break;

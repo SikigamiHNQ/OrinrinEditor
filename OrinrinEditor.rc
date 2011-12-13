@@ -71,8 +71,8 @@ BEGIN
         MENUITEM "削除(&D)\tDelete",              IDM_DELETE
         MENUITEM SEPARATOR
         MENUITEM "SJISコピー(&J)",                 IDM_SJISCOPY
-		MENUITEM "全体をSJISコピー(&S)\tCtrl + Shift + C",	IDM_SJISCOPY_ALL
-		MENUITEM "選択範囲をドラフトボードへ(&G)",			IDM_COPY_TO_DRAUGHT
+        MENUITEM "全体をSJISコピー(&S)\tCtrl + Shift + C", IDM_SJISCOPY_ALL
+        MENUITEM "選択範囲をドラフトボードへ(&G)",           IDM_COPY_TO_DRAUGHT
         MENUITEM SEPARATOR
         MENUITEM "全選択(&A)\tCtrl + A",           IDM_ALLSEL
         MENUITEM "矩形選択(&B)\tCtrl + Alt + B",    IDM_SQSELECT
@@ -257,22 +257,22 @@ IDM_AALIST_POPUP MENU
 BEGIN
     POPUP "複数行テンプレ表示でのアレ"
     BEGIN
-        MENUITEM "ＡＡポップアップ表示(&T)",	IDM_MAA_AATIP_TOGGLE
-        MENUITEM "ＡＡ区切りスタイル切換",		IDM_MAA_SEP_STYLE_TOGGLE
+        MENUITEM "ドラフトボードに追加(&G)",              IDM_DRAUGHT_ADDING
         MENUITEM SEPARATOR
-		MENUITEM "サムネイル一覧表示(&H)",		IDM_MAA_THUMBNAIL_OPEN
+        MENUITEM "編集ビューに通常挿入(&I)",              IDM_MAA_INSERT_EDIT
+        MENUITEM "編集ビューに矩形挿入(&R)",              IDM_MAA_INTERRUPT_EDIT
         MENUITEM SEPARATOR
-        MENUITEM "ドラフトボードに追加(&G)",	IDM_DRAUGHT_ADDING
+        MENUITEM "コピー(UNI&CODE)",               IDM_MAA_CLIP_UNICODE
+        MENUITEM "コピー(Shift&JIS)",              IDM_MAA_CLIP_SHIFTJIS
         MENUITEM SEPARATOR
-        MENUITEM "編集ビューに通常挿入(&I)",	IDM_MAA_INSERT_EDIT
-        MENUITEM "編集ビューに矩形挿入(&R)",	IDM_MAA_INTERRUPT_EDIT
+        MENUITEM "レイヤで開く(&L)",                  IDM_MAA_SET_LAYERBOX
         MENUITEM SEPARATOR
-        MENUITEM "レイヤで開く(&L)",			IDM_MAA_SET_LAYERBOX
+        MENUITEM "削除(&D)",                      IDM_MAA_FAV_DELETE, GRAYED
         MENUITEM SEPARATOR
-        MENUITEM "コピー(UNI&CODE)",			IDM_MAA_CLIP_UNICODE
-        MENUITEM "コピー(Shift&JIS)",			IDM_MAA_CLIP_SHIFTJIS
+        MENUITEM "サムネイル一覧表示(&H)",               IDM_MAA_THUMBNAIL_OPEN
         MENUITEM SEPARATOR
-        MENUITEM "削除(&D)",					IDM_MAA_FAV_DELETE, GRAYED
+        MENUITEM "ＡＡポップアップ表示(&T)",              IDM_MAA_AATIP_TOGGLE
+        MENUITEM "ＡＡ区切りスタイル切換",                 IDM_MAA_SEP_STYLE_TOGGLE
     END
 END
 
@@ -280,16 +280,16 @@ IDM_AATREE_POPUP MENU
 BEGIN
     POPUP "複数行テンプレツリーのアレ"
     BEGIN
-        MENUITEM "プロファイル作成／開く(&N)",	IDM_MAA_PROFILE_MAKE
-        MENUITEM "AA一覧ツリーを再構築(&T)",	IDM_TREE_RECONSTRUCT
-        MENUITEM "ファイル名で検索(&F)",		IDM_FINDMAA_DLG_OPEN
+        MENUITEM "プロファイル作成／開く(&N)",             IDM_MAA_PROFILE_MAKE
+        MENUITEM "AA一覧ツリーを再構築(&T)",             IDM_TREE_RECONSTRUCT
+        MENUITEM "ファイル名で検索(&F)",                IDM_FINDMAA_DLG_OPEN
         MENUITEM SEPARATOR
-        MENUITEM "（名称未設定）",				IDM_DUMMY, GRAYED
-        MENUITEM "主タブで開く(&M)",			IDM_AATREE_MAINOPEN
-        MENUITEM "副タブを追加(&S)",			IDM_AATREE_SUBADD
-        MENUITEM "編集ビューに開く(&E)",		IDM_AATREE_GOEDIT
+        MENUITEM "（名称未設定）",                     IDM_DUMMY, GRAYED
+        MENUITEM "主タブで開く(&M)",                  IDM_AATREE_MAINOPEN
+        MENUITEM "副タブを追加(&S)",                  IDM_AATREE_SUBADD
+        MENUITEM "編集ビューに開く(&E)",                IDM_AATREE_GOEDIT
         MENUITEM SEPARATOR
-        MENUITEM "アイテム追加(&A)",			IDM_MAA_IADD_OPEN
+        MENUITEM "アイテム追加(&A)",                  IDM_MAA_IADD_OPEN
     END
 END
 
@@ -297,10 +297,10 @@ IDM_AATABS_POPUP MENU
 BEGIN
     POPUP "複数行テンプレタブのアレ"
     BEGIN
-        MENUITEM "このタブを閉じる(&Q)",		IDM_AATABS_DELETE
-        MENUITEM "全ての副タブを閉じる(&A)",	IDM_AATABS_ALLDELETE
+        MENUITEM "このタブを閉じる(&Q)",                IDM_AATABS_DELETE
+        MENUITEM "全ての副タブを閉じる(&A)",              IDM_AATABS_ALLDELETE
         MENUITEM SEPARATOR
-        MENUITEM "編集ビューに開く(&E)",		IDM_AATREE_GOEDIT
+        MENUITEM "編集ビューに開く(&E)",                IDM_AATREE_GOEDIT
     END
 END
 
@@ -308,10 +308,10 @@ IDM_LAYERBOX_POPUP MENU
 BEGIN
     POPUP "レイヤボックスのアレ"
     BEGIN
-        MENUITEM "コピー(&C)",						IDM_LYB_COPY
+        MENUITEM "コピー(&C)",                     IDM_LYB_COPY
         MENUITEM SEPARATOR
-        MENUITEM "透過領域設定をリセット(&R)",		IDM_LYB_TRANCE_RELEASE
-        MENUITEM "全ての空白を透過領域に設定(&T)",	IDM_LYB_TRANCE_ALL
+        MENUITEM "透過領域設定をリセット(&R)",             IDM_LYB_TRANCE_RELEASE
+        MENUITEM "全ての空白を透過領域に設定(&T)",           IDM_LYB_TRANCE_ALL
     END
 END
 
@@ -319,10 +319,10 @@ IDM_MULTIFILE_POPUP MENU
 BEGIN
     POPUP "複数ファイルタブのアレ"
     BEGIN
-        MENUITEM "保存(&S)",				IDM_OVERWRITESAVE
-        MENUITEM "名前を付けて保存(&M)",	IDM_RENAMESAVE
+        MENUITEM "保存(&S)",                      IDM_OVERWRITESAVE
+        MENUITEM "名前を付けて保存(&M)",                IDM_RENAMESAVE
         MENUITEM SEPARATOR
-        MENUITEM "タブを閉じる(&Q)",		IDM_FILE_CLOSE
+        MENUITEM "タブを閉じる(&Q)",                  IDM_FILE_CLOSE
     END
 END
 
@@ -330,7 +330,7 @@ IDM_TEMPLATE_POPUP MENU
 BEGIN
     POPUP "テンプレウインドウのアレ"
     BEGIN
-        MENUITEM "常に手前に表示(&Z)",	IDM_TOPMOST_TOGGLE
+        MENUITEM "常に手前に表示(&Z)",                 IDM_TOPMOST_TOGGLE
     END
 END
 
@@ -338,18 +338,18 @@ IDM_DRAUGHT_POPUP MENU
 BEGIN
     POPUP "ドラフトボードのアレ"
     BEGIN
-        MENUITEM "編集ビューに通常挿入(&I)",	IDM_DRAUGHT_INSERTEDIT
-        MENUITEM "編集ビューに矩形挿入(&R)",	IDM_DRAUGHT_INTERRUPTEDIT
-        MENUITEM "レイヤで開く(&L)",			IDM_DRAUGHT_LAYERBOX
-        MENUITEM "コピー(UNI&CODE)",			IDM_DRAUGHT_UNICLIP
-        MENUITEM "コピー(Shift&JIS)",			IDM_DRAUGHT_SJISCLIP
+        MENUITEM "編集ビューに通常挿入(&I)",              IDM_DRAUGHT_INSERTEDIT
+        MENUITEM "編集ビューに矩形挿入(&R)",              IDM_DRAUGHT_INTERRUPTEDIT
+        MENUITEM "レイヤで開く(&L)",                  IDM_DRAUGHT_LAYERBOX
+        MENUITEM "コピー(UNI&CODE)",               IDM_DRAUGHT_UNICLIP
+        MENUITEM "コピー(Shift&JIS)",              IDM_DRAUGHT_SJISCLIP
         MENUITEM SEPARATOR
-        MENUITEM "アイテムを削除(&D)",			IDM_DRAUGHT_DELETE
+        MENUITEM "アイテムを削除(&D)",                 IDM_DRAUGHT_DELETE
         MENUITEM SEPARATOR
-        MENUITEM "全内容をエクスポート(&E)",	IDM_DRAUGHT_EXPORT, GRAYED
+        MENUITEM "全内容をエクスポート(&E)",              IDM_DRAUGHT_EXPORT, GRAYED
         MENUITEM SEPARATOR
-        MENUITEM "全内容を削除(&K)",			IDM_DRAUGHT_ALLDELETE
-        MENUITEM "ドラフトボードを閉じる(&Q)",	IDM_DRAUGHT_CLOSE
+        MENUITEM "全内容を削除(&K)",                  IDM_DRAUGHT_ALLDELETE
+        MENUITEM "ドラフトボードを閉じる(&Q)",             IDM_DRAUGHT_CLOSE
     END
 END
 
@@ -381,14 +381,14 @@ BEGIN
     "N",            IDM_NEWFILE,            VIRTKEY, CONTROL, NOINVERT
     "N",            IDM_PAGEL_RENAME,       VIRTKEY, ALT, NOINVERT
     "O",            IDM_OPEN,               VIRTKEY, CONTROL, NOINVERT
-    "R",            IDM_RIGHT_GUIDE_SET,	VIRTKEY, CONTROL, ALT, NOINVERT
-    "S",            IDM_OVERWRITESAVE,		VIRTKEY, CONTROL, NOINVERT
-    "S",            IDM_RENAMESAVE,			VIRTKEY, CONTROL, ALT, NOINVERT
-	"T",			IDM_MAA_THUMBNAIL_OPEN,	VIRTKEY, CONTROL, NOINVERT
-    "U",            IDM_DEL_TOPSPACE,		VIRTKEY, CONTROL, NOINVERT
-    "U",            IDM_PAGEL_UPFLOW,		VIRTKEY, ALT, NOINVERT
-    "V",            IDM_PASTE,				VIRTKEY, CONTROL, NOINVERT
-    "W",            IDM_DOTDIFF_LOCK,		VIRTKEY, CONTROL, ALT, NOINVERT
+    "R",            IDM_RIGHT_GUIDE_SET,    VIRTKEY, CONTROL, ALT, NOINVERT
+    "S",            IDM_OVERWRITESAVE,      VIRTKEY, CONTROL, NOINVERT
+    "S",            IDM_RENAMESAVE,         VIRTKEY, CONTROL, ALT, NOINVERT
+    "T",            IDM_MAA_THUMBNAIL_OPEN, VIRTKEY, CONTROL, NOINVERT
+    "U",            IDM_DEL_TOPSPACE,       VIRTKEY, CONTROL, NOINVERT
+    "U",            IDM_PAGEL_UPFLOW,       VIRTKEY, ALT, NOINVERT
+    "V",            IDM_PASTE,              VIRTKEY, CONTROL, NOINVERT
+    "W",            IDM_DOTDIFF_LOCK,       VIRTKEY, CONTROL, ALT, NOINVERT
     "W",            IDM_FRMINSBOX_OPEN,     VIRTKEY, CONTROL, NOINVERT
     "W",            IDM_SPACE_VIEW_TOGGLE,  VIRTKEY, SHIFT, CONTROL, NOINVERT
     "X",            IDM_CUT,                VIRTKEY, CONTROL, NOINVERT
@@ -428,7 +428,7 @@ CAPTION "バージョン情報 - Orinrin Editor"
 FONT 9, "MS UI Gothic"
 BEGIN
     ICON            IDI_ORINRINEDITOR,IDC_MYICON,6,6,20,20
-    LTEXT           "Orinrin Editor, Version 0.26 Aurora (2011.1209.2400.920)",IDC_STATIC,36,6,168,8,SS_NOPREFIX
+    LTEXT           "Orinrin Editor, Version 0.26 Aurora (2011.1213.2200.920)",IDC_STATIC,36,6,168,8,SS_NOPREFIX
     LTEXT           "Copyright (C) 2011 by SikigamiHNQ",IDC_STATIC,36,18,168,8
     LTEXT           "Site ： お燐ちゃんは俺の嫁．ｃｏｍ",IDC_STATIC,36,30,168,8
     DEFPUSHBUTTON   "OK",IDOK,84,180,48,12,WS_GROUP
@@ -551,11 +551,12 @@ BEGIN
     CTEXT           "儚い",IDC_STATIC,12,186,18,18,SS_CENTERIMAGE
     CTEXT           "濃い",IDC_STATIC,240,186,18,18,SS_CENTERIMAGE
     GROUPBOX        "複数行テンプレをクリックしたときの動作",IDC_STATIC,6,217,126,53
-    CONTROL         "通常挿入",IDRB_SEL_INS_EDIT,"Button",BS_AUTORADIOBUTTON | WS_GROUP,12,227,42,8
+    CONTROL         "通常挿入",IDRB_SEL_INS_EDIT,"Button",BS_AUTORADIOBUTTON | WS_GROUP,12,228,42,8
     CONTROL         "矩形挿入",IDRB_SEL_INTRPT_EDIT,"Button",BS_AUTORADIOBUTTON,12,240,42,8
     CONTROL         "レイヤボックス",IDRB_SEL_SET_LAYER,"Button",BS_AUTORADIOBUTTON,12,252,54,8
-    CONTROL         "コピー(Unicode)",IDRB_SEL_CLIP_UNI,"Button",BS_AUTORADIOBUTTON,60,228,66,8
-    CONTROL         "コピー(ShiftJIS)",IDRB_SEL_CLIP_SJIS,"Button",BS_AUTORADIOBUTTON,60,240,66,8
+    CONTROL         "コピー(Unicode)",IDRB_SEL_CLIP_UNI,"Button",BS_AUTORADIOBUTTON,66,228,60,8
+    CONTROL         "コピー(ShiftJIS)",IDRB_SEL_CLIP_SJIS,"Button",BS_AUTORADIOBUTTON,66,240,60,8
+    CONTROL         "ドラフトボード",IDRB_SEL_DRAUGHT,"Button",BS_AUTORADIOBUTTON,66,252,60,8
     GROUPBOX        "右ルーラ位置",IDC_STATIC,210,54,54,36
     EDITTEXT        IDE_RIGHT_RULER_POS,216,71,42,12,ES_CENTER | ES_AUTOHSCROLL | ES_NUMBER
     GROUPBOX        "グリッド位置（ドット指定）",IDC_STATIC,174,96,90,42
@@ -569,7 +570,7 @@ BEGIN
     CONTROL         "矩形挿入",IDRB_DRT_INTRPT_EDIT,"Button",BS_AUTORADIOBUTTON,144,240,42,8
     CONTROL         "レイヤボックス",IDRB_DRT_SET_LAYER,"Button",BS_AUTORADIOBUTTON,144,252,54,8
     CONTROL         "コピー(Unicode)",IDRB_DRT_CLIP_UNI,"Button",BS_AUTORADIOBUTTON,192,228,66,8
-    CONTROL         "コピー(ShiftJIS)",IDRB_DRT_CLIP_SJIS,"Button",BS_AUTORADIOBUTTON,192,241,66,8
+    CONTROL         "コピー(ShiftJIS)",IDRB_DRT_CLIP_SJIS,"Button",BS_AUTORADIOBUTTON,192,240,66,8
 END
 
 IDD_TRACEADJUST_DLG DIALOG  0, 0, 139, 281
@@ -777,7 +778,7 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 2011,1209,2400,920
+ FILEVERSION 2011,1213,2200,920
  PRODUCTVERSION 0,26,0,920
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
@@ -803,7 +804,7 @@ BEGIN
             VALUE "LegalTrademarks", "License : GPLv3"
             VALUE "PrivateBuild", "Build by Visual C++ 2008 Express"
             VALUE "SpecialBuild", "Not Speciality"
-            VALUE "FileVersion", "2011.1209.2400.920"
+            VALUE "FileVersion", "2011.1213.2200.920"
             VALUE "ProductVersion", "0.26.0.920"
             VALUE "FileDescription", "AsciiArt Story Editor by Orinrin!"
             VALUE "OriginalFilename", "OrinrinEditor.exe"
@@ -966,22 +967,6 @@ IDBMQ_MOZI_SCRIPT       BITMAP                  "resource\\MoziScript_q.bmp"
 IDBMP_MOZI_WRITE        BITMAP                  "resource\\MoziWrite.bmp"
 IDBMP_MOZI_ADVANCE      BITMAP                  "resource\\MoziAdv.bmp"
 IDBMQ_MOZI_ADVANCE      BITMAP                  "resource\\MoziAdv_q.bmp"
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// DESIGNINFO
-//
-
-#ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO 
-BEGIN
-    IDD_GENERAL_OPTION_DLG, DIALOG
-    BEGIN
-        BOTTOMMARGIN, 263
-    END
-END
-#endif    // APSTUDIO_INVOKED
-
 
 /////////////////////////////////////////////////////////////////////////////
 //
