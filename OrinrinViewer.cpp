@@ -443,7 +443,7 @@ UINT ViewMaaMaterialise( LPSTR pcCont, UINT cbSize, UINT dMode )
 	if( dMode == gdUseMode ){		uRslt = TRUE;	}
 	if( MAA_DEFAULT ==  dMode ){	dMode = gdUseMode;	uRslt = TRUE;	}
 
-	if( MAA_UNICLIP ==  dMode )	//	ユニコード
+	if( MAA_UNICLIP == dMode )	//	ユニコード
 	{
 		ptString = SjisDecodeAlloc( pcCont );	//	ユニコードにしておく
 		StringCchLength( ptString, STRSAFE_MAX_CCH, &cchSize );
@@ -453,10 +453,10 @@ UINT ViewMaaMaterialise( LPSTR pcCont, UINT cbSize, UINT dMode )
 
 		FREE(ptString);
 	}
-	else	//	SJISがほぼ標準でおｋ
-	{
-		DocClipboardDataSet( pcCont, (cbSize + 1), D_SJIS );
-	}
+#ifdef DRAUGHT_STYLE	//	ドラフトボードに追加
+	else if( MAA_DRAUGHT == dMode ){	DraughtItemAdding( pcCont );	}
+#endif
+	else{	DocClipboardDataSet( pcCont, (cbSize + 1), D_SJIS );	}	//	SJISコピー
 
 
 	//ZeroMemory( &stFshWInfo, sizeof(FLASHWINFO) );
@@ -513,15 +513,15 @@ INT_PTR CALLBACK OptionDlgProc( HWND hDlg, UINT message, WPARAM wParam, LPARAM l
 			CheckDlgButton( hDlg, IDCB_POPUP_VISIBLE, dValue ? BST_CHECKED : BST_UNCHECKED );
 
 			//	複数行テンプレをクルックしたときの動作
-			dValue = InitParamValue( INIT_LOAD, VL_SETMETHOD, 4 );
+			dValue = InitParamValue( INIT_LOAD, VL_SETMETHOD, MAA_SJISCLIP );
 			switch( dValue )
 			{
-				case MAA_UNICLIP:	id =  IDRB_SEL_CLIP_UNI;	break;
-
+				case MAA_UNICLIP:	id = IDRB_SEL_CLIP_UNI;		break;
 				default:
-				case MAA_SJISCLIP:	id =  IDRB_SEL_CLIP_SJIS;	break;
+				case MAA_SJISCLIP:	id = IDRB_SEL_CLIP_SJIS;	break;
+				case MAA_DRAUGHT:	id = IDRB_SEL_DRAUGHT;		break;
 			}
-			CheckRadioButton( hDlg, IDRB_SEL_INS_EDIT, IDRB_SEL_CLIP_SJIS, id );
+			CheckRadioButton( hDlg, IDRB_SEL_INS_EDIT, IDRB_SEL_DRAUGHT, id );
 			return (INT_PTR)TRUE;
 
 		case WM_COMMAND:
@@ -555,6 +555,7 @@ INT_PTR CALLBACK OptionDlgProc( HWND hDlg, UINT message, WPARAM wParam, LPARAM l
 
 					//	MAAの操作
 					if( IsDlgButtonChecked( hDlg, IDRB_SEL_CLIP_UNI ) ){	dValue = MAA_UNICLIP;	}
+					else if( IsDlgButtonChecked( hDlg, IDRB_SEL_DRAUGHT ) ){	dValue = MAA_DRAUGHT;	}
 					else{	dValue = MAA_SJISCLIP;	}
 					InitParamValue( INIT_SAVE, VL_SETMETHOD, dValue );
 					gdUseMode = dValue;
@@ -657,6 +658,16 @@ INT ViewStringWidthGet( LPCTSTR ptStr )
 	ReleaseDC( ghMaaWnd, hdc );
 
 	return stSize.cx;
+}
+//-------------------------------------------------------------------------------------------------
+
+/*!
+	MAA一覧からの使用モードを確保
+	@return	使用モード　０通常挿入　１割込挿入　２レイヤ　３ユニコピー　４SJISコピー　５ドラフトボードへ
+*/
+UINT ViewMaaItemsModeGet( VOID )
+{
+	return gdUseMode;
 }
 //-------------------------------------------------------------------------------------------------
 

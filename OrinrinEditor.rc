@@ -70,20 +70,20 @@ BEGIN
         MENUITEM "貼付(&P)\tCtrl + V",            IDM_PASTE
         MENUITEM "削除(&D)\tDelete",              IDM_DELETE
         MENUITEM SEPARATOR
-        MENUITEM "SJISコピー(&J)",                 IDM_SJISCOPY
-        MENUITEM "全体をSJISコピー(&S)\tCtrl + Shift + C", IDM_SJISCOPY_ALL
-        MENUITEM "選択範囲をドラフトボードへ(&G)",           IDM_COPY_TO_DRAUGHT
+        MENUITEM "SJISコピー(&J)",							IDM_SJISCOPY
+        MENUITEM "全体をSJISコピー(&S)\tCtrl + Shift + C",	IDM_SJISCOPY_ALL
+        MENUITEM "選択範囲をドラフトボードへ(&G)",			IDM_COPY_TO_DRAUGHT
         MENUITEM SEPARATOR
         MENUITEM "全選択(&A)\tCtrl + A",           IDM_ALLSEL
         MENUITEM "矩形選択(&B)\tCtrl + Alt + B",    IDM_SQSELECT
         MENUITEM SEPARATOR
-        MENUITEM "レイヤボックス(&L)\tAlt + Space",    IDM_LAYERBOX
-        MENUITEM "部分抽出モード(&E)",                 IDM_EXTRACTION_MODE
+        MENUITEM "レイヤボックス(&L)\tAlt + Space",				IDM_LAYERBOX
+        MENUITEM "部分抽出モード(&E)",							IDM_EXTRACTION_MODE
         MENUITEM SEPARATOR
-        MENUITEM "次の行以降を新頁に分割(&V)",             IDM_PAGEL_DIVIDE
+        MENUITEM "次の行以降を新頁に分割(&V)",					IDM_PAGEL_DIVIDE
         MENUITEM SEPARATOR
-        MENUITEM "文字列検索(&F)\tCtrl + F",         IDM_FIND_DLG_OPEN
-        MENUITEM "検索ハイライト解除(&H)\tCtrl + Shift + F", IDM_FIND_HIGHLIGHT_OFF
+        MENUITEM "文字列検索(&F)\tCtrl + F",					IDM_FIND_DLG_OPEN
+        MENUITEM "検索ハイライト解除(&H)\tCtrl + Shift + F",	IDM_FIND_HIGHLIGHT_OFF
     END
     POPUP "挿入(&I)"
     BEGIN
@@ -164,6 +164,7 @@ BEGIN
         MENUITEM "右ガイド線を表示(&M)",                IDM_RIGHT_RULER_TOGGLE
         MENUITEM SEPARATOR
         MENUITEM "複数行テンプレート(&A)",               IDM_MAATMPLE_VIEW
+        MENUITEM "複数行サムネイル(&B)\tCtrl + T",   IDM_MAA_THUMBNAIL_OPEN
         MENUITEM "頁一覧(&L)",                     IDM_PAGELIST_VIEW
         MENUITEM "壱行テンプレート(&T)",                IDM_LINE_TEMPLATE
         MENUITEM "塗り潰しブラシ(&F)",                 IDM_BRUSH_PALETTE
@@ -428,7 +429,7 @@ CAPTION "バージョン情報 - Orinrin Editor"
 FONT 9, "MS UI Gothic"
 BEGIN
     ICON            IDI_ORINRINEDITOR,IDC_MYICON,6,6,20,20
-    LTEXT           "Orinrin Editor, Version 0.26 Aurora (2011.1213.2200.920)",IDC_STATIC,36,6,168,8,SS_NOPREFIX
+    LTEXT           "Orinrin Editor, Version 0.26 Aurora (2011.1214.2200.920)",IDC_STATIC,36,6,168,8,SS_NOPREFIX
     LTEXT           "Copyright (C) 2011 by SikigamiHNQ",IDC_STATIC,36,18,168,8
     LTEXT           "Site ： お燐ちゃんは俺の嫁．ｃｏｍ",IDC_STATIC,36,30,168,8
     DEFPUSHBUTTON   "OK",IDOK,84,180,48,12,WS_GROUP
@@ -778,7 +779,7 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 2011,1213,2200,920
+ FILEVERSION 2011,1214,2200,920
  PRODUCTVERSION 0,26,0,920
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
@@ -804,7 +805,7 @@ BEGIN
             VALUE "LegalTrademarks", "License : GPLv3"
             VALUE "PrivateBuild", "Build by Visual C++ 2008 Express"
             VALUE "SpecialBuild", "Not Speciality"
-            VALUE "FileVersion", "2011.1213.2200.920"
+            VALUE "FileVersion", "2011.1214.2200.920"
             VALUE "ProductVersion", "0.26.0.920"
             VALUE "FileDescription", "AsciiArt Story Editor by Orinrin!"
             VALUE "OriginalFilename", "OrinrinEditor.exe"
@@ -921,6 +922,10 @@ IDBMP_PASTE             BITMAP                  "resource\\Paste.bmp"
 IDBMQ_PASTE             BITMAP                  "resource\\Paste_q.bmp"
 IDBMP_PREVIEW           BITMAP                  "resource\\Preview.bmp"
 IDBMQ_PREVIEW           BITMAP                  "resource\\Preview_q.bmp"
+IDBMP_DRAUGHTBOARD		BITMAP                  "resource\\DraughtBoard.bmp"
+IDBMQ_DRAUGHTBOARD		BITMAP                  "resource\\DraughtBoard_q.bmp"
+IDBMP_THUMBNAIL			BITMAP                  "resource\\thumbnail.bmp"
+IDBMQ_THUMBNAIL			BITMAP                  "resource\\thumbnail_q.bmp"
 IDBMP_PREVIEW_ALL       BITMAP                  "resource\\PreviewAll.bmp"
 IDBMQ_PREVIEW_ALL       BITMAP                  "resource\\PreviewAll_q.bmp"
 IDBMP_REDO              BITMAP                  "resource\\Redo.bmp"

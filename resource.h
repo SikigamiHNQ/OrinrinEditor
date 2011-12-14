@@ -36,7 +36,7 @@
 #define IDM_AALIST_POPUP                213
 #define IDM_AATREE_POPUP                214
 #define IDM_LAYERBOX_POPUP              215
-#define IDM_AAVIEW_POPUP                216
+//#define IDM_AAVIEW_POPUP                216
 #define IDM_MULTIFILE_POPUP             217
 #define IDM_TEMPLATE_POPUP              218
 #define IDM_DRAUGHT_POPUP               219
@@ -126,6 +126,10 @@
 #define IDBMQ_TRACEMODE                 434
 #define IDBMP_PREVIEW                   435
 #define IDBMQ_PREVIEW                   436
+#define IDBMP_DRAUGHTBOARD				437
+#define IDBMQ_DRAUGHTBOARD				438
+#define IDBMP_THUMBNAIL					439
+#define IDBMQ_THUMBNAIL					440
 #define IDBMPQ_PAGE_TB_FIRST            461
 #define IDBMP_PAGECREATE                461
 #define IDBMQ_PAGECREATE                462

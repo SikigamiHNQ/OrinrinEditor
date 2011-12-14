@@ -87,7 +87,7 @@ static HFONT	ghNumFont6L;	//!<	行番号用フォント６桁用
 
 static INT		gdAutoDiffBase;	//!<	自動調整のベース
 
-static  UINT	gdUseMode;		//!<	挿入レイヤクリップ指示
+static  UINT	gdUseMode;		//!<	MAAからの挿入レイヤクリップ指示
 
 static  UINT	gdSpaceView;	//!<	空白を表示する
 
@@ -1878,8 +1878,8 @@ HRESULT ViewFrameInsert( INT dMode )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	一覧からの使用モードをセット
-	@param[in]	dMode	０通常挿入　１割込挿入　３レイヤ　４ユニコピー　５SJISコピー
+	MAA一覧からの使用モードをセット
+	@param[in]	dMode	０通常挿入　１割込挿入　２レイヤ　３ユニコピー　４SJISコピー　５ドラフトボードへ
 	@return		HRESULT	終了状態コード
 */
 HRESULT ViewMaaItemsModeSet( UINT dMode )
@@ -1887,6 +1887,16 @@ HRESULT ViewMaaItemsModeSet( UINT dMode )
 	gdUseMode = dMode;
 
 	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+
+/*!
+	MAA一覧からの使用モードを確保
+	@return	使用モード　０通常挿入　１割込挿入　２レイヤ　３ユニコピー　４SJISコピー　５ドラフトボードへ
+*/
+UINT ViewMaaItemsModeGet( VOID )
+{
+	return gdUseMode;
 }
 //-------------------------------------------------------------------------------------------------
 

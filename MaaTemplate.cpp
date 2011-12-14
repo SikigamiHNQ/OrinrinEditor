@@ -450,6 +450,11 @@ VOID Maa_OnDestroy( HWND hWnd )
 	SqlDatabaseOpenClose( M_DESTROY, NULL );
 
 #ifdef _ORRVW
+
+#ifdef DRAUGHT_STYLE
+	DraughtInitialise( NULL, NULL );
+#endif
+
 	PostQuitMessage( 0 );
 #endif
 

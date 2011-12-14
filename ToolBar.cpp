@@ -105,11 +105,14 @@ static TBBUTTON gstLayoutTBInfo[] = {
 };
 
 //	表示
-#define TB_VIEW_ITEMS	3
+#define TB_VIEW_ITEMS	5
 static TBBUTTON gstViewTBInfo[] = {
-	{  0, IDM_UNI_PALETTE,	TBSTATE_ENABLED,	TBSTYLE_CHECK | TBSTYLE_AUTOSIZE,	0,	0 },	//	
-	{  1, IDM_TRACE_MODE_ON,TBSTATE_ENABLED,	TBSTYLE_CHECK | TBSTYLE_AUTOSIZE,	0,	0 },	//	
-	{  2, IDM_ON_PREVIEW,	TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,	0,	0 } 	//	
+	{  0, IDM_UNI_PALETTE,			TBSTATE_ENABLED,	TBSTYLE_CHECK | TBSTYLE_AUTOSIZE,	0,	0 },	//	
+	{  1, IDM_TRACE_MODE_ON,		TBSTATE_ENABLED,	TBSTYLE_CHECK | TBSTYLE_AUTOSIZE,	0,	0 },	//	
+	{  2, IDM_ON_PREVIEW,			TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,	0,	0 },	//	
+	{  3, IDM_DRAUGHT_OPEN,			TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,	0,	0 },	//	
+	{  4, IDM_MAA_THUMBNAIL_OPEN,	TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,	0,	0 } 	//	
+
 };
 //-------------------------------------------------------------------------------------------------
 
@@ -384,9 +387,9 @@ VOID ToolBarCreate( HWND hWnd, HINSTANCE lcInst )
 
 //	hImg = ImageList_LoadBitmap( lcInst, MAKEINTRESOURCE(IDBMP_UNIPALETTE), 16, 0, RGB(0xFF,0x00,0xFF) );
 //	こうすればMASKまで一発生成できる・２５６色用っぽい
-	ghViewImgLst = ImageList_Create( 16, 16, ILC_COLOR24 | ILC_MASK, 3, 1 );
+	ghViewImgLst = ImageList_Create( 16, 16, ILC_COLOR24 | ILC_MASK, 5, 1 );
 	resnum = IDBMPQ_VIEW_TB_FIRST;
-	for( ici = 0; 3 > ici; ici++ )
+	for( ici = 0; 5 > ici; ici++ )
 	{
 		hImg = LoadBitmap( lcInst, MAKEINTRESOURCE( (resnum++) ) );
 		hMsq = LoadBitmap( lcInst, MAKEINTRESOURCE( (resnum++) ) );
@@ -399,9 +402,11 @@ VOID ToolBarCreate( HWND hWnd, HINSTANCE lcInst )
 
 	SendMessage( ghViewTBWnd, TB_BUTTONSTRUCTSIZE, (WPARAM)sizeof(TBBUTTON), 0 );
 	//	ツールチップ文字列を設定・ボタンテキストがツールチップになる
-	StringCchCopy( atBuff, MAX_STRING, TEXT("ユニコード表") );	gstViewTBInfo[ 0].iString = SendMessage( ghViewTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-	StringCchCopy( atBuff, MAX_STRING, TEXT("トレスモード") );	gstViewTBInfo[ 1].iString = SendMessage( ghViewTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-	StringCchCopy( atBuff, MAX_STRING, TEXT("プレビュー") );	gstViewTBInfo[ 2].iString = SendMessage( ghViewTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING, TEXT("ユニコード表") );		gstViewTBInfo[ 0].iString = SendMessage( ghViewTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING, TEXT("トレスモード") );		gstViewTBInfo[ 1].iString = SendMessage( ghViewTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING, TEXT("プレビュー") );		gstViewTBInfo[ 2].iString = SendMessage( ghViewTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING, TEXT("ドラフトボード\r\nCtrl + Space") );	gstViewTBInfo[ 3].iString = SendMessage( ghViewTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING, TEXT("複数行サムネイル\r\nCtrl + T") );		gstViewTBInfo[ 4].iString = SendMessage( ghViewTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
 
 	SendMessage( ghViewTBWnd, TB_ADDBUTTONS, (WPARAM)TB_VIEW_ITEMS, (LPARAM)&gstViewTBInfo );	//	ツールバーにボタンを挿入
 	SendMessage( ghViewTBWnd, TB_AUTOSIZE, 0, 0 );	//	ボタンのサイズに合わせてツールバーをリサイズ
@@ -411,7 +416,7 @@ VOID ToolBarCreate( HWND hWnd, HINSTANCE lcInst )
 
 	stRbandInfo.lpText    = TEXT("表示");
 	stRbandInfo.wID       = IDTB_VIEW_TOOLBAR;
-	stRbandInfo.cx        = 100;
+	stRbandInfo.cx        = 140;
 	stRbandInfo.fStyle    = 0;
 	stRbandInfo.hwndChild = ghViewTBWnd;
 	SendMessage( ghRebarWnd, RB_INSERTBAND, (WPARAM)-1, (LPARAM)&stRbandInfo );

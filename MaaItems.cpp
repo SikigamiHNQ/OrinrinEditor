@@ -686,11 +686,10 @@ VOID Aai_OnContextMenu( HWND hWnd, HWND hWndContext, UINT xPos, UINT yPos )
 	dOpen = TreeFavWhichOpen(  );	//	äJÇ¢ÇƒÇÈÇÃÇ≈èàóùÇ©Ç¶ÇÈ
 	//	ACT_ALLTREE	ACT_FAVLIST
 
-#ifdef _ORRVW
-	hMenu = LoadMenu( GetModuleHandle(NULL), MAKEINTRESOURCE(IDM_AAVIEW_POPUP) );
-#else
+// _ORRVW
+//	hMenu = LoadMenu( GetModuleHandle(NULL), MAKEINTRESOURCE(IDM_AAVIEW_POPUP) );
+
 	hMenu = LoadMenu( GetModuleHandle(NULL), MAKEINTRESOURCE(IDM_AALIST_POPUP) );
-#endif
 	hSubMenu = GetSubMenu( hMenu, 0 );
 
 #ifndef DRAUGHT_STYLE
@@ -730,6 +729,12 @@ VOID Aai_OnContextMenu( HWND hWnd, HWND hWndContext, UINT xPos, UINT yPos )
 		case IDM_MAA_CLIP_UNICODE:		AaItemsDoSelect( hWnd, MAA_UNICLIP );	break;
 		case IDM_MAA_CLIP_SHIFTJIS:		AaItemsDoSelect( hWnd, MAA_SJISCLIP );	break;
 
+#ifdef DRAUGHT_STYLE
+		case IDM_DRAUGHT_ADDING:		AaItemsDoSelect( hWnd, MAA_DRAUGHT );	break;
+#ifdef _ORRVW
+		case IDM_DRAUGHT_OPEN:			Maa_OnCommand( hWnd, IDM_DRAUGHT_OPEN, NULL, 0 );	break;
+#endif
+#endif
 		case IDM_MAA_AATIP_TOGGLE:
 			gbAAtipView = gbAAtipView ? FALSE : TRUE;
 			InitParamValue( INIT_SAVE, VL_MAATIP_VIEW, gbAAtipView );
@@ -741,12 +746,6 @@ VOID Aai_OnContextMenu( HWND hWnd, HWND hWndContext, UINT xPos, UINT yPos )
 			InvalidateRect( ghItemsWnd, NULL, TRUE );
 			break;
 
-#ifdef DRAUGHT_STYLE
-		case IDM_DRAUGHT_ADDING:		AaItemsDoSelect( hWnd, MAA_DRAUGHT );	break;
-#ifdef _ORRVW
-		case IDM_DRAUGHT_OPEN:			Maa_OnCommand( hWnd, IDM_DRAUGHT_OPEN, NULL, 0 );	break;
-#endif
-#endif
 
 #ifdef THUMBNAIL_STYLE
 		case IDM_MAA_THUMBNAIL_OPEN:	Maa_OnCommand( hWnd , IDM_MAA_THUMBNAIL_OPEN, NULL, 0 );	break;

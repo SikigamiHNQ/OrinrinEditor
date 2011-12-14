@@ -365,6 +365,8 @@ BOOLEAN		SelectDirectoryDlg( HWND, LPTSTR, UINT_PTR );
 UINT		ViewMaaMaterialise( LPSTR, UINT, UINT );
 INT			ViewStringWidthGet( LPCTSTR );
 
+UINT		ViewMaaItemsModeGet( VOID );
+
 LPTSTR		SjisDecodeAlloc( LPSTR );
 LPSTR		SjisEntityExchange( LPCSTR );
 BOOLEAN		HtmlEntityCheck( TCHAR, LPSTR, UINT_PTR );

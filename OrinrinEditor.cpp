@@ -20,10 +20,13 @@ If not, see <http://www.gnu.org/licenses/>.
 //	大日本帝国公用語は↓を見られたい
 
 
-//	TODO:	「一般設定」の「複数行テンプレをクリックしたときの動作」でドラフトボード追加も欲しい
+//	TODO:	ドラフトクルックの初期標準は挿入のほうがいい
+//デフォの右クリにいれておくべき
+//ツールバーにドラフト関連いれておく
 
-//	TODO:	エディタウィンドウが前面に出ててもCtrl-T押したらサムネイル表示したらいいじゃない
-//	同様に、MAA側でもCtrl+Spaceでドラフトでるように
+
+
+//	TODO:	ドラフトやサムネ、AAサイズ表示出来るようにしたい
 
 //	TODO:	ファイル切り替えても、カーソル位置覚えておく
 
@@ -359,7 +362,7 @@ ASDファイル　　壱行が壱コンテンツ
 					メイン窓のテンプレエリアのサイズ可変になった
 					最大化状態を覚えておくようにした
 					4096バイト超えたら、頁リストのバイト数のところ赤くするようにした
-2011/12/13	0.26	ドラフトボード機能（Viewer込み）
+2011/12/14	0.26	ドラフトボード機能（Viewer込み）
 					MAAサムネイル機能（Viewer込み）
 					MAAの使用のグループ一括削除（Viewer込み）
 
@@ -784,7 +787,7 @@ BOOL InitInstance( HINSTANCE hInstance, INT nCmdShow, LPTSTR ptArgv )
 	ghLnTmplWnd = LineTmpleInitialise( hInstance, hWnd, &rect );
 
 	ViewInitialise( hInstance, hWnd, &rect, ptArgv );
-	ViewMaaItemsModeSet( InitParamValue( INIT_LOAD, VL_SETMETHOD, 0 ) );
+	ViewMaaItemsModeSet( InitParamValue( INIT_LOAD, VL_SETMETHOD, MAA_INSERT ) );
 
 	LayerBoxInitialise( hInstance, &rect );
 	LayerBoxAlphaSet( InitParamValue( INIT_LOAD, VL_LAYER_TRANS, 192 ) );
@@ -2256,7 +2259,7 @@ INT_PTR CALLBACK OptionDlgProc( HWND hDlg, UINT message, WPARAM wParam, LPARAM l
 			SendDlgItemMessage( hDlg, IDSL_LAYERBOX_TRANCED, TBM_SETPOS, TRUE, (dValue - 0x1F) );
 
 			//	複数行テンプレをクルックしたときの動作
-			dValue = InitParamValue( INIT_LOAD, VL_SETMETHOD, 0 );
+			dValue = InitParamValue( INIT_LOAD, VL_SETMETHOD, MAA_INSERT );
 			switch( dValue )
 			{
 				case MAA_INSERT:	id =  IDRB_SEL_INS_EDIT;	break;

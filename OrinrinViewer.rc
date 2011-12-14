@@ -80,11 +80,10 @@ BEGIN
     END
 END
 
-IDM_AAVIEW_POPUP MENU 
+IDM_AALIST_POPUP MENU 
 BEGIN
     POPUP "複数行テンプレ表示でのアレ"
     BEGIN
-        MENUITEM "ドラフトボード表示(&B)",               IDM_DRAUGHT_OPEN
         MENUITEM "ドラフトボードに追加(&G)",              IDM_DRAUGHT_ADDING
         MENUITEM SEPARATOR
         MENUITEM "コピー(UNI&CODE)",               IDM_MAA_CLIP_UNICODE
@@ -92,6 +91,7 @@ BEGIN
         MENUITEM SEPARATOR
         MENUITEM "削除(&D)",                      IDM_MAA_FAV_DELETE, GRAYED
         MENUITEM SEPARATOR
+        MENUITEM "ドラフトボード表示(&B)",               IDM_DRAUGHT_OPEN
         MENUITEM "サムネイル一覧表示(&H)",               IDM_MAA_THUMBNAIL_OPEN
         MENUITEM SEPARATOR
         MENUITEM "ＡＡポップアップ表示(&T)",              IDM_MAA_AATIP_TOGGLE
@@ -141,7 +141,7 @@ CAPTION "バージョン情報 - Orinrin Viewer"
 FONT 9, "MS UI Gothic"
 BEGIN
     ICON            IDI_ORINRINEDITOR,IDC_MYICON,6,6,18,21
-    LTEXT           "Orinrin Viewer, Version 6 Aurora (2011.1213.2200.920)",IDC_STATIC,36,6,180,8,SS_NOPREFIX
+    LTEXT           "Orinrin Viewer, Version 6 Aurora (2011.1214.2200.920)",IDC_STATIC,36,6,180,8,SS_NOPREFIX
     LTEXT           "Copyright (C) 2011 by SikigamiHNQ",IDC_STATIC,36,18,180,8
     LTEXT           "Site ： お燐ちゃんは俺の嫁．ｃｏｍ",IDC_STATIC,36,30,180,8
     DEFPUSHBUTTON   "OK",IDOK,85,180,50,14,WS_GROUP
@@ -202,7 +202,7 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 2011,1213,2200,920
+ FILEVERSION 2011,1214,2200,920
  PRODUCTVERSION 6,0,0,920
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
@@ -228,7 +228,7 @@ BEGIN
             VALUE "LegalTrademarks", "License : GPLv3"
             VALUE "PrivateBuild", "Build by Visual Studio 2008"
             VALUE "SpecialBuild", "Not Speciality"
-            VALUE "FileVersion", "2011.1213.2200.920"
+            VALUE "FileVersion", "2011.1214.2200.920"
             VALUE "ProductVersion", "6.0.0.920"
             VALUE "FileDescription", "AsciiArt Viewer Ver6"
             VALUE "OriginalFilename", "OrinrinViewer.exe"

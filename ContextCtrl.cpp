@@ -32,20 +32,23 @@ typedef struct tagCONTEXTITEM
 } CONTEXTITEM, *LPCONTEXTITEM;
 //-------------------------------------------------------------------------------------------------
 
+
+
+
 const static CONTEXTITEM	gstContextItem[] =
 {
 /* 0*/	{  TEXT("新規作成"),	/*ファイル*/	TEXT("Ctrl + N"),		IDM_NEWFILE			},
 /* 1*/	{  TEXT("ファイル開く"),				TEXT("Ctrl + O"),		IDM_OPEN			},
-/* 2*/	{  TEXT("上書き保存"),					TEXT("Ctrl + S"),		IDM_OVERWRITESAVE	},
-/* 3*/	{  TEXT("名前を付けて保存"),			TEXT("Ctrl + Alt + S"),	IDM_RENAMESAVE		},
-/* 4*/	{  TEXT("現在頁を画像にして保存"),		TEXT(""),				IDM_IMAGE_SAVE		},
+		{  TEXT("上書き保存"),					TEXT("Ctrl + S"),		IDM_OVERWRITESAVE	},
+		{  TEXT("名前を付けて保存"),			TEXT("Ctrl + Alt + S"),	IDM_RENAMESAVE		},
+		{  TEXT("現在頁を画像にして保存"),		TEXT(""),				IDM_IMAGE_SAVE		},
 /* 5*/	{  TEXT("一般設定"),					TEXT(""),				IDM_GENERAL_OPTION	},
-/* 6*/	{  TEXT("（セパレータ）"),				TEXT(""),				0					},
-/* 7*/	{  TEXT("元に戻す"),	/*編集*/		TEXT("Ctrl + Z"),			IDM_UNDO			},
-/* 8*/	{  TEXT("やり直し"),					TEXT("Ctrl + Y"),			IDM_REDO			},
-/* 9*/	{  TEXT("切り取り"),					TEXT("Ctrl + X"),			IDM_CUT				},
+		{  TEXT("（セパレータ）"),				TEXT(""),				0					},
+		{  TEXT("元に戻す"),	/*編集*/		TEXT("Ctrl + Z"),			IDM_UNDO			},
+		{  TEXT("やり直し"),					TEXT("Ctrl + Y"),			IDM_REDO			},
+		{  TEXT("切り取り"),					TEXT("Ctrl + X"),			IDM_CUT				},
 /*10*/	{  TEXT("Unicodeコピー"),				TEXT("Ctrl + C"),			IDM_COPY			},
-/*11*/	{  TEXT("SJISコピー"),					TEXT(""),					IDM_SJISCOPY		},
+		{  TEXT("SJISコピー"),					TEXT(""),					IDM_SJISCOPY		},
 		{  TEXT("全体をSJISコピー"),			TEXT("Ctrl + Shift + C"),	IDM_SJISCOPY_ALL	},
 		{  TEXT("貼付"),						TEXT("Ctrl + V"),			IDM_PASTE			},
 		{  TEXT("削除"),						TEXT("Delete"),				IDM_DELETE			},
@@ -112,30 +115,60 @@ const static CONTEXTITEM	gstContextItem[] =
 /*75*/	{  TEXT("ユニコード表"),				TEXT(""),	IDM_UNI_PALETTE			},
 		{  TEXT("トレスモード"),				TEXT(""),	IDM_TRACE_MODE_ON		},
 		{  TEXT("プレビュー"),					TEXT(""),	IDM_ON_PREVIEW			},
-		{  TEXT("（セパレータ）"),				TEXT(""),	0						},
 		{  TEXT("ドラフトボードを開く"),		TEXT("Ctrl + Space"),	IDM_DRAUGHT_OPEN	},
-/*80*/	{  TEXT("選択範囲をドラフトボードへ"),	TEXT(""),				IDM_COPY_TO_DRAUGHT }
+		{  TEXT("サムネイルを表示"),			TEXT("Ctrl + T"),		IDM_MAA_THUMBNAIL_OPEN	},
+/*80*/	{  TEXT("（セパレータ）"),				TEXT(""),	0						},
+		{  TEXT("選択範囲をドラフトボードへ"),	TEXT(""),	IDM_COPY_TO_DRAUGHT		}
 };
-#define ALL_ITEMS	81
+#define ALL_ITEMS	82
 
-#define DEF_ITEMS	13
+
+
+//初期設定
+#define DEF_ITEMS	32
 const static UINT	gadDefItem[] =
 {
-	IDM_COPY,
-	IDM_PASTE,
-	IDM_SJISCOPY_ALL,
+	IDM_CUT,				//	切り取り
+	IDM_COPY,				//	Unicodeコピー
+	IDM_PASTE,				//	貼付
+	IDM_ALLSEL,				//	全選択
 	0,
-	IDM_SQSELECT,
+	IDM_COPY_TO_DRAUGHT,	//	選択範囲をドラフトボードへ
 	0,
-	IDM_LAYERBOX,
-	IDM_FRMINSBOX_OPEN,
-	IDM_MOZI_SCR_OPEN,
+	IDM_SJISCOPY,			//	SJISコピー
+	IDM_SJISCOPY_ALL,		//	全体をSJISコピー
 	0,
-	IDM_RIGHT_SLIDE,
+	IDM_SQSELECT,			//	矩形選択
 	0,
-	IDM_SPACE_VIEW_TOGGLE,
+	IDM_LAYERBOX,			//	レイヤボックス
+	IDM_FRMINSBOX_OPEN,		//	枠挿入ボックス
+	IDM_MOZI_SCR_OPEN,		//	文字ＡＡ変換ボックス
+	0,
+	IDM_RIGHT_GUIDE_SET,	//	右揃え線
+	IDM_INS_TOPSPACE,		//	行頭に全角空白追加
+	IDM_DEL_TOPSPACE,		//	行頭空白削除
+	IDM_DEL_LASTSPACE,		//	行末空白削除
+	IDM_DEL_LASTLETTER,		//	行末文字削除
+	IDM_FILL_SPACE,			//	選択範囲を空白にする
+	IDM_RIGHT_SLIDE,		//	右に寄せる
+	0,
+	IDM_INCR_DOT_LINES,		//	全体を１ドット右へ
+	IDM_DECR_DOT_LINES,		//	全体を１ドット左へ
+	0,
+	IDM_SPACE_VIEW_TOGGLE,	//	空白を表示	
+	IDM_GRID_VIEW_TOGGLE,	//	グリッド線を表示
+	IDM_RIGHT_RULER_TOGGLE,	//	右ガイド線を表示
+	0,
+	IDM_PAGEL_DIVIDE		//	次の行以降を新頁に分割
 };
 //-------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
 
 extern  UINT	gbCpModSwap;	//!<	SJISとユニコードコピーを入れ替える
 

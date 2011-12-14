@@ -150,8 +150,8 @@ HRESULT DraughtInitialise( HINSTANCE hInstance, HWND hPtWnd )
 		ghNonItemDC = NULL;
 
 #ifndef _ORRVW
-		//	クルック動作指定ロード・デフォ動作はSJISクリップ
-		gdClickMode = InitParamValue( INIT_LOAD, VL_DRAUGHT_MODE, 4 );
+		//	クルック動作指定ロード・デフォ動作は通常挿入
+		gdClickMode = InitParamValue( INIT_LOAD, VL_DRAUGHT_MODE, 0 );
 		//	Viewerの場合はコピーモードに従う
 #endif
 	}
@@ -498,6 +498,7 @@ VOID Drt_OnLButtonUp( HWND hWnd, INT x, INT y, UINT keyFlags )
 {
 	POINT	stPos;
 	INT		id;
+	UINT	dMode;
 
 	TRACE( TEXT("LUP %d x %d"), x, y );	//	クライヤント座標
 
@@ -506,16 +507,36 @@ VOID Drt_OnLButtonUp( HWND hWnd, INT x, INT y, UINT keyFlags )
 
 	giTarget = DraughtTargetItemSet( &stPos );
 
-	switch( gdClickMode )
+	//	サムネ側でクルックしたなら、MAAのデフォ動作に従う
+	if( gbThumb )
 	{
-#ifndef _ORRVW
-		case  0:	id = IDM_DRAUGHT_INSERTEDIT;	break;
-		case  1:	id = IDM_DRAUGHT_INTERRUPTEDIT;	break;
-		case  2:	id = IDM_DRAUGHT_LAYERBOX;	break;
-#endif
-		default:
-		case  3:	id = IDM_DRAUGHT_UNICLIP;	break;
-		case  4:	id = IDM_DRAUGHT_SJISCLIP;	break;
+		dMode = ViewMaaItemsModeGet(  );
+		switch( dMode )
+		{
+	#ifndef _ORRVW
+			case  0:	id = IDM_DRAUGHT_INSERTEDIT;	break;
+			case  1:	id = IDM_DRAUGHT_INTERRUPTEDIT;	break;
+			case  2:	id = IDM_DRAUGHT_LAYERBOX;	break;
+	#endif
+			case  3:	id = IDM_DRAUGHT_UNICLIP;	break;
+			default:	//	とりあえずコピー
+			case  4:	id = IDM_DRAUGHT_SJISCLIP;	break;
+			case  5:	id = IDM_THUMB_DRAUGHT_ADD;	break;
+		}
+	}
+	else
+	{
+		switch( gdClickMode )
+		{
+	#ifndef _ORRVW
+			case  0:	id = IDM_DRAUGHT_INSERTEDIT;	break;
+			case  1:	id = IDM_DRAUGHT_INTERRUPTEDIT;	break;
+			case  2:	id = IDM_DRAUGHT_LAYERBOX;	break;
+	#endif
+			case  3:	id = IDM_DRAUGHT_UNICLIP;	break;
+			default:	//	ドラフト側なら、とりあえずコピー
+			case  4:	id = IDM_DRAUGHT_SJISCLIP;	break;
+		}
 	}
 
 	FORWARD_WM_COMMAND( hWnd, id, ghDraughtWnd, 0, SendMessage );
@@ -785,7 +806,7 @@ UINT DraughtItemAddFromSelect( UINT bSqSel )
 
 /*!
 	AAテキストを確保して取り込む
-	@param[in]	pcArts	ＡＡテキスト
+	@param[in]	pcArts	ＡＡテキストSJIS
 	@return		追加後のアイテム総数
 */
 UINT DraughtItemAdding( LPSTR pcArts )
