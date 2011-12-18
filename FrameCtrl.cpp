@@ -634,6 +634,8 @@ INT_PTR Frm_OnDrawItem( HWND hDlg, CONST LPDRAWITEMSTRUCT pstDrawItem )
 	StringCchLength( atStr, BIG_STRING, &cchSize );
 	ExtTextOut( pstDrawItem->hDC, SPACE_ZEN, yPos, 0, NULL, atStr, cchSize, NULL );
 
+	SelectFont( pstDrawItem->hDC, hFtOld );
+
 	return (INT_PTR)TRUE;
 }
 //-------------------------------------------------------------------------------------------------

@@ -25,6 +25,7 @@ If not, see <http://www.gnu.org/licenses/>.
 //ツールバーにドラフト関連いれておく
 
 
+//	TODO:	MAA検索ダイヤログだして、Esc押すと、ダイヤログが消えるが、その後復帰できない
 
 //	TODO:	ドラフトやサムネ、AAサイズ表示出来るようにしたい
 
@@ -136,7 +137,6 @@ If not, see <http://www.gnu.org/licenses/>.
 
 //	TODO:	頁に、ヘッダフッタ挿入機能。ヘッダには頁番号、フッタには容量、とか
 
-//	TODO:	色をGUIで変更できるように
 
 
 //	TODO:	ファイルタブの[変更]が重い？変更したら、弐回目以降は書かないように
@@ -187,6 +187,7 @@ If not, see <http://www.gnu.org/licenses/>.
 //	TODO:	MAA内容をサムネ表示することは？
 //	TODO:	サムネの右メニューにいらんのがある。開くときに調整を
 //	TODO:	サムネ表示から直接ドラフトボードに追加できるように
+//	TODO:	色をGUIで変更できるように
 
 
 //	TODO:	ブラシや壱行テンプレ、マウスオーバーツールチップで、横幅ドット数表示させたい
@@ -362,9 +363,10 @@ ASDファイル　　壱行が壱コンテンツ
 					メイン窓のテンプレエリアのサイズ可変になった
 					最大化状態を覚えておくようにした
 					4096バイト超えたら、頁リストのバイト数のところ赤くするようにした
-2011/12/14	0.26	ドラフトボード機能（Viewer込み）
+2011/12/16	0.26	ドラフトボード機能（Viewer込み）
 					MAAサムネイル機能（Viewer込み）
 					MAAの使用のグループ一括削除（Viewer込み）
+					配色変更をＧＵＩで出来るようにした
 
 更新日時注意
 
@@ -1810,11 +1812,11 @@ COLORREF InitColourValue( UINT dMode, UINT dStyle, COLORREF nColour )
 
 	switch( dStyle )
 	{
-		case CLRV_BASICPEN:	StringCchCopy( atKeyName, SUB_STRING, TEXT("BasicPen") );	break;
-		case CLRV_BASICBK:	StringCchCopy( atKeyName, SUB_STRING, TEXT("BasicBack") );	break;
-		case CLRV_GRIDLINE:	StringCchCopy( atKeyName, SUB_STRING, TEXT("GridLine") );	break;
-		case CLRV_CRLFMARK:	StringCchCopy( atKeyName, SUB_STRING, TEXT("CrLfMark") );	break;
-		case CLRV_CANTSJIS:	StringCchCopy( atKeyName, SUB_STRING, TEXT("CantSjis") );	break;
+		case CLRV_BASICPEN:	StringCchCopy( atKeyName, SUB_STRING, TEXT("BasicPen") );	break;	//	文字色
+		case CLRV_BASICBK:	StringCchCopy( atKeyName, SUB_STRING, TEXT("BasicBack") );	break;	//	背景色
+		case CLRV_GRIDLINE:	StringCchCopy( atKeyName, SUB_STRING, TEXT("GridLine") );	break;	//	グリッド
+		case CLRV_CRLFMARK:	StringCchCopy( atKeyName, SUB_STRING, TEXT("CrLfMark") );	break;	//	改行マーク
+		case CLRV_CANTSJIS:	StringCchCopy( atKeyName, SUB_STRING, TEXT("CantSjis") );	break;	//	Unicode文字
 		default:	return nColour;
 	}
 

@@ -52,6 +52,18 @@ If not, see <http://www.gnu.org/licenses/>.
 
 */
 
+//!	色見本のドロー用
+typedef struct tagCOLOUROBJECT
+{
+	COLORREF	dTextColour;	//	文字色
+	HBRUSH		hBackBrush;		//	背景色
+	HPEN		hGridPen;		//	グリッド
+	HPEN		hCrLfPen;		//	改行マーク
+	HBRUSH		hUniBackBrs;	//	ユニコード文字背景
+
+} COLOUROBJECT, *LPCOLOUROBJECT;
+//-------------------------------------------------------------------------------------------------
+
 static HINSTANCE	ghInst;		//!<	現在のインターフェイス
 
 EXTERNED HWND	ghPrntWnd;		//!<	メインウインドウハンドル
@@ -219,6 +231,13 @@ HRESULT	ViewDrawRuler( HDC );
 HRESULT	ViewDrawLineNumber( HDC );
 
 VOID	OperationUndoRedo( INT, PINT, PINT );
+
+//	配色変更
+HRESULT	ViewColourEditDlg( HWND );
+INT_PTR	CALLBACK ColourEditDlgProc( HWND, UINT, WPARAM, LPARAM );
+UINT	ColourEditChoose( HWND, LPCOLORREF );
+INT_PTR	ColourEditDrawItem( HWND, CONST LPDRAWITEMSTRUCT, LPCOLOUROBJECT );
+
 //-------------------------------------------------------------------------------------------------
 
 VOID AaFontCreate( UINT bMode )
@@ -1617,7 +1636,8 @@ HRESULT ViewDrawReturnMark( HDC hdc, INT dDot, INT rdLine, UINT dFlag )
 		FillRect( hdc, &rect, gahBrush[BRHT_BASICBK] );
 	}
 
-	ExtTextOut( hdc , dX, dY, 0, NULL, TEXT("　"), 1, NULL );	//	場所作って
+//	ExtTextOut( hdc , dX, dY, 0, NULL, TEXT("　"), 1, NULL );	//	場所作って
+//	20111216	いらない？
 
 	SetBkColor( hdc, clrBackOld );
 
@@ -2074,6 +2094,8 @@ VOID OperationOnCommand( HWND hWnd, INT id, HWND hWndCtl, UINT codeNotify )
 		//	文字スクリプト窓開く
 		case  IDM_MOZI_SCR_OPEN:	MoziScripterCreate( ghInst , hWnd );	break;
 
+		case IDM_COLOUR_EDIT_OPEN:	ViewColourEditDlg( hWnd );	break;
+
 #ifndef MAA_PROFILE
 		//Profileモードなら外すようにする
 		case IDM_TREE_RECONSTRUCT:	FORWARD_WM_COMMAND( ghMaaWnd, IDM_TREE_RECONSTRUCT, NULL, 0 , PostMessage );	break;
@@ -2377,3 +2399,257 @@ VOID OperationOnCommand( HWND hWnd, INT id, HWND hWndCtl, UINT codeNotify )
 	return;
 }
 //-------------------------------------------------------------------------------------------------
+
+/*!
+	編集Viewの配色変更
+	@param[in]	hWnd	ウインドウハンドル
+	@return	HRESULT	終了状態コード
+*/
+HRESULT ViewColourEditDlg( HWND hWnd )
+{
+	INT_PTR	iRslt;
+
+	COLORREF	cadColourSet[5];
+
+	cadColourSet[0] =  gaColourTable[CLRT_BASICPEN];	//	BasicPen
+	cadColourSet[1] =  gaColourTable[CLRT_BASICBK];		//	BasicBack
+	cadColourSet[2] =  gaColourTable[CLRT_GRID_LINE];	//	GridLine
+	cadColourSet[3] =  gaColourTable[CLRT_CRLF_MARK];	//	CrLfMark
+	cadColourSet[4] =  gaColourTable[CLRT_CANTSJIS];	//	CantSjis
+
+	iRslt = DialogBoxParam( ghInst, MAKEINTRESOURCE(IDD_COLOUR_DLG), hWnd, ColourEditDlgProc, (LPARAM)cadColourSet );
+	if( IDOK == iRslt )
+	{
+		gaColourTable[CLRT_BASICPEN]  = cadColourSet[0];
+		gaColourTable[CLRT_BASICBK]   = cadColourSet[1];
+		gaColourTable[CLRT_GRID_LINE] = cadColourSet[2];
+		gaColourTable[CLRT_CRLF_MARK] = cadColourSet[3];
+		gaColourTable[CLRT_CANTSJIS]  = cadColourSet[4];
+
+		DeleteBrush( gahBrush[BRHT_BASICBK] );
+		DeletePen(   gahPen[PENT_CRLF_MARK] );
+		DeletePen(   gahPen[PENT_GRID_LINE] );
+		DeleteBrush( gahBrush[BRHT_CANTSJISBK] );
+
+		gahBrush[BRHT_BASICBK]    = CreateSolidBrush( gaColourTable[CLRT_BASICBK] );
+		gahPen[PENT_CRLF_MARK]    = CreatePen( PS_SOLID, 1, gaColourTable[CLRT_CRLF_MARK] );
+		gahPen[PENT_GRID_LINE]    = CreatePen( PS_SOLID, 1, gaColourTable[CLRT_GRID_LINE] );
+		gahBrush[BRHT_CANTSJISBK] = CreateSolidBrush( gaColourTable[CLRT_CANTSJIS] );
+
+		InitColourValue( INIT_SAVE, CLRV_BASICPEN, gaColourTable[CLRT_BASICPEN] );
+		InitColourValue( INIT_SAVE, CLRV_BASICBK,  gaColourTable[CLRT_BASICBK] );
+		InitColourValue( INIT_SAVE, CLRV_GRIDLINE, gaColourTable[CLRT_GRID_LINE] );
+		InitColourValue( INIT_SAVE, CLRV_CRLFMARK, gaColourTable[CLRT_CRLF_MARK] );
+		InitColourValue( INIT_SAVE, CLRV_CANTSJIS, gaColourTable[CLRT_CANTSJIS] );
+
+		SetClassLong( ghViewWnd, GCL_HBRBACKGROUND, (LONG)(gahBrush[BRHT_BASICBK]) );
+
+		InvalidateRect( ghViewWnd, NULL, TRUE );
+	}
+	
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+
+/*!
+	バージョン情報ボックスのメッセージハンドラです。
+	@param[in]	hDlg		ダイヤログハンドル
+	@param[in]	message		ウインドウメッセージの識別番号
+	@param[in]	wParam		追加の情報１
+	@param[in]	lParam		追加の情報２
+	@retval 0	メッセージは処理していない
+	@retval no0	なんか処理された
+*/
+INT_PTR CALLBACK ColourEditDlgProc( HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam )
+{
+	static LPCOLORREF	pcadColour;	//	0:Pen　1:Back　2:Grid　3:CrLf　4:CantSjis
+	static COLOUROBJECT	cstColours;	
+//	COLORREF	dColourTmp;
+//	UINT	dRslt;
+	INT	id;
+
+	switch( message )
+	{
+		case WM_INITDIALOG:
+			pcadColour = (LPCOLORREF)lParam;
+			cstColours.dTextColour = pcadColour[0];
+			cstColours.hBackBrush  = CreateSolidBrush( pcadColour[1] );
+			cstColours.hGridPen    = CreatePen( PS_SOLID, 1, pcadColour[2] );
+			cstColours.hCrLfPen    = CreatePen( PS_SOLID, 1, pcadColour[3] );
+			cstColours.hUniBackBrs = CreateSolidBrush( pcadColour[4] );
+			return (INT_PTR)TRUE;
+
+		case WM_COMMAND:
+			id = LOWORD(wParam);
+			switch( id )
+			{
+				case IDOK:
+				case IDCANCEL:
+					DeleteBrush( cstColours.hBackBrush );
+					DeletePen(   cstColours.hGridPen );
+					DeletePen(   cstColours.hCrLfPen );
+					DeleteBrush( cstColours.hUniBackBrs );
+					EndDialog( hDlg, id );	return (INT_PTR)TRUE;
+
+				case IDB_COLOUR_BASIC_PEN:
+					if( ColourEditChoose( hDlg, &(pcadColour[0]) ) )
+					{
+						cstColours.dTextColour = pcadColour[0];
+						InvalidateRect( GetDlgItem(hDlg,IDS_COLOUR_IMAGE), NULL, TRUE );
+					}
+					return (INT_PTR)TRUE;
+
+				case IDB_COLOUR_BASIC_BACK:
+					if( ColourEditChoose( hDlg, &(pcadColour[1]) ) )
+					{
+						DeleteBrush( cstColours.hBackBrush );
+						cstColours.hBackBrush  = CreateSolidBrush( pcadColour[1] );
+						InvalidateRect( GetDlgItem(hDlg,IDS_COLOUR_IMAGE), NULL, TRUE );
+					}
+					return (INT_PTR)TRUE;
+
+				case IDB_COLOUR_GRID_LINE:
+					if( ColourEditChoose( hDlg, &(pcadColour[2]) ) )
+					{
+						DeletePen(   cstColours.hGridPen );
+						cstColours.hGridPen  = CreatePen( PS_SOLID, 1, pcadColour[2] );
+						InvalidateRect( GetDlgItem(hDlg,IDS_COLOUR_IMAGE), NULL, TRUE );
+					}
+					return (INT_PTR)TRUE;
+
+				case IDB_COLOUR_CRLF_MARK:
+					if( ColourEditChoose( hDlg, &(pcadColour[3]) ) )
+					{
+						DeletePen(   cstColours.hCrLfPen );
+						cstColours.hCrLfPen  = CreatePen( PS_SOLID, 1, pcadColour[3] );
+						InvalidateRect( GetDlgItem(hDlg,IDS_COLOUR_IMAGE), NULL, TRUE );
+					}
+					return (INT_PTR)TRUE;
+
+				case IDB_COLOUR_CANT_SJIS:
+					if( ColourEditChoose( hDlg, &(pcadColour[4]) ) )
+					{
+						DeleteBrush( cstColours.hUniBackBrs );
+						cstColours.hUniBackBrs  = CreateSolidBrush( pcadColour[4] );
+						InvalidateRect( GetDlgItem(hDlg,IDS_COLOUR_IMAGE), NULL, TRUE );
+					}
+					return (INT_PTR)TRUE;
+
+				default:	return (INT_PTR)FALSE;
+			}
+			break;
+
+		case WM_DRAWITEM:	return ColourEditDrawItem( hDlg, ((CONST LPDRAWITEMSTRUCT)(lParam)), &cstColours );
+
+	}
+	return (INT_PTR)FALSE;
+}
+//-------------------------------------------------------------------------------------------------
+
+/*!
+	色選択ダイヤログ使っていろいろする
+	@param[in]		hWnd		オーナーウインドウハンドル
+	@param[in,out]	pdTgtColour	元の色入れて、変更した色出てくる
+	@return	UINT	非０変更した　０キャンセルした
+*/
+UINT ColourEditChoose( HWND hWnd, LPCOLORREF pdTgtColour )
+{
+	BOOL	bRslt;
+	COLORREF	adColourTemp[16];
+	CHOOSECOLOR	stChColour;
+
+	ZeroMemory( adColourTemp, sizeof(adColourTemp) );
+	adColourTemp[0] = *pdTgtColour;
+
+	ZeroMemory( &stChColour, sizeof(CHOOSECOLOR) );
+	stChColour.lStructSize  = sizeof(CHOOSECOLOR);
+	stChColour.hwndOwner    = hWnd;
+//	stChColour.hInstance    = GetModuleHandle( NULL );
+	stChColour.rgbResult    = *pdTgtColour;
+	stChColour.lpCustColors = adColourTemp;
+	stChColour.Flags        = CC_RGBINIT;
+
+	bRslt = ChooseColor( &stChColour );	//	色ダイヤログ使う
+	if( bRslt ){	*pdTgtColour = stChColour.rgbResult;	}
+
+	return bRslt;
+}
+//-------------------------------------------------------------------------------------------------
+
+/*!
+	オーナードローの処理・スタティックのアレ
+	@param[in]	hDlg		ダイヤロゲハンドゥ
+	@param[in]	pstDrawItem	ドロー情報へのポインター
+	@param[in]	pstColours	色情報とGDI
+	@return		処理したかせんかったか
+*/
+INT_PTR ColourEditDrawItem( HWND hDlg, CONST LPDRAWITEMSTRUCT pstDrawItem, LPCOLOUROBJECT pstColours )
+{
+	const  TCHAR	catMihon[] = { TEXT("フランちゃんウフフ") };
+//	UINT_PTR	cchMr;
+
+	const  TCHAR	catUniMhn[] = { 0x2600, 0x2006, 0x2665, 0x0000 };
+
+
+	RECT	rect;
+	INT		xpos;
+
+	INT		dotlen;
+	INT		dX = 6 , dY = 6;	//	改行描画枠左上
+	INT		aX , aY;	//	改行ペンの位置
+
+	HFONT	hFtOld;
+	HPEN	hPenOld;
+
+	if( IDS_COLOUR_IMAGE != pstDrawItem->CtlID ){	return (INT_PTR)FALSE;	}
+
+	//atUniMihon[0] = 0x2600;
+	//atUniMihon[1] = 0x2006;
+	//atUniMihon[2] = 0x2665;
+	//atUniMihon[3] = 0x0000;
+
+	GetClientRect( GetDlgItem(hDlg,IDS_COLOUR_IMAGE), &rect );	//	見本エリアのサイズ
+
+	hFtOld = SelectFont( pstDrawItem->hDC, ghAaFont );	//	フォントくっつける
+	SetBkMode( pstDrawItem->hDC, TRANSPARENT );	//	背景透過
+
+	SetTextColor( pstDrawItem->hDC, pstColours->dTextColour );	//	テキスト色
+
+	FillRect( pstDrawItem->hDC, &(pstDrawItem->rcItem), pstColours->hBackBrush );	//	背景塗り
+
+	hPenOld = SelectPen( pstDrawItem->hDC, pstColours->hGridPen );	//	グリッド
+	for( xpos = 40; rect.right > xpos; xpos += 40 )
+	{
+		MoveToEx( pstDrawItem->hDC, xpos, 0, NULL );	//	開始地点
+		LineTo(   pstDrawItem->hDC, xpos, rect.bottom );	//	上から下へ
+	}
+
+	dotlen = ViewStringWidthGet( catMihon );
+	ExtTextOut( pstDrawItem->hDC, dX, dY, 0, NULL, catMihon, 9, NULL );//固定値注意
+	dX += dotlen;
+
+	SelectPen( pstDrawItem->hDC, pstColours->hCrLfPen );	//	改行マーク
+	aX = dX + 3;
+	aY = dY + 3;	//	上マージン
+	MoveToEx( pstDrawItem->hDC, aX, aY, NULL );	//	開始地点
+	LineTo(   pstDrawItem->hDC, aX, aY + 12  );	//	上から下へ
+	LineTo(   pstDrawItem->hDC, dX, aY + 9  );	//	そこから左上へ
+	MoveToEx( pstDrawItem->hDC, aX, aY + 12, NULL );	//	矢印の先っぽへ
+	LineTo(   pstDrawItem->hDC, aX + 3, aY + 9 );	//	そして右上へ
+	//	もうちゅっとスマートにできないかこれ
+
+	//	ユニコードみほん
+	dX  = 6;	//	固定値注意
+	dY += LINE_HEIGHT;
+	dotlen = ViewStringWidthGet( catUniMhn );
+	SetRect( &rect, dX, dY, dX + dotlen, dY + LINE_HEIGHT );
+	FillRect( pstDrawItem->hDC, &rect, pstColours->hUniBackBrs );	//	背景塗り
+	ExtTextOut( pstDrawItem->hDC, dX, dY, 0, NULL, catUniMhn, 3, NULL );//固定値注意
+
+	SelectPen( pstDrawItem->hDC, hPenOld );
+	SelectFont( pstDrawItem->hDC, hFtOld );
+
+	return (INT_PTR)TRUE;
+}
+//-------------------------------------------------------------------------------------------------
+

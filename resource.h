@@ -36,7 +36,7 @@
 #define IDM_AALIST_POPUP                213
 #define IDM_AATREE_POPUP                214
 #define IDM_LAYERBOX_POPUP              215
-//#define IDM_AAVIEW_POPUP                216
+#define IDM_AAVIEW_POPUP                216
 #define IDM_MULTIFILE_POPUP             217
 #define IDM_TEMPLATE_POPUP              218
 #define IDM_DRAUGHT_POPUP               219
@@ -50,7 +50,8 @@
 #define IDD_PAGENUMBER_DLG              230
 #define IDD_MAA_IADD_DLG                231
 #define IDD_CONTEXT_ITEM_DLG            232
-#define IDM_AAFAVS_POPUP                233
+#define IDM_AAFAVS_POPUP				233
+#define IDD_COLOUR_DLG					234
 #define IDBMPQ_MAIN_TB_FIRST            301
 #define IDBMP_FILE_NEW                  301
 #define IDBMQ_FILE_NEW                  302
@@ -330,6 +331,12 @@
 #define IDB_FIND_CLEAR                  1224
 #define IDE_MAA_FIND_NAME               1227
 #define IDLV_MAA_FINDED_FILE            1228
+#define IDB_COLOUR_BASIC_PEN			1231
+#define IDB_COLOUR_BASIC_BACK			1232
+#define IDB_COLOUR_GRID_LINE			1233
+#define IDB_COLOUR_CRLF_MARK			1234
+#define IDB_COLOUR_CANT_SJIS			1235
+#define IDS_COLOUR_IMAGE				1236
 #define IDTV_ITEMTREE                   2000
 #define IDTB_TREESEL                    2001
 #define IDSO_AAITEMS                    2002
@@ -366,6 +373,7 @@
 #define IDM_MAA_PROFILE_MAKE            32730
 #define IDM_MAA_SEP_STYLE_TOGGLE        32731
 #define IDM_MAA_FAVFLDR_DELETE          32732
+#define IDM_COLOUR_EDIT_OPEN			32735
 #define IDM_DUMMY                       32768
 #define IDM_NEWFILE                     32771
 #define IDM_OPEN                        32772

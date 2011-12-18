@@ -45,20 +45,21 @@ IDC_ORINRINEDITOR MENU
 BEGIN
     POPUP "ファイル(&F)"
     BEGIN
-        MENUITEM "新規作成(&N)\tCtrl + N",          IDM_NEWFILE
-        MENUITEM "ファイル開く(&O)\tCtrl + O",        IDM_OPEN
+        MENUITEM "新規作成(&N)\tCtrl + N",		IDM_NEWFILE
+        MENUITEM "ファイル開く(&O)\tCtrl + O",	IDM_OPEN
         MENUITEM SEPARATOR
-        MENUITEM "上書き保存(&S)\tCtrl + S",         IDM_OVERWRITESAVE
-        MENUITEM "名前を付けて保存(&M)\tCtrl + Alt + S", IDM_RENAMESAVE
-        MENUITEM "現在頁を画像にして保存(&I)",             IDM_IMAGE_SAVE
+        MENUITEM "上書き保存(&S)\tCtrl + S",				IDM_OVERWRITESAVE
+        MENUITEM "名前を付けて保存(&M)\tCtrl + Alt + S",	IDM_RENAMESAVE
+        MENUITEM "現在頁を画像にして保存(&I)",				IDM_IMAGE_SAVE
         MENUITEM SEPARATOR
-        MENUITEM "一般設定(&G)",                    IDM_GENERAL_OPTION
-        MENUITEM "右クリックメニュー編集",                 IDM_MENUEDIT_DLG_OPEN
-        MENUITEM "AA一覧ツリーを再構築(&T)",             IDM_TREE_RECONSTRUCT
+        MENUITEM "一般設定(&G)",				IDM_GENERAL_OPTION
+        MENUITEM "右クリックメニュー編集",		IDM_MENUEDIT_DLG_OPEN
+        MENUITEM "AA一覧ツリーを再構築(&T)",	IDM_TREE_RECONSTRUCT
+		MENUITEM "編集エリアの配色編集",		IDM_COLOUR_EDIT_OPEN
         MENUITEM SEPARATOR
-        MENUITEM "バージョン情報(&A)",                 IDM_ABOUT
+        MENUITEM "バージョン情報(&A)",			IDM_ABOUT
         MENUITEM SEPARATOR
-        MENUITEM "終了(&Q)",                      IDM_EXIT
+        MENUITEM "終了(&Q)",					IDM_EXIT
     END
     POPUP "編集(&E)"
     BEGIN
@@ -70,20 +71,20 @@ BEGIN
         MENUITEM "貼付(&P)\tCtrl + V",            IDM_PASTE
         MENUITEM "削除(&D)\tDelete",              IDM_DELETE
         MENUITEM SEPARATOR
-        MENUITEM "SJISコピー(&J)",							IDM_SJISCOPY
-        MENUITEM "全体をSJISコピー(&S)\tCtrl + Shift + C",	IDM_SJISCOPY_ALL
-        MENUITEM "選択範囲をドラフトボードへ(&G)",			IDM_COPY_TO_DRAUGHT
+        MENUITEM "SJISコピー(&J)",                 IDM_SJISCOPY
+        MENUITEM "全体をSJISコピー(&S)\tCtrl + Shift + C", IDM_SJISCOPY_ALL
+        MENUITEM "選択範囲をドラフトボードへ(&G)",           IDM_COPY_TO_DRAUGHT
         MENUITEM SEPARATOR
         MENUITEM "全選択(&A)\tCtrl + A",           IDM_ALLSEL
         MENUITEM "矩形選択(&B)\tCtrl + Alt + B",    IDM_SQSELECT
         MENUITEM SEPARATOR
-        MENUITEM "レイヤボックス(&L)\tAlt + Space",				IDM_LAYERBOX
-        MENUITEM "部分抽出モード(&E)",							IDM_EXTRACTION_MODE
+        MENUITEM "レイヤボックス(&L)\tAlt + Space",    IDM_LAYERBOX
+        MENUITEM "部分抽出モード(&E)",                 IDM_EXTRACTION_MODE
         MENUITEM SEPARATOR
-        MENUITEM "次の行以降を新頁に分割(&V)",					IDM_PAGEL_DIVIDE
+        MENUITEM "次の行以降を新頁に分割(&V)",             IDM_PAGEL_DIVIDE
         MENUITEM SEPARATOR
-        MENUITEM "文字列検索(&F)\tCtrl + F",					IDM_FIND_DLG_OPEN
-        MENUITEM "検索ハイライト解除(&H)\tCtrl + Shift + F",	IDM_FIND_HIGHLIGHT_OFF
+        MENUITEM "文字列検索(&F)\tCtrl + F",         IDM_FIND_DLG_OPEN
+        MENUITEM "検索ハイライト解除(&H)\tCtrl + Shift + F", IDM_FIND_HIGHLIGHT_OFF
     END
     POPUP "挿入(&I)"
     BEGIN
@@ -164,7 +165,7 @@ BEGIN
         MENUITEM "右ガイド線を表示(&M)",                IDM_RIGHT_RULER_TOGGLE
         MENUITEM SEPARATOR
         MENUITEM "複数行テンプレート(&A)",               IDM_MAATMPLE_VIEW
-        MENUITEM "複数行サムネイル(&B)\tCtrl + T",   IDM_MAA_THUMBNAIL_OPEN
+        MENUITEM "複数行サムネイル(&B)\tCtrl + T",      IDM_MAA_THUMBNAIL_OPEN
         MENUITEM "頁一覧(&L)",                     IDM_PAGELIST_VIEW
         MENUITEM "壱行テンプレート(&T)",                IDM_LINE_TEMPLATE
         MENUITEM "塗り潰しブラシ(&F)",                 IDM_BRUSH_PALETTE
@@ -429,7 +430,7 @@ CAPTION "バージョン情報 - Orinrin Editor"
 FONT 9, "MS UI Gothic"
 BEGIN
     ICON            IDI_ORINRINEDITOR,IDC_MYICON,6,6,20,20
-    LTEXT           "Orinrin Editor, Version 0.26 Aurora (2011.1214.2200.920)",IDC_STATIC,36,6,168,8,SS_NOPREFIX
+    LTEXT           "Orinrin Editor, Version 0.26 Aurora (2011.1216.2200.920)",IDC_STATIC,36,6,168,8,SS_NOPREFIX
     LTEXT           "Copyright (C) 2011 by SikigamiHNQ",IDC_STATIC,36,18,168,8
     LTEXT           "Site ： お燐ちゃんは俺の嫁．ｃｏｍ",IDC_STATIC,36,30,168,8
     DEFPUSHBUTTON   "OK",IDOK,84,180,48,12,WS_GROUP
@@ -510,7 +511,7 @@ IDD_PAGE_NAME_DLG DIALOG  0, 0, 167, 54
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_TOOLWINDOW
 CAPTION "頁の名前入力"
-FONT 11, "MS UI Gothic"
+FONT 10, "MS UI Gothic"
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,72,36,42,12
     PUSHBUTTON      "キャンセル",IDCANCEL,120,36,42,12
@@ -518,7 +519,7 @@ BEGIN
     EDITTEXT        IDE_PAGENAME,6,18,156,12,ES_AUTOHSCROLL
 END
 
-IDD_GENERAL_OPTION_DLG DIALOG 0, 0, 271, 294
+IDD_GENERAL_OPTION_DLG DIALOG  0, 0, 271, 294
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_TOOLWINDOW
 CAPTION "設定いろいろ"
@@ -772,6 +773,22 @@ BEGIN
     CONTROL         "",IDLV_MAA_FINDED_FILE,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_ALIGNLEFT | LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,6,24,204,96
 END
 
+IDD_COLOUR_DLG DIALOG 0, 0, 162, 119
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_TOOLWINDOW
+CAPTION "色設定"
+FONT 10, "MS UI Gothic"
+BEGIN
+    PUSHBUTTON      "文字色",IDB_COLOUR_BASIC_PEN,6,6,72,12
+    PUSHBUTTON      "背景色",IDB_COLOUR_BASIC_BACK,84,6,72,12
+    PUSHBUTTON      "グリッドライン",IDB_COLOUR_GRID_LINE,6,24,72,12
+    PUSHBUTTON      "改行マーク",IDB_COLOUR_CRLF_MARK,84,24,72,12
+    PUSHBUTTON      "ユニコード背景",IDB_COLOUR_CANT_SJIS,6,42,72,12
+    CONTROL         "",IDS_COLOUR_IMAGE,"Static",SS_OWNERDRAW | SS_NOPREFIX | SS_NOTIFY | WS_BORDER,6,60,150,36,WS_EX_CLIENTEDGE
+    DEFPUSHBUTTON   "OK",IDOK,66,102,42,12
+    PUSHBUTTON      "キャンセル",IDCANCEL,114,102,42,12
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -779,7 +796,7 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 2011,1214,2200,920
+ FILEVERSION 2011,1216,2200,920
  PRODUCTVERSION 0,26,0,920
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
@@ -805,7 +822,7 @@ BEGIN
             VALUE "LegalTrademarks", "License : GPLv3"
             VALUE "PrivateBuild", "Build by Visual C++ 2008 Express"
             VALUE "SpecialBuild", "Not Speciality"
-            VALUE "FileVersion", "2011.1214.2200.920"
+            VALUE "FileVersion", "2011.1216.2200.920"
             VALUE "ProductVersion", "0.26.0.920"
             VALUE "FileDescription", "AsciiArt Story Editor by Orinrin!"
             VALUE "OriginalFilename", "OrinrinEditor.exe"
@@ -922,10 +939,10 @@ IDBMP_PASTE             BITMAP                  "resource\\Paste.bmp"
 IDBMQ_PASTE             BITMAP                  "resource\\Paste_q.bmp"
 IDBMP_PREVIEW           BITMAP                  "resource\\Preview.bmp"
 IDBMQ_PREVIEW           BITMAP                  "resource\\Preview_q.bmp"
-IDBMP_DRAUGHTBOARD		BITMAP                  "resource\\DraughtBoard.bmp"
-IDBMQ_DRAUGHTBOARD		BITMAP                  "resource\\DraughtBoard_q.bmp"
-IDBMP_THUMBNAIL			BITMAP                  "resource\\thumbnail.bmp"
-IDBMQ_THUMBNAIL			BITMAP                  "resource\\thumbnail_q.bmp"
+IDBMP_DRAUGHTBOARD      BITMAP                  "resource\\DraughtBoard.bmp"
+IDBMQ_DRAUGHTBOARD      BITMAP                  "resource\\DraughtBoard_q.bmp"
+IDBMP_THUMBNAIL         BITMAP                  "resource\\thumbnail.bmp"
+IDBMQ_THUMBNAIL         BITMAP                  "resource\\thumbnail_q.bmp"
 IDBMP_PREVIEW_ALL       BITMAP                  "resource\\PreviewAll.bmp"
 IDBMQ_PREVIEW_ALL       BITMAP                  "resource\\PreviewAll_q.bmp"
 IDBMP_REDO              BITMAP                  "resource\\Redo.bmp"
@@ -972,6 +989,7 @@ IDBMQ_MOZI_SCRIPT       BITMAP                  "resource\\MoziScript_q.bmp"
 IDBMP_MOZI_WRITE        BITMAP                  "resource\\MoziWrite.bmp"
 IDBMP_MOZI_ADVANCE      BITMAP                  "resource\\MoziAdv.bmp"
 IDBMQ_MOZI_ADVANCE      BITMAP                  "resource\\MoziAdv_q.bmp"
+
 
 /////////////////////////////////////////////////////////////////////////////
 //

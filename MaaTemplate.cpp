@@ -1483,7 +1483,8 @@ INT_PTR CALLBACK TreeMaaFindDlgProc( HWND hDlg, UINT message, WPARAM wParam, LPA
 			hWorkWnd = GetDlgItem( hDlg, IDE_FIND_TEXT );
 			switch( id )
 			{
-				case IDCANCEL:	DestroyWindow( hDlg );	return (INT_PTR)TRUE;
+				case IDCANCEL:	DestroyWindow( hDlg );	ghMaaFindDlg = NULL;	return (INT_PTR)TRUE;
+
 				case IDOK:		MaaFindExecute( hDlg );	return (INT_PTR)TRUE;	//	åüçıÇ∑ÇÈ
 
 				case IDM_PASTE:	SendMessage( hWorkWnd, WM_PASTE, 0, 0 );	return (INT_PTR)TRUE;
@@ -1495,9 +1496,9 @@ INT_PTR CALLBACK TreeMaaFindDlgProc( HWND hDlg, UINT message, WPARAM wParam, LPA
 			}
 			break;
 
-		case WM_CLOSE:	DestroyWindow( hDlg );	ghMaaFindDlg = NULL;	return (INT_PTR)TRUE;
+		case WM_CLOSE:		DestroyWindow( hDlg );	ghMaaFindDlg = NULL;	return (INT_PTR)TRUE;
 
-		case WM_DESTROY:	return (INT_PTR)TRUE;
+		case WM_DESTROY:	ghMaaFindDlg = NULL;	return (INT_PTR)TRUE;
 
 		case WM_NOTIFY:		MaaFindOnNotify( hDlg, (INT)(wParam), (LPNMHDR)(lParam) );	return (INT_PTR)TRUE;
 
