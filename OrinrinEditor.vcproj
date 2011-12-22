@@ -499,6 +499,14 @@
 					>
 				</File>
 				<File
+					RelativePath=".\resource\DraughtBoard.bmp"
+					>
+				</File>
+				<File
+					RelativePath=".\resource\DraughtBoard_q.bmp"
+					>
+				</File>
+				<File
 					RelativePath=".\resource\Extract.bmp"
 					>
 				</File>
@@ -804,6 +812,14 @@
 				</File>
 				<File
 					RelativePath=".\resource\TailSpaceDel_q.bmp"
+					>
+				</File>
+				<File
+					RelativePath=".\resource\thumbnail.bmp"
+					>
+				</File>
+				<File
+					RelativePath=".\resource\thumbnail_q.bmp"
 					>
 				</File>
 				<File

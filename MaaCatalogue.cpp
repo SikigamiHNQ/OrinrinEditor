@@ -63,7 +63,6 @@ DWORD	AacInflateAst( LPSTR, DWORD );
 
 UINT	AacTitleCheck( LPAAMATRIX );
 
-LPSTR	NextLine( LPSTR );
 
 LRESULT	CALLBACK AacFavInflate( UINT, UINT, UINT, LPCVOID );
 
@@ -148,7 +147,7 @@ DWORD AacInflateAst( LPSTR pcTotal, DWORD cbTotal )
 
 		stAAbuf.ixNum = iNumber;
 
-		pcStart = NextLine( pcCaret );	//	次の行からが本番
+		pcStart = NextLineA(  pcCaret );	//	次の行からが本番
 
 		pcCaret += 5;	//	[AA][
 		cbItem  = pcStart - pcCaret;	//	名前部分の文字数
@@ -250,7 +249,7 @@ DWORD AacInflateMlt( LPSTR pcTotal, DWORD cbTotal )
 
 		iNumber++;
 
-		pcCaret = NextLine( pcEnd );
+		pcCaret = NextLineA( pcEnd );
 
 	}while( *pcCaret );	//	データ有る限りループで探す
 
@@ -283,7 +282,7 @@ UINT AacTitleCheck( LPAAMATRIX pstItem )
 		cbSize  = pstItem->cbItem;
 		cbSize -= 2;	//	壱行の場合を見越して計算
 
-		pcEnd = NextLine( pcCaret );
+		pcEnd = NextLineA( pcCaret );
 		//	中身がNULLなら、改行無し壱行である
 		if( *pcEnd )
 		{
@@ -327,14 +326,14 @@ UINT AacTitleCheck( LPAAMATRIX pstItem )
 		//	見出しと見なして内容をゲットする。
 		cbSize = pstItem->cbItem;	//	壱行の場合
 
-		pcEnd = NextLine( pcCaret );
+		pcEnd = NextLineA( pcCaret );
 		//NULLなら、改行無し壱行である
 		if( *pcEnd )
 		{
 			cbSize = pcEnd - pcCaret;	//	改行分注意
 
 			pcOpen = pcEnd;
-			pcEnd  = NextLine( pcOpen );	//	次行確認
+			pcEnd  = NextLineA( pcOpen );	//	次行確認
 			//	ここで、３行目以降があれば見出しとは見なさない
 			if( *pcEnd )	return 0;
 		}
@@ -357,7 +356,7 @@ UINT AacTitleCheck( LPAAMATRIX pstItem )
 }
 //-------------------------------------------------------------------------------------------------
 
-#ifdef THUMBNAIL_STYLE
+#ifdef DRAUGHT_STYLE
 /*!
 	確保してるアイテム数を返す
 */
@@ -371,15 +370,19 @@ INT_PTR AacItemCount( UINT reserve )
 	通し番号を受けて、HBITMAPとサイズを返す
 	@param[in]	iNumber	通し番号０インデックス
 	@param[out]	pstSize	大きさ
+	@param[out]	pstArea	ドットｘライン
 	@return	HBITMAP	AAの内容のビットマップを返す。已にあるならそのまま、アイテムないならNULL
 */
-HBITMAP AacArtImageGet( INT iNumber, LPSIZE pstSize )
+HBITMAP AacArtImageGet( INT iNumber, LPSIZE pstSize, LPSIZE pstArea )
 {
 	INT_PTR		iItems, i;
 	MAAM_ITR	itArts;
 
 	pstSize->cx = 0;
 	pstSize->cy = 0;
+
+	pstArea->cx = 0;
+	pstArea->cy = 0;
 
 	iItems = gvcArts.size( );
 	if( iItems <= iNumber ){	return NULL;	}	//	はみ出しの場合
@@ -394,6 +397,9 @@ HBITMAP AacArtImageGet( INT iNumber, LPSIZE pstSize )
 		pstSize->cx = itArts->stSize.cx;
 		pstSize->cy = itArts->stSize.cy;
 
+		pstArea->cx = itArts->iMaxDot;
+		pstArea->cy = itArts->iLines;
+
 		return	itArts->hThumbBmp;
 	}
 
@@ -403,6 +409,9 @@ HBITMAP AacArtImageGet( INT iNumber, LPSIZE pstSize )
 
 	pstSize->cx = itArts->stSize.cx;
 	pstSize->cy = itArts->stSize.cy;
+
+	pstArea->cx = itArts->iMaxDot;
+	pstArea->cy = itArts->iLines;
 
 	return itArts->hThumbBmp;
 }
@@ -455,25 +464,6 @@ HRESULT AacMatrixClear( VOID )
 	gvcArts.clear();	//	そして全破棄
 
 	return S_OK;
-}
-//-------------------------------------------------------------------------------------------------
-
-/*!
-	現在行から、次の行の先頭へ移動
-	@param[in]	pt	改行を検索開始するところ
-	@return		改行の次の位置
-*/
-LPSTR NextLine( LPSTR pt )
-{
-	while( *pt && *pt != 0x0D ){	pt++;	}
-
-	if( 0x0D == *pt )
-	{
-		pt++;
-		if( 0x0A == *pt ){	pt++;	}
-	}
-
-	return pt;
 }
 //-------------------------------------------------------------------------------------------------
 

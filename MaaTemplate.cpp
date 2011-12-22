@@ -161,10 +161,10 @@ HWND MaaTmpltInitialise( HINSTANCE hInstance, HWND hParentWnd, LPRECT pstFrame )
 
 	ghMaaWnd = CreateWindowEx(
 #ifdef _ORRVW
-		0, MAATMPLT_CLASS_NAME, TEXT("Orinrin Viewer"), WS_OVERLAPPEDWINDOW,
+		0, MAATMPLT_CLASS_NAME, TEXT("Orinrin Viewer"),
+		WS_OVERLAPPEDWINDOW,
 #else
-		WS_EX_TOOLWINDOW,
-		MAATMPLT_CLASS_NAME, TEXT("Multi Line AA Template"),
+		WS_EX_TOOLWINDOW, MAATMPLT_CLASS_NAME, TEXT("Multi Line AA Template"),
 		WS_POPUP | WS_THICKFRAME | WS_BORDER | WS_CAPTION | WS_VISIBLE,
 #endif
 		rect.left, rect.top, rect.right, rect.bottom,
@@ -324,11 +324,10 @@ VOID Maa_OnCommand( HWND hWnd, INT id, HWND hwndCtl, UINT codeNotify )
 		//	リストスタティックでのクリックはここにくる
 		case IDSO_AAITEMS:	TRACE( TEXT("static") );	break;
 
-#if defined( DRAUGHT_STYLE )
+#ifdef DRAUGHT_STYLE
 		//	ドラフトボードオーポン
 		case IDM_DRAUGHT_OPEN:	DraughtWindowCreate( GetModuleHandle(NULL), ghMaaWnd, 0 );	break;
-#endif
-#ifdef THUMBNAIL_STYLE
+
 		//	サムネイルオーポン
 		case IDM_MAA_THUMBNAIL_OPEN:	DraughtWindowCreate( GetModuleHandle(NULL), ghMaaWnd, 1 );	break;
 #endif

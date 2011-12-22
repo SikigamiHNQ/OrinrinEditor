@@ -50,8 +50,8 @@
 #define IDD_PAGENUMBER_DLG              230
 #define IDD_MAA_IADD_DLG                231
 #define IDD_CONTEXT_ITEM_DLG            232
-#define IDM_AAFAVS_POPUP				233
-#define IDD_COLOUR_DLG					234
+#define IDM_AAFAVS_POPUP                233
+#define IDD_COLOUR_DLG                  234
 #define IDBMPQ_MAIN_TB_FIRST            301
 #define IDBMP_FILE_NEW                  301
 #define IDBMQ_FILE_NEW                  302
@@ -127,10 +127,10 @@
 #define IDBMQ_TRACEMODE                 434
 #define IDBMP_PREVIEW                   435
 #define IDBMQ_PREVIEW                   436
-#define IDBMP_DRAUGHTBOARD				437
-#define IDBMQ_DRAUGHTBOARD				438
-#define IDBMP_THUMBNAIL					439
-#define IDBMQ_THUMBNAIL					440
+#define IDBMP_DRAUGHTBOARD              437
+#define IDBMQ_DRAUGHTBOARD              438
+#define IDBMP_THUMBNAIL                 439
+#define IDBMQ_THUMBNAIL                 440
 #define IDBMPQ_PAGE_TB_FIRST            461
 #define IDBMP_PAGECREATE                461
 #define IDBMQ_PAGECREATE                462
@@ -307,6 +307,7 @@
 #define IDRB_DRT_CLIP_UNI               1144
 #define IDRB_DRT_CLIP_SJIS              1145
 #define IDSB_DRT_THUM_SCROLL            1146
+#define IDTT_DRT_TOOLTIP				1147
 #define IDS_MC_MSG1                     1191
 #define IDS_MC_MSG2                     1192
 #define IDCB_MC_CHECKBOX                1193
@@ -331,12 +332,15 @@
 #define IDB_FIND_CLEAR                  1224
 #define IDE_MAA_FIND_NAME               1227
 #define IDLV_MAA_FINDED_FILE            1228
-#define IDB_COLOUR_BASIC_PEN			1231
-#define IDB_COLOUR_BASIC_BACK			1232
-#define IDB_COLOUR_GRID_LINE			1233
-#define IDB_COLOUR_CRLF_MARK			1234
-#define IDB_COLOUR_CANT_SJIS			1235
-#define IDS_COLOUR_IMAGE				1236
+#define IDB_COLOUR_BASIC_PEN            1231
+#define IDB_COLOUR_BASIC_BACK           1232
+#define IDB_COLOUR_GRID_LINE            1233
+#define IDB_COLOUR_CRLF_MARK            1234
+#define IDB_COLOUR_CANT_SJIS            1235
+#define IDS_COLOUR_IMAGE                1236
+#define IDRB_LASTOPEN_DO				1237
+#define IDRB_LASTOPEN_NON				1238
+#define IDRB_LASTOPEN_ASK				1239
 #define IDTV_ITEMTREE                   2000
 #define IDTB_TREESEL                    2001
 #define IDSO_AAITEMS                    2002
@@ -373,7 +377,7 @@
 #define IDM_MAA_PROFILE_MAKE            32730
 #define IDM_MAA_SEP_STYLE_TOGGLE        32731
 #define IDM_MAA_FAVFLDR_DELETE          32732
-#define IDM_COLOUR_EDIT_OPEN			32735
+#define IDM_COLOUR_EDIT_OPEN            32735
 #define IDM_DUMMY                       32768
 #define IDM_NEWFILE                     32771
 #define IDM_OPEN                        32772
@@ -444,6 +448,7 @@
 #define IDM_COPY_TO_DRAUGHT             32843
 #define IDM_MAA_THUMBNAIL_OPEN          32844
 #define IDM_THUMB_DRAUGHT_ADD           32845
+#define IDM_TMPLT_RELOAD                32846
 #define IDM_PAGEL_DETAIL                32900
 #define IDM_PAGEL_ADD                   32901
 #define IDM_PAGEL_INSERT                32902
@@ -527,9 +532,9 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NO_MFC                     1
-#define _APS_NEXT_RESOURCE_VALUE        233
-#define _APS_NEXT_COMMAND_VALUE         33013
-#define _APS_NEXT_CONTROL_VALUE         1233
+#define _APS_NEXT_RESOURCE_VALUE        235
+#define _APS_NEXT_COMMAND_VALUE         33014
+#define _APS_NEXT_CONTROL_VALUE         1240
 #define _APS_NEXT_SYMED_VALUE           120
 #endif
 #endif

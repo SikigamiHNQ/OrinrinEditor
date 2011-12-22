@@ -33,10 +33,9 @@ extern HFONT	ghNameFont;		//	ファイルタブ用フォント
 
 extern INT		gbTmpltDock;	//	頁・壱行テンプレのドッキング
 
-#ifdef MAIN_SPLITBAR
 extern  HWND	ghMainSplitWnd;	//	メインのスプリットバーハンドル
 extern  LONG	grdSplitPos;	//	スプリットバーの、左側の、画面右からのオフセット
-#endif
+
 
 static  ATOM	gTmpleAtom;		//!<	
 static  HWND	ghTmpleWnd;		//!<	このウインドウハンドル
@@ -47,12 +46,12 @@ static  HWND	ghLnLvTipWnd;	//!<	壱行リストツールチップ
 
 static  HWND	ghDockTabWnd;	//!<	ドッキングしたときの選択肢用
 
-static  UINT	gNowGroup;		//!<	
+static  UINT	gNowGroup;		//!<	今みてるグループ番号
+
+static  UINT	gLnClmCnt;	//!<	表示カラム数
 
 static WNDPROC	gpfOrigLineCtgryProc;	//!<	
 static WNDPROC	gpfOrigLineItemProc;	//!<	
-
-static  UINT	gLnClmCnt;	//!<	表示カラム数
 
 static vector<AATEMPLATE>	gvcTmples;	//!<	テンプレの保持
 //-------------------------------------------------------------------------------------------------
@@ -66,15 +65,16 @@ VOID	Ltp_OnContextMenu( HWND, HWND, UINT, UINT );
 UINT	CALLBACK LineTmpleItemData( LPTSTR, LPTSTR, INT );	//!<	
 
 HRESULT	LineTmpleItemListOn( UINT );	//!<	
+HRESULT	LineTmpleItemReload( HWND );	//!<	
 
 HRESULT	TemplateItemSplit( LPTSTR, UINT, PAGELOAD );	//!<	
 HRESULT	TemplateItemScatter( LPTSTR, INT, PAGELOAD );	//!<	
 
 LRESULT	CALLBACK gpfLineCtgryProc( HWND, UINT, WPARAM, LPARAM );	//!<	
 LRESULT	CALLBACK gpfLineItemProc(  HWND, UINT, WPARAM, LPARAM );	//!<	
-LRESULT	Ltl_OnNotify( HWND, INT, LPNMHDR );
+LRESULT	Ltl_OnNotify( HWND , INT, LPNMHDR );	//!<	
 
-HWND	DockingTabCreate( HINSTANCE, HWND, LPRECT );
+HWND	DockingTabCreate( HINSTANCE, HWND, LPRECT );	//!<	
 //-------------------------------------------------------------------------------------------------
 
 
@@ -96,9 +96,7 @@ HWND LineTmpleInitialise( HINSTANCE hInstance, HWND hParentWnd, LPRECT pstFrame 
 	UINT_PTR	dItems, i;
 	DWORD		dwExStyle, dwStyle;
 	HWND		hPrWnd;
-#ifdef MAIN_SPLITBAR
 	INT			spPos;
-#endif
 
 	TTTOOLINFO	stToolInfo;
 	LVCOLUMN	stLvColm;
@@ -140,9 +138,8 @@ HWND LineTmpleInitialise( HINSTANCE hInstance, HWND hParentWnd, LPRECT pstFrame 
 
 	if( gbTmpltDock )
 	{
-#ifdef MAIN_SPLITBAR
 		spPos = grdSplitPos - SPLITBAR_WIDTH;	//	右からのオフセット
-#endif
+
 		hPrWnd    = hParentWnd;
 		dwExStyle = 0;
 		dwStyle   = WS_CHILD | WS_VISIBLE;
@@ -423,6 +420,8 @@ VOID Ltp_OnCommand( HWND hWnd, INT id, HWND hWndCtl, UINT codeNotify )
 		case IDM_TMPLGROUPSTYLE_TGL:
 			break;
 
+		//	テンプレファイルリロード
+		case IDM_TMPLT_RELOAD:	LineTmpleItemReload( hWnd );	break;
 
 		default:	break;
 	}
@@ -538,15 +537,17 @@ VOID Ltp_OnContextMenu( HWND hWnd, HWND hWndContext, UINT xPos, UINT yPos )
 
 	POINT	stPoint;
 
-	//	一体化なら特に出すモノはない
-	if( gbTmpltDock )	return;
 
 	stPoint.x = (SHORT)xPos;	//	画面座標はマイナスもありうる
 	stPoint.y = (SHORT)yPos;
 
 	hMenu = LoadMenu( GetModuleHandle(NULL), MAKEINTRESOURCE(IDM_TEMPLATE_POPUP) );
 	hSubMenu = GetSubMenu( hMenu, 0 );
-	AppendMenu( hSubMenu, MF_STRING, IDM_TMPLGROUPSTYLE_TGL, TEXT("カテゴリ表示切替") );
+//	AppendMenu( hSubMenu, MF_STRING, IDM_TMPLGROUPSTYLE_TGL, TEXT("カテゴリ表示切替") );
+	//準備中
+
+	//	一体化なら手前表示を削除
+	if( gbTmpltDock ){	DeleteMenu( hSubMenu, IDM_TOPMOST_TOGGLE, MF_BYCOMMAND );	}
 
 	rdExStyle = GetWindowLongPtr( hWnd, GWL_EXSTYLE );
 	if( WS_EX_TOPMOST & rdExStyle ){	CheckMenuItem( hSubMenu , IDM_TOPMOST_TOGGLE, MF_BYCOMMAND | MF_CHECKED );	}
@@ -635,6 +636,40 @@ HRESULT LineTmpleItemListOn( UINT listNum )
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
+
+/*!
+	アイテムファイル最読込
+	@param[in]	hWnd		ウインドウハンドル
+	@return		HRESULT	終了状態コード
+*/
+HRESULT LineTmpleItemReload( HWND hWnd )
+{
+	TEMPL_ITR	itTmpl;
+	
+
+	gNowGroup = 0;	//	とりあえず０に戻す
+
+	for( itTmpl = gvcTmples.begin( ); gvcTmples.end( ) != itTmpl; itTmpl++ ){	itTmpl->vcItems.clear();	}
+	gvcTmples.clear(  );	//	一旦内容破壊
+	
+	//	カテゴリコンボックスの中身を全破壊
+	while( ComboBox_GetCount( ghCtgryBxWnd )  ){	ComboBox_DeleteString( ghCtgryBxWnd, 0 );	}
+
+	TemplateItemLoad( AA_LIST_FILE, LineTmpleItemData );	//	再びロード
+
+	for( itTmpl = gvcTmples.begin( ); gvcTmples.end( ) != itTmpl; itTmpl++ )
+	{
+		ComboBox_AddString( ghCtgryBxWnd, itTmpl->atCtgryName );
+	}
+	ComboBox_SetCurSel( ghCtgryBxWnd, 0 );
+
+	LineTmpleItemListOn( 0 );	//	０頁を表示
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+
+
 
 
 
@@ -734,7 +769,7 @@ HRESULT TemplateItemSplit( LPTSTR ptStr, UINT cchSize, PAGELOAD pfCalling )
 
 	do	//	
 	{
-		ptStart = NextLine( ptCaret );	//	次の行からが本番
+		ptStart = NextLineW( ptCaret );	//	次の行からが本番
 		if( !ptStart )	return  S_FALSE;	//	見つからなかったら
 
 		ptEnd = StrStr( ptCaret, TEXT("=") );	//	=
@@ -763,7 +798,7 @@ HRESULT TemplateItemSplit( LPTSTR ptStr, UINT cchSize, PAGELOAD pfCalling )
 
 		iNumber++;
 
-		ptCaret = NextLine( ptEnd );	//	次の行が次の開始地点
+		ptCaret = NextLineW( ptEnd );	//	次の行が次の開始地点
 
 	}while( *ptCaret );	//	データ有る限りループで探す
 

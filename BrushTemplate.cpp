@@ -38,10 +38,8 @@ extern HFONT	ghAaFont;		//	AA用フォント
 
 extern INT		gbTmpltDock;	//	テンプレのドッキング
 
-#ifdef MAIN_SPLITBAR
 extern  HWND	ghMainSplitWnd;	//	メインのスプリットバーハンドル
 extern  LONG	grdSplitPos;	//	スプリットバーの、左側の、画面右からのオフセット
-#endif
 
 static HIMAGELIST	ghBrushImgLst;
 
@@ -68,7 +66,6 @@ static WNDPROC	gpfOrigTBProc;	//!<
 static vector<AATEMPLATE>	gvcBrTmpls;	//!<	テンプレの保持
 //-------------------------------------------------------------------------------------------------
 
-UINT	BrushTmpleItemListOn( UINT );
 
 LRESULT	CALLBACK BrushTmpleProc( HWND, UINT, WPARAM, LPARAM );
 VOID	Btp_OnCommand( HWND, INT, HWND, UINT );
@@ -77,6 +74,9 @@ LRESULT	Btp_OnNotify( HWND, INT, LPNMHDR );
 VOID	Btp_OnContextMenu( HWND, HWND, UINT, UINT );
 
 UINT	CALLBACK BrushTmpleItemData( LPTSTR, LPTSTR, INT );
+
+UINT	BrushTmpleItemListOn( UINT );
+HRESULT	BrushTmpleItemReload( HWND );
 
 LRESULT	CALLBACK gpfBrushCtgryProc( HWND, UINT, WPARAM, LPARAM );
 LRESULT	CALLBACK gpfBrushItemProc(  HWND, UINT, WPARAM, LPARAM );
@@ -102,9 +102,8 @@ HWND BrushTmpleInitialise( HINSTANCE hInstance, HWND hParentWnd, LPRECT pstFrame
 	TCHAR		atBuffer[MAX_STRING];
 
 	HBITMAP	hImg, hMsq;
-#ifdef MAIN_SPLITBAR
-	INT			spPos;
-#endif
+	INT		spPos;
+
 
 	WNDCLASSEX	wcex;
 	RECT		wdRect, clRect, rect, cbxRect, tbRect, mtbRect;
@@ -160,9 +159,8 @@ HWND BrushTmpleInitialise( HINSTANCE hInstance, HWND hParentWnd, LPRECT pstFrame
 
 	if( gbTmpltDock )
 	{
-#ifdef MAIN_SPLITBAR
 		spPos = grdSplitPos - SPLITBAR_WIDTH;	//	右からのオフセット
-#endif
+
 		hPrWnd    = hParentWnd;
 		dwExStyle = 0;
 		dwStyle   = WS_CHILD;
@@ -482,6 +480,9 @@ VOID Btp_OnCommand( HWND hWnd, INT id, HWND hWndCtl, UINT codeNotify )
 			}
 			break;
 
+		//	テンプレファイルリロード
+		case IDM_TMPLT_RELOAD:	BrushTmpleItemReload( hWnd );	break;
+
 		default:	break;
 	}
 
@@ -605,14 +606,14 @@ VOID Btp_OnContextMenu( HWND hWnd, HWND hWndContext, UINT xPos, UINT yPos )
 
 	POINT	stPoint;
 
-	//	一体化なら特に出すモノはない
-	if( gbTmpltDock )	return;
-
 	stPoint.x = (SHORT)xPos;	//	画面座標はマイナスもありうる
 	stPoint.y = (SHORT)yPos;
 
 	hMenu = LoadMenu( GetModuleHandle(NULL), MAKEINTRESOURCE(IDM_TEMPLATE_POPUP) );
 	hSubMenu = GetSubMenu( hMenu, 0 );
+
+	//	一体化なら手前表示を削除
+	if( gbTmpltDock ){	DeleteMenu( hSubMenu, IDM_TOPMOST_TOGGLE, MF_BYCOMMAND );	}
 
 	rdExStyle = GetWindowLongPtr( hWnd, GWL_EXSTYLE );
 	if( WS_EX_TOPMOST & rdExStyle ){	CheckMenuItem( hSubMenu , IDM_TOPMOST_TOGGLE, MF_BYCOMMAND | MF_CHECKED );	}
@@ -701,6 +702,42 @@ UINT BrushTmpleItemListOn( UINT listNum )
 	return items;
 }
 //-------------------------------------------------------------------------------------------------
+
+
+/*!
+	アイテムファイル最読込
+	@param[in]	hWnd		ウインドウハンドル
+	@return		HRESULT	終了状態コード
+*/
+HRESULT BrushTmpleItemReload( HWND hWnd )
+{
+	TEMPL_ITR	itTmpl;
+
+	gNowGroup = 0;	//	とりあえず０に戻す
+
+	gbBrushMode = 0;	//	選択消して空にしておく
+	ViewBrushStyleSetting( gbBrushMode, TEXT("") );
+
+	for( itTmpl = gvcBrTmpls.begin( );  gvcBrTmpls.end( ) != itTmpl; itTmpl++ ){	itTmpl->vcItems.clear();	}
+	gvcBrTmpls.clear(  );	//	一旦内容破壊
+	
+	//	カテゴリコンボックスの中身を全破壊
+	while( ComboBox_GetCount( ghCtgryBxWnd )  ){	ComboBox_DeleteString( ghCtgryBxWnd, 0 );	}
+
+	TemplateItemLoad( AA_BRUSH_FILE, BrushTmpleItemData );	//	再びロード
+
+	for( itTmpl = gvcBrTmpls.begin( );  gvcBrTmpls.end( ) != itTmpl; itTmpl++ )
+	{
+		ComboBox_AddString( ghCtgryBxWnd, itTmpl->atCtgryName );
+	}
+	ComboBox_SetCurSel( ghCtgryBxWnd, 0 );
+
+	BrushTmpleItemListOn( 0 );	//	０頁を表示
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+
 
 /*!
 	カテゴリコンボックスサブクラス

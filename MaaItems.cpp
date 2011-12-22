@@ -66,8 +66,7 @@ EXTERNED HFONT	ghAaFont;			//!<	表示用のフォント
 #else
 static HFONT	ghAaFont;			//!<	表示用のフォント
 #endif
-static HFONT	ghTipFont;			//!<	ツールチップ用
-//static HBRUSH	ghOddBox, ghEvenBox;
+EXTERNED HFONT	ghTipFont;			//!<	ツールチップ用
 
 static  HPEN	ghSepPen;			//!<	区切り線用ペン
 static BOOLEAN	gbLineSep;			//!<	AAの分けは線にする
@@ -136,22 +135,17 @@ HRESULT AaItemsInitialise( HWND hWnd, HINSTANCE hInst, LPRECT ptRect )
 	gixTopItem = 0;
 
 	//	ツールチップ作る
-	ghToolTipWnd = CreateWindowEx( WS_EX_TOPMOST, TOOLTIPS_CLASS, NULL, TTS_NOPREFIX | TTS_ALWAYSTIP,
-		CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, hWnd, NULL, hInst, NULL );
+	ghToolTipWnd = CreateWindowEx( WS_EX_TOPMOST, TOOLTIPS_CLASS, NULL, TTS_NOPREFIX | TTS_ALWAYSTIP, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, hWnd, NULL, hInst, NULL );
 
 	//	見出しコンボックス
-	ghComboxWnd = CreateWindowEx( 0, WC_COMBOBOX, TEXT(""), WS_VISIBLE | WS_CHILD | WS_BORDER | WS_VSCROLL | CBS_DROPDOWNLIST | CBS_NOINTEGRALHEIGHT,
-		TREE_WIDTH + SPLITBAR_WIDTH, 0, ptRect->right - TREE_WIDTH - LSSCL_WIDTH, TITLECBX_HEI,
-		hWnd, (HMENU)IDCB_AAITEMTITLE, hInst, NULL );
+	ghComboxWnd = CreateWindowEx( 0, WC_COMBOBOX, TEXT(""), WS_VISIBLE | WS_CHILD | WS_BORDER | WS_VSCROLL | CBS_DROPDOWNLIST | CBS_NOINTEGRALHEIGHT, TREE_WIDTH + SPLITBAR_WIDTH, 0, ptRect->right - TREE_WIDTH - LSSCL_WIDTH, TITLECBX_HEI, hWnd, (HMENU)IDCB_AAITEMTITLE, hInst, NULL );
 	GetClientRect( ghComboxWnd, &rect );
 
 	//	サブクラス化
 	gpfOrgAaTitleCbxProc = SubclassWindow( ghComboxWnd, gpfAaTitleCbxProc );
 
 	//	AA一覧のスタティックつくる・オーナードローで描画
-	ghItemsWnd = CreateWindowEx( WS_EX_CLIENTEDGE, WC_STATIC, TEXT(""), WS_VISIBLE | WS_CHILD | SS_OWNERDRAW | SS_NOTIFY,
-		TREE_WIDTH + SPLITBAR_WIDTH, rect.bottom, ptRect->right - TREE_WIDTH - LSSCL_WIDTH, ptRect->bottom - rect.bottom,
-		hWnd, (HMENU)IDSO_AAITEMS, hInst, NULL );
+	ghItemsWnd = CreateWindowEx( WS_EX_CLIENTEDGE, WC_STATIC, TEXT(""), WS_VISIBLE | WS_CHILD | SS_OWNERDRAW | SS_NOTIFY, TREE_WIDTH + SPLITBAR_WIDTH, rect.bottom, ptRect->right - TREE_WIDTH - LSSCL_WIDTH, ptRect->bottom - rect.bottom, hWnd, (HMENU)IDSO_AAITEMS, hInst, NULL );
 
 	DragAcceptFiles( ghItemsWnd, TRUE );
 
@@ -159,9 +153,7 @@ HRESULT AaItemsInitialise( HWND hWnd, HINSTANCE hInst, LPRECT ptRect )
 	gpfOrgAaItemsProc = SubclassWindow( ghItemsWnd, gpfAaItemsProc );
 
 	//	一覧のスクロールバー
-	ghScrollWnd = CreateWindowEx( 0, WC_SCROLLBAR, TEXT("scroll"), WS_VISIBLE | WS_CHILD | SBS_VERT,
-		ptRect->right - LSSCL_WIDTH, rect.bottom, LSSCL_WIDTH, ptRect->bottom - rect.bottom,
-		hWnd, (HMENU)IDSB_LISTSCROLL, hInst, NULL );
+	ghScrollWnd = CreateWindowEx( 0, WC_SCROLLBAR, TEXT("scroll"), WS_VISIBLE | WS_CHILD | SBS_VERT, ptRect->right - LSSCL_WIDTH, rect.bottom, LSSCL_WIDTH, ptRect->bottom - rect.bottom, hWnd, (HMENU)IDSB_LISTSCROLL, hInst, NULL );
 
 	ZeroMemory( &stScrollInfo, sizeof(SCROLLINFO) );
 	stScrollInfo.cbSize = sizeof(SCROLLINFO);
@@ -747,7 +739,7 @@ VOID Aai_OnContextMenu( HWND hWnd, HWND hWndContext, UINT xPos, UINT yPos )
 			break;
 
 
-#ifdef THUMBNAIL_STYLE
+#ifdef DRAUGHT_STYLE
 		case IDM_MAA_THUMBNAIL_OPEN:	Maa_OnCommand( hWnd , IDM_MAA_THUMBNAIL_OPEN, NULL, 0 );	break;
 #endif
 	}

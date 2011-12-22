@@ -106,14 +106,11 @@ static  HWND	ghToolWnd;		//!<	ツールバー
 
 static HIMAGELIST ghPrevwImgLst;
 
-#ifdef MULTI_FILE
 extern list<ONEFILE>	gltMultiFiles;	//!<	複数ファイル保持
 
 extern FILES_ITR	gitFileIt;	//!<	今見てるファイルの本体
 #define gstFile	(*gitFileIt)	//!<	イテレータを構造体と見なす
-#else
-extern ONEFILE	gstFile;			//!<	ファイル単位・複数ファイルにはどうやって対応を？
-#endif
+
 extern INT		gixFocusPage;		//!<	注目中のページ・とりあえず０・０インデックス
 //-------------------------------------------------------------------------------------------------
 
@@ -213,26 +210,6 @@ VOID PreviewInitialise( HINSTANCE hInstance, HWND hParentWnd )
 	return;
 }
 //-------------------------------------------------------------------------------------------------
-
-/*!
-	現在行から、次の行の先頭へ移動
-	@param[in]	pt	改行を検索開始するところ
-	@return		改行の次の位置
-*/
-LPSTR NextLineA( LPSTR pt )
-{
-	while( *pt && *pt != 0x0D ){	pt++;	}
-
-	if( 0x0D == *pt )
-	{
-		pt++;
-		if( 0x0A == *pt ){	pt++;	}
-	}
-
-	return pt;
-}
-//-------------------------------------------------------------------------------------------------
-
 
 /*!
 	テンプレディレクトリに入ってるHeaderFooterファイルの中身をゲットする

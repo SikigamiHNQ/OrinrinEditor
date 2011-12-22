@@ -24,6 +24,9 @@ If not, see <http://www.gnu.org/licenses/>.
 //	
 //	編集ウインドウの制御する・タブとかも？
 
+//	初回起動時は、説明ＡＳＴを表示する
+#define FIRST_STEP	TEXT("説明書.ast")
+
 //-------------------------------------------------------------------------------------------------
 
 #define EDIT_VIEW_CLASS	TEXT("EDIT_VIEW")
@@ -122,10 +125,8 @@ extern INT		gbTmpltDock;	//	ページ窓のドッキング
 //@@コピー処理
 extern  UINT	gbCpModSwap;	//	SJISとユニコードコピーを入れ替える
 
-#ifdef MAIN_SPLITBAR
 extern  HWND	ghMainSplitWnd;	//	メインのスプリットバーハンドル
 extern  LONG	grdSplitPos;	//	スプリットバーの、左側の、画面右からのオフセット
-#endif
 //-------------------------------------------------------------------------------------------------
 
 //	使用する色
@@ -259,21 +260,18 @@ VOID AaFontCreate( UINT bMode )
 */
 HWND ViewInitialise( HINSTANCE hInstance, HWND hParentWnd, LPRECT pstFrame, LPTSTR ptArgv )
 {
-	TCHAR		atFile[MAX_PATH];
+	TCHAR		atFile[MAX_PATH], atFirstStep[MAX_PATH];
 	WNDCLASSEX	wcex;
 	RECT		vwRect, rect;
 
 	LOGFONT		stFont;
 
 	INT			iNewPage;
-#ifdef MULTI_FILE
 	INT			iFiles, i;
 	LPARAM		dNumber;
 	BOOLEAN		bOpen = FALSE;
-#endif
-#ifdef MAIN_SPLITBAR
-	INT			spPos;
-#endif
+
+	INT			spPos, iOpMode, iRslt;
 
 	ghInst = hInstance;
 
@@ -352,9 +350,7 @@ HWND ViewInitialise( HINSTANCE hInstance, HWND hParentWnd, LPRECT pstFrame, LPTS
 	rect = *pstFrame;
 	if( gbTmpltDock )
 	{
-#ifdef MAIN_SPLITBAR
 		spPos = grdSplitPos;	//	右からのオフセット
-#endif
 		rect.right -= spPos;
 	};
 
@@ -391,10 +387,20 @@ HWND ViewInitialise( HINSTANCE hInstance, HWND hParentWnd, LPRECT pstFrame, LPTS
 
 	ZeroMemory( atFile, sizeof(atFile) );
 
-#ifdef MULTI_FILE
 	bOpen = FALSE;
+
+	iOpMode = InitParamValue( INIT_LOAD, VL_LAST_OPEN, LASTOPEN_DO );	//	ラストオーポン・とりやえず開く
+	if( LASTOPEN_ASK <= iOpMode )	//	質問型
+	{
+		iRslt = MessageBox( NULL, TEXT("最後に開けていたファイルを開くのですか？"), TEXT("起動時オープンファイル確認"), MB_YESNO | MB_ICONQUESTION );
+		if( IDYES == iRslt )	iOpMode = LASTOPEN_DO;
+		else					iOpMode = LASTOPEN_NON;
+	}
+
 	//	INIのラストオーポン記録を確認
-	iFiles = InitMultiFileTabOpen( INIT_LOAD, -1, NULL );
+	if( iOpMode ){	iFiles =  0;	}	//	開いていたファイルは無いとする
+	else{	iFiles = InitMultiFileTabOpen( INIT_LOAD, -1, NULL );	}
+
 	for( i = 0; iFiles >= i; i++ )	//	コマンドラインオーポンも監視
 	{
 		//	最後にコマンドラインオーポンを確かめる
@@ -417,6 +423,31 @@ HWND ViewInitialise( HINSTANCE hInstance, HWND hParentWnd, LPRECT pstFrame, LPTS
 		}
 	}
 
+	//オーポン記録がなければ、説明ＡＳＴを表示する
+	if( 0 == InitParamValue( INIT_LOAD, VL_FIRST_READED, 0 ) )
+	{
+		GetModuleFileName( hInstance, atFirstStep, MAX_PATH );	//	実行ファイルの
+		PathRemoveFileSpec( atFirstStep );		//	同じ所に
+		PathAppend( atFirstStep, FIRST_STEP );	//	説明ＡＳＴを置いておく
+
+		dNumber = DocFileInflate( atFirstStep );
+		if( 0 < dNumber )	//	有効なら
+		{
+			if( !(bOpen) )	//	最初のいっこ
+			{
+				MultiFileTabFirst( atFirstStep );
+				bOpen = TRUE;
+			}
+			else
+			{
+				MultiFileTabAppend( dNumber, atFirstStep );
+			}
+			AppTitleChange( atFirstStep );
+
+			InitParamValue( INIT_SAVE, VL_FIRST_READED, 1 );
+		}
+	}
+
 	if( !(bOpen) )	//	完全に開けなかったら
 	{
 		DocMultiFileCreate( atFile );	//	新しいファイル置き場の準備・ここで返り血は要らない
@@ -426,19 +457,6 @@ HWND ViewInitialise( HINSTANCE hInstance, HWND hParentWnd, LPRECT pstFrame, LPTS
 		MultiFileTabFirst( atFile );
 		AppTitleChange( atFile );
 	}
-#else
-	//	INIにラストオーポン記録を確認
-	InitLastOpen( INIT_LOAD, atFile );
-	if( 0 == DocFileInflate( atFile )  )	//	最初のいっこ
-	{
-		//	開けなかった場合
-		StringCchCopy( atFile, MAX_PATH, NAMELESS_DUMMY );
-		iNewPage = DocPageCreate( -1 );	//	ページ作っておく
-		PageListInsert( iNewPage  );	//	ページリストビューに追加
-		DocPageChange( 0 );
-	}
-	AppTitleChange( atFile );
-#endif
 
 	ViewScrollBarAdjust( NULL );
 
@@ -499,20 +517,15 @@ HRESULT ViewSizeMove( HWND hPrntWnd, LPRECT pstFrame )
 
 	if( gbTmpltDock )
 	{
-#ifdef MAIN_SPLITBAR
 		iLeftPos = SplitBarResize( ghMainSplitWnd, pstFrame );	//	スプリットバー
 		grdSplitPos = rect.right - iLeftPos;
-#endif
+
 		PageListResize( hPrntWnd, pstFrame );
 		LineTmpleResize( hPrntWnd, pstFrame );
 		BrushTmpleResize( hPrntWnd, pstFrame );
 
-#ifdef MAIN_SPLITBAR
 		rect.right -= grdSplitPos;
 		InitParamValue( INIT_SAVE, VL_MAIN_SPLIT, grdSplitPos );
-#else
-		rect.right -= PLIST_DOCK;
-#endif
 	};
 
 	//	ビューのサイズ変更
@@ -865,11 +878,8 @@ VOID Evw_OnDestroy( HWND hWnd )
 		DeleteBrush( gahBrush[i] );
 	}
 
-#ifdef MULTI_FILE
 	DocMultiFileDeleteAll(  );
-#else
-	DocContentsObliterate(  );
-#endif
+
 	PostQuitMessage( 0 );
 
 	return;
@@ -2442,7 +2452,7 @@ HRESULT ViewColourEditDlg( HWND hWnd )
 		InitColourValue( INIT_SAVE, CLRV_CRLFMARK, gaColourTable[CLRT_CRLF_MARK] );
 		InitColourValue( INIT_SAVE, CLRV_CANTSJIS, gaColourTable[CLRT_CANTSJIS] );
 
-		SetClassLong( ghViewWnd, GCL_HBRBACKGROUND, (LONG)(gahBrush[BRHT_BASICBK]) );
+		SetClassLongPtr( ghViewWnd, GCL_HBRBACKGROUND, (LONG_PTR)(gahBrush[BRHT_BASICBK]) );
 
 		InvalidateRect( ghViewWnd, NULL, TRUE );
 	}

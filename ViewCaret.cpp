@@ -218,9 +218,16 @@ BOOLEAN ViewDrawCaret( INT rdXdot, INT rdLine, BOOLEAN bOnScr )
 {
 	INT		dX, dY, loop;
 	BOOLEAN	bRslt, fRslt, cRslt;
+	POINT	stCaret;
 
 	dX = rdXdot;
 	dY = rdLine * LINE_HEIGHT;
+
+
+	stCaret.x = rdXdot;
+	stCaret.y = rdLine;
+	DocCaretPosMemory( INIT_SAVE, &stCaret );	//	ファイル毎のCaret位置保存
+
 
 	//	位置情報は、ドキュメント的な位置で操作して、ビューするときだけいろいろする
 	//	ここで、カーソル位置が画面からはみ出しそうなら、適切な方向にスクロール

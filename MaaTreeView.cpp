@@ -1164,9 +1164,9 @@ INT TreeSelItemProc( HWND hWnd, HTREEITEM hSelItem, UINT dMode )
 #ifndef _ORRVW
 		case  2:	//	編集ビューで開く場合
 			dNumber = DocFileInflate( atPath  );	//	開いて中身展開
-	#ifdef MULTI_FILE
+
 			if( dNumber ){	MultiFileTabAppend( dNumber, atPath );	}
-	#endif
+
 			break;
 
 		//	アイテム追加
@@ -1378,9 +1378,8 @@ INT TabMultipleSelect( HWND hWnd, INT tabSel, UINT dMode )
 			else	//	ファイル名を確保して、さらに編集ビュー側で開く処理をする
 			{
 				dNumber = DocFileInflate( itNulti->atFilePath );	//	開いて中身展開
-	#ifdef MULTI_FILE
+
 				if( dNumber ){	MultiFileTabAppend( dNumber, itNulti->atFilePath );	}
-	#endif
 			}
 #endif
 			return 1;

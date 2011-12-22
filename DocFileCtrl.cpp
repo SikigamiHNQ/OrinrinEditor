@@ -25,14 +25,12 @@ If not, see <http://www.gnu.org/licenses/>.
 
 //	TODO:	保存するとき、ユニコードかSJISか選択出来るように・デフォはSJISでいいか
 
-#ifdef MULTI_FILE
+
 extern list<ONEFILE>	gltMultiFiles;	//!<	複数ファイル保持
 
 extern FILES_ITR	gitFileIt;	//!<	今見てるファイルの本体
 #define gstFile	(*gitFileIt)	//!<	イテレータを構造体と見なす
-#else
-extern ONEFILE	gstFile;			//!<	ファイル単位・複数ファイルにはどうやって対応を？
-#endif
+
 extern INT		gixFocusPage;		//!<	注目中のページ・とりあえず０・０インデックス
 
 extern  UINT	gbAutoBUmsg;	//	自動バックアップメッセージ出すか？
@@ -41,11 +39,7 @@ static TCHAR	gatBackUpDirty[MAX_PATH];
 
 //-------------------------------------------------------------------------------------------------
 
-#ifdef MULTI_FILE
 INT	DocAstSeparatorGetAlloc( INT, UINT, LPVOID *, FILES_ITR );
-#else
-INT	DocAstSeparatorGetAlloc( INT, UINT, LPVOID * );
-#endif
 //-------------------------------------------------------------------------------------------------
 
 /*!
@@ -91,10 +85,7 @@ HRESULT DocFileOpen( HWND hWnd )
 	{
 		MessageBox( hWnd, TEXT("ファイルを開けなかったかしらー！？"), NULL, MB_OK | MB_ICONERROR );
 	}
-#ifdef MULTI_FILE
 	else{	MultiFileTabAppend( dNumber, atFilePath );	}
-#endif
-
 
 	return S_OK;
 }
@@ -143,46 +134,31 @@ HRESULT DocFileBackup( HWND hWnd )
 
 	UINT_PTR	iPages, i;	//	頁数
 
-#ifdef MULTI_FILE
 	FILES_ITR	itFile;
-#endif
 
 	ZeroMemory( atFilePath,  sizeof(atFilePath) );
 	ZeroMemory( atFileName,  sizeof(atFileName) );
 	ZeroMemory( atBuffer,  sizeof(atBuffer) );
 
 //複数ファイル、各ファイルをセーブするには？
-#ifdef MULTI_FILE
 	for( itFile = gltMultiFiles.begin(); itFile != gltMultiFiles.end(); itFile++ )
 	{
 		iPages = itFile->vcCont.size( );	//	総頁数
-#else
-		iPages = gstFile.vcCont.size( );	//	総頁数
-#endif
+
 		if( 1 >= iPages )	isMLT = FALSE;
 		else				isMLT = TRUE;
 
-#ifdef MULTI_FILE
 		isAST = PageListIsNamed( itFile );	//	頁に名前が付いてる？
-#else
-		isAST = PageListIsNamed(  );	//	頁に名前が付いてる？
-#endif
+
 		if( isAST ){		ddExten = 0;	}	//	AST
 		else if( isMLT ){	ddExten = 1;	}	//	MLT
 		else{				ddExten = 2;	}	//	TXT
 
-#ifdef MULTI_FILE
 		StringCchCopy( atBuffer, MAX_PATH, itFile->atFileName );
-#else
-		StringCchCopy( atBuffer, MAX_PATH, gstFile.atFileName );
-#endif
+
 		if( atBuffer[0] == NULL )	//	名称未設定状態
 		{
-#ifdef MULTI_FILE
 			StringCchCopy( atFileName, MAX_STRING, itFile->atDummyName );
-#else
-			StringCchCopy( atFileName, MAX_STRING, NAMELESS_DUMMY );
-#endif
 		}
 		else
 		{
@@ -252,11 +228,8 @@ HRESULT DocFileBackup( HWND hWnd )
 		{
 			if( isAST )
 			{
-#ifdef MULTI_FILE
 				cbSplSz = DocAstSeparatorGetAlloc( i, D_SJIS, &pbSplit, itFile );
-#else
-				cbSplSz = DocAstSeparatorGetAlloc( i, D_SJIS, &pbSplit );
-#endif
+
 				WriteFile( hFile , pbSplit, (cbSplSz- iNullTmt), &wrote, NULL );
 				FREE(pbSplit);
 			}
@@ -265,11 +238,8 @@ HRESULT DocFileBackup( HWND hWnd )
 				if( 1 <= i ){	WriteFile( hFile , pbSplit, cbSplSz, &wrote, NULL );	}
 			}
 
-#ifdef MULTI_FILE
 			iByteSize = DocAllTextGetAlloc( i, D_SJIS, &pBuffer, itFile );
-#else
-			iByteSize = DocAllTextGetAlloc( i, D_SJIS, &pBuffer );
-#endif
+
 			if( (i+1) == iPages ){	iByteSize -=  iCrLf;	}
 			//	最終頁の末端の改行は不要のはず
 			WriteFile( hFile, pBuffer, iByteSize - iNullTmt, &wrote, NULL );
@@ -281,9 +251,8 @@ HRESULT DocFileBackup( HWND hWnd )
 		CloseHandle( hFile );
 
 		FREE( pbSplit );
-#ifdef MULTI_FILE
 	}
-#endif
+
 	if( gbAutoBUmsg ){	NotifyBalloonExist( TEXT("作業中のファイルをバックアップ保存したのです。あぅあぅ"), TEXT("あぅあぅ"), NIIF_INFO );	}
 
 	return S_OK;
@@ -342,11 +311,8 @@ HRESULT DocFileSave( HWND hWnd, UINT bStyle )
 
 //既存の拡張子がASTなら、それを優先する
 
-#ifdef MULTI_FILE
 	isAST = PageListIsNamed( gitFileIt );	//	頁に名前が付いてる？
-#else
-	isAST = PageListIsNamed(  );	//	頁に名前が付いてる？
-#endif
+
 	if( isAST ){		ddExten = 0;	}	//	AST
 	else if( isMLT ){	ddExten = 1;	}	//	MLT
 	else{				ddExten = 2;	}	//	TXT
@@ -476,11 +442,8 @@ HRESULT DocFileSave( HWND hWnd, UINT bStyle )
 	{
 		if( isAST )
 		{
-#ifdef MULTI_FILE
 			cbSplSz = DocAstSeparatorGetAlloc( i, bStyle, &pbSplit, gitFileIt );
-#else
-			cbSplSz = DocAstSeparatorGetAlloc( i, bStyle, &pbSplit );
-#endif
+
 			WriteFile( hFile , pbSplit, (cbSplSz- iNullTmt), &wrote, NULL );
 			FREE(pbSplit);
 		}
@@ -489,11 +452,8 @@ HRESULT DocFileSave( HWND hWnd, UINT bStyle )
 			if( 1 <= i ){	WriteFile( hFile , pbSplit, cbSplSz, &wrote, NULL );	}
 		}
 
-#ifdef MULTI_FILE
 		iByteSize = DocAllTextGetAlloc( i, bStyle, &pBuffer, gitFileIt );
-#else
-		iByteSize = DocAllTextGetAlloc( i, bStyle, &pBuffer );
-#endif
+
 		if( (i+1) == iPages ){	iByteSize -=  iCrLf;	}
 		//	最終頁の末端の改行は不要のはず
 		WriteFile( hFile, pBuffer, iByteSize - iNullTmt, &wrote, NULL );
@@ -513,9 +473,7 @@ HRESULT DocFileSave( HWND hWnd, UINT bStyle )
 	if( bExtChg )
 	{
 		InitLastOpen( INIT_SAVE, atFilePath );	//	ラストオーポンを書換
-#ifdef MULTI_FILE
 		MultiFileTabRename( gstFile.dUnique, atFilePath );	//	タブ名称変更
-#endif
 		AppTitleChange( atFilePath );
 		StringCchPrintf( atBuffer, MAX_STRING, TEXT("拡張子を %s にして保存したのです。あぅあぅ"), aatExte[ddExten] );
 		NotifyBalloonExist( atBuffer, TEXT("拡張子を変更したのです"), NIIF_INFO );
@@ -526,9 +484,7 @@ HRESULT DocFileSave( HWND hWnd, UINT bStyle )
 		if( bLastChg )
 		{
 			InitLastOpen( INIT_SAVE, atFilePath );
-#ifdef MULTI_FILE
 			MultiFileTabRename( gstFile.dUnique, atFilePath );	//	タブ名称変更
-#endif
 			AppTitleChange( atFilePath );
 		}
 
@@ -546,20 +502,12 @@ HRESULT DocFileSave( HWND hWnd, UINT bStyle )
 	@param[out]	pText	確保した領域を返す・ワイド文字かマルチ文字になる・NULLだと必要バイト数を返すのみ
 	@return				確保したバイト数・NULLターミネータ含む
 */
-#ifdef MULTI_FILE
 INT DocAstSeparatorGetAlloc( INT dPage, UINT bStyle, LPVOID *pText, FILES_ITR itFile )
-#else
-INT DocAstSeparatorGetAlloc( INT dPage, UINT bStyle, LPVOID *pText )
-#endif
 {
 	UINT	cchSize, cbSize;
 	TCHAR	atBuffer[MAX_PATH];
 
-#ifdef MULTI_FILE
 	StringCchPrintf( atBuffer, MAX_PATH, TEXT("[AA][%s]\r\n"), itFile->vcCont.at( dPage ).atPageName );
-#else
-	StringCchPrintf( atBuffer, MAX_PATH, TEXT("[AA][%s]\r\n"), gstFile.vcCont.at( dPage ).atPageName );
-#endif
 	StringCchLength( atBuffer, MAX_PATH, &cchSize );
 
 	if( bStyle & D_UNI )
@@ -590,11 +538,7 @@ INT DocAstSeparatorGetAlloc( INT dPage, UINT bStyle, LPVOID *pText )
 	@param[out]	pText	確保した領域を返す・ワイド文字かマルチ文字になる・NULLだと必要バイト数を返すのみ
 	@return				確保したバイト数・NULLターミネータ含む
 */
-#ifdef MULTI_FILE
 INT DocAllTextGetAlloc( INT dPage, UINT bStyle, LPVOID *pText, FILES_ITR itFile )
-#else
-INT DocAllTextGetAlloc( INT dPage, UINT bStyle, LPVOID *pText )
-#endif
 {
 	UINT_PTR	iLines, i, iLetters, j, iSize;
 
@@ -604,28 +548,17 @@ INT DocAllTextGetAlloc( INT dPage, UINT bStyle, LPVOID *pText )
 	srString.clear( );
 	wsString.clear( );
 
-#ifdef MULTI_FILE
 	iLines = itFile->vcCont.at( dPage ).vcPage.size( );
-#else
-	iLines = gstFile.vcCont.at( dPage ).vcPage.size( );
-#endif
+
 	//	全文字を頂く
 	for( i = 0; iLines > i; i++ )
 	{
-#ifdef MULTI_FILE
 		iLetters = itFile->vcCont.at( dPage ).vcPage.at( i ).vcLine.size( );
-#else
-		iLetters = gstFile.vcCont.at( dPage ).vcPage.at( i ).vcLine.size( );
-#endif
+
 		for( j = 0; iLetters > j; j++ )
 		{
-#ifdef MULTI_FILE
 			srString +=  string( itFile->vcCont.at( dPage ).vcPage.at( i ).vcLine.at( j ).acSjis );
 			wsString += itFile->vcCont.at( dPage ).vcPage.at( i ).vcLine.at( j ).cchMozi;
-#else
-			srString +=  string( gstFile.vcCont.at( dPage ).vcPage.at( i ).vcLine.at( j ).acSjis );
-			wsString += gstFile.vcCont.at( dPage ).vcPage.at( i ).vcLine.at( j ).cchMozi;
-#endif
 		}
 		
 		if( !(1 == iLines && 0 == iLetters) )	//	壱行かつ零文字は空である

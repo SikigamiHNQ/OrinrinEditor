@@ -52,7 +52,7 @@ gstFileを、マクロでイテレータポインタに仕立て上げる
 (*ltrItr).cchMozi;	これでおｋっぽい
 */
 
-#ifdef MULTI_FILE
+
 EXTERNED list<ONEFILE>	gltMultiFiles;	//!<	複数ファイル保持
 //イテレータのtypedefはヘッダへ
 
@@ -60,9 +60,7 @@ static LPARAM	gdNextNumber;	//!<	開いたファイルの通し番号・常にインクリ
 
 EXTERNED FILES_ITR	gitFileIt;	//!<	今見てるファイルの本体
 #define gstFile	(*gitFileIt)	//!<	イテレータを構造体と見なす
-#else
-EXTERNED ONEFILE	gstFile;		//!<	ファイル単位・複数ファイルにはどうやって対応を？
-#endif
+
 EXTERNED INT		gixFocusPage;	//!<	注目中のページ・とりあえず０・０インデックス
 
 EXTERNED INT		gixDropPage;	//!<	投下ホット番号
@@ -72,10 +70,6 @@ extern  UINT		gbCrLfCode;		//	改行コード：０したらば・非０ＹＹ
 //-------------------------------------------------------------------------------------------------
 
 UINT	CALLBACK DocPageLoad( LPTSTR, LPTSTR, INT );
-
-UINT	DocStringSplitMLT( LPTSTR, INT );
-
-
 //-------------------------------------------------------------------------------------------------
 
 /*!
@@ -83,9 +77,8 @@ UINT	DocStringSplitMLT( LPTSTR, INT );
 */
 HRESULT DocInitialise( LPVOID pVoid )
 {
-#ifdef MULTI_FILE
 	gdNextNumber = 1;
-#endif
+
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
@@ -132,9 +125,7 @@ HRESULT DocModifyContent( UINT dMode )
 		StatusBarSetText( SB_MODIFY, TEXT("") );
 	}
 
-#ifdef MULTI_FILE
 	DocMultiFileModify( dMode );
-#endif
 
 	gstFile.dModify =  dMode;	//	ここで記録しておく
 
@@ -142,9 +133,6 @@ HRESULT DocModifyContent( UINT dMode )
 }
 //-------------------------------------------------------------------------------------------------
 
-
-
-#ifdef MULTI_FILE
 /*!
 	新しいファイル置き場を作ってフォーカスする
 	@param[in]	ptDmyName	ダミー名を返す。NULL可。MAX_PATHであること
@@ -156,9 +144,11 @@ LPARAM DocMultiFileCreate( LPTSTR ptDmyName )
 	FILES_ITR	itNew;
 
 	ZeroMemory( stFile.atFileName, sizeof(stFile.atFileName) );
-	stFile.dModify  = FALSE;
-	stFile.dNowPage = 0;
-	stFile.dUnique  = gdNextNumber++;
+	stFile.dModify   = FALSE;
+	stFile.dNowPage  = 0;
+	stFile.dUnique   = gdNextNumber++;
+	stFile.stCaret.x = 0;
+	stFile.stCaret.y = 0;
 
 	ZeroMemory( stFile.atDummyName, sizeof(stFile.atDummyName) );
 	StringCchPrintf( stFile.atDummyName, MAX_PATH, TEXT("%s%d.%s"), NAME_DUMMY_NAME, stFile.dUnique, NAME_DUMMY_EXT );
@@ -214,6 +204,7 @@ HRESULT DocMultiFileModify( UINT dMode )
 HRESULT DocMultiFileSelect( LPARAM uqNumber )
 {
 	FILES_ITR	itNow;
+	POINT	stCaret;
 
 	for( itNow = gltMultiFiles.begin(); itNow != gltMultiFiles.end(); itNow++ )
 	{
@@ -237,7 +228,11 @@ HRESULT DocMultiFileSelect( LPARAM uqNumber )
 
 	DocModifyContent( itNow->dModify );	//	変更したかどうか
 
+	DocCaretPosMemory( INIT_LOAD, &stCaret );	//	先に読み出さないと次でクルヤーされる
+
 	PageListViewChange( gixFocusPage );	//	全部読み込んだのでラストページを表示する
+
+	ViewPosResetCaret( stCaret.x, stCaret.y );	//	Caret位置再設定
 
 	return S_OK;
 }
@@ -411,7 +406,30 @@ HRESULT DocMultiFileStore( LPTSTR ptIniPath )
 //-------------------------------------------------------------------------------------------------
 
 
-#endif
+
+
+/*!
+	Caret位置を常時記録・ファイル切り替えたときに意味がある
+	@param[in]		dMode	非０ロード　０セーブ
+	@param[in,out]	pstPos	Caret位置、ドット、行数
+*/
+VOID DocCaretPosMemory( UINT dMode, LPPOINT pstPos )
+{
+	if( dMode )	//	ロード
+	{
+		pstPos->x = gitFileIt->stCaret.x;
+		pstPos->y = gitFileIt->stCaret.y;
+	}
+	else	//	セーブ
+	{
+		gitFileIt->stCaret.x = pstPos->x;
+		gitFileIt->stCaret.y = pstPos->y;
+	}
+
+	return;
+}
+//-------------------------------------------------------------------------------------------------
+
 
 /*!
 	編集中のを破棄して新しいの作る・新しいファイルを開く
@@ -420,28 +438,16 @@ HRESULT DocMultiFileStore( LPTSTR ptIniPath )
 */
 HRESULT DocOpenFromNull( HWND hWnd )
 {
-#ifdef MULTI_FILE
 	LPARAM	dNumber;
-#else
-	INT	dRslt;
-#endif
+
 	TCHAR	atDummyName[MAX_PATH];
 	//	複数ファイル扱うなら、破棄は不要、新しいファイルインスタンス作って対応
 
-#ifdef MULTI_FILE
 	//	新しいファイル置き場の準備
 	dNumber = DocMultiFileCreate( atDummyName );
 
 	MultiFileTabAppend( dNumber, gstFile.atDummyName );
-#else
-	//	編集中残ってたら確認を
-	dRslt = DocFileCloseCheck( hWnd, FALSE );
-	if( !(dRslt) )	return S_FALSE;
 
-	DocContentsObliterate(  );
-
-	StringcchCopy( atDummyName, MAX_PATH, NAMELESS_DUMMY );
-#endif
 	AppTitleChange( atDummyName );
 
 	gixFocusPage = DocPageCreate( -1 );
@@ -463,7 +469,7 @@ HRESULT DocOpenFromNull( HWND hWnd )
 INT DocFileCloseCheck( HWND hWnd, UINT dMode )
 {
 	INT		rslt, ret;
-#ifdef MULTI_FILE
+
 	BOOLEAN	bMod = FALSE;
 	FILES_ITR	itFiles;
 
@@ -482,14 +488,6 @@ INT DocFileCloseCheck( HWND hWnd, UINT dMode )
 		rslt = MessageBox( hWnd, TEXT("あぅあぅ！？\r\n保存してないファイルがあるのですよ！\r\n終わっちゃっていいのですか？"), TEXT("／(^o^)＼"), MB_YESNO | MB_ICONQUESTION );
 		if( IDYES == rslt ){	ret = 1;	}
 		else{	ret = 0;	}
-#else
-	if( gstFile.dModify )	//	更新がのこってる＝保存されてないなら
-	{
-		rslt = MessageBox( hWnd, TEXT("あぅあぅ！？\r\n変更したままなのですよ！　保存するのですか？"), TEXT("／(^o^)＼"), MB_YESNOCANCEL | MB_ICONQUESTION );
-		if( IDYES == rslt ){	DocFileSave( hWnd, D_SJIS );	ret = 1;	}
-		else if( IDNO == rslt ){	ret = 1;	}
-		else{	ret = 0;	}
-#endif
 	}
 	else
 	{
@@ -543,16 +541,10 @@ LPARAM DocFileInflate( LPTSTR ptFileName )
 	hFile = CreateFile( ptFileName, GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL );
 	if( INVALID_HANDLE_VALUE == hFile ){	return 0;	}
 
-	InitLastOpen( INIT_SAVE, ptFileName );//複数ファイルでは意味が無い
+	InitLastOpen( INIT_SAVE, ptFileName );	//	複数ファイルでは意味が無い
 
-#ifdef MULTI_FILE
 	//	新しいファイル置き場の準備
 	dNumber = DocMultiFileCreate( NULL );
-#else
-	//	今の内容破棄・ファイルアレイにするなら？
-	DocContentsObliterate(  );	//	ページリストも破棄してる
-	dNumber = 1;
-#endif
 
 	iByteSize = GetFileSize( hFile, NULL );
 	pBuffer = malloc( iByteSize + 2 );
@@ -584,10 +576,26 @@ LPARAM DocFileInflate( LPTSTR ptFileName )
 
 	StringCchLength( ptString, STRSAFE_MAX_CCH, &cchSize );
 
-	//	もしASTなら、先頭は[AA]になってるはず
+/*
+	//	拡張子を確認・ドット込みだよ～ん
+	ptExten = PathFindExtension( ptFileName );	//	拡張子が無いならNULL、というか末端になる
+	if( 0 == *ptExten )
+	{
+		//	拡張子指定がないなら
+	}
+	else	//	既存の拡張子があったら
+	{
+		StringCchCopy( atExBuf, 10, ptExten );
+		CharLower( atExBuf );	//	比較のために小文字にしちゃう
+
+		//	既存の拡張子が、ASTならそれを優先する
+		if( !( StrCmp( atExBuf, aatExte[0] ) ) )	//	ASTであるなら
+*/
+
+	//	もしASTなら、先頭は[AA]になってるはず・分割は中でやる
 	if( StrCmpN( AST_SEPARATERW, ptString, 4 ) )
 	{
-		DocStringSplitMLT( ptString , cchSize );	//	ＭＬＴの分割はここで
+		DocStringSplitMLT( ptString , cchSize, DocPageLoad );
 	}
 	else
 	{
@@ -597,7 +605,7 @@ LPARAM DocFileInflate( LPTSTR ptFileName )
 	//	ファイル開いたらキャレットとかスクロールをリセットする
 	ViewEditReset(  );
 
-	FREE( pBuffer );
+	FREE( pBuffer );	//	＝ptString
 
 	DocPageChange( 0  );	//	全部読み込んだので最初のページを表示する
 
@@ -609,24 +617,6 @@ LPARAM DocFileInflate( LPTSTR ptFileName )
 //-------------------------------------------------------------------------------------------------
 
 
-/*!
-	現在行から、次の行の先頭へ移動
-	@param[in]	pt	改行を検索開始するところ
-	@return		改行の次の位置
-*/
-LPTSTR NextLine( LPTSTR pt )
-{
-	while( *pt && *pt != 0x000D ){	pt++;	}
-
-	if( 0x000D == *pt )
-	{
-		pt++;
-		if( 0x000A == *pt ){	pt++;	}
-	}
-
-	return pt;
-}
-//-------------------------------------------------------------------------------------------------
 
 /*!
 	頁を作って内容をぶち込む
@@ -660,11 +650,12 @@ UINT CALLBACK DocPageLoad( LPTSTR ptName, LPTSTR ptCont, INT cchSize )
 
 /*!
 	ＭＬＴもしくはＴＸＴなユニコード文字列を受け取って分解しつつページに入れる
-	@param[in]	ptStr	分解対象文字列へのポインター
-	@param[in]	cchSize	その文字列の文字数
-	@return		UINT	作成した頁数
+	@param[in]	ptStr		分解対象文字列へのポインター
+	@param[in]	cchSize		その文字列の文字数
+	@param[in]	pfPageLoad	内容を入れるコールバック函数のアレ
+	@return		UINT		作成した頁数
 */
-UINT DocStringSplitMLT( LPTSTR ptStr, INT cchSize )
+UINT DocStringSplitMLT( LPTSTR ptStr, INT cchSize, PAGELOAD pfPageLoad )
 {
 	LPTSTR	ptCaret;	//	読込開始・現在位置
 	LPTSTR	ptEnd;		//	ページの末端位置・セパレータの直前
@@ -695,11 +686,11 @@ UINT DocStringSplitMLT( LPTSTR ptStr, INT cchSize )
 			cchItem -= CH_CRLF_CCH;
 		}
 
-		DocPageLoad( NULL, ptCaret, cchItem );
+		pfPageLoad( NULL, ptCaret, cchItem );
 
 		iNumber++;
 
-		ptCaret = NextLine( ptEnd );
+		ptCaret = NextLineW( ptEnd );
 
 	}while( *ptCaret );	//	データ有る限りループで探す
 
@@ -734,7 +725,7 @@ UINT DocStringSplitAST( LPTSTR ptStr, INT cchSize, PAGELOAD pfPageLoad )
 
 	do	//	とりあえず一番最初はptCaretは[AA]になってる
 	{
-		ptStart = NextLine( ptCaret );	//	次の行からが本番
+		ptStart = NextLineW( ptCaret );	//	次の行からが本番
 
 		ptCaret += 5;	//	[AA][
 		cchItem = ptStart - ptCaret;	//	名前部分の文字数
@@ -772,6 +763,99 @@ UINT DocStringSplitAST( LPTSTR ptStr, INT cchSize, PAGELOAD pfPageLoad )
 //-------------------------------------------------------------------------------------------------
 
 /*!
+	ＡＳＤなＳＪＩＳ文字列を受け取って分解しつつページに入れる
+	@param[in]	pcStr		分解対象SJIS文字列へのポインター
+	@param[in]	cchSize		その文字列の文字数
+	@param[in]	pfPageLoad	内容を入れるコールバック函数のアレ
+	@return		UINT		作成した頁数
+*/
+UINT DocImportSplitASD( LPSTR pcStr, INT cbSize, PAGELOAD pfPageLoad )
+{
+//ASDなら、SJISのままで0x01,0x01、0x02,0x02を対応する必要がある
+//0x01,0x01が改行、0x02,0x02が説明の区切り、アイテム区切りが改行
+
+	LPSTR	pcCaret;	//	読込開始・現在位置
+	LPSTR	pcEnd, pcDesc;
+	UINT	iNumber;	//	通し番号カウント
+	UINT	cbItem, d;
+	BOOLEAN	bLast;
+
+	LPTSTR		ptName, ptCont;
+	UINT_PTR	cchItem;
+
+
+	pcCaret = pcStr;	//	まずは最初から
+
+	iNumber = 0;	//	通し番号０インデックス
+
+	bLast = FALSE;
+
+
+	do	//	とりやえず実行
+	{
+		pcEnd = NextLineA( pcCaret );	//	次の行までで１アイテム
+		//if( !(*pcEnd) )	//	見つからなかったら＝これが最後なら＝NULL
+		//{
+		//	pcEnd = pcStr + cbSize;	//	CHARサイズで計算おｋ？
+		//	bLast = TRUE;
+		//}
+		//	中身がNULLなだけで、ポインタは有効なので特に位置計算は不要か
+		cbItem  = pcEnd - pcCaret;	//	壱行の文字数
+
+		pcDesc = NULL;
+		ptName = NULL;
+		ptCont = NULL;
+
+		for( d = 0; cbItem > d; d++ )
+		{
+			if( (0x0D == pcCaret[d]) && (0x0A == pcCaret[d+1]) )	//	末端であるか
+			{
+				pcCaret[d]   = 0x00;	//	末端なのでNULLにする
+				pcCaret[d+1] = 0x00;
+
+				if( pcDesc ){	ptName =  SjisDecodeAlloc( pcDesc );	}
+
+				break;
+			}
+
+			//	処理順番注意
+			if( (0x01 == pcCaret[d]) && (0x01 == pcCaret[d+1]) )	//	改行であるか
+			{
+				pcCaret[d]   = 0x0D;	//	￥ｒ
+				pcCaret[d+1] = 0x0A;	//	￥ｎ
+				d++;	//	変換したので次に進めるのがよい
+			}
+
+			if( (0x02 == pcCaret[d]) && (0x02 == pcCaret[d+1]) )	//	アイテムと説明の区切り
+			{
+				pcDesc = &(pcCaret[d+2]);	//	説明開始位置
+
+				pcCaret[d]   = 0x00;	//	仕切りなのでNULLにする
+				pcCaret[d+1] = 0x00;
+				d++;	//	変換したので次に進めるのがよい
+			}
+		}
+
+		ptCont = SjisDecodeAlloc( pcCaret );	//	作っておく
+		StringCchLength( ptCont, STRSAFE_MAX_CCH, &cchItem );
+
+		pfPageLoad( ptName, ptCont, cchItem );
+
+		iNumber++;
+
+		FREE( ptCont );
+		FREE( ptName );
+
+		pcCaret = pcEnd;
+
+	}while( *pcCaret  );	//	データ有る限りループで探す
+
+	return iNumber;
+}
+//-------------------------------------------------------------------------------------------------
+
+
+/*!
 	頁名をセットする
 	@param[in]	ptName	セットする頁名称へのポインター
 	@return		HRESULT	終了状態コード
@@ -785,44 +869,6 @@ HRESULT DocPageNameSet( LPTSTR ptName )
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-
-#ifndef MULTI_FILE
-/*!
-	今開いてるファイルの内容を全て破棄して新しいの作れる状態にする
-	@return		HRESULT	終了状態コード
-*/
-HRESULT DocContentsObliterate( VOID )
-{
-	//	ページの新規作成はしない
-
-	UINT_PTR	i, j, iPage, iLine;
-
-	iPage = gstFile.vcCont.size( );
-	for( i = 0; iPage > i; i++ )
-	{
-		iLine = gstFile.vcCont.at( i ).vcPage.size( );
-		for( j = 0; iLine > j; j++ )
-		{
-			gstFile.vcCont.at( i ).vcPage.at( j ).vcLine.clear(   );	//	各行の中身全消し
-		}
-		gstFile.vcCont.at( i ).vcPage.clear(  );	//	行を全消し
-		SqnFreeAll( &(gstFile.vcCont.at( i ).stUndoLog) );
-	}
-	gstFile.vcCont.clear( );	//	ページを全消し
-
-
-	//	新規作成の準備
-	gixFocusPage = -1;
-
-	ZeroMemory( gstFile.atFileName, sizeof(gstFile.atFileName) );
-	gstFile.dModify = FALSE;
-
-	PageListClear(  );	//	ページリストビューも破棄
-
-	return S_OK;
-}
-//-------------------------------------------------------------------------------------------------
-#endif
 
 /*!
 	ページ追加処理
@@ -1486,7 +1532,7 @@ INT DocLineCount( LPTSTR ptStr, UINT cchSize )
 			break;
 		}
 
-		ptCaret = NextLine( ptEnd );
+		ptCaret = NextLineW( ptEnd );
 
 		lineCnt++;
 

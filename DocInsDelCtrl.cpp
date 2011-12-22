@@ -31,12 +31,9 @@ typedef struct tagPAGENUMINFO
 } PAGENUMINFO, *LPPAGENUMINFO;
 //-------------------------------------------------------------------------------------------------
 
-#ifdef MULTI_FILE
 extern FILES_ITR	gitFileIt;	//	今見てるファイルの本体
 #define gstFile	(*gitFileIt)	//!<	イテレータを構造体と見なす
-#else
-extern ONEFILE	gstFile;		//	ファイル単位・複数ファイルにはどうやって対応を？
-#endif
+
 extern INT		gixFocusPage;	//	注目中のページ・とりあえず０・０インデックス
 
 extern  UINT	gbUniPad;		//	パディングにユニコードをつかって、ドットを見せないようにする
@@ -671,7 +668,7 @@ INT DocSquareAdd( PINT pNowDot, PINT pdLine, LPTSTR ptStr, INT cchSize, LPPOINT 
 		pstBuf->y = dBaseLine;
 		DocStringAdd( &dBaseDot, &dBaseLine, ptCaret, cchMozi );
 
-		ptCaret = NextLine( ptSprt );	//	次の行の先頭に移動
+		ptCaret = NextLineW( ptSprt );	//	次の行の先頭に移動
 		if( *ptCaret  ){	dBaseLine++;	}	//	行位置も進める
 
 		dCrLf++;

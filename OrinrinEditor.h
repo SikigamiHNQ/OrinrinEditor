@@ -283,22 +283,20 @@ typedef struct tagONEFILE
 {
 	TCHAR	atFileName[MAX_PATH];	//!<	ファイル名
 	//	頁数はヴェクタルをカウンツすればＯＫ？
-	UINT	dModify;	//!<	変更したかどうか
+	UINT	dModify;		//!<	変更したかどうか
 
-#ifdef MULTI_FILE
-	LPARAM	dUnique;	//!<	通し番号・１インデックス
+	LPARAM	dUnique;		//!<	通し番号・１インデックス
 	TCHAR	atDummyName[MAX_PATH];	//!<	ファイル名ないときの仮名称
-#endif
 
-	INT		dNowPage;	//!<	見てる頁
+	INT		dNowPage;		//!<	見てる頁
+
+	POINT	stCaret;		//!<	Caret位置・ドット、行数
 
 	vector<ONEPAGE>	vcCont;	//!<	ページを保持する
 
 } ONEFILE, *LPONEFILE;
 
-#ifdef MULTI_FILE
 typedef list<ONEFILE>::iterator	FILES_ITR;
-#endif
 //-----------------------------
 
 //	複数ファイル扱うなら、さらにコレを包含すればいい？
@@ -311,6 +309,7 @@ typedef struct tagAATEMPLATE
 	vector<wstring>	vcItems;	//!<	テンプレ文字列本体
 
 } AATEMPLATE, *LPAATEMPLATE;
+typedef vector<AATEMPLATE>::iterator	TEMPL_ITR;	
 //-----------------------------
 
 
@@ -337,9 +336,7 @@ typedef struct tagAAMATRIX
 	INT		iLines;		//!<	使用行数
 
 	SIZE	stSize;		//!<	ピクセルサイズ
-//	HDC		hThumbDC;	//!<	サムネイル用デバイスコンテキスト
 	HBITMAP	hThumbBmp;	//!<	サムネイル用ビットマップハンドル
-//	HBITMAP	hOldBmp;	//!<	復帰用
 
 } AAMATRIX, *LPAAMATRIX;
 typedef vector<AAMATRIX>::iterator	MAAM_ITR;	
@@ -439,7 +436,6 @@ HMENU		CntxMenuGet( VOID );
 HRESULT		CntxMenuCopySwap( VOID );
 
 
-#ifdef MULTI_FILE
 HRESULT		MultiFileTabFirst( LPTSTR );
 HRESULT		MultiFileTabAppend( LPARAM, LPTSTR );
 HRESULT		MultiFileTabSelect( LPARAM );
@@ -447,7 +443,6 @@ HRESULT		MultiFileTabSlide( INT );
 HRESULT		MultiFileTabRename( LPARAM, LPTSTR );
 HRESULT		MultiFileTabClose( VOID );
 INT			InitMultiFileTabOpen( UINT, INT, LPTSTR );
-#endif
 
 VOID		OperationOnCommand( HWND, INT, HWND, UINT );
 
@@ -520,11 +515,7 @@ HRESULT		PageListDelete( INT );
 HRESULT		PageListViewChange( INT );
 HRESULT		PageListInfoSet( INT, INT, INT );
 HRESULT		PageListNameSet( INT, LPTSTR );
-#ifdef MULTI_FILE
 INT			PageListIsNamed( FILES_ITR );
-#else
-INT			PageListIsNamed( VOID );
-#endif
 
 HRESULT		PageListBuild( LPVOID );
 
@@ -578,6 +569,8 @@ BOOLEAN		DocRangeIsError( INT, INT );
 
 INT_PTR		DocPageCount( VOID );
 
+VOID		DocCaretPosMemory( UINT, LPPOINT );
+
 HRESULT		DocOpenFromNull( HWND );
 UINT		DocPageParamGet( PINT, PINT );
 INT			DocPageMaxDotGet( INT, INT );
@@ -592,11 +585,8 @@ HRESULT		DocPageChange( INT );
 
 HRESULT		DocModifyContent( UINT );
 
-#ifdef MULTI_FILE
 LPARAM		DocMultiFileCreate( LPTSTR );
-#else
-HRESULT		DocContentsObliterate( VOID );
-#endif
+
 INT			DocLineParamGet( INT, PINT, PINT );
 
 UINT		DocBadSpaceCheck( INT );
@@ -663,15 +653,13 @@ HRESULT		DocExtractExecute( HINSTANCE );
 
 HRESULT		DocFileSave( HWND, UINT );
 HRESULT		DocFileOpen( HWND );
-#ifdef MULTI_FILE
 INT			DocAllTextGetAlloc( INT, UINT, LPVOID *, FILES_ITR );
-#else
-INT			DocAllTextGetAlloc( INT, UINT, LPVOID * );
-#endif
 HRESULT		DocImageSave( HWND, UINT, HFONT );
 
-
+UINT		DocStringSplitMLT( LPTSTR, INT, PAGELOAD );
 UINT		DocStringSplitAST( LPTSTR, INT, PAGELOAD );
+
+UINT		DocImportSplitASD( LPSTR, INT, PAGELOAD );
 
 INT			DocLineStateCheckWithDot( INT, INT, PINT, PINT, PINT, PINT, PBOOLEAN );
 HRESULT		DocLeftGuideline( LPVOID );
@@ -694,7 +682,6 @@ INT			DocDiffAdjBaseSet( INT );
 INT			DocDiffAdjExec( PINT, INT );
 
 VOID		ZeroONELINE( LPONELINE );
-LPTSTR		NextLine( LPTSTR );
 INT			DocLineCount( LPTSTR, UINT );
 
 UINT		DocRangeDeleteByMozi( INT, INT, INT, INT, PBOOLEAN );
@@ -707,14 +694,13 @@ INT			DocFileCloseCheck( HWND, UINT );
 HRESULT		DocClipLetter( TCHAR );
 VOID		DocBackupDirectoryInit( LPTSTR );
 HRESULT		DocFileBackup( HWND );
-#ifdef MULTI_FILE
+
 HRESULT		DocMultiFileDeleteAll( VOID );
 LPARAM		DocMultiFileDelete( HWND, LPARAM );
 HRESULT		DocMultiFileSelect( LPARAM );
 HRESULT		DocMultiFileModify( UINT );
 HRESULT		DocMultiFileStore( LPTSTR );
 INT			DocMultiFileFetch( INT, LPTSTR, LPTSTR );
-#endif
 
 HRESULT		SqnInitialise( LPUNDOBUFF );
 HRESULT		SqnFreeAll( LPUNDOBUFF );
@@ -736,6 +722,10 @@ HRESULT		FindHighlightOff( VOID );
 
 #endif	//	NOT _ORRVW
 
+LPTSTR		NextLineW( LPTSTR );
+LPSTR		NextLineA( LPSTR );
+
+
 //Viewerでも有り？
 #ifdef DRAUGHT_STYLE
 HRESULT	DraughtInitialise( HINSTANCE, HWND );
@@ -749,11 +739,9 @@ UINT	DraughtAaImageing( LPAAMATRIX );
 
 INT		TextViewSizeGet( LPCTSTR, PINT );
 
+INT_PTR	AacItemCount( UINT );
+HBITMAP	AacArtImageGet( INT, LPSIZE, LPSIZE );
 #endif
 
-#ifdef THUMBNAIL_STYLE
-INT_PTR	AacItemCount( UINT );
-HBITMAP	AacArtImageGet( INT, LPSIZE );
-#endif
 LPSTR	AacAsciiArtGet( DWORD );			//!<	
 

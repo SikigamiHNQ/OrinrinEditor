@@ -31,13 +31,10 @@ If not, see <http://www.gnu.org/licenses/>.
 //-------------------------------------------------------------------------------------------------
 
 //	ホイホイ共有していいのだらうか
-#ifdef MULTI_FILE
+
 extern FILES_ITR	gitFileIt;	//!<	今見てるファイルの本体
 #define gstFile	(*gitFileIt)	//!<	イテレータを構造体と見なす
-#else
-extern ONEFILE	gstFile;			//!<	ファイル単位・複数ファイルにはどうやって対応を？
-#endif
-		//!<	ファイル単位・複数ファイルにはどうやって対応を？
+
 extern INT		gixFocusPage;	//!<	注目中のページ・とりあえず０・０インデックス
 extern INT		gixDropPage;	//!<	投下ホット番号
 //-------------------------------------------------------------------------------------------------
@@ -66,10 +63,8 @@ static HIMAGELIST	ghPgLstImgLst;
 extern INT	gbTmpltDock;		//	頁・壱行テンプレのドッキング
 
 
-#ifdef MAIN_SPLITBAR
 extern  HWND	ghMainSplitWnd;	//!<	メインのスプリットバーハンドル
 extern  LONG	grdSplitPos;	//!<	スプリットバーの、左側の、画面右からのオフセット
-#endif
 //-------------------------------------------------------------------------------------------------
 
 //	ツールバー・新規作成とか
@@ -135,10 +130,8 @@ HWND PageListInitialise( HINSTANCE hInstance, HWND hParentWnd, LPRECT pstFrame )
 
 	UINT		ici, resnum;
 	HBITMAP		hImg, hMsq;
-
-#ifdef MAIN_SPLITBAR
 	INT			spPos;
-#endif
+
 	WNDCLASSEX	wcex;
 	RECT	wdRect, clRect, rect;
 
@@ -177,9 +170,8 @@ HWND PageListInitialise( HINSTANCE hInstance, HWND hParentWnd, LPRECT pstFrame )
 
 	if( gbTmpltDock )	//	メーンウィンドーにドッキュする
 	{
-#ifdef MAIN_SPLITBAR
 		spPos = grdSplitPos - SPLITBAR_WIDTH;	//	右からのオフセット
-#endif
+
 		hPrWnd    = hParentWnd;
 		dwExStyle = 0;
 		dwStyle   = WS_CHILD | WS_VISIBLE;
@@ -1092,27 +1084,16 @@ HRESULT PageListNameSet( INT dPage, LPTSTR ptName )
 	名前の付いている頁があるか
 	@return	INT	非０名前付きがあった　０なかった
 */
-#ifdef MULTI_FILE
 INT PageListIsNamed( FILES_ITR itFile )
-#else
-INT PageListIsNamed( VOID )
-#endif
 {
 	UINT_PTR	iPage, i;
 
-#ifdef MULTI_FILE
 	iPage = itFile->vcCont.size(  );
 	for( i = 0; iPage > i; i++ )
 	{
 		if( 0 != itFile->vcCont.at( i ).atPageName[0] ){	return TRUE;	}
 	}
-#else
-	iPage = gstFile.vcCont.size(  );
-	for( i = 0; iPage > i; i++ )
-	{
-		if( 0 != gstFile.vcCont.at( i ).atPageName[0] ){	return TRUE;	}
-	}
-#endif
+
 	return FALSE;
 }
 //-------------------------------------------------------------------------------------------------
@@ -1273,11 +1254,8 @@ LRESULT Plv_OnNotify( HWND hWnd, INT idFrom, LPNMHDR pstNmhdr )
 		if( 0 > gixMouseSel ){	return 0;	}
 
 		//	該当ページから引っ張る
-#ifdef MULTI_FILE
 		dBytes = DocAllTextGetAlloc( gixMouseSel, D_UNI, (LPVOID *)(&gptPgTipBuf), gitFileIt );
-#else
-		dBytes = DocAllTextGetAlloc( gixMouseSel, D_UNI, (LPVOID *)(&gptPgTipBuf) );
-#endif
+
 		StringCchLength( gptPgTipBuf, STRSAFE_MAX_CCH, &rdLength );
 		if( 2 <= rdLength )
 		{

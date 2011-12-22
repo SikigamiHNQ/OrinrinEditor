@@ -21,6 +21,18 @@ If not, see <http://www.gnu.org/licenses/>.
 #include "OrinrinEditor.h"
 //-------------------------------------------------------------------------------------------------
 
+/*
+複数行断片を使うには
+・区切りは￥ｎとし、読み書のタイミングで適当に変更する
+・各パーツの幅と高さを持っておく
+・配置用ダミーレイヤボックスみたいなのが居る
+・目標幅に合わせて、上パーツを並べる・右上は、上パーツの右側を削る計算がいるか？
+・左下に向かって配置していく
+・右下に向かっていくのは同じ理屈のはず
+・配置出来たら、枠ボックスならそのままレイヤ処理、挿入なら、元文字列をずらす処理して挿入か
+
+*/
+
 #define FRAMEINSERTBOX_CLASS	TEXT("FRAMEINSBOX_CLASS")
 #define FIB_WIDTH	400
 #define FIB_HEIGHT	200
@@ -62,13 +74,9 @@ static  TBBUTTON	gstFIBTBInfo[] = {
 //-------------------------------------------------------------------------------------------------
 
 
-#ifdef MULTI_FILE
 extern FILES_ITR	gitFileIt;	//!<	今見てるファイルの本体
 #define gstFile	(*gitFileIt)	//!<	イテレータを構造体と見なす
-#else
-extern ONEFILE	gstFile;			//!<	ファイル単位・複数ファイルにはどうやって対応を？
-#endif
-		//!<	ファイル単位・複数ファイルにはどうやって対応を？
+
 extern INT		gixFocusPage;	//!<	注目中のページ・とりあえず０・０インデックス
 
 extern  HWND	ghViewWnd;		//!<	ビューウインドウハンドル

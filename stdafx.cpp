@@ -271,6 +271,7 @@ LPTSTR SjisDecodeAlloc( LPSTR pcBuff )
 
 	DWORD	dStart, dEnd;
 
+	if( !(pcBuff) ){	return NULL;	}	//	データおかしかったら終わり
 
 	cchSize = MultiByteToWideChar( CP_ACP, MB_PRECOMPOSED, pcBuff, -1, NULL, 0 );
 
@@ -329,6 +330,45 @@ LPTSTR SjisDecodeAlloc( LPSTR pcBuff )
 }
 //-------------------------------------------------------------------------------------------------
 
+/*!
+	現在行から、次の行の先頭へ移動
+	@param[in]	pt	改行を検索開始するところ
+	@return		改行の次の位置
+*/
+LPTSTR NextLineW( LPTSTR pt )
+{
+	while( *pt && *pt != 0x000D ){	pt++;	}
+
+	if( 0x000D == *pt )
+	{
+		pt++;
+		if( 0x000A == *pt ){	pt++;	}
+	}
+
+	return pt;
+}
+//-------------------------------------------------------------------------------------------------
+
+/*!
+	現在行から、次の行の先頭へ移動
+	@param[in]	pt	改行を検索開始するところ
+	@return		改行の次の位置
+*/
+LPSTR NextLineA( LPSTR pt )
+{
+	while( *pt && *pt != 0x0D ){	pt++;	}
+
+	if( 0x0D == *pt )
+	{
+		pt++;
+		if( 0x0A == *pt ){	pt++;	}
+	}
+
+	return pt;
+}
+//-------------------------------------------------------------------------------------------------
+
+
 #ifndef _ORRVW
 
 /*!
@@ -346,6 +386,8 @@ LPSTR SjisEncodeAlloc( LPCTSTR ptTexts )
 	LPSTR	pcString;
 
 	string	sString;
+
+	if( !(ptTexts) ){	return NULL;	}
 
 	//	長さ確認
 	StringCchLength( ptTexts, STRSAFE_MAX_CCH, &cchSize );

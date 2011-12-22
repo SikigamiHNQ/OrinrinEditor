@@ -39,15 +39,12 @@ typedef struct tagFINDPATTERN
 } FINDPATTERN, *LPFINDPATTERN;
 //-------------------------------------------------------------------------------------------------
 
-#ifdef MULTI_FILE
 extern list<ONEFILE>	gltMultiFiles;	//!<	複数ファイル保持
 //イテレータのtypedefはヘッダへ
 
 extern FILES_ITR	gitFileIt;	//	今見てるファイルの本体
 #define gstFile	(*gitFileIt)	//!<	イテレータを構造体と見なす
-#else
-EXTERNED ONEFILE	gstFile;	//!<	ファイル単位・複数ファイルにはどうやって対応を？
-#endif
+
 extern INT		gixFocusPage;	//	注目中のページ・とりあえず０・０インデックス
 
 EXTERNED HWND	ghFindDlg;	//!<	検索ダイヤログのハンドル

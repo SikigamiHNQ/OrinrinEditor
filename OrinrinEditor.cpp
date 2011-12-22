@@ -20,16 +20,9 @@ If not, see <http://www.gnu.org/licenses/>.
 //	大日本帝国公用語は↓を見られたい
 
 
-//	TODO:	ドラフトクルックの初期標準は挿入のほうがいい
-//デフォの右クリにいれておくべき
-//ツールバーにドラフト関連いれておく
 
-
-//	TODO:	MAA検索ダイヤログだして、Esc押すと、ダイヤログが消えるが、その後復帰できない
-
-//	TODO:	ドラフトやサムネ、AAサイズ表示出来るようにしたい
-
-//	TODO:	ファイル切り替えても、カーソル位置覚えておく
+//	TODO:	最大化して終わる＞起動して、最大化解除すると、メインスプリットバーが見えなくなる
+//右にイッちゃってるまま
 
 //	TODO:	デカいファイル開いたら時間かかる（1000コマとか）
 //逐次読み込みにするとか、先読みしたらvector確保してからいれるとか
@@ -37,8 +30,13 @@ If not, see <http://www.gnu.org/licenses/>.
 //壱行毎のサイズ確認して、確保してからブチ込むとか
 
 //	TODO:	複数ファイルタブ、マウスオーバーでフルパス表示
+//右クリメニューでファイル情報出す
 
-//	TODO:	起動時に、閉じたときのファイルを復元するかどうか選択できるように
+//	TODO:	複数行テンプレ窓の主タブでホイールスクロールが効かない
+//メイン窓の編集スペース、Page List、複数行テンプレ窓のAA一覧ツリーなど、他の場所では問題ない
+
+//	TODO:	ASD対応＜読込は作ったがどこで使う？
+
 
 //	TODO:	デカいファイル開こうとしたときはメッセージ出すとか
 
@@ -53,11 +51,11 @@ If not, see <http://www.gnu.org/licenses/>.
 
 //	TODO:	バックアップ機能の強化・上書き保存したらバックアップとか・頁新規作成したら保存
 
+//	TODO:	保存するとき、同名ファイルがあったら、日時くっつけてバックアップとか
+
 //	TODO:	台詞用Enter機能。Shift+Enterとかで、改行挿入ではなく、その行の末端からの直前の
 //空白の位置＝文章の開始地点まで、次の行に空白を入れて、そこにカーソル移動。台詞挿入に使える。
 //下行がなければ、改行して空白。既存の文字列に引っかかるなら、カーソル移動のみ
-
-//	TODO:	保存するとき、同名ファイルがあったら、日時くっつけてバックアップとか
 
 //	TODO:	MLTのブックマーク機能・タブ増やすか、ツリーに増やすか・副タブじゃいけない？
 
@@ -111,15 +109,10 @@ If not, see <http://www.gnu.org/licenses/>.
 
 //	TODO:	ファイルを開き直す機能
 
-//	TODO:	起動中に、ラインテンプレートのリストを開く＆再読み込みできるようにして欲しい
-//	Brushも同じか。右クリメニューで
-
 //	TODO:	DocBadSpaceCheck内の更新指令の最適化が必要
 
 //	TODO:	テンプレの「常に最前面に表示」Orinrinediterを表示している時だけ最前面に来るように
 //もしくは、メイン窓に統合とか
-
-//	TODO:	終了時に開いていたファイルを起動時に読み込むのはやめるか、開かないように設定できるようにしてほしい
 
 //	TODO:	使用履歴をファイル出力できるように
 
@@ -128,19 +121,20 @@ If not, see <http://www.gnu.org/licenses/>.
 
 //	TODO:	よく使うユニコードを纏めておけないか、ユーザ定義でいいんじゃね
 
-
-
 //	TODO:	テンプレのコンボックスを、リストボックス型と切り替えられるとか
-
-//	TODO:	お気にリスト、グループを一括削除する機能
-
 
 //	TODO:	頁に、ヘッダフッタ挿入機能。ヘッダには頁番号、フッタには容量、とか
 
-
-
 //	TODO:	ファイルタブの[変更]が重い？変更したら、弐回目以降は書かないように
 //みてるファイル変えたときのステータスバーの書き直しに注意
+
+//	TODO:	起動中に、ラインテンプレートのリストを開く＆再読み込みできるようにして欲しい
+//	Brushも同じか。右クリメニューで
+
+
+
+
+
 
 
 //外部スクリプトはどのように実現するか。Rubyの組込とかつかえない？
@@ -176,18 +170,18 @@ If not, see <http://www.gnu.org/licenses/>.
 
 //OK?
 //	TODO:	最大化で終了したときは、最大化状態を覚えておく方がいい
-//	TODO:	統合したテンプレ窓の幅変更できるように
-//	TODO:	MAAで、含んでいるファイルの検索。検索して、そのファイルをタブに表示とか
 //	TODO:	副タブを選択した状態で検索で新しいファイルを開くと、上のタブリストは副タブが選択されたまま
 //「全て」に戻す方が親切かな
-//	TODO:	検索から開くと、見出しドロップダウンがリセットされてない
 //	TODO:	MAAプロファイル、構築ダイヤログで、リストアップしたら、登録済みのやつにチェキしていく
-//	TODO:	開いてる副タブを全部閉じる機能・TabMultipleDeleteAllを呼べばいい
 //	TODO:	Safariのリーディングリストみたいな機能。
 //	TODO:	MAA内容をサムネ表示することは？
 //	TODO:	サムネの右メニューにいらんのがある。開くときに調整を
 //	TODO:	サムネ表示から直接ドラフトボードに追加できるように
 //	TODO:	色をGUIで変更できるように
+//	TODO:	お気にリスト、グループを一括削除する機能
+//	TODO:	ドラフトやサムネ、AAサイズ表示出来るようにしたい
+//	TODO:	ファイル切り替えても、カーソル位置覚えておく
+//	TODO:	起動時に、閉じたときのファイルを復元するかどうか選択できるように
 
 
 //	TODO:	ブラシや壱行テンプレ、マウスオーバーツールチップで、横幅ドット数表示させたい
@@ -363,10 +357,14 @@ ASDファイル　　壱行が壱コンテンツ
 					メイン窓のテンプレエリアのサイズ可変になった
 					最大化状態を覚えておくようにした
 					4096バイト超えたら、頁リストのバイト数のところ赤くするようにした
-2011/12/16	0.26	ドラフトボード機能（Viewer込み）
+2011/12/22	0.26	ドラフトボード機能（Viewer込み）
 					MAAサムネイル機能（Viewer込み）
 					MAAの使用のグループ一括削除（Viewer込み）
 					配色変更をＧＵＩで出来るようにした
+					オーポン記録がなければ、説明ASTを表示するようにした
+					ファイル毎のCaret位置を保存するようにした
+					起動したまま、壱行テンプレ、ブラシテンプレのリロードできるようんした
+					起動するとき、最後に開けてたファイルを開くとか選択できるようにした
 
 更新日時注意
 
@@ -407,9 +405,7 @@ static  TCHAR		gszWindowClass[MAX_STRING];	//!<	メインウィンドウクラス名
 
 static  HMENU	ghMenu;			//!<	メニュー
 
-#ifdef MULTI_FILE
 static   HWND	ghFileTabWnd;	//!<	複数ファイルタブ
-#endif
 
 static   HWND	ghMainWnd;		
 static   HWND	ghStsBarWnd;	//!<	ステータスバー
@@ -423,10 +419,8 @@ EXTERNED HWND	ghPgVwWnd;		//!<	ページリスト
 EXTERNED HWND	ghLnTmplWnd;	//!<	壱行テンプレ
 EXTERNED HWND	ghBrTmplWnd;	//!<	ブラシテンプレ
 
-#ifdef MAIN_SPLITBAR
 EXTERNED HWND	ghMainSplitWnd;	//!<	メインのスプリットバーハンドル
 EXTERNED LONG	grdSplitPos;	//!<	スプリットバーの、左側の、画面右からのオフセット
-#endif
 
 EXTERNED UINT	gbUniPad;		//!<	パディングにユニコードをつかって、ドットを見せないようにする
 EXTERNED UINT	gbUniRadixHex;	//!<	ユニコード数値参照が１６進数であるか
@@ -683,10 +677,6 @@ BOOL InitInstance( HINSTANCE hInstance, INT nCmdShow, LPTSTR ptArgv )
 	HMENU	hSubMenu;
 #endif
 
-//#ifdef MAIN_SPLITBAR
-//	INT	spPos;
-//#endif
-
 	ghInst = hInstance;	//	グローバル変数にインスタンス処理を格納します。
 
 	SplitBarClass( hInstance );	//	スプリットバーの準備
@@ -771,7 +761,6 @@ BOOL InitInstance( HINSTANCE hInstance, INT nCmdShow, LPTSTR ptArgv )
 
 	SqnSetting(  );
 
-#ifdef MAIN_SPLITBAR
 	if( gbTmpltDock )
 	{
 		//	設定からスプリットバーの位置を引っ張る
@@ -782,7 +771,7 @@ BOOL InitInstance( HINSTANCE hInstance, INT nCmdShow, LPTSTR ptArgv )
 		ghMainSplitWnd = SplitBarCreate( hInstance, hWnd, rect.right - grdSplitPos, rect.top, rect.bottom );
 	}
 	else{	ghMainSplitWnd = NULL;	grdSplitPos = 0;	}
-#endif
+
 
 	ghPgVwWnd = PageListInitialise( hInstance, hWnd, &rect );
 
@@ -1050,11 +1039,9 @@ BOOLEAN Cls_OnCreate( HWND hWnd, LPCREATESTRUCT lpCreateStruct )
 {
 	RECT	clRect, tbRect;
 
-
-#ifdef MULTI_FILE
 	RECT	tiRect;
 	TCITEM	stTcItem;
-#endif
+
 
 	HINSTANCE lcInst = lpCreateStruct->hInstance;	//	受け取った初期化情報から、インスタンスハンドルをひっぱる
 
@@ -1082,8 +1069,6 @@ BOOLEAN Cls_OnCreate( HWND hWnd, LPCREATESTRUCT lpCreateStruct )
 	ghNameFont = CreateFont( 12, 0, 0, 0, FW_REGULAR, FALSE, FALSE, FALSE, DEFAULT_CHARSET, OUT_OUTLINE_PRECIS, CLIP_DEFAULT_PRECIS, PROOF_QUALITY, VARIABLE_PITCH, TEXT("MS UI Gothic") );
 
 //マルチファイルオーポン
-#ifdef MULTI_FILE
-
 	ghFileTabWnd = CreateWindowEx( 0, WC_TABCONTROL, TEXT("filetab"),
 		WS_VISIBLE | WS_CHILD | WS_CLIPSIBLINGS | TCS_SINGLELINE,
 		0, 0, clRect.right, 0, hWnd, (HMENU)IDTB_MULTIFILE, lcInst, NULL );
@@ -1100,7 +1085,6 @@ BOOLEAN Cls_OnCreate( HWND hWnd, LPCREATESTRUCT lpCreateStruct )
 	tiRect.bottom  += tiRect.top;
 	MoveWindow( ghFileTabWnd, 0, tbRect.bottom, clRect.right, tiRect.bottom, TRUE );
 
-#endif
 
 	ghStsBarWnd = CreateStatusWindow( WS_CHILD | WS_VISIBLE | CCS_BOTTOM | SBARS_SIZEGRIP, TEXT(""), hWnd, IDSB_VIEW_STATUS_BAR );
 	SendMessage( ghStsBarWnd, SB_SIMPLE, FALSE, 0L );
@@ -1355,11 +1339,10 @@ VOID Cls_OnDestroy( HWND hWnd )
 	DestroyWindow( ghPgVwWnd );
 
 
-#ifdef MULTI_FILE
 	InitMultiFileTabOpen( INIT_SAVE, 0, NULL );
 
 	SetWindowFont( ghFileTabWnd, GetStockFont(DEFAULT_GUI_FONT), FALSE );
-#endif
+
 	DeleteFont( ghNameFont );
 
 	ToolBarDestroy(  );
@@ -1383,8 +1366,6 @@ VOID Cls_OnDestroy( HWND hWnd )
 */
 VOID Cls_OnContextMenu( HWND hWnd, HWND hWndContext, UINT xPos, UINT yPos )
 {
-#ifdef MULTI_FILE
-
 	HMENU	hMenu, hSubMenu;
 	UINT	dRslt;
 	INT		curSel;
@@ -1451,7 +1432,6 @@ VOID Cls_OnContextMenu( HWND hWnd, HWND hWndContext, UINT xPos, UINT yPos )
 
 	DestroyMenu( hMenu );
 
-#endif
 	return;
 }
 //-------------------------------------------------------------------------------------------------
@@ -1466,10 +1446,9 @@ VOID Cls_OnContextMenu( HWND hWnd, HWND hWndContext, UINT xPos, UINT yPos )
 LRESULT Cls_OnNotify( HWND hWnd, INT idFrom, LPNMHDR pstNmhdr )
 {
 	INT	curSel;
-#ifdef MULTI_FILE
 	TCITEM	stTcItem;
 	TCHAR	atText[MAX_PATH];
-#endif
+
 
 	ToolBarOnNotify( hWnd, idFrom, pstNmhdr );
 
@@ -1491,7 +1470,6 @@ LRESULT Cls_OnNotify( HWND hWnd, INT idFrom, LPNMHDR pstNmhdr )
 		}
 	}
 
-#ifdef MULTI_FILE
 	if( IDTB_MULTIFILE == idFrom )
 	{
 		if( TCN_SELCHANGE == pstNmhdr->code )
@@ -1511,7 +1489,6 @@ LRESULT Cls_OnNotify( HWND hWnd, INT idFrom, LPNMHDR pstNmhdr )
 			DocMultiFileSelect( stTcItem.lParam );
 		}
 	}
-#endif
 
 	return 0;	//	何もないなら０を戻す
 }
@@ -1539,9 +1516,8 @@ VOID Cls_OnDropFiles( HWND hWnd, HDROP hDrop )
 	{
 		MessageBox( hWnd, TEXT("ファイルを開けなかったかしらー！？"), NULL, MB_OK | MB_ICONERROR );
 	}
-#ifdef MULTI_FILE
 	else{	MultiFileTabAppend( dNumber, atFileName );	}
-#endif
+
 
 	return;
 }
@@ -1643,9 +1619,8 @@ HRESULT BrushModeToggle( VOID )
 UINT AppClientAreaCalc( LPRECT pstRect )
 {
 	RECT	rect, sbRect, tbRect;
-#ifdef MULTI_FILE
 	RECT	ftRect;
-#endif
+
 
 	if( !(pstRect) )	return 0;
 
@@ -1659,13 +1634,12 @@ UINT AppClientAreaCalc( LPRECT pstRect )
 
 	GetClientRect( ghStsBarWnd, &sbRect );	//	ステータスバーのサイズ確認
 	rect.bottom   -= sbRect.bottom;
-#ifdef MULTI_FILE
+
 	GetWindowRect( ghFileTabWnd, &ftRect );	//	タブバーのサイズ確認
 	ftRect.bottom -= ftRect.top;
 	SetWindowPos( ghFileTabWnd, HWND_TOP, 0, tbRect.bottom, rect.right, ftRect.bottom, SWP_NOZORDER );
 	rect.top      += ftRect.bottom;
 	rect.bottom   -= ftRect.bottom;	//	タブバーの分縮める
-#endif
 
 	SetRect( pstRect, rect.left, rect.top, rect.right, rect.bottom );
 
@@ -1883,6 +1857,8 @@ INT InitParamValue( UINT dMode, UINT dStyle, INT nValue )
 		case  VL_MAIN_SPLIT:	StringCchCopy( atKeyName, SUB_STRING, TEXT("MainSplit") );		break;
 		case  VL_MAXIMISED:		StringCchCopy( atKeyName, SUB_STRING, TEXT("Maximised") );		break;
 		case  VL_DRAUGHT_MODE:	StringCchCopy( atKeyName, SUB_STRING, TEXT("DraughtDefault") );	break;
+		case  VL_FIRST_READED:	StringCchCopy( atKeyName, SUB_STRING, TEXT("FirstStep") );		break;
+		case  VL_LAST_OPEN:		StringCchCopy( atKeyName, SUB_STRING, TEXT("LastOpenStyle") );	break;
 		default:	return nValue;
 	}
 
@@ -2256,6 +2232,10 @@ INT_PTR CALLBACK OptionDlgProc( HWND hDlg, UINT message, WPARAM wParam, LPARAM l
 			dValue = InitParamValue( INIT_LOAD, VL_PLS_LN_DOCK, 1 );
 			CheckDlgButton( hDlg, IDCB_DOCKING_STYLE, dValue ? BST_CHECKED : BST_UNCHECKED );
 
+			//	起動時オーポン
+			dValue = InitParamValue( INIT_LOAD, VL_LAST_OPEN, LASTOPEN_DO );
+			CheckRadioButton( hDlg, IDRB_LASTOPEN_DO, IDRB_LASTOPEN_ASK, (IDRB_LASTOPEN_DO + dValue) );
+
 			//	レイヤボックスの透明度
 			dValue = InitParamValue( INIT_LOAD, VL_LAYER_TRANS, 192 );
 			SendDlgItemMessage( hDlg, IDSL_LAYERBOX_TRANCED, TBM_SETPOS, TRUE, (dValue - 0x1F) );
@@ -2373,6 +2353,12 @@ INT_PTR CALLBACK OptionDlgProc( HWND hDlg, UINT message, WPARAM wParam, LPARAM l
 					dValue = IsDlgButtonChecked( hDlg, IDCB_DOCKING_STYLE );
 					InitParamValue( INIT_SAVE, VL_PLS_LN_DOCK, dValue ? 1 : 0 );
 
+					//	起動時オーポン
+					if( IsDlgButtonChecked( hDlg, IDRB_LASTOPEN_NON ) ){	dValue = LASTOPEN_NON;	}
+					else if( IsDlgButtonChecked( hDlg, IDRB_LASTOPEN_ASK ) ){	dValue = LASTOPEN_ASK;	}
+					else{	dValue = LASTOPEN_DO;	}	//	IDRB_LASTOPEN_DO
+					InitParamValue( INIT_SAVE, VL_LAST_OPEN, dValue );
+
 					//	透明度
 					dValue = SendDlgItemMessage( hDlg, IDSL_LAYERBOX_TRANCED, TBM_GETPOS, 0, 0 );
 					dValue += 0x1F;
@@ -2468,7 +2454,7 @@ BOOLEAN SelectDirectoryDlg( HWND hWnd, LPTSTR ptSelDir, UINT_PTR cchLen )
 }
 //-------------------------------------------------------------------------------------------------
 
-#ifdef MULTI_FILE
+
 //	起動時の最初の一個のファイルタブを追加
 HRESULT MultiFileTabFirst( LPTSTR ptName )
 {
@@ -2644,7 +2630,7 @@ HRESULT MultiFileTabRename( LPARAM dNumber, LPTSTR ptName )
 /*!
 	開いてるタブを保存したりよびだしたり
 	@param[in]	dMode	非０ロード　０セーブ
-	@param[in]	iTgt	読み出す番号・０インデックス
+	@param[in]	iTgt	読み出す番号・０インデックス・負数ならファイル数のみ確保
 	@param[out]	ptFile	フルパス・MAX_PATHであること
 	@return		INT	セーブ：０　ロード：記録数
 */
@@ -2693,7 +2679,7 @@ HRESULT MultiFileTabClose( VOID )
 
 
 
-#endif
+
 
 #ifdef USE_NOTIFYICON
 /*!

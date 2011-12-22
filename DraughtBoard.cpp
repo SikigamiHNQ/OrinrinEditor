@@ -36,6 +36,8 @@ Ctrl+Space‚ÅƒTƒ€ƒlƒCƒ‹ƒEƒCƒ“ƒhƒEo‚µ‚½‚è•Â‚¶‚½‚èB‘I‘ð‚µ‚ÄŽg‚¦‚éBMAA‚Ì‚Ù‚¤‚Å‚à‚
 ‹L˜^Œ`Ž®‚Ç‚¤‚·‚é‚©BSQLite‚©vectorH@ƒTƒ€ƒl[ƒ‹ƒCƒ[ƒW‚ð‚Ç‚¤‚·‚é‚©‚É‚æ‚Á‚Ä•Ï‚í‚é‚©
 
 MAA‚ÌƒTƒ€ƒl•\Ž¦‚É‚àŽg‚¤‚È‚çAƒXƒNƒ[ƒ‹ƒo[l—¶BŒÄoƒL[ƒoƒCƒ“ƒh‚àl‚¦‚éBCtrl+T‚Æ‚©H
+
+ƒc[ƒ‹ƒ`ƒbƒv‚Ì•\Ž¦”ñ•\Ž¦‚Æ•¶ŽšƒTƒCƒY‚Í‚l‚`‚`‚É]‚¤
 */
 
 #include "stdafx.h"
@@ -48,6 +50,8 @@ MAA‚ÌƒTƒ€ƒl•\Ž¦‚É‚àŽg‚¤‚È‚çAƒXƒNƒ[ƒ‹ƒo[l—¶BŒÄoƒL[ƒoƒCƒ“ƒh‚àl‚¦‚éBCtrl+
 
 #define DRAUGHT_BOARD_CLASS	TEXT("DRAUGHT_BOARD")
 
+#define TTMSG_NO_ITEM	TEXT("NO ITEM")
+
 //	ˆê–‡‚Ìƒpƒlƒ‹ƒTƒCƒYE¬‚³‚¢‚©H
 #define THM_WIDTH	128
 #define THM_HEIGHT	128
@@ -59,27 +63,21 @@ MAA‚ÌƒTƒ€ƒl•\Ž¦‚É‚àŽg‚¤‚È‚çAƒXƒNƒ[ƒ‹ƒo[l—¶BŒÄoƒL[ƒoƒCƒ“ƒh‚àl‚¦‚éBCtrl+
 
 #ifdef DRAUGHT_STYLE
 
-//	MAA‚Ì‚Æ‹¤’Ê‚Å‚¢‚¯‚é
-//typedef struct tagDRAUGHTITEM
-//{
-//	LPSTR	pcAaText;	//!<	AA•¶Žš—ñESjis‚ÅŠm•Û
-//
-//	INT		iMaxDot;	//!<	‰¡•Å‘åƒhƒbƒg”
-//	INT		iLines;		//!<	Žg—ps”
-//
-//	SIZE	stSize;		//!<	ƒsƒNƒZƒ‹ƒTƒCƒY
-//	HDC		hThumbDC;	//!<	ƒTƒ€ƒlƒCƒ‹—pƒfƒoƒCƒXƒRƒ“ƒeƒLƒXƒg
-//	HBITMAP	hThumbBmp;	//!<	ƒTƒ€ƒlƒCƒ‹—pƒrƒbƒgƒ}ƒbƒvƒnƒ“ƒhƒ‹
-//	HBITMAP	hOldBmp;	//!<	•œ‹A—p
-//
-//} DRAUGHTITEM, *LPDRAUGHTITEM;
+//	Žg—p‚·‚é\‘¢‘Ì‚ÍMAA‚Ì‚Æ‹¤’Ê‚Å‚¢‚¯‚é
 //-------------------------------------------------------------------------------------------------
 
 extern HFONT	ghAaFont;		//	AA—pƒtƒHƒ“ƒg
+extern HFONT	ghTipFont;		//	ƒc[ƒ‹ƒ`ƒbƒv—p
+
+extern  UINT	gbAAtipView;	//!<	”ñ‚O‚ÅA‚`‚`ƒc[ƒ‹ƒ`ƒbƒv•\Ž¦
+
+static  HWND	ghPtWnd;
 
 static  ATOM	gDraughtAtom;	//!<	ƒEƒCƒ“ƒhƒEƒNƒ‰ƒXƒAƒgƒ€
 static  HWND	ghDraughtWnd;	//!<	‚±‚ÌƒEƒCƒ“ƒhƒEƒnƒ“ƒhƒ‹
-static  HWND	ghDraughtTip;	//!<	ƒc[ƒ‹ƒ`ƒbƒv
+
+static  HWND	ghDrghtTipWnd;	//!<	ƒc[ƒ‹ƒ`ƒbƒv
+static LPTSTR	gptTipBuffer;	//!<	ƒ`ƒbƒv“à—e
 
 EXTERNED UINT	gdClickMode;	//!<	ƒAƒCƒeƒ€‚ðƒNƒ‹ƒbƒN‚µ‚½‚Æ‚«‚ÌŠî–{“®ìE‚O’Êí‘}“ü@‚P‹éŒ`‘}“ü@‚QƒŒƒCƒ„ƒ{ƒbƒNƒXŠJ‚­@‚RUNIƒNƒŠƒbƒv@‚SSJISƒNƒŠƒbƒv
 //ƒNƒ‹ƒbƒyƒ{[ƒh‚ÖƒRƒs‚éƒ‚[ƒh‚ÍƒRƒs[ƒ‚[ƒhƒXƒƒbƒv‚É]‚¤
@@ -88,21 +86,22 @@ static HDC		ghNonItemDC;	//!<	ƒAƒCƒeƒ€–³‚µ‚ÌŠG
 static HBITMAP	ghNonItemBMP, ghOldBmp;	
 static HPEN		ghLinePen;
 
+static HFONT	ghAreaFont;		//!<	ƒTƒCƒY•\Ž¦—p
+
 static INT		giTarget;		//!<	ƒNƒ‹ƒbƒN‚µ‚½ƒAƒCƒeƒ€”Ô†E|‚P‚Å–³‚µ
 
-#ifdef THUMBNAIL_STYLE
 static  UINT	gbThumb;		//!<	ƒTƒ€ƒló‘Ô‚Å‚ ‚é‚©
 static  LONG	gdVwTop;		//!<	•\Ž¦‚³‚ê‚Ä‚éˆê”Ô¶ã‚Ìs”Ô†‚OƒCƒ“ƒfƒbƒNƒX
 static  HWND	ghScrBarWnd;	//!<	ƒTƒ€ƒl—pƒXƒNƒ[ƒ‹ƒoƒ@[
-#endif
+
 static vector<AAMATRIX>	gvcDrtItems;	//!<	
-//typedef vector<DRAUGHTITEM>::iterator	DRTI_ITR;	//!<	
 //-------------------------------------------------------------------------------------------------
 
-INT		DraughtTargetItemSet( LPPOINT );	//!<	
+INT		DraughtTargetItemSet( LPPOINT );		//!<	
 DOUBLE	DraughtAspectKeeping( LPSIZE, UINT );	//!<	
-INT		DraughtItemDelete( CONST INT  );	//!<	
-HRESULT	DraughtItemUse( INT );	//!<	
+INT		DraughtItemDelete( CONST INT  );		//!<	
+HRESULT	DraughtItemUse( INT );					//!<	
+HRESULT	DraughtItemExport( HWND, LPTSTR );		//!<	
 
 LRESULT CALLBACK DraughtProc( HWND, UINT, WPARAM, LPARAM );
 VOID	Drt_OnCommand( HWND , INT, HWND, UINT );		//!<	
@@ -149,6 +148,11 @@ HRESULT DraughtInitialise( HINSTANCE hInstance, HWND hPtWnd )
 
 		ghNonItemDC = NULL;
 
+		//	ƒTƒCƒY•\Ž¦—pƒtƒHƒ“ƒg
+		ghAreaFont = CreateFont( FONTSZ_REDUCE, 0, 0, 0, FW_REGULAR, FALSE, FALSE, FALSE, DEFAULT_CHARSET, OUT_OUTLINE_PRECIS, CLIP_DEFAULT_PRECIS, PROOF_QUALITY, VARIABLE_PITCH, TEXT("MS UI Gothic") );
+
+		ghPtWnd = hPtWnd;
+
 #ifndef _ORRVW
 		//	ƒNƒ‹ƒbƒN“®ìŽw’èƒ[ƒhEƒfƒtƒH“®ì‚Í’Êí‘}“ü
 		gdClickMode = InitParamValue( INIT_LOAD, VL_DRAUGHT_MODE, 0 );
@@ -165,6 +169,9 @@ HRESULT DraughtInitialise( HINSTANCE hInstance, HWND hPtWnd )
 		}
 		if( ghNonItemBMP  ){	DeleteBitmap( ghNonItemBMP );	}
 		if( ghLinePen ){	DeletePen( ghLinePen  );	}
+		if( ghAreaFont ){	DeleteFont( ghAreaFont );	}
+
+		FREE( gptTipBuffer );
 
 		DraughtItemDelete( -1 );
 	}
@@ -188,17 +195,14 @@ HWND DraughtWindowCreate( HINSTANCE hInstance, HWND hPtWnd, UINT bThumb )
 	HDC		hdc;
 
 	RECT	wdRect, rect;
+	TTTOOLINFO	stToolInfo;
 
-#ifdef THUMBNAIL_STYLE
 	INT		iLines, iStep = 0;
 	LONG	rigOffs = 0;
 	SCROLLINFO	stScrollInfo;
-#endif
 
 	if( !(hPtWnd ) )	//	”j‰ó‚·‚éE‚¢‚ç‚È‚¢H
 	{
-
-
 		return NULL;
 	}
 
@@ -215,7 +219,6 @@ HWND DraughtWindowCreate( HINSTANCE hInstance, HWND hPtWnd, UINT bThumb )
 	rect.right  = THM_WIDTH  * TPNL_HORIZ;
 	rect.bottom = THM_HEIGHT * TPNL_VERTI;
 
-#ifdef THUMBNAIL_STYLE
 	if( gbThumb )	//	ƒTƒ€ƒlƒ‚[ƒh
 	{
 		gdVwTop = 0;
@@ -233,14 +236,31 @@ HWND DraughtWindowCreate( HINSTANCE hInstance, HWND hPtWnd, UINT bThumb )
 		iScWid = GetSystemMetrics( SM_CXVSCROLL );	//	‚’¼ƒXƒNƒ[ƒ‹ƒo[‚Ì•Šm•Û
 		rect.right += iScWid;
 	}
-#endif
 
 	//	ƒEƒCƒ“ƒhƒEì¬	TOPMOST‚¢‚é‚©H	
 	ghDraughtWnd = CreateWindowEx( WS_EX_TOOLWINDOW,// | WS_EX_TOPMOST | WS_EX_CLIENTEDGE,
 		DRAUGHT_BOARD_CLASS, TEXT("Draught Board"), WS_POPUP | WS_VISIBLE | WS_BORDER,
 		rect.left, rect.top, rect.right, rect.bottom, NULL, NULL, hInstance, NULL );
 
-#ifdef THUMBNAIL_STYLE
+	//	ƒc[ƒ‹ƒ`ƒbƒv
+	ghDrghtTipWnd = CreateWindowEx( WS_EX_TOPMOST, TOOLTIPS_CLASS, NULL, TTS_NOPREFIX | TTS_ALWAYSTIP, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, ghDraughtWnd, NULL, hInstance, NULL );
+	SetWindowFont( ghDrghtTipWnd, ghTipFont, TRUE );
+
+	FREE( gptTipBuffer );
+
+	//	ƒc[ƒ‹ƒ`ƒbƒv‚ðƒR[ƒ‹ƒoƒbƒN‚ÅŠ„‚è•t‚¯
+	ZeroMemory( &stToolInfo, sizeof(TTTOOLINFO) );
+	GetClientRect( ghDraughtWnd, &stToolInfo.rect );
+	stToolInfo.cbSize   = sizeof(TTTOOLINFO);
+	stToolInfo.uFlags   = TTF_SUBCLASS;
+	stToolInfo.hinst    = NULL;	//	
+	stToolInfo.hwnd     = ghDraughtWnd;
+	stToolInfo.uId      = IDTT_DRT_TOOLTIP;
+	stToolInfo.lpszText = LPSTR_TEXTCALLBACK;	//	ƒRƒŒ‚ðŽw’è‚·‚é‚ÆƒR[ƒ‹ƒoƒbƒN‚É‚È‚é
+	SendMessage( ghDrghtTipWnd, TTM_ADDTOOL, 0, (LPARAM)&stToolInfo );
+	SendMessage( ghDrghtTipWnd, TTM_SETMAXTIPWIDTH, 0 , 0 );	//	ƒ`ƒbƒv‚Ì•B‚OÝ’è‚Å‚¢‚¢B‚±‚ê‚µ‚Æ‚©‚È‚¢‚Æ‰üs‚³‚ê‚È‚¢
+
+
 	if( gbThumb )	//	ƒTƒ€ƒlƒ‚[ƒh
 	{
 		//	ˆê——‚ÌƒXƒNƒ[ƒ‹ƒo[
@@ -256,7 +276,6 @@ HWND DraughtWindowCreate( HINSTANCE hInstance, HWND hPtWnd, UINT bThumb )
 		stScrollInfo.nTrackPos = 0;
 		SetScrollInfo( ghScrBarWnd, SB_CTL, &stScrollInfo, TRUE );
 	}
-#endif
 
 	if( !(ghNonItemDC) )	//	ŒŠ–„‚ß•`‰æ—pƒrƒbƒgƒ}ƒbƒvì¬
 	{
@@ -302,7 +321,7 @@ LRESULT CALLBACK DraughtProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lPa
 	{
 	//	HANDLE_MSG( hWnd, WM_SIZE,        Drt_OnSize );	
 		HANDLE_MSG( hWnd, WM_COMMAND,     Drt_OnCommand );	
-	//	HANDLE_MSG( hWnd, WM_NOTIFY,      Drt_OnNotify );	//	ƒRƒ‚ƒ“ƒRƒ“ƒgƒ[ƒ‹‚ÌŒÂ•ÊƒCƒxƒ“ƒg
+		HANDLE_MSG( hWnd, WM_NOTIFY,      Drt_OnNotify );	//	ƒRƒ‚ƒ“ƒRƒ“ƒgƒ[ƒ‹‚ÌŒÂ•ÊƒCƒxƒ“ƒg
 		HANDLE_MSG( hWnd, WM_LBUTTONUP,   Drt_OnLButtonUp );
 		HANDLE_MSG( hWnd, WM_PAINT,       Drt_OnPaint );
 		HANDLE_MSG( hWnd, WM_CONTEXTMENU, Drt_OnContextMenu );
@@ -333,21 +352,25 @@ VOID Drt_OnCommand( HWND hWnd, INT id, HWND hWndCtl, UINT codeNotify )
 	
 	switch( id )
 	{
+#ifndef _ORRVW
 		case IDM_DRAUGHT_INSERTEDIT:
 		case IDM_DRAUGHT_INTERRUPTEDIT:
 		case IDM_DRAUGHT_LAYERBOX:
+#endif
 		case IDM_DRAUGHT_UNICLIP:
 		case IDM_DRAUGHT_SJISCLIP:	DraughtItemUse( id );	DestroyWindow( hWnd );	break;
 
 		case IDM_THUMB_DRAUGHT_ADD:	DraughtItemUse( id );	break;	//	Draught’Ç‰Á‚È‚ç•Â‚¶‚È‚¢•û‚ª‚¢‚¢‚¾‚ë‚¤
 
 		case IDM_DRAUGHT_DELETE:	DraughtItemDelete( giTarget );	InvalidateRect( hWnd , NULL, TRUE );	break;
-#ifndef _ORRVW
-		case IDM_DRAUGHT_EXPORT:	NotifyBalloonExist( TEXT("–¢ŽÀ‘•‚È‚Ì‚Å‚·EEE"), TEXT("‚ ‚£‚ ‚£"), NIIF_ERROR );	break;
-#endif
+
+		case IDM_DRAUGHT_EXPORT:	DraughtItemExport( hWnd, NULL );	break;
+
 		case IDM_DRAUGHT_ALLDELETE:	DraughtItemDelete( -1 );	DestroyWindow( hWnd );	break;
 
 		case IDM_DRAUGHT_CLOSE:		DestroyWindow( hWnd );	break;
+
+		default:	break;
 	}
 
 	return;
@@ -364,18 +387,22 @@ VOID Drt_OnPaint( HWND hWnd )
 	PAINTSTRUCT	ps;
 	HDC			hdc, hAaDC;
 	HBITMAP		hOldBmp, hBmp;
+	HFONT		hOldFnt;
 	UINT		x = 0, y = 0;
 	INT_PTR		iItems;
-	SIZE		stSize, stOrgSize;
+	UINT_PTR	cchLen;
+	TCHAR		atArea[MIN_STRING];
+	SIZE		stSize, stOrgSize, stArea;
 
 	MAAM_ITR	itItem;
 
 
 	hdc = BeginPaint( hWnd, &ps );
 
+	hOldFnt = SelectFont( hdc, ghAreaFont );
+
 	SetStretchBltMode( hdc, HALFTONE );
 
-#ifdef THUMBNAIL_STYLE
 	if( gbThumb )	//	ƒTƒ€ƒlƒ‚[ƒh
 	{
 		iItems = gdVwTop * TPNL_HORIZ;
@@ -384,7 +411,9 @@ VOID Drt_OnPaint( HWND hWnd )
 		{
 			for( x = 0; TPNL_HORIZ > x; x++ )
 			{
-				hBmp = AacArtImageGet( iItems, &stSize );
+				ZeroMemory( atArea, sizeof(atArea) );
+
+				hBmp = AacArtImageGet( iItems, &stSize, &stArea );
 				if( hBmp )
 				{
 					stOrgSize = stSize;
@@ -396,10 +425,16 @@ VOID Drt_OnPaint( HWND hWnd )
 					StretchBlt( hdc, (x * THM_WIDTH), (y * THM_HEIGHT), stSize.cx, stSize.cy,	//	ƒRƒs[æ‚c‚bA¶ã‚w‚xA•A‚‚³
 						hAaDC, 0, 0, stOrgSize.cx, stOrgSize.cy,	//	ƒRƒs[Œ³‚c‚bA¶ã‚w‚xA•A‚‚³
 						SRCCOPY );	//	ƒ‰ƒXƒ^ƒIƒyƒŒ[ƒVƒ‡ƒ“ƒR[ƒh
-					iItems++;
 
 					SelectBitmap( hAaDC, hOldBmp );
+
+					StringCchPrintf( atArea, MIN_STRING, TEXT("%dDOT x %dLINE"), stArea.cx, stArea.cy );
+					StringCchLength( atArea, MIN_STRING, &cchLen );
+					ExtTextOut( hdc, (x * THM_WIDTH)+1, ((y+1) * THM_HEIGHT)-12, 0, NULL, atArea, cchLen, NULL );
+
 					DeleteDC( hAaDC );
+
+					iItems++;
 				}
 				else
 				{
@@ -410,7 +445,6 @@ VOID Drt_OnPaint( HWND hWnd )
 	}
 	else
 	{
-#endif
 		itItem = gvcDrtItems.begin();
 
 		for( y = 0; TPNL_VERTI > y; y++ )
@@ -419,6 +453,8 @@ VOID Drt_OnPaint( HWND hWnd )
 			{
 				if( itItem != gvcDrtItems.end() )
 				{
+					ZeroMemory( atArea, sizeof(atArea) );
+
 					stSize = itItem->stSize;
 					DraughtAspectKeeping( &stSize, TRUE );
 
@@ -428,10 +464,16 @@ VOID Drt_OnPaint( HWND hWnd )
 					StretchBlt( hdc, (x * THM_WIDTH), (y * THM_HEIGHT), stSize.cx, stSize.cy,	//	ƒRƒs[æ‚c‚bA¶ã‚w‚xA•A‚‚³
 						hAaDC, 0, 0, itItem->stSize.cx, itItem->stSize.cy,	//	ƒRƒs[Œ³‚c‚bA¶ã‚w‚xA•A‚‚³
 						SRCCOPY );	//	ƒ‰ƒXƒ^ƒIƒyƒŒ[ƒVƒ‡ƒ“ƒR[ƒh	//	itItem->hThumbDC
-					itItem++;
 
 					SelectBitmap( hAaDC, hOldBmp );
+
+					StringCchPrintf( atArea, MIN_STRING, TEXT("%dDOT x %dLINE"), itItem->iMaxDot, itItem->iLines );
+					StringCchLength( atArea, MIN_STRING, &cchLen );
+					ExtTextOut( hdc, (x * THM_WIDTH)+1, ((y+1) * THM_HEIGHT)-12, 0, NULL, atArea, cchLen, NULL );
+
 					DeleteDC( hAaDC );
+
+					itItem++;
 				}
 				else
 				{
@@ -439,9 +481,9 @@ VOID Drt_OnPaint( HWND hWnd )
 				}
 			}
 		}
-#ifdef THUMBNAIL_STYLE
 	}
-#endif
+
+	SelectFont( hdc, hOldFnt );
 
 	for( y = 1; TPNL_HORIZ > y; y++ )
 	{
@@ -481,7 +523,59 @@ VOID Drt_OnKillFocus( HWND hWnd, HWND hwndNewFocus )
 */
 LRESULT Drt_OnNotify( HWND hWnd, INT idFrom, LPNMHDR pstNmhdr )
 {
+	INT		iTarget, iOffset, i;
+	INT_PTR	iItems;
+	LPSTR	pcConts = NULL;
+	POINT	stMosPos;
+	LPNMTTDISPINFO	pstDispInfo;
 
+	MAAM_ITR	itItem;
+
+	if( TTN_GETDISPINFO ==  pstNmhdr->code )	//	ƒc[ƒ‹ƒ`ƒbƒv‚Ì“à—e‚Ì–â‚¢‡‚í‚¹‚¾‚Á‚½‚ç
+	{
+		GetCursorPos( &stMosPos );	//	ƒXƒNƒŠ[ƒ“À•W
+		ScreenToClient( hWnd, &stMosPos );	//	ƒNƒ‰ƒCƒ„ƒ“ƒgÀ•W‚É•ÏŠ·
+
+		pstDispInfo = (LPNMTTDISPINFO)pstNmhdr;
+
+		ZeroMemory( &(pstDispInfo->szText), sizeof(pstDispInfo->szText) );
+		pstDispInfo->lpszText = NULL;
+
+		if( !(gbAAtipView) ){	return 0;	}	//	”ñ•\Ž¦‚È‚ç‰½‚à‚µ‚È‚¢‚Å‚¨‚‹
+
+		FREE( gptTipBuffer );
+
+		iTarget = DraughtTargetItemSet( &stMosPos );
+
+		if( gbThumb )	//	ƒTƒ€ƒlƒCƒ‹
+		{
+			iOffset = gdVwTop * TPNL_HORIZ;
+			iTarget = iOffset + iTarget;
+			pcConts = AacAsciiArtGet( iTarget );	//	ŠY“–‚·‚éƒCƒ“ƒfƒbƒNƒXAA‚ðˆø‚Á’£‚Á‚Ä‚­‚é
+
+			gptTipBuffer = SjisDecodeAlloc( pcConts );
+			free( pcConts );
+		}
+		else
+		{
+			iItems = gvcDrtItems.size( );	//	Œ»ÝŒÂ”
+			if( iItems > iTarget )	//	•ÛŽ”“à‚Å‚ ‚ê‚Î
+			{
+				for( i = 0, itItem = gvcDrtItems.begin(); gvcDrtItems.end() != itItem; i++, itItem++ )
+				{
+					if( iTarget == i )	//	ƒqƒbƒg
+					{
+						gptTipBuffer = SjisDecodeAlloc( itItem->pcItem );
+						break;
+					}
+				}
+			}
+		}
+
+		//	‚±‚±‚ÅNULL‚ð•Ô‚·‚ÆA‚»‚êˆÈ~‚Ìƒ`ƒbƒv‚ªo‚Ä‚±‚È‚¢
+		if( gptTipBuffer  ){	pstDispInfo->lpszText = gptTipBuffer;	}
+		else{					pstDispInfo->lpszText = TTMSG_NO_ITEM;	}
+	}
 
 	return 0;
 }
@@ -572,7 +666,6 @@ VOID Drt_OnContextMenu( HWND hWnd, HWND hWndContext, UINT xPos, UINT yPos )
 	hMenu = LoadMenu( GetModuleHandle(NULL), MAKEINTRESOURCE(IDM_DRAUGHT_POPUP) );
 	hSubMenu = GetSubMenu( hMenu, 0 );
 
-#ifdef THUMBNAIL_STYLE
 	if( gbThumb )	//	ƒTƒ€ƒl‘¤‚È‚ç
 	{
 		DeleteMenu( hSubMenu, IDM_DRAUGHT_ALLDELETE, MF_BYCOMMAND );	//	‘Síœ‚ð”j‰ó
@@ -581,7 +674,6 @@ VOID Drt_OnContextMenu( HWND hWnd, HWND hWndContext, UINT xPos, UINT yPos )
 
 		ModifyMenu( hSubMenu, IDM_DRAUGHT_DELETE,    MF_BYCOMMAND | MFT_STRING, IDM_THUMB_DRAUGHT_ADD, TEXT("ƒhƒ‰ƒtƒgƒ{[ƒh‚É’Ç‰Á(&D)") );
 	}
-#endif
 
 	dRslt = TrackPopupMenu( hSubMenu, 0, stPoint.x, stPoint.y, 0, hWnd, NULL );
 	//	‘I‘ð‚¹‚¸‚Å‚O‚©|‚PHATPM_RETURNCMD–³‚©‚Á‚½‚çA‘I‘ð‚µ‚½‚ç‚»‚Ìƒƒjƒ…[‚Ì‚h‚c‚ÅWM_COMMAND‚ª”­s
@@ -600,6 +692,8 @@ VOID Drt_OnDestroy( HWND hWnd )
 {
 	ghDraughtWnd = NULL;
 	ghScrBarWnd  = NULL;
+
+	FREE( gptTipBuffer );
 
 	return;
 }
@@ -640,7 +734,7 @@ VOID Drt_OnMouseWheel( HWND hWnd, INT xPos, INT yPos, INT zDelta, UINT fwKeys )
 	@param[in]	hwndCtl	ƒXƒNƒ[ƒ‹ƒo[‚ÌƒEƒCƒ“ƒhƒEƒnƒ“ƒhƒ‹
 	@param[in]	code	“®ìó‘ÔƒR[ƒh
 	@param[in]	pos		‚Â‚Ü‚Ý‚ÌˆÊ’u
-	@return		ˆ—‚µ‚½“à—e‚Æ‚©
+	@return		–³‚µ
 */
 VOID Drt_OnVScroll( HWND hWnd, HWND hwndCtl, UINT code, INT pos )
 {
@@ -819,6 +913,7 @@ UINT DraughtItemAdding( LPSTR pcArts )
 
 	StringCchLengthA( pcArts, STRSAFE_MAX_CCH, &cbSize );
 
+	stItem.cbItem = cbSize;
 	stItem.pcItem = (LPSTR)malloc( (cbSize + 1) );
 	ZeroMemory( stItem.pcItem, (cbSize + 1) );
 	StringCchCopyA( stItem.pcItem, (cbSize + 1), pcArts );
@@ -909,7 +1004,6 @@ HRESULT DraughtItemUse( INT id )
 	UINT		dMode;
 	MAAM_ITR	itItem;
 
-#ifdef THUMBNAIL_STYLE
 	if( gbThumb )	//	ƒTƒ€ƒlƒ‚[ƒh
 	{
 		iOffset = gdVwTop * TPNL_HORIZ;
@@ -936,7 +1030,6 @@ HRESULT DraughtItemUse( INT id )
 	}
 	else
 	{
-#endif
 		iItems = gvcDrtItems.size( );	//	Œ»ÝŒÂ”
 		if( 0 >= iItems )	return E_OUTOFMEMORY;
 
@@ -958,9 +1051,8 @@ HRESULT DraughtItemUse( INT id )
 				ViewMaaMaterialise( itItem->pcItem, cbSize, dMode );
 			}
 		}
-#ifdef THUMBNAIL_STYLE
 	}
-#endif
+
 	return E_INVALIDARG;
 }
 //-------------------------------------------------------------------------------------------------
@@ -985,9 +1077,7 @@ INT DraughtItemDelete( CONST INT iTarget )
 		if( iTarget == i || 0 > iTarget )
 		{
 			FREE( itItem->pcItem );
-		//	SelectBitmap( itItem->hThumbDC, itItem->hOldBmp );
 			DeleteBitmap( itItem->hThumbBmp );
-		//	DeleteDC( itItem->hThumbDC );
 			delCnt++;
 
 			if( iTarget == i )
@@ -1146,6 +1236,77 @@ INT TextViewSizeGet( LPCTSTR ptText, PINT piLine )
 
 	if( piLine )	*piLine = yLine;	//	‹ós‚¾‚Á‚½‚Æ‚µ‚Ä‚à‚Ps‚Í‚ ‚é
 	return dMaxDot;
+}
+//-------------------------------------------------------------------------------------------------
+
+/*!
+	ƒhƒ‰ƒtƒgƒ{[ƒh‚Ì“à—e‚ðƒtƒ@ƒCƒ‹‚É‘‚«o‚·
+	@param[in]	hWnd	ƒEƒCƒ“ƒhƒEƒnƒ“ƒhƒ‹
+*/
+HRESULT DraughtItemExport( HWND hWnd, LPTSTR ptPath )
+{
+	CONST CHAR	cacSplit[] = ("[SPLIT]\r\n");	//	‚X‚a‚x‚s‚d
+
+	UINT_PTR	dItems, cbSize;
+	TCHAR		atPath[MAX_PATH], atName[MAX_PATH];
+	BOOLEAN		bOpened;
+	OPENFILENAME	stOpenFile;
+
+	MAAM_ITR	itItem;
+
+	HANDLE	hFile;
+	DWORD	wrote;
+
+
+	dItems = gvcDrtItems.size();
+	if( 0 >= dItems )	return E_NOTIMPL;	//	‹ó‚È‚ç‰½‚à‚µ‚È‚¢
+
+	//ƒtƒ@ƒCƒ‹–¼Šm’è
+	ZeroMemory( atPath, sizeof(atPath) );
+	ZeroMemory( atName, sizeof(atName) );
+
+	ZeroMemory( &stOpenFile, sizeof(OPENFILENAME) );
+	stOpenFile.lStructSize     = sizeof(OPENFILENAME);
+	stOpenFile.hwndOwner       = ghPtWnd;
+	stOpenFile.lpstrFilter     = TEXT("•¡”sƒeƒ“ƒvƒŒƒtƒ@ƒCƒ‹(*.mlt)\0*.mlt\0‘S‚Ä‚ÌŒ`Ž®(*.*)\0*.*\0\0");
+	stOpenFile.nFilterIndex    = 1;
+	stOpenFile.lpstrFile       = atPath;
+	stOpenFile.nMaxFile        = MAX_PATH;
+	stOpenFile.lpstrFileTitle  = atName;
+	stOpenFile.nMaxFileTitle   = MAX_PATH;
+	stOpenFile.lpstrTitle      = TEXT("•Û‘¶‚·‚éƒtƒ@ƒCƒ‹–¼‚ðŽw’è‚µ‚Ä‚Ë");
+	stOpenFile.Flags           = OFN_OVERWRITEPROMPT | OFN_HIDEREADONLY;
+	stOpenFile.lpstrDefExt     = TEXT("mlt");
+
+	//‚±‚±‚Å FileOpenDialogue ‚ðo‚·
+	bOpened = GetSaveFileName( &stOpenFile );
+	wrote = CommDlgExtendedError();
+
+	TRACE( TEXT("ƒtƒ@ƒCƒ‹•Û‘¶ƒ_ƒCƒ„ƒƒO’Ê‰ß[%X]"), wrote );
+
+#ifndef _ORRVW
+	ViewFocusSet(  );
+#endif
+	if( !(bOpened) ){	return  E_ABORT;	}	//	ƒLƒƒƒ“ƒZƒ‹‚µ‚Ä‚½‚ç‰½‚à‚µ‚È‚¢
+
+	hFile = CreateFile( atPath, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL );
+	if( INVALID_HANDLE_VALUE == hFile ){	return E_HANDLE;	}
+
+	SetFilePointer( hFile, 0, NULL, FILE_BEGIN );
+
+	for( itItem = gvcDrtItems.begin(); gvcDrtItems.end() != itItem; itItem++ )
+	{
+		StringCchLengthA( itItem->pcItem, STRSAFE_MAX_LENGTH, &cbSize );
+		
+		WriteFile( hFile, itItem->pcItem, cbSize, &wrote, NULL );
+		WriteFile( hFile, cacSplit, 9, &wrote, NULL );	//	ŒÅ’è’l’ˆÓ
+	}
+
+	CloseHandle( hFile );
+
+	MessageBox( hWnd, TEXT("ƒtƒ@ƒCƒ‹‚É•Û‘¶‚µ‚½‚æ"), TEXT("‘€ìŠm”F"), MB_OK | MB_ICONINFORMATION );
+
+	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 

@@ -21,12 +21,9 @@ If not, see <http://www.gnu.org/licenses/>.
 #include "OrinrinEditor.h"
 //-------------------------------------------------------------------------------------------------
 
-#ifdef MULTI_FILE
 extern FILES_ITR	gitFileIt;	//!<	今見てるファイルの本体
 #define gstFile	(*gitFileIt)	//!<	イテレータを構造体と見なす
-#else
-extern ONEFILE	gstFile;			//!<	ファイル単位・複数ファイルにはどうやって対応を？
-#endif
+
 extern INT		gixFocusPage;	//!<	注目中のページ・とりあえず０・０インデックス
 
 static BOOLEAN	gbGroupUndo;	//!<	真ならグループアンドゥをする
@@ -246,7 +243,7 @@ UINT SqnAppendSquare( LPUNDOBUFF pstBuff, UINT dCmd, LPTSTR ptStr, LPPOINT pstPt
 
 		pstBuff->vcOpeSqn.push_back( stOpe );
 
-		ptCaret = NextLine( ptSprt );	//	次の行の先頭に移動
+		ptCaret = NextLineW( ptSprt );	//	次の行の先頭に移動
 	}
 
 	pstBuff->dNowSqn = pstBuff->vcOpeSqn.size( );

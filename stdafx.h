@@ -33,7 +33,7 @@ If not, see <http://www.gnu.org/licenses/>.
 
 #pragma comment(linker, "/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='x86' publicKeyToken='6595b64144ccf1df' language='*'\"")
 
-#define WIN32_LEAN_AND_MEAN		//	Windows ヘッダーから使用されていない部分を除外します。
+//#define WIN32_LEAN_AND_MEAN		//	Windows ヘッダーから使用されていない部分を除外します。
 // Windows ヘッダー ファイル:
 #include <windows.h>
 #include <shlobj.h>
@@ -45,6 +45,7 @@ If not, see <http://www.gnu.org/licenses/>.
 
 //	コモンダイヤログ
 #include <commdlg.h>
+#pragma comment(lib, "Comdlg32.lib")
 
 #include <Commctrl.h>
 #pragma comment(lib, "ComCtl32.lib")
@@ -107,13 +108,10 @@ static CONST GUID gcstGUID = { 0x66D3E881, 0x972B, 0x458B, { 0x93, 0x5E, 0x9E, 0
 
 //#define FIND_STRINGS	//	文字列検索機能
 
-#define DRAUGHT_STYLE
-#define THUMBNAIL_STYLE
-
 //機能ＯＫ
-#define MAIN_SPLITBAR	//	DOCKINGしてたらメイン窓にスプリットバー
+#define DRAUGHT_STYLE
+
 #define MAA_PROFILE		//	ツリー構成をプロファイルする機能
-#define MULTI_FILE		//	複数ファイルの同時展開
 
 #define USE_NOTIFYICON	//	タスクトレイアイコンを有効
 //-------------------------------------------------------------------------------------------------
@@ -245,6 +243,8 @@ VOID	SqlErrMsgView( sqlite3 *, DWORD );
 #define VL_MAIN_SPLIT	35	//	メインのスプリットバーの右からの位置
 #define VL_MAXIMISED	36	//	最大化で終わったか？
 #define VL_DRAUGHT_MODE	37	//	ドラフトボードクリックのデフォ動作
+#define VL_FIRST_READED	38	//	マニュアル読込した
+#define VL_LAST_OPEN	39	//	最後に開いていたファイルを　０開く　１開かない　２毎回選択
 
 //増やしたら、函数内に取扱つくっておくこと
 
@@ -286,6 +286,9 @@ VOID	SqlErrMsgView( sqlite3 *, DWORD );
 #define MAA_SJISCLIP	4
 #define MAA_DRAUGHT		5
 
+#define LASTOPEN_DO		0
+#define LASTOPEN_NON	1
+#define LASTOPEN_ASK	2
 
 //	指示コード・かぶらないように
 #define D_SJIS		0x00	//	シフトJIS

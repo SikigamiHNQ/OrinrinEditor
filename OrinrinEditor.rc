@@ -45,21 +45,21 @@ IDC_ORINRINEDITOR MENU
 BEGIN
     POPUP "ファイル(&F)"
     BEGIN
-        MENUITEM "新規作成(&N)\tCtrl + N",		IDM_NEWFILE
-        MENUITEM "ファイル開く(&O)\tCtrl + O",	IDM_OPEN
+        MENUITEM "新規作成(&N)\tCtrl + N",          IDM_NEWFILE
+        MENUITEM "ファイル開く(&O)\tCtrl + O",        IDM_OPEN
         MENUITEM SEPARATOR
-        MENUITEM "上書き保存(&S)\tCtrl + S",				IDM_OVERWRITESAVE
-        MENUITEM "名前を付けて保存(&M)\tCtrl + Alt + S",	IDM_RENAMESAVE
-        MENUITEM "現在頁を画像にして保存(&I)",				IDM_IMAGE_SAVE
+        MENUITEM "上書き保存(&S)\tCtrl + S",         IDM_OVERWRITESAVE
+        MENUITEM "名前を付けて保存(&M)\tCtrl + Alt + S", IDM_RENAMESAVE
+        MENUITEM "現在頁を画像にして保存(&I)",             IDM_IMAGE_SAVE
         MENUITEM SEPARATOR
-        MENUITEM "一般設定(&G)",				IDM_GENERAL_OPTION
-        MENUITEM "右クリックメニュー編集",		IDM_MENUEDIT_DLG_OPEN
-        MENUITEM "AA一覧ツリーを再構築(&T)",	IDM_TREE_RECONSTRUCT
-		MENUITEM "編集エリアの配色編集",		IDM_COLOUR_EDIT_OPEN
+        MENUITEM "一般設定(&G)",                    IDM_GENERAL_OPTION
+        MENUITEM "右クリックメニュー編集",                 IDM_MENUEDIT_DLG_OPEN
+        MENUITEM "AA一覧ツリーを再構築(&T)",             IDM_TREE_RECONSTRUCT
+        MENUITEM "編集エリアの配色編集",                  IDM_COLOUR_EDIT_OPEN
         MENUITEM SEPARATOR
-        MENUITEM "バージョン情報(&A)",			IDM_ABOUT
+        MENUITEM "バージョン情報(&A)",                 IDM_ABOUT
         MENUITEM SEPARATOR
-        MENUITEM "終了(&Q)",					IDM_EXIT
+        MENUITEM "終了(&Q)",                      IDM_EXIT
     END
     POPUP "編集(&E)"
     BEGIN
@@ -333,6 +333,7 @@ BEGIN
     POPUP "テンプレウインドウのアレ"
     BEGIN
         MENUITEM "常に手前に表示(&Z)",                 IDM_TOPMOST_TOGGLE
+        MENUITEM "テンプレート再読込(&R)",               IDM_TMPLT_RELOAD
     END
 END
 
@@ -348,7 +349,7 @@ BEGIN
         MENUITEM SEPARATOR
         MENUITEM "アイテムを削除(&D)",                 IDM_DRAUGHT_DELETE
         MENUITEM SEPARATOR
-        MENUITEM "全内容をエクスポート(&E)",              IDM_DRAUGHT_EXPORT, GRAYED
+        MENUITEM "全内容をエクスポート(&E)",              IDM_DRAUGHT_EXPORT
         MENUITEM SEPARATOR
         MENUITEM "全内容を削除(&K)",                  IDM_DRAUGHT_ALLDELETE
         MENUITEM "ドラフトボードを閉じる(&Q)",             IDM_DRAUGHT_CLOSE
@@ -430,7 +431,7 @@ CAPTION "バージョン情報 - Orinrin Editor"
 FONT 9, "MS UI Gothic"
 BEGIN
     ICON            IDI_ORINRINEDITOR,IDC_MYICON,6,6,20,20
-    LTEXT           "Orinrin Editor, Version 0.26 Aurora (2011.1216.2200.920)",IDC_STATIC,36,6,168,8,SS_NOPREFIX
+    LTEXT           "Orinrin Editor, Version 0.26 Aurora (2011.1222.2200.920)",IDC_STATIC,36,6,168,8,SS_NOPREFIX
     LTEXT           "Copyright (C) 2011 by SikigamiHNQ",IDC_STATIC,36,18,168,8
     LTEXT           "Site ： お燐ちゃんは俺の嫁．ｃｏｍ",IDC_STATIC,36,30,168,8
     DEFPUSHBUTTON   "OK",IDOK,84,180,48,12,WS_GROUP
@@ -519,15 +520,15 @@ BEGIN
     EDITTEXT        IDE_PAGENAME,6,18,156,12,ES_AUTOHSCROLL
 END
 
-IDD_GENERAL_OPTION_DLG DIALOG  0, 0, 271, 294
+IDD_GENERAL_OPTION_DLG DIALOG 0, 0, 271, 311
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_TOOLWINDOW
 CAPTION "設定いろいろ"
 FONT 10, "MS UI Gothic"
 BEGIN
-    DEFPUSHBUTTON   "OK",IDOK,102,276,42,12
-    PUSHBUTTON      "キャンセル",IDCANCEL,162,276,42,12
-    PUSHBUTTON      "適用",IDB_APPLY,222,276,42,12
+    DEFPUSHBUTTON   "OK",IDOK,102,294,42,12
+    PUSHBUTTON      "キャンセル",IDCANCEL,162,294,42,12
+    PUSHBUTTON      "適用",IDB_APPLY,222,294,42,12
     GROUPBOX        "AAの入ってるディレクトリ",IDC_STATIC,6,6,258,42
     EDITTEXT        IDE_AA_DIRECTORY,12,18,210,12,ES_AUTOHSCROLL
     PUSHBUTTON      "参照",IDB_AADIR_SEARCH,228,18,30,12
@@ -548,17 +549,21 @@ BEGIN
     CONTROL         "アンドゥ・リドゥの同じタイミング操作をまとめて行う",IDCB_GROUPUNDO_SET,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,120,156,8
     CONTROL         "コピーの標準をShiftJISにする",IDCB_COPY_STYLE_SWAP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,132,156,10
     CONTROL         "テンプレ窓をメイン窓に統合（再起動後に有効）",IDCB_DOCKING_STYLE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,144,156,10
-    GROUPBOX        "レイヤボックスの透明度",IDC_STATIC,6,174,258,36
-    CONTROL         "",IDSL_LAYERBOX_TRANCED,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | WS_TABSTOP,36,186,198,15
-    CTEXT           "儚い",IDC_STATIC,12,186,18,18,SS_CENTERIMAGE
-    CTEXT           "濃い",IDC_STATIC,240,186,18,18,SS_CENTERIMAGE
-    GROUPBOX        "複数行テンプレをクリックしたときの動作",IDC_STATIC,6,217,126,53
-    CONTROL         "通常挿入",IDRB_SEL_INS_EDIT,"Button",BS_AUTORADIOBUTTON | WS_GROUP,12,228,42,8
-    CONTROL         "矩形挿入",IDRB_SEL_INTRPT_EDIT,"Button",BS_AUTORADIOBUTTON,12,240,42,8
-    CONTROL         "レイヤボックス",IDRB_SEL_SET_LAYER,"Button",BS_AUTORADIOBUTTON,12,252,54,8
-    CONTROL         "コピー(Unicode)",IDRB_SEL_CLIP_UNI,"Button",BS_AUTORADIOBUTTON,66,228,60,8
-    CONTROL         "コピー(ShiftJIS)",IDRB_SEL_CLIP_SJIS,"Button",BS_AUTORADIOBUTTON,66,240,60,8
-    CONTROL         "ドラフトボード",IDRB_SEL_DRAUGHT,"Button",BS_AUTORADIOBUTTON,66,252,60,8
+    GROUPBOX        "起動時に、前回開いていたファイルを",IDC_STATIC,6,162,138,24
+    CONTROL         "開く",IDRB_LASTOPEN_DO,"Button",BS_AUTORADIOBUTTON | WS_GROUP,12,174,30,8
+    CONTROL         "開かない",IDRB_LASTOPEN_NON,"Button",BS_AUTORADIOBUTTON,48,174,48,8
+    CONTROL         "毎回確認",IDRB_LASTOPEN_ASK,"Button",BS_AUTORADIOBUTTON,96,174,48,8
+    GROUPBOX        "レイヤボックスの透明度",IDC_STATIC,6,192,258,36
+    CONTROL         "",IDSL_LAYERBOX_TRANCED,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | WS_TABSTOP,36,204,198,15
+    CTEXT           "儚い",IDC_STATIC,12,204,18,18,SS_CENTERIMAGE
+    CTEXT           "濃い",IDC_STATIC,240,204,18,18,SS_CENTERIMAGE
+    GROUPBOX        "複数行テンプレをクリックしたときの動作",IDC_STATIC,6,235,126,53
+    CONTROL         "通常挿入",IDRB_SEL_INS_EDIT,"Button",BS_AUTORADIOBUTTON | WS_GROUP,12,246,42,8
+    CONTROL         "矩形挿入",IDRB_SEL_INTRPT_EDIT,"Button",BS_AUTORADIOBUTTON,12,258,42,8
+    CONTROL         "レイヤボックス",IDRB_SEL_SET_LAYER,"Button",BS_AUTORADIOBUTTON,12,270,54,8
+    CONTROL         "コピー(Unicode)",IDRB_SEL_CLIP_UNI,"Button",BS_AUTORADIOBUTTON,66,246,60,8
+    CONTROL         "コピー(ShiftJIS)",IDRB_SEL_CLIP_SJIS,"Button",BS_AUTORADIOBUTTON,66,258,60,8
+    CONTROL         "ドラフトボード",IDRB_SEL_DRAUGHT,"Button",BS_AUTORADIOBUTTON,66,270,60,8
     GROUPBOX        "右ルーラ位置",IDC_STATIC,210,54,54,36
     EDITTEXT        IDE_RIGHT_RULER_POS,216,71,42,12,ES_CENTER | ES_AUTOHSCROLL | ES_NUMBER
     GROUPBOX        "グリッド位置（ドット指定）",IDC_STATIC,174,96,90,42
@@ -567,12 +572,12 @@ BEGIN
     CTEXT           "X",IDC_STATIC,180,108,8,12,SS_CENTERIMAGE
     CTEXT           "Y",IDC_STATIC,222,108,8,12,SS_CENTERIMAGE
     LTEXT           "※壱行は18ドットです",IDC_STATIC,186,126,72,8
-    GROUPBOX        "ドラフトボードでクリックしたときの動作",IDC_STATIC,138,216,126,54
-    CONTROL         "通常挿入",IDRB_DRT_INS_EDIT,"Button",BS_AUTORADIOBUTTON | WS_GROUP,144,228,42,8
-    CONTROL         "矩形挿入",IDRB_DRT_INTRPT_EDIT,"Button",BS_AUTORADIOBUTTON,144,240,42,8
-    CONTROL         "レイヤボックス",IDRB_DRT_SET_LAYER,"Button",BS_AUTORADIOBUTTON,144,252,54,8
-    CONTROL         "コピー(Unicode)",IDRB_DRT_CLIP_UNI,"Button",BS_AUTORADIOBUTTON,192,228,66,8
-    CONTROL         "コピー(ShiftJIS)",IDRB_DRT_CLIP_SJIS,"Button",BS_AUTORADIOBUTTON,192,240,66,8
+    GROUPBOX        "ドラフトボードでクリックしたときの動作",IDC_STATIC,138,234,126,54
+    CONTROL         "通常挿入",IDRB_DRT_INS_EDIT,"Button",BS_AUTORADIOBUTTON | WS_GROUP,144,246,42,8
+    CONTROL         "矩形挿入",IDRB_DRT_INTRPT_EDIT,"Button",BS_AUTORADIOBUTTON,144,258,42,8
+    CONTROL         "レイヤボックス",IDRB_DRT_SET_LAYER,"Button",BS_AUTORADIOBUTTON,144,270,54,8
+    CONTROL         "コピー(Unicode)",IDRB_DRT_CLIP_UNI,"Button",BS_AUTORADIOBUTTON,192,246,66,8
+    CONTROL         "コピー(ShiftJIS)",IDRB_DRT_CLIP_SJIS,"Button",BS_AUTORADIOBUTTON,192,258,66,8
 END
 
 IDD_TRACEADJUST_DLG DIALOG  0, 0, 139, 281
@@ -773,7 +778,7 @@ BEGIN
     CONTROL         "",IDLV_MAA_FINDED_FILE,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_ALIGNLEFT | LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,6,24,204,96
 END
 
-IDD_COLOUR_DLG DIALOG 0, 0, 162, 119
+IDD_COLOUR_DLG DIALOG  0, 0, 162, 119
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_TOOLWINDOW
 CAPTION "色設定"
@@ -796,7 +801,7 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 2011,1216,2200,920
+ FILEVERSION 2011,1222,2200,920
  PRODUCTVERSION 0,26,0,920
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
@@ -822,7 +827,7 @@ BEGIN
             VALUE "LegalTrademarks", "License : GPLv3"
             VALUE "PrivateBuild", "Build by Visual C++ 2008 Express"
             VALUE "SpecialBuild", "Not Speciality"
-            VALUE "FileVersion", "2011.1216.2200.920"
+            VALUE "FileVersion", "2011.1222.2200.920"
             VALUE "ProductVersion", "0.26.0.920"
             VALUE "FileDescription", "AsciiArt Story Editor by Orinrin!"
             VALUE "OriginalFilename", "OrinrinEditor.exe"
@@ -989,7 +994,6 @@ IDBMQ_MOZI_SCRIPT       BITMAP                  "resource\\MoziScript_q.bmp"
 IDBMP_MOZI_WRITE        BITMAP                  "resource\\MoziWrite.bmp"
 IDBMP_MOZI_ADVANCE      BITMAP                  "resource\\MoziAdv.bmp"
 IDBMQ_MOZI_ADVANCE      BITMAP                  "resource\\MoziAdv_q.bmp"
-
 
 /////////////////////////////////////////////////////////////////////////////
 //
