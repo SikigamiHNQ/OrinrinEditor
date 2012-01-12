@@ -104,15 +104,14 @@ using namespace	std;	//	このスコープ内ではstd::が省略できる
 static CONST GUID gcstGUID = { 0x66D3E881, 0x972B, 0x458B, { 0x93, 0x5E, 0x9E, 0x78, 0xB9, 0x26, 0xB4, 0x15 } };
 //-------------------------------------------------------------------------------------------------
 
-//#define OPEN_HISTORY
-
+//#define OPEN_HISTORY	//	ファイル開いた履歴
 //#define FIND_STRINGS	//	文字列検索機能
+//#define FRAME_MLINE	//	枠パーツ複数行
+
+#define VERTICAL_TEXT	//	縦書きモード
 
 //機能ＯＫ
-#define DRAUGHT_STYLE
-
 #define MAA_PROFILE		//	ツリー構成をプロファイルする機能
-
 #define USE_NOTIFYICON	//	タスクトレイアイコンを有効
 //-------------------------------------------------------------------------------------------------
 
@@ -211,7 +210,7 @@ VOID	SqlErrMsgView( sqlite3 *, DWORD );
 #define VL_LAYER_TRANS	3	//	レイヤボックス透明度
 #define VL_RIGHT_SLIDE	4	//	右寄せる位置
 #define VL_MAA_SPLIT	5	//	ＭＡＡのスプリットバーの位置
-#define VL_SETMETHOD	6	//	ＭＡＡ一覧でクルッコしたときの標準動作
+#define VL_MAA_LCLICK	6	//	ＭＡＡ一覧でクルッコしたときの標準動作
 #define VL_UNILISTLAST	7	//	ユニコード一覧を閉じたときの位置
 #define VL_MAATIP_VIEW	8	//	ＭＡＡのＡＡツールチップの表示するか
 #define VL_MAATIP_SIZE	9	//	ＭＡＡのＡＡツールチップの文字サイズ・16か12
@@ -242,9 +241,12 @@ VOID	SqlErrMsgView( sqlite3 *, DWORD );
 #define VL_SWAP_COPY	34	//	コピー標準をSJISにするか
 #define VL_MAIN_SPLIT	35	//	メインのスプリットバーの右からの位置
 #define VL_MAXIMISED	36	//	最大化で終わったか？
-#define VL_DRAUGHT_MODE	37	//	ドラフトボードクリックのデフォ動作
+#define VL_DRT_LCLICK	37	//	ドラフトボードクリックのデフォ動作
 #define VL_FIRST_READED	38	//	マニュアル読込した
 #define VL_LAST_OPEN	39	//	最後に開いていたファイルを　０開く　１開かない　２毎回選択
+#define VL_MAA_MCLICK	40	//	ＭＡＡ一覧でミドゥクルッコしたときの標準動作
+#define VL_DRT_MCLICK	41	//	ドラフトボードクリックのデフォ動作
+#define VS_FONT_NAME	42	//	メインのフォント名、ＭＳ Ｐゴシック
 
 //増やしたら、函数内に取扱つくっておくこと
 
@@ -279,6 +281,7 @@ VOID	SqlErrMsgView( sqlite3 *, DWORD );
 #define M_EXISTENCE	2
 
 #define MAA_DEFAULT		0xFF
+#define MAA_SUBDEFAULT	0xFE
 #define MAA_INSERT		0
 #define MAA_INTERRUPT	1
 #define MAA_LAYERED		2

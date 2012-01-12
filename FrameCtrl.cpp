@@ -42,14 +42,24 @@ If not, see <http://www.gnu.org/licenses/>.
 
 typedef struct tagFRAMEINSINFO
 {
-	UINT	dRfItem;	//	天井・上のパーツ数
-	UINT	dLftRfDot;	//	左上＋上のドット数・中の右オフセット開始地点
-	UINT	dMidLines;	//	間の行数
-	UINT	dFlrItem;	//	床・下のパーツ数
+	UINT	dRfItem;	//!<	天井・上のパーツ数
+	UINT	dLftRfDot;	//!<	左上＋上のドット数・中の右オフセット開始地点
+	UINT	dMidLines;	//!<	間の行数
+	UINT	dFlrItem;	//!<	床・下のパーツ数
 
-	LPTSTR	ptRoof;		//	天井の文字列
-	LPTSTR	ptMiddle;	//	間の文字列
-	LPTSTR	ptFloor;	//	床の文字列
+	LPTSTR	ptRoof;		//!<	天井の文字列
+	LPTSTR	ptMiddle;	//!<	間の文字列・複数型だと使わないか？
+	LPTSTR	ptFloor;	//!<	床の文字列
+
+#ifdef FRAME_MLINE
+	UINT	dRoofLine;	//!<	天井・上の使用行数
+	UINT	dFloorLine;	//!<	床・下の使用行数
+
+	POINT	stRiOrigin;	//!<	右柱の左上相対ドット・行
+
+	LPTSTR	ptLfPillar;	//!<	左柱の文字列
+	LPTSTR	ptRiPillar;	//!<	右柱の文字列
+#endif
 
 } FRMINSINFO, *LPFRMINSINFO;
 //-------------------------------------------------------------------------------------------------
@@ -129,6 +139,13 @@ HRESULT	FramePartsUpdate( HWND, HWND, LPFRAMEITEM );
 
 HRESULT	FrameDataGet( UINT, LPFRAMEINFO );
 HRESULT	FrameInfoDisp( HWND );
+
+#ifdef FRAME_MLINE
+VOID	FrameDataTranslate( LPTSTR, UINT );
+INT		FramePartsSizeCalc( LPTSTR, PINT );
+#endif
+
+
 
 
 HRESULT	FrameInsBoxInfoCheck( VOID );
@@ -234,7 +251,7 @@ HRESULT FrameInitialise( LPTSTR ptCurrent, HINSTANCE hInstance )
 */
 HRESULT FrameNameModifyMenu( HWND hWnd )
 {
-	HMENU	hMenu, hSubMenu;//, hBoxMenu;
+	HMENU	hMenu, hSubMenu;
 	UINT	i;
 	TCHAR	atBuffer[MAX_PATH], atName[MAX_STRING];
 
@@ -242,12 +259,7 @@ HRESULT FrameNameModifyMenu( HWND hWnd )
 	hMenu = GetMenu( hWnd );
 	hSubMenu = GetSubMenu( hMenu, 2 );
 
-	//	メイン枠、０番のアレ
-	//FrameNameLoad( 0, atName, MAX_STRING );
-	//StringCchPrintf( atBuffer, MAX_PATH, TEXT("枠：(&A)%s"), atName );
-	//ModifyMenu( hSubMenu, IDM_INSFRAME_ALPHA, MF_BYCOMMAND | MFT_STRING, IDM_INSFRAME_ALPHA, atBuffer );
-
-	//	追加枠・１から０から
+	//	枠
 	for( i = 0; FRAME_MAX > i; i++ )
 	{
 		FrameNameLoad( i, atName, MAX_STRING );
@@ -327,24 +339,36 @@ HRESULT FrameNameLoad( UINT dNumber, LPTSTR ptNamed, UINT_PTR cchSize )
 HRESULT InitFrameItem( UINT dMode, UINT dNumber, LPFRAMEINFO pstInfo )
 {
 	TCHAR	atAppName[MIN_STRING], atBuff[MIN_STRING];
+	TCHAR	atBuffer[PARTS_CCH];
 
 	//	所定のAPP名を作る
 	StringCchPrintf( atAppName, MIN_STRING, TEXT("Frame%u"), dNumber );
+
+//20120105	複数行を扱う、￥￥と￥ｎによる相互変換函数を用意
 
 	if( dMode )	//	ロード
 	{
 		GetPrivateProfileString( atAppName, TEXT("Name"), atAppName, pstInfo->atFrameName, MAX_STRING, gatFrameIni );
 
-		GetPrivateProfileString( atAppName, TEXT("Daybreak"), TEXT("│"), pstInfo->stDaybreak.atParts, PARTS_CCH, gatFrameIni );
-		GetPrivateProfileString( atAppName, TEXT("Morning"), TEXT("┌"), pstInfo->stMorning.atParts, PARTS_CCH, gatFrameIni );
-		GetPrivateProfileString( atAppName, TEXT("Noon"), TEXT("─"), pstInfo->stNoon.atParts, PARTS_CCH, gatFrameIni );
+		GetPrivateProfileString( atAppName, TEXT("Daybreak"),  TEXT("│"), pstInfo->stDaybreak.atParts, PARTS_CCH, gatFrameIni );
+		GetPrivateProfileString( atAppName, TEXT("Morning"),   TEXT("┌"), pstInfo->stMorning.atParts, PARTS_CCH, gatFrameIni );
+		GetPrivateProfileString( atAppName, TEXT("Noon"),      TEXT("─"), pstInfo->stNoon.atParts, PARTS_CCH, gatFrameIni );
 		GetPrivateProfileString( atAppName, TEXT("Afternoon"), TEXT("┐"), pstInfo->stAfternoon.atParts, PARTS_CCH, gatFrameIni );
 		GetPrivateProfileString( atAppName, TEXT("Nightfall"), TEXT("│"), pstInfo->stNightfall.atParts, PARTS_CCH, gatFrameIni );
-		GetPrivateProfileString( atAppName, TEXT("Twilight"), TEXT("┘"), pstInfo->stTwilight.atParts, PARTS_CCH, gatFrameIni );
-		GetPrivateProfileString( atAppName, TEXT("Midnight"), TEXT("─"), pstInfo->stMidnight.atParts, PARTS_CCH, gatFrameIni );
-		GetPrivateProfileString( atAppName, TEXT("Dawn"), TEXT("└"), pstInfo->stDawn.atParts, PARTS_CCH, gatFrameIni );
-
-		GetPrivateProfileString( atAppName, TEXT("LEFTOFFSET"), TEXT("0"), atBuff, MIN_STRING, gatFrameIni );
+		GetPrivateProfileString( atAppName, TEXT("Twilight"),  TEXT("┘"), pstInfo->stTwilight.atParts, PARTS_CCH, gatFrameIni );
+		GetPrivateProfileString( atAppName, TEXT("Midnight"),  TEXT("─"), pstInfo->stMidnight.atParts, PARTS_CCH, gatFrameIni );
+		GetPrivateProfileString( atAppName, TEXT("Dawn"),      TEXT("└"), pstInfo->stDawn.atParts, PARTS_CCH, gatFrameIni );
+#ifdef FRAME_MLINE
+		FrameDataTranslate( pstInfo->stDaybreak.atParts , 1 );
+		FrameDataTranslate( pstInfo->stMorning.atParts , 1 );
+		FrameDataTranslate( pstInfo->stNoon.atParts , 1 );
+		FrameDataTranslate( pstInfo->stAfternoon.atParts , 1 );
+		FrameDataTranslate( pstInfo->stNightfall.atParts , 1 );
+		FrameDataTranslate( pstInfo->stTwilight.atParts , 1 );
+		FrameDataTranslate( pstInfo->stMidnight.atParts , 1 );
+		FrameDataTranslate( pstInfo->stDawn.atParts , 1 );
+#endif
+		GetPrivateProfileString( atAppName, TEXT("LEFTOFFSET"),  TEXT("0"), atBuff, MIN_STRING, gatFrameIni );
 		pstInfo->dLeftOffset  = StrToInt( atBuff );
 		GetPrivateProfileString( atAppName, TEXT("RIGHTOFFSET"), TEXT("0"), atBuff, MIN_STRING, gatFrameIni );
 		pstInfo->dRightOffset = StrToInt( atBuff );
@@ -353,14 +377,33 @@ HRESULT InitFrameItem( UINT dMode, UINT dNumber, LPFRAMEINFO pstInfo )
 	{
 		WritePrivateProfileString( atAppName, TEXT("Name"), pstInfo->atFrameName, gatFrameIni );
 
-		WritePrivateProfileString( atAppName, TEXT("Daybreak"), pstInfo->stDaybreak.atParts, gatFrameIni );
-		WritePrivateProfileString( atAppName, TEXT("Morning"), pstInfo->stMorning.atParts, gatFrameIni );
-		WritePrivateProfileString( atAppName, TEXT("Noon"), pstInfo->stNoon.atParts, gatFrameIni );
+#ifdef FRAME_MLINE
+		StringCchCopy( atBuffer, PARTS_CCH, pstInfo->stDaybreak.atParts );	FrameDataTranslate( atBuffer, 0 );
+		WritePrivateProfileString( atAppName, TEXT("Daybreak"),  atBuffer, gatFrameIni );
+		StringCchCopy( atBuffer, PARTS_CCH, pstInfo->stMorning.atParts );	FrameDataTranslate( atBuffer, 0 );
+		WritePrivateProfileString( atAppName, TEXT("Morning"),   atBuffer, gatFrameIni );
+		StringCchCopy( atBuffer, PARTS_CCH, pstInfo->stNoon.atParts );		FrameDataTranslate( atBuffer, 0 );
+		WritePrivateProfileString( atAppName, TEXT("Noon"),      atBuffer, gatFrameIni );
+		StringCchCopy( atBuffer, PARTS_CCH, pstInfo->stAfternoon.atParts );	FrameDataTranslate( atBuffer, 0 );
+		WritePrivateProfileString( atAppName, TEXT("Afternoon"), atBuffer, gatFrameIni );
+		StringCchCopy( atBuffer, PARTS_CCH, pstInfo->stNightfall.atParts );	FrameDataTranslate( atBuffer, 0 );
+		WritePrivateProfileString( atAppName, TEXT("Nightfall"), atBuffer, gatFrameIni );
+		StringCchCopy( atBuffer, PARTS_CCH, pstInfo->stTwilight.atParts );	FrameDataTranslate( atBuffer, 0 );
+		WritePrivateProfileString( atAppName, TEXT("Twilight"),  atBuffer, gatFrameIni );
+		StringCchCopy( atBuffer, PARTS_CCH, pstInfo->stMidnight.atParts );	FrameDataTranslate( atBuffer, 0 );
+		WritePrivateProfileString( atAppName, TEXT("Midnight"),  atBuffer, gatFrameIni );
+		StringCchCopy( atBuffer, PARTS_CCH, pstInfo->stDawn.atParts );		FrameDataTranslate( atBuffer, 0 );
+		WritePrivateProfileString( atAppName, TEXT("Dawn"),      atBuffer, gatFrameIni );
+#else
+		WritePrivateProfileString( atAppName, TEXT("Daybreak"),  pstInfo->stDaybreak.atParts, gatFrameIni );
+		WritePrivateProfileString( atAppName, TEXT("Morning"),   pstInfo->stMorning.atParts, gatFrameIni );
+		WritePrivateProfileString( atAppName, TEXT("Noon"),      pstInfo->stNoon.atParts, gatFrameIni );
 		WritePrivateProfileString( atAppName, TEXT("Afternoon"), pstInfo->stAfternoon.atParts, gatFrameIni );
 		WritePrivateProfileString( atAppName, TEXT("Nightfall"), pstInfo->stNightfall.atParts, gatFrameIni );
-		WritePrivateProfileString( atAppName, TEXT("Twilight"), pstInfo->stTwilight.atParts, gatFrameIni );
-		WritePrivateProfileString( atAppName, TEXT("Midnight"), pstInfo->stMidnight.atParts, gatFrameIni );
-		WritePrivateProfileString( atAppName, TEXT("Dawn"), pstInfo->stDawn.atParts, gatFrameIni );
+		WritePrivateProfileString( atAppName, TEXT("Twilight"),  pstInfo->stTwilight.atParts, gatFrameIni );
+		WritePrivateProfileString( atAppName, TEXT("Midnight"),  pstInfo->stMidnight.atParts, gatFrameIni );
+		WritePrivateProfileString( atAppName, TEXT("Dawn"),      pstInfo->stDawn.atParts, gatFrameIni );
+#endif
 
 		StringCchPrintf( atBuff, MIN_STRING, TEXT("%d"), pstInfo->dLeftOffset );
 		WritePrivateProfileString( atAppName, TEXT("LEFTOFFSET"), atBuff, gatFrameIni );
@@ -386,7 +429,11 @@ INT_PTR FrameEditDialogue( HINSTANCE hInst, HWND hWnd, UINT dRsv )
 
 	gNowSel = 0;
 
+#ifdef FRAME_MLINE
+	iRslt = DialogBoxParam( hInst, MAKEINTRESOURCE(IDD_FRAME_EDIT_DLG_2), hWnd, FrameEditDlgProc, 0 );
+#else
 	iRslt = DialogBoxParam( hInst, MAKEINTRESOURCE(IDD_FRAME_EDIT_DLG), hWnd, FrameEditDlgProc, 0 );
+#endif
 	//	処理結果によっては、ここでメニューの内容書換
 	if( IDYES == iRslt ){	FrameNameModifyMenu( hWnd );	}
 
@@ -537,11 +584,11 @@ INT_PTR Frm_OnCommand( HWND hDlg, INT id, HWND hWndCtl, UINT codeNotify )
 */
 HRESULT FramePartsUpdate( HWND hDlg, HWND hWndCtl, LPFRAMEITEM pstItem )
 {
-	TCHAR	atBuffer[MIN_STRING];
+	TCHAR	atBuffer[PARTS_CCH];
 
 	if( Edit_GetTextLength( hWndCtl ) )
 	{
-		Edit_GetText( hWndCtl, atBuffer, MIN_STRING );
+		Edit_GetText( hWndCtl, atBuffer, PARTS_CCH );
 		atBuffer[PARTS_CCH-1] = 0;
 		StringCchCopy( pstItem->atParts, PARTS_CCH, atBuffer );
 	}
@@ -551,8 +598,11 @@ HRESULT FramePartsUpdate( HWND hDlg, HWND hWndCtl, LPFRAMEITEM pstItem )
 	}
 
 	//	ドット数確認して
+#ifdef FRAME_MLINE
+	pstItem->dDot = FramePartsSizeCalc( pstItem->atParts, &(pstItem->iLine) );
+#else
 	pstItem->dDot = ViewStringWidthGet( pstItem->atParts );
-
+#endif
 	//	ついでに再描画
 	InvalidateRect( GetDlgItem(hDlg,IDS_FRAME_IMAGE), NULL, TRUE );
 
@@ -579,9 +629,13 @@ INT_PTR Frm_OnDrawItem( HWND hDlg, CONST LPDRAWITEMSTRUCT pstDrawItem )
 
 	if( IDS_FRAME_IMAGE != pstDrawItem->CtlID ){	return (INT_PTR)FALSE;	}
 
-	pstInfo = &(gstFrameInfo[gNowSel]);
+#ifdef FRAME_MLINE
+#error 複数行による枠配置を作成中
+#endif
 
-	hFtOld = SelectFont( pstDrawItem->hDC, ghAaFont );
+	pstInfo = &(gstFrameInfo[gNowSel]);	//	対象枠確認
+
+	hFtOld = SelectFont( pstDrawItem->hDC, ghAaFont );	//	フォント設定
 
 	FillRect( pstDrawItem->hDC, &(pstDrawItem->rcItem), GetSysColorBrush( COLOR_WINDOW ) );
 	SetBkMode( pstDrawItem->hDC, TRANSPARENT );
@@ -709,6 +763,16 @@ HRESULT FrameDataGet( UINT dNumber, LPFRAMEINFO pstFrame )
 {
 	InitFrameItem( INIT_LOAD, dNumber, pstFrame );
 
+#ifdef FRAME_MLINE
+	pstFrame->stDaybreak.dDot  = FramePartsSizeCalc( pstFrame->stDaybreak.atParts,  &(pstFrame->stDaybreak.iLine) );
+	pstFrame->stMorning.dDot   = FramePartsSizeCalc( pstFrame->stMorning.atParts,   &(pstFrame->stMorning.iLine) );
+	pstFrame->stNoon.dDot      = FramePartsSizeCalc( pstFrame->stNoon.atParts,      &(pstFrame->stNoon.iLine) );
+	pstFrame->stAfternoon.dDot = FramePartsSizeCalc( pstFrame->stAfternoon.atParts, &(pstFrame->stAfternoon.iLine) );
+	pstFrame->stNightfall.dDot = FramePartsSizeCalc( pstFrame->stNightfall.atParts, &(pstFrame->stNightfall.iLine) );
+	pstFrame->stTwilight.dDot  = FramePartsSizeCalc( pstFrame->stTwilight.atParts,  &(pstFrame->stTwilight.iLine) );
+	pstFrame->stMidnight.dDot  = FramePartsSizeCalc( pstFrame->stMidnight.atParts,  &(pstFrame->stMidnight.iLine) );
+	pstFrame->stDawn.dDot      = FramePartsSizeCalc( pstFrame->stDawn.atParts,      &(pstFrame->stDawn.iLine) );
+#else
 	pstFrame->stDaybreak.dDot  = ViewStringWidthGet( pstFrame->stDaybreak.atParts );
 	pstFrame->stMorning.dDot   = ViewStringWidthGet( pstFrame->stMorning.atParts );
 	pstFrame->stNoon.dDot      = ViewStringWidthGet( pstFrame->stNoon.atParts );
@@ -717,7 +781,7 @@ HRESULT FrameDataGet( UINT dNumber, LPFRAMEINFO pstFrame )
 	pstFrame->stTwilight.dDot  = ViewStringWidthGet( pstFrame->stTwilight.atParts );
 	pstFrame->stMidnight.dDot  = ViewStringWidthGet( pstFrame->stMidnight.atParts );
 	pstFrame->stDawn.dDot      = ViewStringWidthGet( pstFrame->stDawn.atParts );
-
+#endif
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
@@ -880,8 +944,126 @@ HRESULT DocFrameInsert( INT dMode, INT dStyle )
 }
 //-------------------------------------------------------------------------------------------------
 
+#ifdef FRAME_MLINE
+/*!
+	複数行Frameの、￥￥・￥ｎ＜＝＞￥・0x0D0Aの相互変換
+	@param[in,out]	ptData	変換元バッファで、変換後文字列入れる。PARTS_CCHサイズであること
+	@param[in]		bMode	１：￥ｎを改行にする　０：改行を￥ｎにする
+*/
+VOID FrameDataTranslate( LPTSTR ptData, UINT bMode )
+{
+	TCHAR	atBuffer[SUB_STRING];
+	UINT_PTR	i, j, cchLen;
+
+	ZeroMemory( atBuffer, sizeof(atBuffer) );
+
+	StringCchLength( ptData, PARTS_CCH, &cchLen );	//	長さ確認
+
+	for( i = 0, j = 0; cchLen > i; i++, j++ )
+	{
+		if( 0x0000 == ptData[i] )	break;	//	多分意味はないけど安全対策
+
+		if( bMode  )	//	￥ｎを改行にする
+		{
+			if( 0x005C == ptData[i] )	//	エスケープシーケンス
+			{
+				i++;	//	次の文字が重要
+				if( 'n' == ptData[i] )
+				{
+					atBuffer[j++] = 0x000D;
+					atBuffer[j] = 0x000A;
+				}
+				else
+				{
+					atBuffer[j] = ptData[i];
+				}
+			}
+			else	//	関係ないならそのままコピーしていく
+			{
+				atBuffer[j] = ptData[i];
+			}
+		}
+		else	//	改行を￥ｎにする
+		{
+			if( 0x005C == ptData[i] )	//	￥記号
+			{
+				atBuffer[j++] = 0x005C;
+				atBuffer[j] = 0x005C;	//	重ねる
+			}
+			else if( 0x000D == ptData[i] )	//	改行はいった
+			{
+				atBuffer[j++] = 0x005C;
+				atBuffer[j] = TEXT('n');	//	エスケープシーケンス
+				i++;	//	次に進める
+			}
+			else	//	関係ないならそのままコピーしていく
+			{
+				atBuffer[j] = ptData[i];
+			}
+		}
+	}
+
+	StringCchCopy( ptData, PARTS_CCH, atBuffer );	//	書き戻す
+
+	return;
+}
+//-------------------------------------------------------------------------------------------------
+
+/*!
+	パーツの文字列を受けて、最大ドット数と行数を返す
+	@param[in]	ptParts	パーツ文字列へのポインター
+	@param[out]	pLine	行数を戻す
+	@return	INT	ドット数を返す
+*/
+INT FramePartsSizeCalc( LPTSTR ptParts, PINT pLine )
+{
+	INT	iDot, iLine, iMax;
+	TCHAR	atBuffer[PARTS_CCH];
+	UINT_PTR	d, e, cchLen;
+
+	StringCchLength( ptParts, PARTS_CCH, &cchLen );	//	チェキ文字列の長さ確認
+	ZeroMemory( atBuffer, sizeof(atBuffer) );
+
+	iDot = 0;	iLine = 0;	iMax = 0;
+	for( d = 0, e = 0; cchLen >= d; d++ )	//	ヌルタミネタまで必要
+	{
+		if( 0x0000 == ptParts[d] || 0x000D == ptParts[d] )
+		{
+			iLine++;	//	壱行
+			iDot = ViewStringWidthGet( atBuffer );
+			if( iMax < iDot )	iMax = iDot;	//	ドット長
+
+			if( 0x0000 == ptParts[d] )	break;	//	終わりならここまで
+
+			d++;	//	次の行の為に
+			e = 0;
+			ZeroMemory( atBuffer, sizeof(atBuffer) );
+		}
+		else
+		{
+			atBuffer[e++] =  ptParts[d];	//	文字列を壱行ずつ確認していく
+		}
+	}
+
+	if( pLine ){	*pLine =  iLine;	}
+
+	return iMax;
+}
+//-------------------------------------------------------------------------------------------------
+
+#endif
 
 
+
+
+
+
+
+
+
+
+
+//挿入ウインドウについて
 
 /*!
 	挿入用ウインドウ作る
@@ -931,15 +1113,9 @@ HWND FrameInsBoxCreate( HINSTANCE hInst, HWND hPrWnd )
 	//	自動ツールチップスタイルを追加
 	SendMessage( ghFIBtlbrWnd, TB_SETEXTENDEDSTYLE, 0, TBSTYLE_EX_MIXEDBUTTONS );
 
-	//	アイコン・とりあえず臨時で
-	//stToolBmp.hInst = HINST_COMMCTRL;
-	//stToolBmp.nID   = IDB_STD_SMALL_COLOR;
-	//SendMessage( ghFIBtlbrWnd, TB_ADDBITMAP, 0, (LPARAM)&stToolBmp );
-
+	//	アイコン
 	SendMessage( ghFIBtlbrWnd, TB_SETIMAGELIST, 0, (LPARAM)ghFrameImgLst );
-
 	SendMessage( ghFIBtlbrWnd, TB_SETBUTTONSIZE, 0, MAKELPARAM(16,16) );
-
 	SendMessage( ghFIBtlbrWnd, TB_BUTTONSTRUCTSIZE, (WPARAM)sizeof(TBBUTTON), 0 );
 
 	//	ツールチップ文字列を設定・ボタンテキストがツールチップになる
@@ -1313,23 +1489,15 @@ VOID FrameInsBoxFrmDraw( HDC hDC )
 	//	天井描画
 	iYpos = topOst;
 	FrameDrawItem( hDC, iYpos, gstFrmInsInfo.ptRoof );
-	//StringCchLength( gstFrmInsInfo.ptRoof, STRSAFE_MAX_CCH, &cchSize );
-	//ExtTextOut( hDC, 0, iYpos, 0, NULL, gstFrmInsInfo.ptRoof, cchSize, NULL );
 	iYpos += LINE_HEIGHT;
 	//	間描画
-	//StringCchLength( gstFrmInsInfo.ptMiddle, STRSAFE_MAX_CCH, &cchSize );
 	for( i = 0; gstFrmInsInfo.dMidLines > i; i++ )
 	{
 		FrameDrawItem( hDC, iYpos, gstFrmInsInfo.ptMiddle );
-		//ExtTextOut( hDC, 0, iYpos, 0, NULL, gstFrmInsInfo.ptMiddle, cchSize, NULL );
 		iYpos += LINE_HEIGHT;
 	}
 	//	床描画
 	FrameDrawItem( hDC, iYpos, gstFrmInsInfo.ptFloor );
-	//StringCchLength( gstFrmInsInfo.ptFloor, STRSAFE_MAX_CCH, &cchSize );
-	//ExtTextOut( hDC, 0, iYpos, 0, NULL, gstFrmInsInfo.ptFloor, cchSize, NULL );
-
-
 
 	SelectFont( hDC , hOldFnt );	//	フォント戻す
 

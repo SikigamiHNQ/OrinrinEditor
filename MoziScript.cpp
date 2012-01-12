@@ -57,13 +57,6 @@ use1=0
 文字と文字の間を透過するかしないか選択
 透過なら壱文字ずつ、しないなら一枚板に直してカキコすればいい
 
-アドバンスドモード
-壱文字ごとにフローティングさせて、各文字を好きな位置に配置出来る。
-文字コンテキストには、複製・削除みたいな
-各文字をリストビューで表にしておく。ダブルクルックとかで文字追加
-確定したら、各文字毎にレイヤすればおｋ
-各文字の周りは透過
-
 
 IDD_MOZI_SCRIPT_DLG
 
@@ -128,7 +121,7 @@ static  HWND		ghMoziToolBar;	//!<
 static HIMAGELIST	ghMoziImgLst;	//!<	
 
 static  ATOM		gMoziViewAtom;
-static  HWND		ghMoziViewWnd;	//!<	単独モード用表示スタティック
+static  HWND		ghMoziViewWnd;	//!<	表示スタティック
 
 static  HWND		ghTextWnd;		//!<	文字列入力枠
 static  HWND		ghIsolaLvWnd;	//!<	アドバンズド文字選択リストビュー
@@ -137,6 +130,7 @@ static  HWND		ghSettiLvWnd;	//!<	設定リストビュー
 static POINT		gstViewOrigin;	//!<	ビューの左上ウインドウ位置・
 static POINT		gstOffset;		//!<	ビュー左上からの、ボックスの相対位置
 static POINT		gstFrmSz;		//!<	ウインドウエッジから描画領域までのオフセット
+
 static INT			gdToolBarHei;	//!<	ツールバー太さ
 
 static INT			gdMoziInterval;	//!<	文字間隔・正：広がる　負：縮まる
@@ -561,6 +555,9 @@ HRESULT MoziEditAssemble( HWND hWnd )
 	//	やたらデカいなら自重
 	if( iViewXdot < cx ){	cx =  iViewXdot;	}
 	if( iViewYdot < cy ){	cy =  iViewYdot;	}
+	//	小さくても自重・最小サイズは適当
+	if( 66 > cx ){	cx = 66;	}
+	if( 66 > cy ){	cy = 66;	}
 
 #ifdef _DEBUG
 	SetWindowPos( ghMoziViewWnd, HWND_TOP, 0, 0, cx, cy, SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE );
@@ -736,7 +733,11 @@ VOID Mzv_OnKey( HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UINT flags )
 		}
 	}
 
+#ifdef _DEBUG
 	SetWindowPos( hWnd, HWND_TOP, rect.left, rect.top, 0, 0, SWP_NOSIZE | SWP_NOZORDER );
+#else
+	SetWindowPos( hWnd, HWND_TOPMOST, rect.left, rect.top, 0, 0, SWP_NOSIZE | SWP_NOZORDER );
+#endif
 	Mzv_OnMoving( hWnd, &rect );
 
 	return;
@@ -766,6 +767,7 @@ VOID Mzv_OnPaint( HWND hWnd )
 
 /*!
 	表示枠の描画処理
+	@param[in]	hDC	描画するデバイスコンテキスト
 */
 VOID MoziViewDraw( HDC hDC )
 {
@@ -1290,8 +1292,10 @@ HRESULT MoziSpaceCreate( VOID )
 
 /*!
 	内容を書き込む
+	@param[in]	hWnd	ウインドウハンドル・あまり意味はない
+	@return		HRESULT	終了状態コード
 */
-HRESULT	MoziScriptInsert( HWND hWnd )
+HRESULT MoziScriptInsert( HWND hWnd )
 {
 	UINT	bTranst;	//	透過するか？
 	INT		ixNowPage;	//	今の頁を覚えておく
@@ -1322,6 +1326,7 @@ HRESULT	MoziScriptInsert( HWND hWnd )
 		gdHideXdot = 0;
 		gdViewTopLine = 0;
 	}
+	//	透過なら本頁に直で、非透過ならダミー頁に書いてから本頁に転送する
 
 	//	挿入処理には、レイヤボックスを非表示処理で使う
 	hLyrWnd = LayerBoxVisibalise( GetModuleHandle(NULL), TEXT(" "), 0x10 );
@@ -1355,6 +1360,7 @@ HRESULT	MoziScriptInsert( HWND hWnd )
 
 	if( bTranst )	//	キャレットの位置を適当にあわせる
 	{
+		//	透過なら本頁に、非透過なら一時頁にレイヤしてる
 	}
 	else	//	一時頁からぶんどって改めて書込
 	{
@@ -1763,5 +1769,7 @@ HRESULT MoziSqlItemDeleteAll( VOID )
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
+
+
 
 

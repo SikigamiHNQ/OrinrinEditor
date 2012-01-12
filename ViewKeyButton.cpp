@@ -63,8 +63,11 @@ static  UINT	gdSqFillCnt;	//!<	矩形選択を、IME文字列で塗りつぶした時の文字数
 //-------------------------------------------------------------------------------------------------
 
 HRESULT	ViewBrushFilling( VOID );
+
+HRESULT	ViewScriptedLineFeed( VOID );
 //-------------------------------------------------------------------------------------------------
 
+//CreateAcceleratorTable メモ
 
 /*!
 	シフト、コントロール、アルトキーの状態を確認する
@@ -259,15 +262,23 @@ VOID Evw_OnChar( HWND hWnd, TCHAR ch, INT cRepeat )
 
 		if( VK_RETURN == ch )	//	改行
 		{
-			DocCrLfAdd( gdDocXdot , gdDocLine, TRUE );
-			ViewRedrawSetLine( gdDocLine );
+			TRACE( TEXT("Enter Shift[%d]"), gbShiftOn );
+			if( gbShiftOn )
+			{
+				ViewScriptedLineFeed(  );	//	Shift押しながらの場合、台詞改行とする。
+			}
+			else
+			{
+				DocCrLfAdd( gdDocXdot , gdDocLine, TRUE );
+				ViewRedrawSetLine( gdDocLine );
 
-			gdDocXdot = 0;	gdDocMozi = 0;	gdDocLine++;	//	次の行に移る
-			ViewDrawCaret( gdDocXdot, gdDocLine, 1 );	//	位置を決める
-			gdXmemory = gdDocXdot;	//	最新位置記憶
-			//	改行した行以降全取っ替え
-			iLines = DocPageParamGet( NULL, NULL );
-			for( i = gdDocLine; iLines > i; i++ ){	ViewRedrawSetLine(  i );	}
+				gdDocXdot = 0;	gdDocMozi = 0;	gdDocLine++;	//	次の行に移る
+				ViewDrawCaret( gdDocXdot, gdDocLine, 1 );	//	位置を決める
+				gdXmemory = gdDocXdot;	//	最新位置記憶
+				//	改行した行以降全取っ替え
+				iLines = DocPageParamGet( NULL, NULL );
+				for( i = gdDocLine; iLines > i; i++ ){	ViewRedrawSetLine(  i );	}
+			}
 		}
 
 		if( VK_BACK == ch )	//	BackSpace
@@ -441,6 +452,8 @@ VOID Evw_OnMouseMove( HWND hWnd, INT x, INT y, UINT keyFlags )
 		{
 			//	その行のドット数を確認して、常に末端にカーソルがあると仮定する
 			dX = DocLineParamGet( dLine, NULL, NULL );
+			//	バック選択中なら、逆に先頭にカーソルが来るようにする
+			if( ViewSelBackCheck( dLine ) ){	dX =  0;	}
 		}
 	}
 
@@ -631,6 +644,57 @@ INT ViewInsertUniSpace( UINT dCommando )
 	DocPageInfoRenew( -1, 1 );
 
 	return width;
+}
+//-------------------------------------------------------------------------------------------------
+
+/*!
+	台詞用改行の処理する
+*/
+HRESULT ViewScriptedLineFeed( VOID )
+{
+//押した行の、最後の空白＝文字列の先頭部分を探し、
+//次の行をそこまで空白パディングして、カーソル移動・行を増やすのとは違う処理
+//めり込んでたらカーソル移動だけ・次の行が無かったら、増やしてパディングする
+
+	INT		dLines, iTgtDot, iLastDot, iLineDot, iPadDot;
+	BOOLEAN	bIsSp, bFirst = TRUE;
+	UINT	dStyle = 0;
+	LPTSTR	ptSpace;
+
+	//	文字列の開始地点を探す。iTgtDotがその位置のはず
+	DocLineStateCheckWithDot( gdDocXdot, gdDocLine, &iTgtDot, &iLastDot, NULL, NULL, &bIsSp );
+	TRACE( TEXT("TEXT START D[%d] L[%d]"), iTgtDot, gdDocLine );
+
+	dLines = DocPageParamGet( NULL , NULL );	//	頁の行数確認
+	if( (dLines - 1) <= gdDocLine )	//	最終行だったら
+	{
+		DocAdditionalLine( 1 , bFirst );	bFirst = FALSE;
+		ViewRedrawSetLine( gdDocLine );
+	}//末端に壱行追加
+
+	gdDocLine++;	//	次の行に移動
+
+	iLineDot = DocLineParamGet( gdDocLine, NULL, NULL );	//	次の行のドット数確認
+	if( iTgtDot <= iLineDot )	//	ターゲットドット位置より長かったら
+	{
+		gdDocXdot = iTgtDot;	//	とりやえず合わせる
+		DocLetterPosGetAdjust( &gdDocXdot, gdDocLine, 0 );	//	Caret位置調整
+	}
+	else
+	{
+		iPadDot = iTgtDot - iLineDot;	//	埋めるのに必要なドット数
+		ptSpace = DocPaddingSpaceMake( iPadDot );	//	埋め空白作る
+		gdDocXdot = iLineDot;	//	とりやえず合わせる
+		//	空白文字列追加
+		DocInsertString( &gdDocXdot, &gdDocLine, NULL, ptSpace, dStyle, bFirst );	bFirst = FALSE;
+
+		FREE(ptSpace);
+	}
+
+	ViewRedrawSetLine( gdDocLine  );	//	今操作した行を書き直し
+
+
+	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 

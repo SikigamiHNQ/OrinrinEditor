@@ -261,7 +261,9 @@ HWND PageListInitialise( HINSTANCE hInstance, HWND hParentWnd, LPRECT pstFrame )
 	ghPageTipWnd = CreateWindowEx( WS_EX_TOPMOST, TOOLTIPS_CLASS, NULL, TTS_NOPREFIX | TTS_ALWAYSTIP,
 		CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, ghPageWnd, NULL, hInstance, NULL );
 
-	ghPgTipFont = CreateFont( FONTSZ_REDUCE, 0, 0, 0, FW_REGULAR, FALSE, FALSE, FALSE, DEFAULT_CHARSET, OUT_OUTLINE_PRECIS, CLIP_DEFAULT_PRECIS, PROOF_QUALITY, VARIABLE_PITCH, TEXT("ＭＳ Ｐゴシック") );
+	ghPgTipFont = CreateFont( FONTSZ_REDUCE, 0, 0, 0, FW_REGULAR, FALSE, FALSE, FALSE,
+		DEFAULT_CHARSET, OUT_OUTLINE_PRECIS, CLIP_DEFAULT_PRECIS, PROOF_QUALITY, VARIABLE_PITCH,
+		TEXT("ＭＳ Ｐゴシック") );
 	SetWindowFont( ghPageTipWnd, ghPgTipFont, TRUE );
 
 	//	ツールチップをコールバックで割り付け
@@ -406,13 +408,13 @@ VOID Plt_OnCommand( HWND hWnd, INT id, HWND hWndCtl, UINT codeNotify )
 		case IDM_PAGE_PREV:	//	前の頁へ移動
 			iDiff = iItem - 1;
 			PageListJump( iDiff );
-			break;
+			return;
 
 		case IDM_PAGE_NEXT:	//	次の頁へ移動
 			iDiff = iItem + 1;
 			PageListJump( iDiff );
-			break;
-
+			return;
+		//	20120110	頁移動したら変更有りになっちゃうの修正
 
 		case IDM_PAGEL_INSERT:	//	任意位置新規作成
 			iPage = DocPageCreate( iItem );

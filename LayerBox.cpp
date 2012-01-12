@@ -27,15 +27,15 @@ If not, see <http://www.gnu.org/licenses/>.
 
 typedef struct tagLAYERBOXSTRUCT
 {
-	LONG	id;				//!<	ボックスの認識番号
+	LONG	id;					//!<	ボックスの認識番号
 
-	POINT	stOffset;		//!<	ビュー左上からの、ボックスの相対位置
+	POINT	stOffset;			//!<	ビュー左上からの、ボックスの相対位置
 
-	HWND	hBoxWnd;		//!<	ボックスのウインドウハンドル
-	HWND	hTextWnd;		//!<	テキストエリアのウインドウハンドル
+	HWND	hBoxWnd;			//!<	ボックスのウインドウハンドル
+	HWND	hTextWnd;			//!<	テキストエリアのウインドウハンドル
 
-	HWND	hToolWnd;		//!<	ツールバーのウインドウハンドル
-	WNDPROC	pfOrgToolProc;	//!<	
+	HWND	hToolWnd;			//!<	ツールバーのウインドウハンドル
+	WNDPROC	pfOrgToolProc;		//!<	
 
 	vector<ONELINE>	vcLyrImg;	//!<	表示するデータの保持・AA用
 
@@ -91,12 +91,12 @@ static BOOLEAN	gbQuickClose;	//!<	貼り付けたら直ぐ閉じる
 
 static WNDPROC	gpfOrigLyrTBProc;	//!<	
 
-static HIMAGELIST	ghLayerImgLst;
+static HIMAGELIST	ghLayerImgLst;	//!<	
 
 static  list<LAYERBOXSTRUCT>	gltLayer;	//!<	複数のレイヤボックスを開いたとき
 //-------------------------------------------------------------------------------------------------
 
-static LRESULT	CALLBACK gpfLayerTBProc( HWND, UINT, WPARAM, LPARAM );
+static LRESULT	CALLBACK gpfLayerTBProc( HWND, UINT, WPARAM, LPARAM );	//!<	
 
 LRESULT	CALLBACK LayerBoxProc( HWND, UINT, WPARAM, LPARAM );	//!<	
 
@@ -116,13 +116,13 @@ HRESULT	LayerEditOnOff( HWND, UINT );					//!<
 
 
 HRESULT	LayerStringObliterate( LAYER_ITR  );			//!<	
-HRESULT	LayerFromString( LAYER_ITR, LPTSTR );			//!<	
+HRESULT	LayerFromString( LAYER_ITR, LPCTSTR );			//!<	
 HRESULT	LayerFromSelectArea( LAYER_ITR , UINT );		//!<	
 HRESULT	LayerFromClipboard( LAYER_ITR );				//!<	
 HRESULT LayerForClipboard( HWND, UINT );				//!<	
 INT		LayerInputLetter( LAYER_ITR, INT, INT, TCHAR );	//!<	
-LPTSTR	LayerLineTextGetAlloc( LAYER_ITR, INT );				//!<	
-HRESULT	LayerBoxSetString( LAYER_ITR, LPTSTR, UINT, LPPOINT, UINT );	//!<	
+LPTSTR	LayerLineTextGetAlloc( LAYER_ITR, INT );		//!<	
+HRESULT	LayerBoxSetString( LAYER_ITR, LPCTSTR, UINT, LPPOINT, UINT );	//!<	
 HRESULT	LayerBoxSizeAdjust( LAYER_ITR );				//!<	
 
 INT		LayerTransparentAdjust( LAYER_ITR, INT, INT );	//!<	
@@ -213,7 +213,7 @@ HRESULT LayerBoxAlphaSet( UINT dParam )
 	@param[in]	bNormal	0x00普通に処理　0x10裏処理
 	@return		HWND	作成されたレイヤボックスのウインドウハンドル
 */
-HWND LayerBoxVisibalise( HINSTANCE hInst, LPTSTR ptStr, UINT bNormal )
+HWND LayerBoxVisibalise( HINSTANCE hInst, LPCTSTR ptStr, UINT bNormal )
 {
 	INT		x, y;
 	RECT	vwRect, rect;
@@ -1271,7 +1271,7 @@ HRESULT LayerStringReplace( HWND hLyrWnd, LPTSTR ptStr )
 	@param[in]	ptStr	表示する文字列
 	@return		HRESULT	終了状態コード
 */
-HRESULT LayerFromString( LAYER_ITR itLyr, LPTSTR ptStr )
+HRESULT LayerFromString( LAYER_ITR itLyr, LPCTSTR ptStr )
 {
 	UINT	cchSize;
 	ONELINE	stLine;
@@ -1407,7 +1407,7 @@ HRESULT LayerBoxSizeAdjust( LAYER_ITR itLyr )
 	@param[in]	bStyle	非０内容に合わせてサイズ変更　０ナニもしない
 	@return		HRESULT	終了状態コード
 */
-HRESULT LayerBoxSetString( LAYER_ITR itLyr, LPTSTR ptText, UINT cchSize, LPPOINT pstPt, UINT bStyle )
+HRESULT LayerBoxSetString( LAYER_ITR itLyr, LPCTSTR ptText, UINT cchSize, LPPOINT pstPt, UINT bStyle )
 {
 	UINT_PTR	i, j, iLine, iTexts;
 	LONG	dMin = 0;

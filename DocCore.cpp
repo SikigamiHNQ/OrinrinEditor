@@ -405,6 +405,29 @@ HRESULT DocMultiFileStore( LPTSTR ptIniPath )
 }
 //-------------------------------------------------------------------------------------------------
 
+/*!
+	対象ファイルの名前をゲッツ！する
+	@param[in]	tabNum	名前を知りたいヤツのタブ番号
+	@return		LPTSTR	名前バッファのポインター・無効ならNULLを返す
+*/
+LPTSTR DocMultiFileNameGet( INT tabNum )
+{
+	INT	i;
+	FILES_ITR	itNow;
+
+	//	ヒットするまでサーチ
+	for( i = 0, itNow = gltMultiFiles.begin(); itNow != gltMultiFiles.end(); i++, itNow++ )
+	{
+		if( tabNum == i )	break;
+	}
+	if( itNow == gltMultiFiles.end() )	return NULL;	//	ヒット無し・アリエナーイ
+
+	//	名無しならダミー名
+	if( NULL == itNow->atFileName[ 0] ){	return itNow->atDummyName;	}
+
+	return itNow->atFileName;	//	ファイル名戻す
+}
+//-------------------------------------------------------------------------------------------------
 
 
 

@@ -138,7 +138,7 @@ CONST  TCHAR	gatEOF[] = TEXT("[EOF]");
 
 #ifdef OPEN_HISTORY
 //開いた履歴用
-#define OPENHIST_MAX	10
+#define OPENHIST_MAX	12
 typedef struct tagOPENHISTORY
 {
 	TCHAR	atFile[MAX_PATH];
@@ -148,13 +148,15 @@ typedef vector<OPENHIST>::iterator	OPHIS_ITR;
 #endif
 //----------------
 
-//	枠パーツデータ
-#define PARTS_CCH	10
+//	枠パーツデータ	20120105	複数行に向けて調整
+#define PARTS_CCH	32
 typedef struct tagFRAMEITEM
 {
 	TCHAR	atParts[PARTS_CCH];	//!<	パーツ文字列・９字まで
-	INT		dDot;	//!<	
-
+	INT		dDot;	//!<	横幅ドット数
+#ifdef FRAME_MLINE
+	INT		iLine;	//!<	使用行数
+#endif
 } FRAMEITEM, *LPFRAMEITEM;
 //----------------
 //	枠処理用
@@ -362,7 +364,7 @@ BOOLEAN		SelectDirectoryDlg( HWND, LPTSTR, UINT_PTR );
 UINT		ViewMaaMaterialise( LPSTR, UINT, UINT );
 INT			ViewStringWidthGet( LPCTSTR );
 
-UINT		ViewMaaItemsModeGet( VOID );
+UINT		ViewMaaItemsModeGet( PUINT );	//!<	
 
 LPTSTR		SjisDecodeAlloc( LPSTR );
 LPSTR		SjisEntityExchange( LPCSTR );
@@ -456,7 +458,7 @@ BOOL		ViewShowCaret( VOID );			//!<
 VOID		ViewHideCaret( VOID );
 
 HRESULT		ViewFrameInsert( INT );
-HRESULT		ViewMaaItemsModeSet( UINT );
+HRESULT		ViewMaaItemsModeSet( UINT, UINT );
 
 INT			ViewLetterWidthGet( TCHAR );
 HRESULT		ViewNowPosStatus( VOID );
@@ -483,6 +485,7 @@ INT			ViewAreaSizeGet( PINT );
 HRESULT		ViewSelPositionSet( LPVOID );	//!<	
 HRESULT		ViewSelMoveCheck( UINT );		//!<	
 HRESULT		ViewSelRangeCheck( UINT );		//!<	
+UINT		ViewSelBackCheck( INT );		//!<	
 INT			ViewSelPageAll( INT );			//!<	
 UINT		ViewSqSelModeToggle( LPVOID );	//!<	
 
@@ -554,7 +557,7 @@ HRESULT		ImageFileSaveDC( HDC, LPTSTR, INT );
 VOID		LayerBoxInitialise( HINSTANCE, LPRECT );
 HRESULT		LayerBoxAlphaSet( UINT );
 HRESULT		LayerMoveFromView( HWND, UINT );
-HWND		LayerBoxVisibalise( HINSTANCE, LPTSTR, UINT );
+HWND		LayerBoxVisibalise( HINSTANCE, LPCTSTR, UINT );
 INT			LayerHeadSpaceCheck( vector<LETTER> *, PINT );	//!<	
 HRESULT		LayerTransparentToggle( HWND, UINT );			//!<	
 HRESULT		LayerContentsImportable( HWND, UINT, LPINT, LPINT, UINT );	//!<	
@@ -634,6 +637,7 @@ INT			DocRangeSelStateToggle( INT, INT, INT, INT );
 INT			DocPageSelStateToggle( INT );
 HRESULT		DocSelRangeSet( INT, INT );
 HRESULT		DocSelRangeGet( PINT, PINT );
+VOID		DocSelByteSet( INT );
 //BOOLEAN		DocIsSelecting( VOID );
 
 LPTSTR		DocClipboardDataGet( PUINT );
@@ -701,6 +705,7 @@ HRESULT		DocMultiFileSelect( LPARAM );
 HRESULT		DocMultiFileModify( UINT );
 HRESULT		DocMultiFileStore( LPTSTR );
 INT			DocMultiFileFetch( INT, LPTSTR, LPTSTR );
+LPTSTR		DocMultiFileNameGet( INT );
 
 HRESULT		SqnInitialise( LPUNDOBUFF );
 HRESULT		SqnFreeAll( LPUNDOBUFF );
@@ -715,6 +720,12 @@ INT			MoziInitialise( LPTSTR, HINSTANCE );
 HWND		MoziScripterCreate( HINSTANCE, HWND );
 HRESULT		MoziMoveFromView( HWND, UINT );
 
+#ifdef VERTICAL_TEXT
+INT			VertInitialise( LPTSTR, HINSTANCE );
+HWND		VertScripterCreate( HINSTANCE, HWND );
+HRESULT		VertMoveFromView( HWND, UINT );
+#endif
+
 #ifdef FIND_STRINGS
 HRESULT		FindDialogueOpen( HINSTANCE, HWND );
 HRESULT		FindHighlightOff( VOID );
@@ -726,8 +737,7 @@ LPTSTR		NextLineW( LPTSTR );
 LPSTR		NextLineA( LPSTR );
 
 
-//Viewerでも有り？
-#ifdef DRAUGHT_STYLE
+//Viewerも有り
 HRESULT	DraughtInitialise( HINSTANCE, HWND );
 HWND	DraughtWindowCreate( HINSTANCE, HWND, UINT );
 
@@ -741,7 +751,6 @@ INT		TextViewSizeGet( LPCTSTR, PINT );
 
 INT_PTR	AacItemCount( UINT );
 HBITMAP	AacArtImageGet( INT, LPSIZE, LPSIZE );
-#endif
 
 LPSTR	AacAsciiArtGet( DWORD );			//!<	
 

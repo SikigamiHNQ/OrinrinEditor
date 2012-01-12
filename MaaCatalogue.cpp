@@ -356,7 +356,6 @@ UINT AacTitleCheck( LPAAMATRIX pstItem )
 }
 //-------------------------------------------------------------------------------------------------
 
-#ifdef DRAUGHT_STYLE
 /*!
 	確保してるアイテム数を返す
 */
@@ -416,8 +415,6 @@ HBITMAP AacArtImageGet( INT iNumber, LPSIZE pstSize, LPSIZE pstArea )
 	return itArts->hThumbBmp;
 }
 //-------------------------------------------------------------------------------------------------
-
-#endif
 
 /*!
 	通し番号を受けて、内容を返す

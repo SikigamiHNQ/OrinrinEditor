@@ -304,6 +304,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\VerticalScript.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\ViewCaret.cpp"
 				>
 			</File>

@@ -61,7 +61,7 @@ static WNDPROC	gpfOriginTreeViewProc;
 static WNDPROC	gpfOriginTabMultiProc;	
 
 
-list<MULTIPLEMAA>	gltMultiFiles;	//!<	複数ファイルの保持
+static list<MULTIPLEMAA>	gltMultiFiles;	//!<	複数ファイルの保持
 typedef  list<MULTIPLEMAA>::iterator	MLTT_ITR;
 //-------------------------------------------------------------------------------------------------
 

@@ -33,85 +33,85 @@ LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
 
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
-IDI_ORINRINEDITOR       ICON                    "OrinrinEditor.ico"
-IDI_SMALL               ICON                    "OrinrinEditor.ico"
+IDI_ORINRINEDITOR	ICON	"OrinrinEditor.ico"
+IDI_SMALL			ICON	"OrinrinEditor.ico"
 
 /////////////////////////////////////////////////////////////////////////////
 //
 // Menu
 //
 
-IDC_ORINRINVIEWER MENU 
+IDC_ORINRINVIEWER MENU
 BEGIN
     POPUP "機能(&F)"
     BEGIN
-        MENUITEM "プロファイル作成／開く(&N)",             IDM_MAA_PROFILE_MAKE
-        MENUITEM "AA一覧ツリーを再構築(&T)",             IDM_TREE_RECONSTRUCT
-        MENUITEM "一般設定(&G)",                    IDM_GENERAL_OPTION
-        MENUITEM "ファイル名で検索(&F)",                IDM_FINDMAA_DLG_OPEN
+        MENUITEM "プロファイル作成／開く(&N)",	IDM_MAA_PROFILE_MAKE
+        MENUITEM "AA一覧ツリーを再構築(&T)",	IDM_TREE_RECONSTRUCT
+        MENUITEM "一般設定(&G)",				IDM_GENERAL_OPTION
+        MENUITEM "ファイル名で検索(&F)",		IDM_FINDMAA_DLG_OPEN
         MENUITEM SEPARATOR
-        MENUITEM "ドラフトボード表示(&B)",               IDM_DRAUGHT_OPEN
+        MENUITEM "ドラフトボード表示(&B)",		IDM_DRAUGHT_OPEN
         MENUITEM SEPARATOR
-        MENUITEM "常に手前に表示(&A)",                 IDM_TOPMOST_TOGGLE
+        MENUITEM "常に手前に表示(&A)",			IDM_TOPMOST_TOGGLE
         MENUITEM SEPARATOR
-        MENUITEM "バージョン情報(&I)",                 IDM_ABOUT
+        MENUITEM "バージョン情報(&I)",			IDM_ABOUT
         MENUITEM SEPARATOR
-        MENUITEM "終了(&Q)",                      IDM_EXIT
+        MENUITEM "終了(&Q)",					IDM_EXIT
     END
 END
 
-IDM_AATREE_POPUP MENU 
+IDM_AATREE_POPUP MENU
 BEGIN
     POPUP "複数行テンプレツリーのアレ"
     BEGIN
-        MENUITEM "主タブで開く(&M)",                  IDM_AATREE_MAINOPEN
-        MENUITEM "副タブを追加(&S)",                  IDM_AATREE_SUBADD
+        MENUITEM "主タブで開く(&M)",		IDM_AATREE_MAINOPEN
+        MENUITEM "副タブを追加(&S)",		IDM_AATREE_SUBADD
         MENUITEM SEPARATOR
-        MENUITEM "ドラフトボード表示(&B)",               IDM_DRAUGHT_OPEN
+        MENUITEM "ドラフトボード表示(&B)",	IDM_DRAUGHT_OPEN
     END
 END
 
-IDM_AATABS_POPUP MENU 
+IDM_AATABS_POPUP MENU
 BEGIN
     POPUP "複数行テンプレタブのアレ"
     BEGIN
-        MENUITEM "このタブを閉じる(&Q)",                IDM_AATABS_DELETE
-        MENUITEM "全ての副タブを閉じる(&A)",              IDM_AATABS_ALLDELETE
+        MENUITEM "このタブを閉じる(&Q)",		IDM_AATABS_DELETE
+        MENUITEM "全ての副タブを閉じる(&A)",	IDM_AATABS_ALLDELETE
     END
 END
 
-IDM_AALIST_POPUP MENU 
+IDM_AALIST_POPUP MENU
 BEGIN
     POPUP "複数行テンプレ表示でのアレ"
     BEGIN
-        MENUITEM "ドラフトボードに追加(&G)",              IDM_DRAUGHT_ADDING
+        MENUITEM "ドラフトボードに追加(&G)",	IDM_DRAUGHT_ADDING
         MENUITEM SEPARATOR
-        MENUITEM "コピー(UNI&CODE)",               IDM_MAA_CLIP_UNICODE
-        MENUITEM "コピー(&ShiftJIS)",              IDM_MAA_CLIP_SHIFTJIS
+        MENUITEM "コピー(UNI&CODE)",			IDM_MAA_CLIP_UNICODE
+        MENUITEM "コピー(&ShiftJIS)",			IDM_MAA_CLIP_SHIFTJIS
         MENUITEM SEPARATOR
-        MENUITEM "削除(&D)",                      IDM_MAA_FAV_DELETE, GRAYED
+        MENUITEM "削除(&D)",					IDM_MAA_FAV_DELETE, GRAYED
         MENUITEM SEPARATOR
-        MENUITEM "ドラフトボード表示(&B)",               IDM_DRAUGHT_OPEN
-        MENUITEM "サムネイル一覧表示(&H)",               IDM_MAA_THUMBNAIL_OPEN
+        MENUITEM "ドラフトボード表示(&B)",		IDM_DRAUGHT_OPEN
+        MENUITEM "サムネイル一覧表示(&H)",		IDM_MAA_THUMBNAIL_OPEN
         MENUITEM SEPARATOR
-        MENUITEM "ＡＡポップアップ表示(&T)",              IDM_MAA_AATIP_TOGGLE
-        MENUITEM "ＡＡ区切りスタイル切換",                 IDM_MAA_SEP_STYLE_TOGGLE
+        MENUITEM "ＡＡポップアップ表示(&T)",	IDM_MAA_AATIP_TOGGLE
+        MENUITEM "ＡＡ区切りスタイル切換",		IDM_MAA_SEP_STYLE_TOGGLE
     END
 END
 
-IDM_DRAUGHT_POPUP MENU 
+IDM_DRAUGHT_POPUP MENU
 BEGIN
     POPUP "ドラフトボードのアレ"
     BEGIN
-        MENUITEM "コピー(UNI&CODE)",               IDM_DRAUGHT_UNICLIP
-        MENUITEM "コピー(Shift&JIS)",              IDM_DRAUGHT_SJISCLIP
+        MENUITEM "コピー(UNI&CODE)",			IDM_DRAUGHT_UNICLIP
+        MENUITEM "コピー(Shift&JIS)",			IDM_DRAUGHT_SJISCLIP
         MENUITEM SEPARATOR
-        MENUITEM "アイテムを削除(&D)",                 IDM_DRAUGHT_DELETE
+        MENUITEM "アイテムを削除(&D)",			IDM_DRAUGHT_DELETE
         MENUITEM SEPARATOR
-        MENUITEM "全内容をエクスポート(&E)",              IDM_DRAUGHT_EXPORT
+        MENUITEM "全内容をエクスポート(&E)",	IDM_DRAUGHT_EXPORT
         MENUITEM SEPARATOR
-        MENUITEM "全内容を削除(&K)",                  IDM_DRAUGHT_ALLDELETE
-        MENUITEM "ドラフトボードを閉じる(&Q)",             IDM_DRAUGHT_CLOSE
+        MENUITEM "全内容を削除(&K)",			IDM_DRAUGHT_ALLDELETE
+        MENUITEM "ドラフトボードを閉じる(&Q)",	IDM_DRAUGHT_CLOSE
     END
 END
 
@@ -121,11 +121,11 @@ END
 // Accelerator
 //
 
-IDC_ORINRINVIEWER ACCELERATORS 
+IDC_ORINRINVIEWER ACCELERATORS
 BEGIN
-    "F",            IDM_FINDMAA_DLG_OPEN,   VIRTKEY, CONTROL, NOINVERT
-    "T",            IDM_MAA_THUMBNAIL_OPEN, VIRTKEY, CONTROL, NOINVERT
-    VK_SPACE,       IDM_DRAUGHT_OPEN,       VIRTKEY, CONTROL, NOINVERT
+    "F",		IDM_FINDMAA_DLG_OPEN,	VIRTKEY, CONTROL, NOINVERT
+    "T",		IDM_MAA_THUMBNAIL_OPEN,	VIRTKEY, CONTROL, NOINVERT
+    VK_SPACE,	IDM_DRAUGHT_OPEN,		VIRTKEY, CONTROL, NOINVERT
 END
 
 
@@ -141,33 +141,39 @@ CAPTION "バージョン情報 - Orinrin Viewer"
 FONT 9, "MS UI Gothic"
 BEGIN
     ICON            IDI_ORINRINEDITOR,IDC_MYICON,6,6,18,21
-    LTEXT           "Orinrin Viewer, Version 6 Aurora (2011.1222.2200.920)",IDC_STATIC,36,6,180,8,SS_NOPREFIX
-    LTEXT           "Copyright (C) 2011 by SikigamiHNQ",IDC_STATIC,36,18,180,8
+    LTEXT           "Orinrin Viewer, Version 7 Aurora (2012.112.2200.920)",IDC_STATIC,36,6,180,8,SS_NOPREFIX
+    LTEXT           "Copyright (C) 2011 - 2012 SikigamiHNQ",IDC_STATIC,36,18,180,8
     LTEXT           "Site ： お燐ちゃんは俺の嫁．ｃｏｍ",IDC_STATIC,36,30,180,8
     DEFPUSHBUTTON   "OK",IDOK,85,180,50,14,WS_GROUP
     EDITTEXT        IDE_ABOUT_DISP,6,42,210,132,ES_MULTILINE | ES_READONLY | NOT WS_BORDER,WS_EX_STATICEDGE
 END
 
-IDD_ORRVWR_OPTION_DLG DIALOGEX 0, 0, 270, 113
+IDD_ORRVWR_OPTION_DLG DIALOG 0, 0, 275, 142
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_TOOLWINDOW
 CAPTION "設定いろいろ"
-FONT 10, "MS UI Gothic", 0, 0, 0x0
+FONT 9, "MS UI Gothic"
 BEGIN
-    DEFPUSHBUTTON   "OK",IDOK,114,96,42,12
-    PUSHBUTTON      "キャンセル",IDCANCEL,168,96,42,12
-    PUSHBUTTON      "適用",IDB_APPLY,222,96,42,12
-    GROUPBOX        "AAの入ってるディレクトリ",IDC_STATIC,6,6,258,48
+    DEFPUSHBUTTON   "OK",IDOK,114,126,42,12
+    PUSHBUTTON      "キャンセル",IDCANCEL,168,126,42,12
+    PUSHBUTTON      "適用",IDB_APPLY,222,126,42,12
+    GROUPBOX        "AAの入ってるディレクトリ",IDC_STATIC,6,6,264,48
     EDITTEXT        IDE_AA_DIRECTORY,12,18,210,12,ES_AUTOHSCROLL
     PUSHBUTTON      "参照",IDB_AADIR_SEARCH,228,18,30,12
     LTEXT           "ポップアップ表示",IDC_STATIC,12,36,48,8
     CONTROL         "通常",IDRB_POPUP_NOMAL,"Button",BS_AUTORADIOBUTTON | WS_GROUP,84,36,42,8
     CONTROL         "縮小",IDRB_POPUP_REDUCE,"Button",BS_AUTORADIOBUTTON,138,36,30,8
     CONTROL         "表示する",IDCB_POPUP_VISIBLE,"Button",BS_AUTOCHECKBOX | WS_GROUP | WS_TABSTOP,186,36,48,8
-    GROUPBOX        "複数行テンプレをクリックしたときの動作",IDC_STATIC,6,60,258,30
-    CONTROL         "コピー（Unicode）",IDRB_SEL_CLIP_UNI,"Button",BS_AUTORADIOBUTTON | WS_GROUP,90,72,72,12
-    CONTROL         "コピー（ShiftJIS）",IDRB_SEL_CLIP_SJIS,"Button",BS_AUTORADIOBUTTON,12,72,72,12
-    CONTROL         "ドラフトボード追加",IDRB_SEL_DRAUGHT,"Button",BS_AUTORADIOBUTTON,174,72,72,12
+    GROUPBOX        "複数行テンプレ・サムネイル・ドラフトボードをクリックしたときの動作",IDC_STATIC,6,60,264,60
+    LTEXT           "左クリック",IDC_STATIC,12,72,30,8
+    CONTROL         "コピー（Unicode）",IDRB_SEL_CLIP_UNI,"Button",BS_AUTORADIOBUTTON | WS_GROUP,114,72,66,8
+    CONTROL         "コピー（ShiftJIS）",IDRB_SEL_CLIP_SJIS,"Button",BS_AUTORADIOBUTTON,48,72,60,8
+    CONTROL         "ドラフトボード追加（※）",IDRB_SEL_DRAUGHT,"Button",BS_AUTORADIOBUTTON,186,72,78,8
+    LTEXT           "中クリック",IDC_STATIC,12,90,30,8
+    CONTROL         "コピー（Unicode）",IDRB_SELSUB_CLIP_UNI,"Button",BS_AUTORADIOBUTTON | WS_GROUP,114,90,66,8
+    CONTROL         "コピー（ShiftJIS）",IDRB_SELSUB_CLIP_SJIS,"Button",BS_AUTORADIOBUTTON,48,90,60,8
+    CONTROL         "ドラフトボード追加（※）",IDRB_SELSUB_DRAUGHT,"Button",BS_AUTORADIOBUTTON,186,90,78,8
+    LTEXT           "※ドラフトボード内の場合は、追加ではなくShiftJISコピーになるのです。",IDC_STATIC,72,108,191,8
 END
 
 IDD_PROFILE_TREESEL_DLG DIALOG  0, 0, 203, 275
@@ -202,8 +208,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 2011,1222,2200,920
- PRODUCTVERSION 6,0,0,920
+ FILEVERSION 2012,112,2200,920
+ PRODUCTVERSION 7,0,0,920
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -224,16 +230,16 @@ BEGIN
         BEGIN
             VALUE "Comments", "Japanese Only, Perfectly No Warranty"
             VALUE "CompanyName", "I love 2ch, Yaruo and TohoProject"
-            VALUE "LegalCopyright", "Copyright (C) 2011 SikigamiHNQ"
+            VALUE "LegalCopyright", "Copyright (C) 2011 - 2012 SikigamiHNQ"
             VALUE "LegalTrademarks", "License : GPLv3"
-            VALUE "PrivateBuild", "Build by Visual Studio 2008"
+            VALUE "PrivateBuild", "Build by Visual C++ 2008 Express"
             VALUE "SpecialBuild", "Not Speciality"
-            VALUE "FileVersion", "2011.1222.2200.920"
-            VALUE "ProductVersion", "6.0.0.920"
-            VALUE "FileDescription", "AsciiArt Viewer Ver6"
+            VALUE "FileVersion", "2012.112.2200.920"
+            VALUE "ProductVersion", "7.0.0.920"
+            VALUE "FileDescription", "AsciiArt Viewer Ver7"
             VALUE "OriginalFilename", "OrinrinViewer.exe"
             VALUE "InternalName", "Orinrin Viewer"
-            VALUE "ProductName", "Orinrin Viewer 6"
+            VALUE "ProductName", "Orinrin Viewer 7"
         END
     END
 END
@@ -275,7 +281,7 @@ END
 // String Table
 //
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_ORRVWR_TITLE        "OrinrinViewer"
     IDC_ORINRINVIEWER       "ORINRINVIEWER"

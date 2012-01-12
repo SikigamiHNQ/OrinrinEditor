@@ -1398,6 +1398,9 @@ HRESULT DocPositionShift( UINT vk, PINT pXdot, INT dLine )
 	if( 0 > iTop )		iTop = 0;
 	if( 0 > iBottom )	iBottom = iLines - 1;
 
+//容量が狂う・選択状態ならここで gdSelByte をリセットを？
+	if( bSeled ){	DocSelByteSet(  0 );	}
+
 	//	壱行ずつ面倒見ていく
 	for( i = iTop; iBottom >= i; i++ )
 	{

@@ -324,13 +324,11 @@ VOID Maa_OnCommand( HWND hWnd, INT id, HWND hwndCtl, UINT codeNotify )
 		//	リストスタティックでのクリックはここにくる
 		case IDSO_AAITEMS:	TRACE( TEXT("static") );	break;
 
-#ifdef DRAUGHT_STYLE
 		//	ドラフトボードオーポン
 		case IDM_DRAUGHT_OPEN:	DraughtWindowCreate( GetModuleHandle(NULL), ghMaaWnd, 0 );	break;
 
 		//	サムネイルオーポン
 		case IDM_MAA_THUMBNAIL_OPEN:	DraughtWindowCreate( GetModuleHandle(NULL), ghMaaWnd, 1 );	break;
-#endif
 
 		case IDLB_FAVLIST:	FavListSelected( hWnd, codeNotify );	break;
 
@@ -450,9 +448,7 @@ VOID Maa_OnDestroy( HWND hWnd )
 
 #ifdef _ORRVW
 
-#ifdef DRAUGHT_STYLE
 	DraughtInitialise( NULL, NULL );
-#endif
 
 	PostQuitMessage( 0 );
 #endif

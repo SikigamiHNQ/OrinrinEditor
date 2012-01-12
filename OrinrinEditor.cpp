@@ -20,25 +20,38 @@ If not, see <http://www.gnu.org/licenses/>.
 //	大日本帝国公用語は↓を見られたい
 
 
+//	TODO:	Viewer、右クリメニューからのドラフトボードが開かない？・追加されない？
+
+//	TODO:	ViewerEXEの場合、最前面に表示になってたらドラフトボード・サムネが裏になってまう
+
+//	TODO:	文字ＡＡの入力とか、レイヤボックスの編集とかで、キーボードショートカット使えるように
+
+//	TODO:	フォント変更出来るように
 
 //	TODO:	最大化して終わる＞起動して、最大化解除すると、メインスプリットバーが見えなくなる
 //右にイッちゃってるまま
+//	TODO:	メインスプリットバーの位置情報リセットが居るかも
+//	TODO:	位置情報のリセット機能・システムメニューに搭載する
 
+
+//	TODO:	デカいファイル開こうとしたときはメッセージ出すとか
 //	TODO:	デカいファイル開いたら時間かかる（1000コマとか）
 //逐次読み込みにするとか、先読みしたらvector確保してからいれるとか
 //vectorじゃなくlistにするとか？
 //壱行毎のサイズ確認して、確保してからブチ込むとか
 
-//	TODO:	複数ファイルタブ、マウスオーバーでフルパス表示
-//右クリメニューでファイル情報出す
+//	TODO:	ＡＡ文字入力のアレ、配置したら即閉じるオプショッ
 
-//	TODO:	複数行テンプレ窓の主タブでホイールスクロールが効かない
+//	TODO:	複数ファイルタブ、右クリメニューでファイル情報出す
+
+//	TODO:	複数行テンプレ窓の主タブでホイールスクロールが効かない？
 //メイン窓の編集スペース、Page List、複数行テンプレ窓のAA一覧ツリーなど、他の場所では問題ない
 
 //	TODO:	ASD対応＜読込は作ったがどこで使う？
 
+//	TODO:	MAAやサムネ、Draughtで、中クルック動作を付けられないか
 
-//	TODO:	デカいファイル開こうとしたときはメッセージ出すとか
+//	TODO:	MMAビュー、AAのスクロールをアイテム区切りでなく行スクロールも出来るように
 
 //	TODO:	MAAのファイル名検索、フォルダも検索出来るように？開くときは？
 
@@ -53,20 +66,15 @@ If not, see <http://www.gnu.org/licenses/>.
 
 //	TODO:	保存するとき、同名ファイルがあったら、日時くっつけてバックアップとか
 
-//	TODO:	台詞用Enter機能。Shift+Enterとかで、改行挿入ではなく、その行の末端からの直前の
-//空白の位置＝文章の開始地点まで、次の行に空白を入れて、そこにカーソル移動。台詞挿入に使える。
-//下行がなければ、改行して空白。既存の文字列に引っかかるなら、カーソル移動のみ
-
 //	TODO:	MLTのブックマーク機能・タブ増やすか、ツリーに増やすか・副タブじゃいけない？
 
+//	TODO:	カーソルのところに上書き挿入、的な機能・レイヤボックス介さずに直で。
 
 //	TODO:	MAA窓を非使用するオプショッ
 
 //	TODO:	枠機能で、複数行パーツを使いたい
 
 //	TODO:	頁リスト、直前に選択していた頁を灰色にしておく機能
-
-//	TODO:	メインスプリットバーの位置情報リセットが居るかも
 
 //	TODO:	ファイル内容統計機能が欲しい。全バイト数、頁数とか
 
@@ -85,11 +93,9 @@ If not, see <http://www.gnu.org/licenses/>.
 //	TODO:	トレスの２画面だと、背景絵はどっちのペインでも表示出来るようにしたい
 //	TODO:	トレスで、画像をつまんで直接移動できるように
 
-//	TODO:	位置情報のリセット機能・システムメニューに搭載する
 
 //	TODO:	使用のアレ、別MLTに同じAAが有ったらハッシュが同じってことでラリってまう。どうしよう
 
-//	TODO:	縦書き機能・行間調整機能とか
 
 //	TODO:	ツールチップ付けたい
 
@@ -152,13 +158,6 @@ If not, see <http://www.gnu.org/licenses/>.
 //	スクロールが発生した場合、画面全体書換必要か
 
 
-//	TODO:	MLT/ASTの、サムネイル表示・タイルっぽい感じで。そこから選択できる
-//枠表示だして、フォーカス失ったら閉じる
-//50x50のタイルを、5x3にならべる。フォント小でよろし・フォーカスでポップアップとか
-//でかいAAは超小フォントでもいけるか。多少のずれは気にしない・サムネだし
-//特定のキータップで良いだろう・縦スクロールバーも付ける。そのときアクティブに
-//なっているタブの内容とか、ツリーでカーソルの下にあるやつとか
-
 //	ツールチップのポップディレイは、TTM_SETDELAYTIME で調整出来る
 //	wParam	TTDT_INITIAL	表示までの時間
 //	lParam	The LOWORD specifies the delay time, in milliseconds. The HIWORD must be zero.
@@ -169,19 +168,13 @@ If not, see <http://www.gnu.org/licenses/>.
 
 
 //OK?
-//	TODO:	最大化で終了したときは、最大化状態を覚えておく方がいい
-//	TODO:	副タブを選択した状態で検索で新しいファイルを開くと、上のタブリストは副タブが選択されたまま
-//「全て」に戻す方が親切かな
-//	TODO:	MAAプロファイル、構築ダイヤログで、リストアップしたら、登録済みのやつにチェキしていく
-//	TODO:	Safariのリーディングリストみたいな機能。
-//	TODO:	MAA内容をサムネ表示することは？
-//	TODO:	サムネの右メニューにいらんのがある。開くときに調整を
-//	TODO:	サムネ表示から直接ドラフトボードに追加できるように
-//	TODO:	色をGUIで変更できるように
-//	TODO:	お気にリスト、グループを一括削除する機能
-//	TODO:	ドラフトやサムネ、AAサイズ表示出来るようにしたい
-//	TODO:	ファイル切り替えても、カーソル位置覚えておく
-//	TODO:	起動時に、閉じたときのファイルを復元するかどうか選択できるように
+//	TODO:	複数ファイルタブ、マウスオーバーでフルパス表示
+//	TODO:	バック選択してると、先頭行が選択されない・行番号で全選択と噛んでるか
+//	TODO:	台詞用Enter機能。Shift+Enterとかで、改行挿入ではなく、その行の末端からの直前の
+//	TODO:	縦書き機能・行間調整機能とか
+//	TODO:	選択して、全体ドットズラしすると選択容量がおかしくなる・常に加算してるようだ
+
+//	TODO:	ALT+上下すると変更状態になってまう
 
 
 //	TODO:	ブラシや壱行テンプレ、マウスオーバーツールチップで、横幅ドット数表示させたい
@@ -365,6 +358,12 @@ ASDファイル　　壱行が壱コンテンツ
 					ファイル毎のCaret位置を保存するようにした
 					起動したまま、壱行テンプレ、ブラシテンプレのリロードできるようんした
 					起動するとき、最後に開けてたファイルを開くとか選択できるようにした
+2012/01/12	0.27	編集窓のファイルタブで、マウスオーバーでフルパス表示
+					ＭＡＡとドラフトボードで、中クルックの場合処理を増やした（Viewer込み）
+					台詞用Enter機能。Shift+Enterで、改行挿入ではなく次の行に空白とかで台詞位置合わせできる
+					縦書き機能
+					バグ修正いろいろ
+
 
 更新日時注意
 
@@ -406,6 +405,7 @@ static  TCHAR		gszWindowClass[MAX_STRING];	//!<	メインウィンドウクラス名
 static  HMENU	ghMenu;			//!<	メニュー
 
 static   HWND	ghFileTabWnd;	//!<	複数ファイルタブ
+static  HWND	ghFileTabTip;	//!<	複数ファイルタブツールチップ
 
 static   HWND	ghMainWnd;		
 static   HWND	ghStsBarWnd;	//!<	ステータスバー
@@ -438,7 +438,7 @@ static TCHAR	gatIniPath[MAX_PATH];	//!<	ＩＮＩファイルの位置
 EXTERNED INT	gbTmpltDock;	//!<	テンプレのドッキング
 
 #ifdef OPEN_HISTORY
-static vector<OPENHIST>	gvcOpenHist;	//!<	ファイル開いた履歴
+static vector<OPENHIST>	gvcOpenHist;	//!<	ファイル開いた履歴・キューのほうがいいか？
 #endif
 
 #ifdef FIND_STRINGS
@@ -448,9 +448,8 @@ extern  HWND	ghMoziWnd;		//	文字ＡＡ変換ダイヤログのハンドル
 
 extern  HWND	ghMaaFindDlg;	//	MAA検索ダイヤログハンドル
 
-#ifdef DRAUGHT_STYLE
-extern  UINT	gdClickMode;	//
-#endif
+extern  UINT	gdClickDrt;		//	ドラフトボードクルックスタイル
+extern  UINT	gdSubClickDrt;	//
 
 extern  HWND	ghViewWnd;		//	ビュー
 
@@ -573,6 +572,10 @@ INT APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 	if( !InitInstance( hInstance, nCmdShow , atArgv ) ){	return FALSE;	}
 
 	CntxEditInitialise( gatExePath, hInstance );
+
+#ifdef VERTICAL_TEXT
+	VertInitialise( gatExePath, hInstance );
+#endif
 
 	RegisterHotKey( ghMainWnd, IDHK_THREAD_DROP, MOD_CONTROL | MOD_SHIFT, VK_D );
 
@@ -737,8 +740,11 @@ BOOL InitInstance( HINSTANCE hInstance, INT nCmdShow, LPTSTR ptArgv )
 	DeleteMenu( hSubMenu, IDM_FIND_HIGHLIGHT_OFF, MF_BYCOMMAND );
 	DeleteMenu( hSubMenu, 19, MF_BYPOSITION );	//	削除順番注意
 #endif
-#ifndef DRAUGHT_STYLE
-	DeleteMenu( hSubMenu, IDM_COPY_TO_DRAUGHT, MF_BYCOMMAND );
+
+#ifndef VERTICAL_TEXT
+	hSubMenu = GetSubMenu( ghMenu, 2 );	//	挿入
+	DeleteMenu( hSubMenu, IDM_VERT_SCRIPT_OPEN, MF_BYCOMMAND );
+
 #endif
 
 	hSubMenu = GetSubMenu( ghMenu, 4 );	//	表示
@@ -748,9 +754,6 @@ BOOL InitInstance( HINSTANCE hInstance, INT nCmdShow, LPTSTR ptArgv )
 		DeleteMenu( hSubMenu, IDM_LINE_TEMPLATE, MF_BYCOMMAND );
 		DeleteMenu( hSubMenu, IDM_BRUSH_PALETTE, MF_BYCOMMAND );
 	}
-#ifndef DRAUGHT_STYLE
-	DeleteMenu( hSubMenu, IDM_DRAUGHT_ADDING, MF_BYCOMMAND );
-#endif
 
 
 
@@ -778,7 +781,7 @@ BOOL InitInstance( HINSTANCE hInstance, INT nCmdShow, LPTSTR ptArgv )
 	ghLnTmplWnd = LineTmpleInitialise( hInstance, hWnd, &rect );
 
 	ViewInitialise( hInstance, hWnd, &rect, ptArgv );
-	ViewMaaItemsModeSet( InitParamValue( INIT_LOAD, VL_SETMETHOD, MAA_INSERT ) );
+	ViewMaaItemsModeSet( InitParamValue( INIT_LOAD, VL_MAA_LCLICK, MAA_INSERT ), InitParamValue( INIT_LOAD, VL_MAA_MCLICK, MAA_INSERT ) );
 
 	LayerBoxInitialise( hInstance, &rect );
 	LayerBoxAlphaSet( InitParamValue( INIT_LOAD, VL_LAYER_TRANS, 192 ) );
@@ -803,9 +806,7 @@ BOOL InitInstance( HINSTANCE hInstance, INT nCmdShow, LPTSTR ptArgv )
 
 	ghMaaWnd = MaaTmpltInitialise( hInstance, hWnd, &wnRect );
 
-#ifdef DRAUGHT_STYLE
 	DraughtInitialise( hInstance, hWnd );
-#endif
 
 	if( isMaxim )
 	{
@@ -1041,9 +1042,10 @@ BOOLEAN Cls_OnCreate( HWND hWnd, LPCREATESTRUCT lpCreateStruct )
 
 	RECT	tiRect;
 	TCITEM	stTcItem;
-
+	TTTOOLINFO	stToolInfo;
 
 	HINSTANCE lcInst = lpCreateStruct->hInstance;	//	受け取った初期化情報から、インスタンスハンドルをひっぱる
+
 
 	DragAcceptFiles( hWnd, TRUE );
 
@@ -1069,10 +1071,7 @@ BOOLEAN Cls_OnCreate( HWND hWnd, LPCREATESTRUCT lpCreateStruct )
 	ghNameFont = CreateFont( 12, 0, 0, 0, FW_REGULAR, FALSE, FALSE, FALSE, DEFAULT_CHARSET, OUT_OUTLINE_PRECIS, CLIP_DEFAULT_PRECIS, PROOF_QUALITY, VARIABLE_PITCH, TEXT("MS UI Gothic") );
 
 //マルチファイルオーポン
-	ghFileTabWnd = CreateWindowEx( 0, WC_TABCONTROL, TEXT("filetab"),
-		WS_VISIBLE | WS_CHILD | WS_CLIPSIBLINGS | TCS_SINGLELINE,
-		0, 0, clRect.right, 0, hWnd, (HMENU)IDTB_MULTIFILE, lcInst, NULL );
-
+	ghFileTabWnd = CreateWindowEx( 0, WC_TABCONTROL, TEXT("filetab"), WS_VISIBLE | WS_CHILD | WS_CLIPSIBLINGS | TCS_SINGLELINE, 0, 0, clRect.right, 0, hWnd, (HMENU)IDTB_MULTIFILE, lcInst, NULL );
 	SetWindowFont( ghFileTabWnd, ghNameFont, FALSE );
 
 	ZeroMemory( &stTcItem, sizeof(TCITEM) );
@@ -1084,6 +1083,22 @@ BOOLEAN Cls_OnCreate( HWND hWnd, LPCREATESTRUCT lpCreateStruct )
 	TabCtrl_GetItemRect( ghFileTabWnd, 1, &tiRect );
 	tiRect.bottom  += tiRect.top;
 	MoveWindow( ghFileTabWnd, 0, tbRect.bottom, clRect.right, tiRect.bottom, TRUE );
+
+	//	ツールチップ・ファイルパス表示汁
+	ghFileTabTip = CreateWindowEx( WS_EX_TOPMOST, TOOLTIPS_CLASS, NULL, TTS_NOPREFIX | TTS_ALWAYSTIP, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, ghFileTabWnd, NULL, lcInst, NULL );
+	//	ツールチップをコールバックで割り付け
+	ZeroMemory( &stToolInfo, sizeof(TTTOOLINFO) );
+	GetClientRect( ghFileTabWnd, &stToolInfo.rect );
+	stToolInfo.cbSize   = sizeof(TTTOOLINFO);
+	stToolInfo.uFlags   = TTF_SUBCLASS;
+	stToolInfo.hinst    = NULL;	//	
+	stToolInfo.hwnd     = ghFileTabWnd;
+	stToolInfo.uId      = IDTT_TILETAB_TIP;
+	stToolInfo.lpszText = LPSTR_TEXTCALLBACK;	//	コレを指定するとコールバックになる
+	SendMessage( ghFileTabTip, TTM_ADDTOOL, 0, (LPARAM)&stToolInfo );
+	SendMessage( ghFileTabTip, TTM_SETMAXTIPWIDTH, 0, 0 );	//	チップの幅。０設定でいい。これしとかないと改行されない
+
+
 
 
 	ghStsBarWnd = CreateStatusWindow( WS_CHILD | WS_VISIBLE | CCS_BOTTOM | SBARS_SIZEGRIP, TEXT(""), hWnd, IDSB_VIEW_STATUS_BAR );
@@ -1249,12 +1264,14 @@ VOID Cls_OnMove( HWND hWnd, INT x, INT y )
 		LayerMoveFromView( hWnd, SIZE_MINIMIZED );
 		FrameMoveFromView( hWnd, SIZE_MINIMIZED );
 		MoziMoveFromView( hWnd, SIZE_MINIMIZED );
+		VertMoveFromView( hWnd, SIZE_MINIMIZED );
 	}
 	else
 	{
 		LayerMoveFromView( hWnd, SIZE_RESTORED );
 		FrameMoveFromView( hWnd, SIZE_RESTORED );
 		MoziMoveFromView( hWnd, SIZE_RESTORED );
+		VertMoveFromView( hWnd, SIZE_RESTORED );
 	}
 
 	return;
@@ -1292,9 +1309,11 @@ VOID Cls_OnDestroy( HWND hWnd )
 
 	MoziInitialise( NULL, NULL );
 
-#ifdef DRAUGHT_STYLE
-	DraughtInitialise( NULL, NULL );
+#ifdef VERTICAL_TEXT
+	VertInitialise( NULL, NULL );
 #endif
+
+	DraughtInitialise( NULL, NULL );
 
 	CntxEditInitialise( NULL, NULL );
 
@@ -1446,11 +1465,13 @@ VOID Cls_OnContextMenu( HWND hWnd, HWND hWndContext, UINT xPos, UINT yPos )
 LRESULT Cls_OnNotify( HWND hWnd, INT idFrom, LPNMHDR pstNmhdr )
 {
 	INT	curSel;
-	TCITEM	stTcItem;
 	TCHAR	atText[MAX_PATH];
+	TCITEM	stTcItem;
+	LPNMTTDISPINFO	pstDispInfo;
+	TCHITTESTINFO	stTcHitTest;
 
 
-	ToolBarOnNotify( hWnd, idFrom, pstNmhdr );
+	ToolBarOnNotify( hWnd, idFrom, pstNmhdr );	//	ツールバーの処理
 
 	if( IDTB_DOCK_TAB == idFrom )
 	{
@@ -1487,6 +1508,29 @@ LRESULT Cls_OnNotify( HWND hWnd, INT idFrom, LPNMHDR pstNmhdr )
 			TRACE( TEXT("FILE [%s] param[%d]"), atText, stTcItem.lParam );
 
 			DocMultiFileSelect( stTcItem.lParam );
+		}
+	}
+
+	if( IDTT_TILETAB_TIP == idFrom )	//	ツールチップの場合
+	{
+		if( TTN_GETDISPINFO ==  pstNmhdr->code )	//	内容の問い合わせだったら
+		{
+			GetCursorPos( &(stTcHitTest.pt) );	//	スクリーン座標
+			ScreenToClient( ghFileTabWnd, &(stTcHitTest.pt) );	//	クライヤント座標に変換
+
+			curSel = TabCtrl_HitTest( ghFileTabWnd, &stTcHitTest );
+			TRACE( TEXT("FILE TAB under [%d]"), curSel );
+
+			pstDispInfo = (LPNMTTDISPINFO)pstNmhdr;
+
+			ZeroMemory( &(pstDispInfo->szText), sizeof(pstDispInfo->szText) );
+
+			pstDispInfo->lpszText = DocMultiFileNameGet( curSel );
+			if( !(pstDispInfo->lpszText)  )
+			{
+				StringCchCopy( pstDispInfo->szText, 80, TEXT(" ") );
+				pstDispInfo->lpszText = pstDispInfo->szText;
+			}
 		}
 	}
 
@@ -1830,7 +1874,7 @@ INT InitParamValue( UINT dMode, UINT dStyle, INT nValue )
 		case  VL_LAYER_TRANS:	StringCchCopy( atKeyName, SUB_STRING, TEXT("LayerTrans")  );	break;
 		case  VL_RIGHT_SLIDE:	StringCchCopy( atKeyName, SUB_STRING, TEXT("RightSlide")  );	break;
 		case  VL_MAA_SPLIT:		StringCchCopy( atKeyName, SUB_STRING, TEXT("MaaSplit") );		break;
-		case  VL_SETMETHOD:		StringCchCopy( atKeyName, SUB_STRING, TEXT("MaaMethod") );		break;
+		case  VL_MAA_LCLICK:	StringCchCopy( atKeyName, SUB_STRING, TEXT("MaaMethod") );		break;
 		case  VL_UNILISTLAST:	StringCchCopy( atKeyName, SUB_STRING, TEXT("UniListLast") );	break;
 		case  VL_MAATIP_VIEW:	StringCchCopy( atKeyName, SUB_STRING, TEXT("MaaToolTip")  );	break;
 		case  VL_MAATIP_SIZE:	StringCchCopy( atKeyName, SUB_STRING, TEXT("MaaToolTipSize") );	break;
@@ -1856,9 +1900,11 @@ INT InitParamValue( UINT dMode, UINT dStyle, INT nValue )
 		case  VL_SWAP_COPY:		StringCchCopy( atKeyName, SUB_STRING, TEXT("CopyModeSwap") );	break;
 		case  VL_MAIN_SPLIT:	StringCchCopy( atKeyName, SUB_STRING, TEXT("MainSplit") );		break;
 		case  VL_MAXIMISED:		StringCchCopy( atKeyName, SUB_STRING, TEXT("Maximised") );		break;
-		case  VL_DRAUGHT_MODE:	StringCchCopy( atKeyName, SUB_STRING, TEXT("DraughtDefault") );	break;
+		case  VL_DRT_LCLICK:	StringCchCopy( atKeyName, SUB_STRING, TEXT("DraughtDefault") );	break;
 		case  VL_FIRST_READED:	StringCchCopy( atKeyName, SUB_STRING, TEXT("FirstStep") );		break;
 		case  VL_LAST_OPEN:		StringCchCopy( atKeyName, SUB_STRING, TEXT("LastOpenStyle") );	break;
+		case  VL_MAA_MCLICK:	StringCchCopy( atKeyName, SUB_STRING, TEXT("MaaSubMethod") );	break;
+		case  VL_DRT_MCLICK:	StringCchCopy( atKeyName, SUB_STRING, TEXT("DraughtSubDef") );	break;
 		default:	return nValue;
 	}
 
@@ -1895,6 +1941,7 @@ HRESULT InitParamString( UINT dMode, UINT dStyle, LPTSTR ptFile )
 	{
 		case VS_PROFILE_NAME:	StringCchCopy( atKeyName, SUB_STRING, TEXT("ProfilePath") );	break;
 		case VS_PAGE_FORMAT:	StringCchCopy( atKeyName, SUB_STRING, TEXT("PageFormat")  );	break;
+		case VS_FONT_NAME:		StringCchCopy( atKeyName, SUB_STRING, TEXT("FontName") );		break;
 		default:	return E_INVALIDARG;
 	}
 
@@ -2017,13 +2064,31 @@ HRESULT InitWindowPos( UINT dMode, UINT dStyle, LPRECT pstRect )
 		StringCchPrintf( atBuff, MIN_STRING, TEXT("%d"), pstRect->bottom );
 		WritePrivateProfileString( atAppName, TEXT("BOTTOM"), atBuff, gatIniPath );
 	}
-	
+
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 
+#ifdef OPEN_HISTORY
+HRESULT InitOpenHistory( UINT dMode, LPTSTR ptFile, INT iNumber )
+{
+	TCHAR	atKeyName[SUB_STRING];
 
+	if(  !(ptFile) )	return E_INVALIDARG;
 
+	if( dMode )
+	{
+
+	}
+	else
+	{
+
+	}
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+#endif
 
 /*!
 	最終使用ファイルのセーブロード
@@ -2033,25 +2098,9 @@ HRESULT InitWindowPos( UINT dMode, UINT dStyle, LPRECT pstRect )
 */
 HRESULT InitLastOpen( UINT dMode, LPTSTR ptFile )
 {
-#ifdef OPEN_HISTORY
-	TCHAR	atKeyName[SUB_STRING];
-
-	if(  !(ptFile) )	return E_INVALIDARG;
-
-	if( dMode )	//	ロードのときは、番号は１引いて使う
-	{
-
-	}
-	else
-	{
-
-	}
-
-#else
 	if(  !(ptFile) )	return E_INVALIDARG;
 	if( dMode ){	GetPrivateProfileString( TEXT("History"), TEXT("LastOpen"), TEXT(""), ptFile, MAX_PATH, gatIniPath );	}
 	else{			WritePrivateProfileString( TEXT("History") , TEXT("LastOpen"), ptFile, gatIniPath );	}
-#endif
 
 	return S_OK;
 }
@@ -2204,28 +2253,24 @@ INT_PTR CALLBACK OptionDlgProc( HWND hDlg, UINT message, WPARAM wParam, LPARAM l
 			dValue = InitParamValue( INIT_LOAD, VL_BACKUP_INTVL, 3 );
 			StringCchPrintf( atBuff, SUB_STRING, TEXT("%d"), dValue );
 			Edit_SetText( GetDlgItem(hDlg,IDE_AUTO_BU_INTVL), atBuff );
+
 			//	自動保存メッセージ
-			//dValue = InitParamValue( INIT_LOAD, VL_BACKUP_MSGON, 1 );
 			CheckDlgButton( hDlg, IDCB_AUTOBU_MSG_ON, gbAutoBUmsg ? BST_CHECKED : BST_UNCHECKED );
 
 			//	改行コード選択
-			//dValue = InitParamValue( INIT_LOAD, VL_CRLF_CODE, 0 );
 			CheckRadioButton( hDlg, IDRB_CRLF_STRB, IDRB_CRLF_2CH_YY, gbCrLfCode ? IDRB_CRLF_2CH_YY : IDRB_CRLF_STRB );
 
 			//	空白ユニコードパディング
-			//dValue = InitParamValue( INIT_LOAD, VL_USE_UNICODE, 1 );
 			CheckDlgButton( hDlg, IDCB_USE_UNISPACE_SET, gbUniPad ? BST_CHECKED : BST_UNCHECKED );
 
 			//	ユニコード１６進数
-			//dValue = InitParamValue( INIT_LOAD, VL_UNIRADIX_HEX, 1 );
 			CheckDlgButton( hDlg, IDCB_UNIRADIX_HEX, gbUniRadixHex ? BST_CHECKED : BST_UNCHECKED );
 
 			//	グループアンドゥ
 			dValue = InitParamValue( INIT_LOAD, VL_GROUP_UNDO, 1 );
 			CheckDlgButton( hDlg, IDCB_GROUPUNDO_SET, dValue ? BST_CHECKED : BST_UNCHECKED );
 
-			//	コピー標準スタイル
-			//dValue = InitParamValue( INIT_LOAD, VL_SWAP_COPY, 0 );	//	０ユニコード　１SJIS
+			//	コピー標準スタイル	//	０ユニコード　１SJIS
 			CheckDlgButton( hDlg, IDCB_COPY_STYLE_SWAP, gbCpModSwap ? BST_CHECKED : BST_UNCHECKED );
 
 			//	ドッキングスタイル
@@ -2241,9 +2286,10 @@ INT_PTR CALLBACK OptionDlgProc( HWND hDlg, UINT message, WPARAM wParam, LPARAM l
 			SendDlgItemMessage( hDlg, IDSL_LAYERBOX_TRANCED, TBM_SETPOS, TRUE, (dValue - 0x1F) );
 
 			//	複数行テンプレをクルックしたときの動作
-			dValue = InitParamValue( INIT_LOAD, VL_SETMETHOD, MAA_INSERT );
+			dValue = InitParamValue( INIT_LOAD, VL_MAA_LCLICK, MAA_INSERT );
 			switch( dValue )
 			{
+				default:
 				case MAA_INSERT:	id =  IDRB_SEL_INS_EDIT;	break;
 				case MAA_INTERRUPT:	id =  IDRB_SEL_INTRPT_EDIT;	break;
 				case MAA_LAYERED:	id =  IDRB_SEL_SET_LAYER;	break;
@@ -2253,9 +2299,22 @@ INT_PTR CALLBACK OptionDlgProc( HWND hDlg, UINT message, WPARAM wParam, LPARAM l
 			}
 			CheckRadioButton( hDlg, IDRB_SEL_INS_EDIT, IDRB_SEL_DRAUGHT, id );
 
-#ifdef DRAUGHT_STYLE
+			//	複数行テンプレをミッドクルックしたときの動作
+			dValue = InitParamValue( INIT_LOAD, VL_MAA_MCLICK, MAA_INSERT );
+			switch( dValue )
+			{
+				default:
+				case MAA_INSERT:	id =  IDRB_SELSUB_INS_EDIT;		break;
+				case MAA_INTERRUPT:	id =  IDRB_SELSUB_INTRPT_EDIT;	break;
+				case MAA_LAYERED:	id =  IDRB_SELSUB_SET_LAYER;	break;
+				case MAA_UNICLIP:	id =  IDRB_SELSUB_CLIP_UNI;		break;
+				case MAA_SJISCLIP:	id =  IDRB_SELSUB_CLIP_SJIS;	break;
+				case MAA_DRAUGHT:	id =  IDRB_SELSUB_DRAUGHT;		break;
+			}
+			CheckRadioButton( hDlg, IDRB_SELSUB_INS_EDIT, IDRB_SELSUB_DRAUGHT, id );
+
 			//	ドラフトボードでクリックしたときの動作
-			switch( gdClickMode )
+			switch( gdClickDrt )
 			{
 				case MAA_INSERT:	id =  IDRB_DRT_INS_EDIT;	break;
 				case MAA_INTERRUPT:	id =  IDRB_DRT_INTRPT_EDIT;	break;
@@ -2264,7 +2323,17 @@ INT_PTR CALLBACK OptionDlgProc( HWND hDlg, UINT message, WPARAM wParam, LPARAM l
 				case MAA_SJISCLIP:	id =  IDRB_DRT_CLIP_SJIS;	break;
 			}
 			CheckRadioButton( hDlg, IDRB_DRT_INS_EDIT, IDRB_DRT_CLIP_SJIS, id );
-#endif
+
+			switch( gdSubClickDrt )
+			{
+				case MAA_INSERT:	id =  IDRB_DRTSUB_INS_EDIT;		break;
+				case MAA_INTERRUPT:	id =  IDRB_DRTSUB_INTRPT_EDIT;	break;
+				case MAA_LAYERED:	id =  IDRB_DRTSUB_SET_LAYER;	break;
+				case MAA_UNICLIP:	id =  IDRB_DRTSUB_CLIP_UNI;		break;
+				case MAA_SJISCLIP:	id =  IDRB_DRTSUB_CLIP_SJIS;	break;
+			}
+			CheckRadioButton( hDlg, IDRB_DRTSUB_INS_EDIT, IDRB_DRTSUB_CLIP_SJIS, id );
+
 			return (INT_PTR)TRUE;
 
 		case WM_COMMAND:
@@ -2372,18 +2441,35 @@ INT_PTR CALLBACK OptionDlgProc( HWND hDlg, UINT message, WPARAM wParam, LPARAM l
 					else if( IsDlgButtonChecked( hDlg, IDRB_SEL_CLIP_SJIS ) ){	dValue = MAA_SJISCLIP;	}
 					else if( IsDlgButtonChecked( hDlg, IDRB_SEL_DRAUGHT ) ){	dValue = MAA_DRAUGHT;	}
 					else{	dValue = MAA_INSERT;	}	//	IDRB_SEL_INS_EDIT
-					InitParamValue( INIT_SAVE, VL_SETMETHOD, dValue );
-					ViewMaaItemsModeSet( dValue );	//	MAAにも設定おくる
+					InitParamValue( INIT_SAVE, VL_MAA_LCLICK, dValue );
 
-#ifdef DRAUGHT_STYLE
+					if( IsDlgButtonChecked( hDlg, IDRB_SELSUB_INTRPT_EDIT )   ){	dBuff = MAA_INTERRUPT;	}
+					else if( IsDlgButtonChecked( hDlg, IDRB_SELSUB_SET_LAYER ) ){	dBuff = MAA_LAYERED;	}
+					else if( IsDlgButtonChecked( hDlg, IDRB_SELSUB_CLIP_UNI ) ){	dBuff = MAA_UNICLIP;	}
+					else if( IsDlgButtonChecked( hDlg, IDRB_SELSUB_CLIP_SJIS ) ){	dBuff = MAA_SJISCLIP;	}
+					else if( IsDlgButtonChecked( hDlg, IDRB_SELSUB_DRAUGHT )  ){	dBuff = MAA_DRAUGHT;	}
+					else{	dBuff =  MAA_INSERT;	}	//	IDRB_SEL_INS_EDIT
+					InitParamValue( INIT_SAVE, VL_MAA_MCLICK, dBuff );
+
+					ViewMaaItemsModeSet( dValue, dBuff );	//	MAAにも設定おくる
+
 					//	ドラフトボードの操作
-					if( IsDlgButtonChecked( hDlg, IDRB_DRT_INTRPT_EDIT )  ){	gdClickMode = MAA_INTERRUPT;	}
-					else if( IsDlgButtonChecked( hDlg, IDRB_DRT_SET_LAYER ) ){	gdClickMode = MAA_LAYERED;		}
-					else if( IsDlgButtonChecked( hDlg, IDRB_DRT_CLIP_UNI ) ){	gdClickMode = MAA_UNICLIP;		}
-					else if( IsDlgButtonChecked( hDlg, IDRB_DRT_CLIP_SJIS ) ){	gdClickMode = MAA_SJISCLIP;		}
-					else{	gdClickMode = MAA_INSERT;	}	//	IDRB_DRT_INS_EDIT
-					InitParamValue( INIT_SAVE, VL_DRAUGHT_MODE, gdClickMode );
-#endif
+					if( IsDlgButtonChecked( hDlg, IDRB_DRT_INTRPT_EDIT )  ){	gdClickDrt = MAA_INTERRUPT;	}
+					else if( IsDlgButtonChecked( hDlg, IDRB_DRT_SET_LAYER ) ){	gdClickDrt = MAA_LAYERED;	}
+					else if( IsDlgButtonChecked( hDlg, IDRB_DRT_CLIP_UNI ) ){	gdClickDrt = MAA_UNICLIP;	}
+					else if( IsDlgButtonChecked( hDlg, IDRB_DRT_CLIP_SJIS ) ){	gdClickDrt = MAA_SJISCLIP;	}
+					else{	gdClickDrt = MAA_INSERT;	}	//	IDRB_DRT_INS_EDIT
+					InitParamValue( INIT_SAVE, VL_DRT_LCLICK, gdClickDrt );
+
+					if( IsDlgButtonChecked( hDlg, IDRB_DRTSUB_INTRPT_EDIT )   ){	gdSubClickDrt = MAA_INTERRUPT;	}
+					else if( IsDlgButtonChecked( hDlg, IDRB_DRTSUB_SET_LAYER ) ){	gdSubClickDrt = MAA_LAYERED;	}
+					else if( IsDlgButtonChecked( hDlg, IDRB_DRTSUB_CLIP_UNI ) ){	gdSubClickDrt = MAA_UNICLIP;	}
+					else if( IsDlgButtonChecked( hDlg, IDRB_DRTSUB_CLIP_SJIS ) ){	gdSubClickDrt = MAA_SJISCLIP;	}
+					else{	gdSubClickDrt = MAA_INSERT;	}	//	IDRB_DRTSUB_INS_EDIT
+					InitParamValue( INIT_SAVE, VL_DRT_MCLICK, gdSubClickDrt );
+
+
+
 					//	ＯＫなら閉じちゃう
 					if( IDOK == id ){	EndDialog( hDlg, IDOK );	}
 					return (INT_PTR)TRUE;

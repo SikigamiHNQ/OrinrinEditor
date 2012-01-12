@@ -40,6 +40,24 @@ typedef struct tagAATITLE
 } AATITLE, *LPAATITLE;
 //-------------------------------------------------------------------------------------------------
 
+static LOGFONT	gstBaseFont = {
+	FONTSZ_NORMAL,			//	フォントの高さ
+	0,						//	平均幅
+	0,						//	文字送りの方向とX軸との角度
+	0,						//	ベースラインとX軸との角度
+	FW_NORMAL,				//	文字の太さ(0~1000まで・400=nomal)
+	FALSE,					//	イタリック体
+	FALSE,					//	アンダーライン
+	FALSE,					//	打ち消し線
+	DEFAULT_CHARSET,		//	文字セット
+	OUT_OUTLINE_PRECIS,		//	出力精度
+	CLIP_DEFAULT_PRECIS,	//	クリッピング精度
+	PROOF_QUALITY,			//	出力品質
+	VARIABLE_PITCH,			//	固定幅か可変幅
+	TEXT("ＭＳ Ｐゴシック")	//	フォント名
+};
+//-------------------------------------------------------------------------------------------------
+
 #define TITLECBX_HEI	200
 
 #define SBP_DIRECT		0xFF
@@ -79,22 +97,23 @@ static vector<VIEWORDER>	gvcViewOrder;	//!<
 static vector<AATITLE>		gvcAaTitle;		//!<	
 //-------------------------------------------------------------------------------------------------
 
-LRESULT	Aai_OnNotify( HWND , INT, LPNMHDR );	//!<	
-VOID	Aai_OnMouseMove( HWND, INT, INT, UINT );	//!<	
+LRESULT	Aai_OnNotify( HWND , INT, LPNMHDR );				//!<	
+VOID	Aai_OnMouseMove( HWND, INT, INT, UINT );			//!<	
 VOID	Aai_OnLButtonDown( HWND, BOOL, INT, INT, UINT );	//!<	
-VOID	Aai_OnContextMenu( HWND, HWND, UINT, UINT );	//!<	
-VOID	Aai_OnDropFiles( HWND , HDROP );	//!<	
+VOID	Aai_OnMButtonDown( HWND, BOOL, INT, INT, UINT );	//!<	
+VOID	Aai_OnContextMenu( HWND, HWND, UINT, UINT );		//!<	
+VOID	Aai_OnDropFiles( HWND , HDROP );					//!<	
 
 
 HRESULT	AaItemsFavUpload( LPSTR, UINT );	//!<	
 HRESULT	AaItemsFavDelete( LPSTR, UINT );	//!<	
 UINT	AaItemsDoSelect( HWND, UINT );		//!<	
 
-LRESULT	CALLBACK gpfAaItemsProc( HWND, UINT, WPARAM, LPARAM );	//	
-LRESULT	CALLBACK gpfAaTitleCbxProc( HWND, UINT, WPARAM, LPARAM );	//	
+LRESULT	CALLBACK gpfAaItemsProc( HWND, UINT, WPARAM, LPARAM );		//!<	
+LRESULT	CALLBACK gpfAaTitleCbxProc( HWND, UINT, WPARAM, LPARAM );	//!<	
 
 #ifndef _ORRVW
-INT_PTR	CALLBACK AaItemAddDlgProc( HWND, UINT, WPARAM, LPARAM );
+INT_PTR	CALLBACK AaItemAddDlgProc( HWND, UINT, WPARAM, LPARAM );	//!<	
 #endif
 //-------------------------------------------------------------------------------------------------
 
@@ -160,13 +179,17 @@ HRESULT AaItemsInitialise( HWND hWnd, HINSTANCE hInst, LPRECT ptRect )
 	stScrollInfo.fMask = SIF_DISABLENOSCROLL;
 	SetScrollInfo( ghScrollWnd, SB_CTL, &stScrollInfo, TRUE );
 
-	ghAaFont = CreateFont( FONTSZ_NORMAL, 0, 0, 0, FW_REGULAR, FALSE, FALSE, FALSE, DEFAULT_CHARSET, OUT_OUTLINE_PRECIS, CLIP_DEFAULT_PRECIS, PROOF_QUALITY, VARIABLE_PITCH, TEXT("ＭＳ Ｐゴシック") );
+	//	表示用メインフォント
+//	ghAaFont = CreateFont( FONTSZ_NORMAL, 0, 0, 0, FW_REGULAR, FALSE, FALSE, FALSE, DEFAULT_CHARSET, OUT_OUTLINE_PRECIS, CLIP_DEFAULT_PRECIS, PROOF_QUALITY, VARIABLE_PITCH, TEXT("ＭＳ Ｐゴシック") );
+	ghAaFont = CreateFontIndirect( &gstBaseFont );
 	//	フォントの高さ	平均幅	文字送りの方向とX軸との角度	ベースラインとX軸との角度	文字の太さ(0~1000まで・400=nomal)	イタリック体	アンダーライン	ストライクアウト	文字セット	出力精度	クリッピング精度	出力品質	固定幅か可変幅	フォント名
 	SetWindowFont( ghItemsWnd, ghAaFont, TRUE );
 
-	//	圧迫しないように、9pt文字も用意してみる
+	//	ポッパップチップ用・12/9pt兼用
 	ttSize = InitParamValue( INIT_LOAD, VL_MAATIP_SIZE, 16 );	//	サイズ確認
-	ghTipFont = CreateFont( (FONTSZ_REDUCE == ttSize) ? FONTSZ_REDUCE : FONTSZ_NORMAL, 0, 0, 0, FW_REGULAR, FALSE, FALSE, FALSE, DEFAULT_CHARSET, OUT_OUTLINE_PRECIS, CLIP_DEFAULT_PRECIS, PROOF_QUALITY, VARIABLE_PITCH, TEXT("ＭＳ Ｐゴシック") );
+//	ghTipFont = CreateFont( (FONTSZ_REDUCE == ttSize) ? FONTSZ_REDUCE : FONTSZ_NORMAL, 0, 0, 0, FW_REGULAR, FALSE, FALSE, FALSE, DEFAULT_CHARSET, OUT_OUTLINE_PRECIS, CLIP_DEFAULT_PRECIS, PROOF_QUALITY, VARIABLE_PITCH, TEXT("ＭＳ Ｐゴシック") );
+	gstBaseFont.lfHeight = (FONTSZ_REDUCE == ttSize) ? FONTSZ_REDUCE : FONTSZ_NORMAL;
+	ghTipFont = CreateFontIndirect( &gstBaseFont );
 	SetWindowFont( ghToolTipWnd, ghTipFont, TRUE );
 
 	//	ツールチップをコールバックで割り付け
@@ -334,7 +357,8 @@ LRESULT CALLBACK gpfAaItemsProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 
 		HANDLE_MSG( hWnd, WM_NOTIFY,      Aai_OnNotify );		//	コモンコントロールの個別イベント
 		HANDLE_MSG( hWnd, WM_MOUSEMOVE,   Aai_OnMouseMove );	//	マウスいごいた
-		HANDLE_MSG( hWnd, WM_LBUTTONDOWN, Aai_OnLButtonDown );	//	マウス左ボタン押された
+		HANDLE_MSG( hWnd, WM_LBUTTONDOWN, Aai_OnLButtonDown );	//	マウス左ボタンダウン
+		HANDLE_MSG( hWnd, WM_MBUTTONDOWN, Aai_OnMButtonDown );	//	マウス中ボタンダウン
 		HANDLE_MSG( hWnd, WM_CONTEXTMENU, Aai_OnContextMenu );	//	コンテキストメニュー発生
 		HANDLE_MSG( hWnd, WM_DROPFILES,   Aai_OnDropFiles );	//	ドラグンドロップの受付
 
@@ -542,6 +566,23 @@ VOID Aai_OnLButtonDown( HWND hWnd, BOOL fDoubleClick, INT x, INT y, UINT keyFlag
 //-------------------------------------------------------------------------------------------------
 
 /*!
+	マウスの中ボタンがダウン(ダブルクルッコ）したときの処理
+	@param[in]	hWnd			親ウインドウハンドル
+	@param[in]	fDoubleClick	ダブルクルッコされたときなら非０となる
+	@param[in]	x				クライアント座標Ｘ
+	@param[in]	y				クライアント座標Ｙ
+	@param[in]	keyFlags		押されてる他のボタン
+	@return		なし
+*/
+VOID Aai_OnMButtonDown( HWND hWnd, BOOL fDoubleClick, INT x, INT y, UINT keyFlags )
+{
+	AaItemsDoSelect( hWnd, MAA_SUBDEFAULT );
+
+	return;
+}
+//-------------------------------------------------------------------------------------------------
+
+/*!
 	スクロールの処理
 	@param[in]	hWnd	ウインドウハンドル
 	@param[in]	hwndCtl	スクロールバーのウインドウハンドル
@@ -684,10 +725,6 @@ VOID Aai_OnContextMenu( HWND hWnd, HWND hWndContext, UINT xPos, UINT yPos )
 	hMenu = LoadMenu( GetModuleHandle(NULL), MAKEINTRESOURCE(IDM_AALIST_POPUP) );
 	hSubMenu = GetSubMenu( hMenu, 0 );
 
-#ifndef DRAUGHT_STYLE
-	DeleteMenu( hSubMenu, IDM_DRAUGHT_ADDING, MF_BYCOMMAND );
-#endif
-
 	//	お気にリストのみ、削除を有効に、変更すること・標準で無効にしておく
 	if( ACT_FAVLIST == dOpen )
 	{	EnableMenuItem( hSubMenu, IDM_MAA_FAV_DELETE , MF_ENABLED );	}
@@ -721,12 +758,11 @@ VOID Aai_OnContextMenu( HWND hWnd, HWND hWndContext, UINT xPos, UINT yPos )
 		case IDM_MAA_CLIP_UNICODE:		AaItemsDoSelect( hWnd, MAA_UNICLIP );	break;
 		case IDM_MAA_CLIP_SHIFTJIS:		AaItemsDoSelect( hWnd, MAA_SJISCLIP );	break;
 
-#ifdef DRAUGHT_STYLE
 		case IDM_DRAUGHT_ADDING:		AaItemsDoSelect( hWnd, MAA_DRAUGHT );	break;
 #ifdef _ORRVW
 		case IDM_DRAUGHT_OPEN:			Maa_OnCommand( hWnd, IDM_DRAUGHT_OPEN, NULL, 0 );	break;
 #endif
-#endif
+
 		case IDM_MAA_AATIP_TOGGLE:
 			gbAAtipView = gbAAtipView ? FALSE : TRUE;
 			InitParamValue( INIT_SAVE, VL_MAATIP_VIEW, gbAAtipView );
@@ -738,10 +774,7 @@ VOID Aai_OnContextMenu( HWND hWnd, HWND hWndContext, UINT xPos, UINT yPos )
 			InvalidateRect( ghItemsWnd, NULL, TRUE );
 			break;
 
-
-#ifdef DRAUGHT_STYLE
 		case IDM_MAA_THUMBNAIL_OPEN:	Maa_OnCommand( hWnd , IDM_MAA_THUMBNAIL_OPEN, NULL, 0 );	break;
-#endif
 	}
 
 	return;
@@ -935,8 +968,12 @@ HRESULT AaItemsTipSizeChange( INT ttSize, UINT bView )
 
 	SetWindowFont( ghToolTipWnd, GetStockFont(DEFAULT_GUI_FONT), FALSE );
 	DeleteFont( ghTipFont );
+
 	//	今使ってるヤツぶっ壊してから、新しいのつくってくっつける
-	ghTipFont = CreateFont( (FONTSZ_REDUCE == ttSize) ? FONTSZ_REDUCE : FONTSZ_NORMAL, 0, 0, 0, FW_REGULAR, FALSE, FALSE, FALSE, DEFAULT_CHARSET, OUT_OUTLINE_PRECIS, CLIP_DEFAULT_PRECIS, PROOF_QUALITY, VARIABLE_PITCH, TEXT("ＭＳ Ｐゴシック") );
+//	ghTipFont = CreateFont( (FONTSZ_REDUCE == ttSize) ? FONTSZ_REDUCE : FONTSZ_NORMAL, 0, 0, 0, FW_REGULAR, FALSE, FALSE, FALSE, DEFAULT_CHARSET, OUT_OUTLINE_PRECIS, CLIP_DEFAULT_PRECIS, PROOF_QUALITY, VARIABLE_PITCH, TEXT("ＭＳ Ｐゴシック") );
+	gstBaseFont.lfHeight = (FONTSZ_REDUCE == ttSize) ? FONTSZ_REDUCE : FONTSZ_NORMAL;
+	ghTipFont = CreateFontIndirect( &gstBaseFont );
+
 	SetWindowFont( ghToolTipWnd, ghTipFont, TRUE );
 
 	return S_OK;

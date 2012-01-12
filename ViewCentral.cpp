@@ -102,7 +102,8 @@ static HFONT	ghNumFont6L;	//!<	行番号用フォント６桁用
 
 static INT		gdAutoDiffBase;	//!<	自動調整のベース
 
-static  UINT	gdUseMode;		//!<	MAAからの挿入レイヤクリップ指示
+static  UINT	gdUseMode;		//!<	MAAからの左クルックによる使用スタイルの指示
+static  UINT	gdUseSubMode;	//!<	MAAからの中クルックによる使用スタイルの指示
 
 static  UINT	gdSpaceView;	//!<	空白を表示する
 
@@ -1909,12 +1910,14 @@ HRESULT ViewFrameInsert( INT dMode )
 
 /*!
 	MAA一覧からの使用モードをセット
-	@param[in]	dMode	０通常挿入　１割込挿入　２レイヤ　３ユニコピー　４SJISコピー　５ドラフトボードへ
+	@param[in]	dMode		左クルック用・０通常挿入　１割込挿入　２レイヤ　３ユニコピー　４SJISコピー　５ドラフトボードへ
+	@param[in]	dSubMode	中クルック用・０通常挿入　１割込挿入　２レイヤ　３ユニコピー　４SJISコピー　５ドラフトボードへ
 	@return		HRESULT	終了状態コード
 */
-HRESULT ViewMaaItemsModeSet( UINT dMode )
+HRESULT ViewMaaItemsModeSet( UINT dMode, UINT dSubMode )
 {
 	gdUseMode = dMode;
+	gdUseSubMode = dSubMode;
 
 	return S_OK;
 }
@@ -1924,8 +1927,10 @@ HRESULT ViewMaaItemsModeSet( UINT dMode )
 	MAA一覧からの使用モードを確保
 	@return	使用モード　０通常挿入　１割込挿入　２レイヤ　３ユニコピー　４SJISコピー　５ドラフトボードへ
 */
-UINT ViewMaaItemsModeGet( VOID )
+UINT ViewMaaItemsModeGet( PUINT pdSubMode )
 {
+	if( pdSubMode ){	*pdSubMode = gdUseSubMode;	}
+
 	return gdUseMode;
 }
 //-------------------------------------------------------------------------------------------------
@@ -1941,12 +1946,13 @@ UINT ViewMaaMaterialise( LPSTR pcCont, UINT cbSize, UINT dMode )
 {
 	LPTSTR		ptString;
 	UINT_PTR	cchSize;
-	UINT		uRslt = FALSE;	//	デフォ動作であるならTRUE
+	UINT		uRslt = TRUE;	//	デフォ動作であるならTRUE・仕様変更により常にTRUE
 	INT			xDot;
 
 	//	デフォ動作であるかどうか
-	if( dMode == gdUseMode ){		uRslt = TRUE;	}
-	if( MAA_DEFAULT ==  dMode ){	dMode = gdUseMode;	uRslt = TRUE;	}
+//	if( dMode == gdUseMode ){	uRslt = TRUE;	}
+	if( MAA_DEFAULT ==  dMode ){	dMode = gdUseMode;	}
+	if( MAA_SUBDEFAULT == dMode ){	dMode = gdUseSubMode;	}
 
 	//	先にSJIS固定のイベントから済ませる
 	if( MAA_SJISCLIP == dMode )
@@ -1954,13 +1960,13 @@ UINT ViewMaaMaterialise( LPSTR pcCont, UINT cbSize, UINT dMode )
 		DocClipboardDataSet( pcCont, (cbSize + 1), D_SJIS );
 		return uRslt;
 	}
-#ifdef DRAUGHT_STYLE
+
 	if( MAA_DRAUGHT == dMode )	//	ドラフトボードに追加
 	{
 		DraughtItemAdding( pcCont );
 		return uRslt;
 	}
-#endif
+
 
 	xDot = 0;
 
@@ -2103,6 +2109,11 @@ VOID OperationOnCommand( HWND hWnd, INT id, HWND hWndCtl, UINT codeNotify )
 
 		//	文字スクリプト窓開く
 		case  IDM_MOZI_SCR_OPEN:	MoziScripterCreate( ghInst , hWnd );	break;
+
+#ifdef VERTICAL_TEXT
+		//	縦書きスクリプト開く
+		case IDM_VERT_SCRIPT_OPEN:	VertScripterCreate( ghInst , hWnd );	break;
+#endif
 
 		case IDM_COLOUR_EDIT_OPEN:	ViewColourEditDlg( hWnd );	break;
 

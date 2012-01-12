@@ -61,7 +61,6 @@ MAAのサムネ表示にも使うなら、スクロールバー考慮。呼出キーバインドも考える。Ctrl+
 #define TPNL_VERTI	3
 //-------------------------------------------------------------------------------------------------
 
-#ifdef DRAUGHT_STYLE
 
 //	使用する構造体はMAAのと共通でいける
 //-------------------------------------------------------------------------------------------------
@@ -79,7 +78,8 @@ static  HWND	ghDraughtWnd;	//!<	このウインドウハンドル
 static  HWND	ghDrghtTipWnd;	//!<	ツールチップ
 static LPTSTR	gptTipBuffer;	//!<	チップ内容
 
-EXTERNED UINT	gdClickMode;	//!<	アイテムをクルックしたときの基本動作・０通常挿入　１矩形挿入　２レイヤボックス開く　３UNIクリップ　４SJISクリップ
+EXTERNED UINT	gdClickDrt;		//!<	アイテムを左クルックしたときの基本動作・０通常挿入　１矩形挿入　２レイヤボックス開く　３UNIクリップ　４SJISクリップ
+EXTERNED UINT	gdSubClickDrt;	//!<	アイテムを中クルックしたときの基本動作・０通常挿入　１矩形挿入　２レイヤボックス開く　３UNIクリップ　４SJISクリップ
 //クルッペボードへコピるモードはコピーモードスワップに従う
 
 static HDC		ghNonItemDC;	//!<	アイテム無しの絵
@@ -102,6 +102,7 @@ DOUBLE	DraughtAspectKeeping( LPSIZE, UINT );	//!<
 INT		DraughtItemDelete( CONST INT  );		//!<	
 HRESULT	DraughtItemUse( INT );					//!<	
 HRESULT	DraughtItemExport( HWND, LPTSTR );		//!<	
+VOID	DraughtButtonUp( HWND, INT, INT, UINT, UINT );	//!<	
 
 LRESULT CALLBACK DraughtProc( HWND, UINT, WPARAM, LPARAM );
 VOID	Drt_OnCommand( HWND , INT, HWND, UINT );		//!<	
@@ -109,6 +110,7 @@ VOID	Drt_OnPaint( HWND );							//!<
 //VOID	Drt_OnSize( HWND , UINT, INT, INT );			//!<	
 LRESULT	Drt_OnNotify( HWND , INT, LPNMHDR );			//!<	
 VOID	Drt_OnLButtonUp( HWND, INT, INT, UINT );		//!<	
+VOID	Drt_OnMButtonUp( HWND, INT, INT, UINT );		//!<	
 VOID	Drt_OnContextMenu( HWND, HWND, UINT, UINT );	//!<	
 VOID	Drt_OnDestroy( HWND );							//!<	
 VOID	Drt_OnKillFocus( HWND, HWND );					//!<	
@@ -155,7 +157,8 @@ HRESULT DraughtInitialise( HINSTANCE hInstance, HWND hPtWnd )
 
 #ifndef _ORRVW
 		//	クルック動作指定ロード・デフォ動作は通常挿入
-		gdClickMode = InitParamValue( INIT_LOAD, VL_DRAUGHT_MODE, 0 );
+		gdClickDrt    = InitParamValue( INIT_LOAD, VL_DRT_LCLICK, MAA_INSERT );
+		gdSubClickDrt = InitParamValue( INIT_LOAD, VL_DRT_MCLICK, MAA_INSERT );
 		//	Viewerの場合はコピーモードに従う
 #endif
 	}
@@ -237,8 +240,8 @@ HWND DraughtWindowCreate( HINSTANCE hInstance, HWND hPtWnd, UINT bThumb )
 		rect.right += iScWid;
 	}
 
-	//	ウインドウ作成	TOPMOSTいるか？	
-	ghDraughtWnd = CreateWindowEx( WS_EX_TOOLWINDOW,// | WS_EX_TOPMOST | WS_EX_CLIENTEDGE,
+	//	ウインドウ作成	TOPMOSTいるか？	要る
+	ghDraughtWnd = CreateWindowEx( WS_EX_TOOLWINDOW | WS_EX_TOPMOST,
 		DRAUGHT_BOARD_CLASS, TEXT("Draught Board"), WS_POPUP | WS_VISIBLE | WS_BORDER,
 		rect.left, rect.top, rect.right, rect.bottom, NULL, NULL, hInstance, NULL );
 
@@ -323,6 +326,7 @@ LRESULT CALLBACK DraughtProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lPa
 		HANDLE_MSG( hWnd, WM_COMMAND,     Drt_OnCommand );	
 		HANDLE_MSG( hWnd, WM_NOTIFY,      Drt_OnNotify );	//	コモンコントロールの個別イベント
 		HANDLE_MSG( hWnd, WM_LBUTTONUP,   Drt_OnLButtonUp );
+		HANDLE_MSG( hWnd, WM_MBUTTONUP,   Drt_OnMButtonUp );
 		HANDLE_MSG( hWnd, WM_PAINT,       Drt_OnPaint );
 		HANDLE_MSG( hWnd, WM_CONTEXTMENU, Drt_OnContextMenu );
 		HANDLE_MSG( hWnd, WM_DESTROY,     Drt_OnDestroy );
@@ -582,6 +586,23 @@ LRESULT Drt_OnNotify( HWND hWnd, INT idFrom, LPNMHDR pstNmhdr )
 //-------------------------------------------------------------------------------------------------
 
 /*!
+	マウスの中ボタンがうっｐされたとき
+	@param[in]	hWnd		ウインドウハンドル
+	@param[in]	x			発生したＸ座標値
+	@param[in]	y			発生したＹ座標値
+	@param[in]	keyFlags	他に押されてるキーについて
+*/
+VOID Drt_OnMButtonUp( HWND hWnd, INT x, INT y, UINT keyFlags )
+{
+	TRACE( TEXT("MUP %d x %d"), x , y );	//	クライヤント座標
+
+	DraughtButtonUp( hWnd, x, y, keyFlags, WM_MBUTTONUP );
+
+	return;
+}
+//-------------------------------------------------------------------------------------------------
+
+/*!
 	マウスの左ボタンがうっｐされたとき
 	@param[in]	hWnd		ウインドウハンドル
 	@param[in]	x			発生したＸ座標値
@@ -590,11 +611,27 @@ LRESULT Drt_OnNotify( HWND hWnd, INT idFrom, LPNMHDR pstNmhdr )
 */
 VOID Drt_OnLButtonUp( HWND hWnd, INT x, INT y, UINT keyFlags )
 {
+	TRACE( TEXT("LUP %d x %d"), x , y );	//	クライヤント座標
+
+	DraughtButtonUp( hWnd, x, y, keyFlags, WM_LBUTTONUP );
+
+	return;
+}
+//-------------------------------------------------------------------------------------------------
+
+/*!
+	マウスのボタンがうっｐされたとき
+	@param[in]	hWnd		ウインドウハンドル
+	@param[in]	x			発生したＸ座標値
+	@param[in]	y			発生したＹ座標値
+	@param[in]	keyFlags	他に押されてるキーについて
+	@param[in]	message		うｐされたボタンタイプ	WM_LBUTTONUP	WM_MBUTTONUP
+*/
+VOID DraughtButtonUp( HWND hWnd, INT x, INT y, UINT keyFlags, UINT message )
+{
 	POINT	stPos;
 	INT		id;
-	UINT	dMode;
-
-	TRACE( TEXT("LUP %d x %d"), x, y );	//	クライヤント座標
+	UINT	dMode, dSubMode, dStyle;
 
 	stPos.x = x;
 	stPos.y = y;
@@ -604,7 +641,10 @@ VOID Drt_OnLButtonUp( HWND hWnd, INT x, INT y, UINT keyFlags )
 	//	サムネ側でクルックしたなら、MAAのデフォ動作に従う
 	if( gbThumb )
 	{
-		dMode = ViewMaaItemsModeGet(  );
+		dMode = ViewMaaItemsModeGet( &dSubMode );
+		//	中クルックの場合
+		if( WM_MBUTTONUP == message )	dMode = dSubMode;
+
 		switch( dMode )
 		{
 	#ifndef _ORRVW
@@ -620,7 +660,10 @@ VOID Drt_OnLButtonUp( HWND hWnd, INT x, INT y, UINT keyFlags )
 	}
 	else
 	{
-		switch( gdClickMode )
+		if( WM_MBUTTONUP == message ){	dStyle = gdSubClickDrt;	}
+		else{							dStyle = gdClickDrt;	}
+
+		switch( dStyle )
 		{
 	#ifndef _ORRVW
 			case  0:	id = IDM_DRAUGHT_INSERTEDIT;	break;
@@ -1310,4 +1353,4 @@ HRESULT DraughtItemExport( HWND hWnd, LPTSTR ptPath )
 }
 //-------------------------------------------------------------------------------------------------
 
-#endif
+

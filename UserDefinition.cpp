@@ -260,7 +260,11 @@ HRESULT UserDefAppendMenu( HWND hWnd )
 	hMenu = GetMenu( hWnd );
 	hSubMenu = GetSubMenu( hMenu, 2 );
 	hMenu = hSubMenu;
-	hSubMenu = GetSubMenu( hMenu, 6 );
+#ifdef VERTICAL_TEXT
+	hSubMenu = GetSubMenu( hMenu, 10 );
+#else
+	hSubMenu = GetSubMenu( hMenu, 9 );
+#endif
 
 	UserDefMenuWrite( hSubMenu );
 

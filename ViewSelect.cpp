@@ -394,6 +394,24 @@ HRESULT ViewSelStateChange( UINT dFirst )
 //-------------------------------------------------------------------------------------------------
 
 /*!
+	選択開始地点より前に選択しているか
+	@param[in]	line	現在行
+	@return	UINT		非０いる！いる！
+*/
+UINT ViewSelBackCheck( INT line )
+{
+	//	選択範囲、左上右下調整・Orig位置は絶対的な内容のはず・Orig値を元にすればいいか？
+
+	TRACE( TEXT("LINE[%d] ST[%d]"), line, gstSelBgnOrig.y );
+
+	//	開始から上の行イッたら
+	if( gstSelBgnOrig.y >= line ){	return TRUE;	}
+
+	return FALSE;
+}
+//-------------------------------------------------------------------------------------------------
+
+/*!
 	矩形選択の調整
 	@param[in]	dBaseLine	元々キャレットのあった行番号
 	@return		HRESULT	終了状態コード

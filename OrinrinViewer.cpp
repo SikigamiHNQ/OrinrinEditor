@@ -34,6 +34,8 @@ TEXT("もし受け取っていなければ、<http://www.gnu.org/licenses/> をご覧ください。\
 };
 
 static  UINT	gdUseMode;		//!<	挿入レイヤクリップ指示・設定に注意
+static  UINT	gdUseSubMode;	//!<	
+
 static  HWND	ghMaaWnd;		//!<	作られたウインドウハンドル
 static TCHAR	gatIniPath[MAX_PATH];	//!<	ＩＮＩファイルの位置
 
@@ -41,9 +43,7 @@ extern  HWND	ghMaaFindDlg;	//!<	MAA検索ダイヤログハンドル
 
 extern HFONT	ghAaFont;		//!<	表示用のフォント
 
-#ifdef DRAUGHT_STYLE
-extern  UINT	gdClickMode;	//
-#endif
+extern  UINT	gdClickDrt;	//
 //------------------------------------------------------------------------------------------------------------------------
 
 BOOLEAN	SelectFolderDlg( HWND, LPTSTR, UINT_PTR );
@@ -88,16 +88,15 @@ INT APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 
 	SplitBarClass( hInstance );	//	スプリットバーの準備
 
-	gdUseMode = InitParamValue( INIT_LOAD, VL_SETMETHOD, MAA_SJISCLIP );
+	gdUseMode    = InitParamValue( INIT_LOAD, VL_MAA_LCLICK, MAA_SJISCLIP );
+	gdUseSubMode = InitParamValue( INIT_LOAD, VL_MAA_MCLICK, MAA_SJISCLIP );
 
 	//	アプリケーションの初期化を実行します:
 	ghMaaWnd = MaaTmpltInitialise( hInstance, GetDesktopWindow(), NULL );
 	if( !(ghMaaWnd) )	return (-1);
 
-#ifdef DRAUGHT_STYLE
 	DraughtInitialise( hInstance, ghMaaWnd );
-	gdClickMode = gdUseMode;
-#endif
+	gdClickDrt = gdUseMode;
 
 	hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_ORINRINVIEWER));
 
@@ -230,11 +229,12 @@ INT InitParamValue( UINT dMode, UINT dStyle, INT nValue )
 	switch( dStyle )
 	{
 		case VL_MAA_SPLIT:		StringCchCopy( atKeyName, SUB_STRING, TEXT("MaaSplit") );		break;
-		case VL_SETMETHOD:		StringCchCopy( atKeyName, SUB_STRING, TEXT("MaaMethod") );		break;
+		case VL_MAA_LCLICK:		StringCchCopy( atKeyName, SUB_STRING, TEXT("MaaMethod") );		break;
 		case VL_MAATIP_VIEW:	StringCchCopy( atKeyName, SUB_STRING, TEXT("MaaToolTip")  );	break;
 		case VL_MAATIP_SIZE:	StringCchCopy( atKeyName, SUB_STRING, TEXT("MaaToolTipSize") );	break;
 		case VL_MAA_TOPMOST:	StringCchCopy( atKeyName, SUB_STRING, TEXT("MaaTopMost")  );	break;
 		case VL_MAASEP_STYLE:	StringCchCopy( atKeyName, SUB_STRING, TEXT("MaaSepLine")  );	break;
+		case VL_MAA_MCLICK:		StringCchCopy( atKeyName, SUB_STRING, TEXT("MaaSubMethod") );	break;
 		default:	return 0;
 	}
 
@@ -435,13 +435,14 @@ UINT ViewMaaMaterialise( LPSTR pcCont, UINT cbSize, UINT dMode )
 {
 	LPTSTR		ptString;
 	UINT_PTR	cchSize;
-	UINT		uRslt = FALSE;	//	デフォ動作であるならTRUE
+	UINT		uRslt = TRUE;	//	デフォ動作であるならTRUE＜いつでもTRUEにした
 
 //	FLASHWINFO	stFshWInfo;
 
 	//	デフォ動作であるかどうか
-	if( dMode == gdUseMode ){		uRslt = TRUE;	}
-	if( MAA_DEFAULT ==  dMode ){	dMode = gdUseMode;	uRslt = TRUE;	}
+//	if( dMode == gdUseMode ){		uRslt = TRUE;	}
+	if( MAA_DEFAULT ==  dMode ){	dMode = gdUseMode;	}
+	if( MAA_SUBDEFAULT== dMode ){	dMode = gdUseSubMode;	}
 
 	if( MAA_UNICLIP == dMode )	//	ユニコード
 	{
@@ -453,9 +454,7 @@ UINT ViewMaaMaterialise( LPSTR pcCont, UINT cbSize, UINT dMode )
 
 		FREE(ptString);
 	}
-#ifdef DRAUGHT_STYLE	//	ドラフトボードに追加
-	else if( MAA_DRAUGHT == dMode ){	DraughtItemAdding( pcCont );	}
-#endif
+	else if( MAA_DRAUGHT == dMode ){	DraughtItemAdding( pcCont );	}	//	ドラフトボードに追加
 	else{	DocClipboardDataSet( pcCont, (cbSize + 1), D_SJIS );	}	//	SJISコピー
 
 
@@ -513,7 +512,7 @@ INT_PTR CALLBACK OptionDlgProc( HWND hDlg, UINT message, WPARAM wParam, LPARAM l
 			CheckDlgButton( hDlg, IDCB_POPUP_VISIBLE, dValue ? BST_CHECKED : BST_UNCHECKED );
 
 			//	複数行テンプレをクルックしたときの動作
-			dValue = InitParamValue( INIT_LOAD, VL_SETMETHOD, MAA_SJISCLIP );
+			dValue = InitParamValue( INIT_LOAD, VL_MAA_LCLICK, MAA_SJISCLIP );
 			switch( dValue )
 			{
 				case MAA_UNICLIP:	id = IDRB_SEL_CLIP_UNI;		break;
@@ -522,6 +521,17 @@ INT_PTR CALLBACK OptionDlgProc( HWND hDlg, UINT message, WPARAM wParam, LPARAM l
 				case MAA_DRAUGHT:	id = IDRB_SEL_DRAUGHT;		break;
 			}
 			CheckRadioButton( hDlg, IDRB_SEL_INS_EDIT, IDRB_SEL_DRAUGHT, id );
+
+			dValue = InitParamValue( INIT_LOAD, VL_MAA_MCLICK, MAA_SJISCLIP );
+			switch( dValue )
+			{
+				case MAA_UNICLIP:	id = IDRB_SELSUB_CLIP_UNI;	break;
+				default:
+				case MAA_SJISCLIP:	id = IDRB_SELSUB_CLIP_SJIS;	break;
+				case MAA_DRAUGHT:	id = IDRB_SELSUB_DRAUGHT;	break;
+			}
+			CheckRadioButton( hDlg, IDRB_SELSUB_INS_EDIT, IDRB_SELSUB_DRAUGHT, id );
+
 			return (INT_PTR)TRUE;
 
 		case WM_COMMAND:
@@ -554,14 +564,19 @@ INT_PTR CALLBACK OptionDlgProc( HWND hDlg, UINT message, WPARAM wParam, LPARAM l
 					InitParamValue( INIT_SAVE, VL_MAATIP_VIEW, dBuff );
 
 					//	MAAの操作
-					if( IsDlgButtonChecked( hDlg, IDRB_SEL_CLIP_UNI ) ){	dValue = MAA_UNICLIP;	}
+					if(      IsDlgButtonChecked( hDlg, IDRB_SEL_CLIP_UNI ) ){	dValue = MAA_UNICLIP;	}
 					else if( IsDlgButtonChecked( hDlg, IDRB_SEL_DRAUGHT ) ){	dValue = MAA_DRAUGHT;	}
 					else{	dValue = MAA_SJISCLIP;	}
-					InitParamValue( INIT_SAVE, VL_SETMETHOD, dValue );
+					InitParamValue( INIT_SAVE, VL_MAA_LCLICK, dValue );
 					gdUseMode = dValue;
-#ifdef DRAUGHT_STYLE
-					gdClickMode = gdUseMode;
-#endif
+					gdClickDrt = gdUseMode;
+
+					if(      IsDlgButtonChecked( hDlg, IDRB_SELSUB_CLIP_UNI ) ){	dValue = MAA_UNICLIP;	}
+					else if( IsDlgButtonChecked( hDlg, IDRB_SELSUB_DRAUGHT )  ){	dValue = MAA_DRAUGHT;	}
+					else{	dValue = MAA_SJISCLIP;	}
+					InitParamValue( INIT_SAVE, VL_MAA_MCLICK, dValue );
+					gdUseSubMode = dValue;
+
 					//	ＯＫなら閉じちゃう
 					if( IDOK == id ){	EndDialog( hDlg, IDOK );	}
 					return (INT_PTR)TRUE;
@@ -665,8 +680,10 @@ INT ViewStringWidthGet( LPCTSTR ptStr )
 	MAA一覧からの使用モードを確保
 	@return	使用モード　０通常挿入　１割込挿入　２レイヤ　３ユニコピー　４SJISコピー　５ドラフトボードへ
 */
-UINT ViewMaaItemsModeGet( VOID )
+UINT ViewMaaItemsModeGet( PUINT pdSubMode )
 {
+	if( pdSubMode ){	*pdSubMode = gdUseSubMode;	}
+
 	return gdUseMode;
 }
 //-------------------------------------------------------------------------------------------------
