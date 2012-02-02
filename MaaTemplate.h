@@ -85,6 +85,7 @@ VOID		AaItemsResize( HWND, LPRECT );						//!<
 VOID		AaItemsDrawItem( HWND, CONST DRAWITEMSTRUCT * );	//!<	
 //VOID		AaItemsMeasureItem( HWND, LPMEASUREITEMSTRUCT );	//!<	
 HRESULT		AaItemsDoShow( HWND, LPTSTR, UINT );		//!<	
+HRESULT		AaItemsFavUpload( LPSTR, UINT );	//!<	
 UINT		AaItemsIsUnderCursor( HWND, HWND, INT );	//!<	
 VOID		AaTitleClear( VOID );
 INT			AaTitleAddString( UINT, LPSTR );

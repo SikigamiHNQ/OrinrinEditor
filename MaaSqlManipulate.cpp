@@ -279,6 +279,9 @@ HRESULT SqlFavUpload( LPTSTR ptBaseName, DWORD dHash, LPSTR pcConts, UINT rdLeng
 	rslt = sqlite3_prepare( gpDataBase, acArtSelect, -1, &statement, NULL );
 	if( SQLITE_OK != rslt ){	SQL_DEBUG( gpDataBase );	return E_OUTOFMEMORY;	}
 
+//	TODO:	複数のベースネームが有る場合どうするか
+//先に登録した後、そのＡＡのベースネームが変わった場合、新しい名前で出てこない問題
+//ハッシュで見てるので、ＡＡ自体は一つしか登録されない
 	sqlite3_reset( statement );
 	sqlite3_bind_int( statement, 1, dHash );	//	hash
 	rslt = sqlite3_step( statement );
@@ -287,6 +290,7 @@ HRESULT SqlFavUpload( LPTSTR ptBaseName, DWORD dHash, LPSTR pcConts, UINT rdLeng
 		index = sqlite3_column_int( statement , 0 );	//	id
 		sqlite3_finalize( statement );
 
+		//	ベースネームも書き換えるか
 		SqlFavUpdate( index );	//	内容更新
 	}
 	else	//	未記録のならInsert
@@ -323,7 +327,7 @@ HRESULT SqlFavUpdate( UINT index )
 	iCount = sqlite3_column_int( statement , 0 );	//	count
 	sqlite3_finalize( statement );
 
-	iCount++;
+	iCount++;	//	使用回数である・増やす
 
 	//	今のユリウス時間をゲット
 	rslt = sqlite3_prepare( gpDataBase, ("SELECT julianday('now')"), -1, &statement, NULL );

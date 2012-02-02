@@ -36,22 +36,22 @@ If not, see <http://www.gnu.org/licenses/>.
 //-------------------------------------------------------------------------------------------------
 
 
-static LOGFONT	gstUniFont = {
-	FONTSZ_NORMAL,			//	フォントの高さ
-	0,						//	平均幅
-	0,						//	文字送りの方向とX軸との角度
-	0,						//	ベースラインとX軸との角度
-	FW_NORMAL,				//	文字の太さ(0~1000まで・400=nomal)
-	FALSE,					//	イタリック体
-	FALSE,					//	アンダーライン
-	FALSE,					//	打ち消し線
-	DEFAULT_CHARSET,		//	文字セット
-	OUT_OUTLINE_PRECIS,		//	出力精度
-	CLIP_DEFAULT_PRECIS,	//	クリッピング精度
-	PROOF_QUALITY,			//	出力品質
-	VARIABLE_PITCH,			//	固定幅か可変幅
-	TEXT("ＭＳ Ｐゴシック")	//	フォント名
-};
+//static LOGFONT	gstUniFont = {
+//	FONTSZ_NORMAL,			//	フォントの高さ
+//	0,						//	平均幅
+//	0,						//	文字送りの方向とX軸との角度
+//	0,						//	ベースラインとX軸との角度
+//	FW_NORMAL,				//	文字の太さ(0~1000まで・400=nomal)
+//	FALSE,					//	イタリック体
+//	FALSE,					//	アンダーライン
+//	FALSE,					//	打ち消し線
+//	DEFAULT_CHARSET,		//	文字セット
+//	OUT_OUTLINE_PRECIS,		//	出力精度
+//	CLIP_DEFAULT_PRECIS,	//	クリッピング精度
+//	PROOF_QUALITY,			//	出力品質
+//	VARIABLE_PITCH,			//	固定幅か可変幅
+//	TEXT("ＭＳ Ｐゴシック")	//	フォント名
+//};
 //-------------------------------------------------------------------------------------------------
 
 static  HWND	ghMainWnd;		//!<	
@@ -145,6 +145,7 @@ INT_PTR Uni_OnInitDialog( HWND hDlg, HWND hWndFocus, LPARAM lParam )
 {
 	INT		iTopIdx;
 	UINT	i;
+	LOGFONT	stFont;
 	LVCOLUMN	stLvColm;
 	RECT		rect;
 
@@ -157,14 +158,14 @@ INT_PTR Uni_OnInitDialog( HWND hDlg, HWND hWndFocus, LPARAM lParam )
 	}
 	ComboBox_SetCurSel( ghGroupSelWnd, 0 );
 
-//	ghPanelFont = CreateFont( 48, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE, DEFAULT_CHARSET, OUT_OUTLINE_PRECIS, CLIP_DEFAULT_PRECIS, PROOF_QUALITY, VARIABLE_PITCH, TEXT("ＭＳ Ｐゴシック") );
-	gstUniFont.lfHeight = 48;
-	ghPanelFont = CreateFontIndirect( &gstUniFont );
+	ViewingFontGet( &stFont );	//	gstUniFont
+
+	stFont.lfHeight = 48;
+	ghPanelFont = CreateFontIndirect( &stFont );
 	SetWindowFont( GetDlgItem(hDlg,IDS_UNI_LETTER_IMG), ghPanelFont, TRUE );
 
-//	ghLvFont = CreateFont( 28, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE, DEFAULT_CHARSET, OUT_OUTLINE_PRECIS, CLIP_DEFAULT_PRECIS, PROOF_QUALITY, VARIABLE_PITCH, TEXT("ＭＳ Ｐゴシック") );
-	gstUniFont.lfHeight = 28;
-	ghLvFont = CreateFontIndirect( &gstUniFont );
+	stFont.lfHeight = 28;
+	ghLvFont = CreateFontIndirect( &stFont );
 
 	ghUniLvWnd = GetDlgItem( hDlg, IDLV_UNI_CATALOGUE );
 	ListView_SetExtendedListViewStyle( ghUniLvWnd, LVS_EX_GRIDLINES | LVS_EX_LABELTIP );

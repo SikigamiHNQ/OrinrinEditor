@@ -40,6 +40,8 @@ static TCHAR	gatBackUpDirty[MAX_PATH];
 //-------------------------------------------------------------------------------------------------
 
 INT	DocAstSeparatorGetAlloc( INT, UINT, LPVOID *, FILES_ITR );
+
+INT	DocUnicode2UTF8( LPVOID * );
 //-------------------------------------------------------------------------------------------------
 
 /*!
@@ -262,13 +264,11 @@ HRESULT DocFileBackup( HWND hWnd )
 /*!
 	ファイルに保存する
 	@param[in]	hWnd	親にするウインドウハンドル
-	@param[in]	bStyle	SJISかユニコードか、上書きかリネームか
+	@param[in]	bStyle	上書きかリネームか・フォーマット選択はダイヤログでやる
 	@return		HRESULT	終了状態コード
 */
 HRESULT DocFileSave( HWND hWnd, UINT bStyle )
 {
-	//	ユニコードモードについて・形式指定の時の選択肢にいれちゃうか
-
 	CONST  TCHAR	aatExte[3][5] = { {TEXT(".ast")}, {TEXT(".mlt")}, {TEXT(".txt")} };
 	CONST  WCHAR	rtHead = 0xFEFF;	//	ユニコードテキストヘッダ
 
@@ -294,6 +294,9 @@ HRESULT DocFileSave( HWND hWnd, UINT bStyle )
 
 	INT		isAST, isMLT, ddExten;
 	BOOLEAN	bExtChg =FALSE, bLastChg = FALSE;
+
+	BOOLEAN	bUtf8 = FALSE;	//	ＵＴＦ８で保存セヨ
+	BOOLEAN	bUnic = FALSE;	//	ユニコードで保存セヨ
 
 	UINT_PTR	iPages, i;	//	頁数
 
@@ -328,7 +331,7 @@ HRESULT DocFileSave( HWND hWnd, UINT bStyle )
 		//ここで FileSaveDialogue を出す
 		stSaveFile.lStructSize     = sizeof(OPENFILENAME);
 		stSaveFile.hwndOwner       = hWnd;
-		stSaveFile.lpstrFilter     = TEXT("アスキーアートファイル ( mlt, ast, txt )\0*.mlt;*.ast;*.txt\0名前付アスキーアートファイル ( ast )\0*.ast\0全ての形式(*.*)\0*.*\0\0");
+		stSaveFile.lpstrFilter     = TEXT("[ShiftJIS]アスキーアートファイル ( mlt, ast, txt )\0*.mlt;*.ast;*.txt\0[UTF8]アスキーアートファイル ( mlt, ast, txt )\0*.mlt;*.ast;*.txt\0\0");
 		stSaveFile.nFilterIndex    = 1;	//	デフォのフィルタ選択肢
 		stSaveFile.lpstrFile       = atFilePath;
 		stSaveFile.nMaxFile        = MAX_PATH;
@@ -348,9 +351,19 @@ HRESULT DocFileSave( HWND hWnd, UINT bStyle )
 		//	キャンセルしてたら何もしない
 
 		//選択したフィルタ番号が１インデックスで入る
-//		if( 1 == stSaveFile.nFilterIndex ){}	//	MLTかTXTの場合
+		if(  2 == stSaveFile.nFilterIndex ){	bUtf8 = TRUE;	}
+		//	ＵＴＦ８で保存・ユニコードから変換すればよろし
 
-		bLastChg = TRUE;	//	20110713	新規保存・リネーム保存
+		if( bUnic || bUtf8 )
+		{	//	名無しのままエクスポートしようとしてたら無効
+			if( NULL == gstFile.atFileName[0] )
+			{
+				MessageBox( hWnd, TEXT("先に通常の保存をしておいて欲しいのです。"), NULL, MB_OK | MB_ICONINFORMATION );
+				return E_FAIL;
+			}
+		}
+		else{	bLastChg = TRUE;	}	//	新規保存・リネーム保存
+		//	特殊フォーマットの場合はエクスポートとし、内部状態には影響しないようにする
 	}
 
 	//	拡張子を確認・ドット込みだよ～ん
@@ -396,7 +409,8 @@ HRESULT DocFileSave( HWND hWnd, UINT bStyle )
 	//	上書きなら直前の状態のバックアップとか取るべき
 	//	同じ名前のファイルがあれば、ってことで
 
-	StringCchCopy( gstFile.atFileName, MAX_PATH, atFilePath );
+	//	オリジナルファイル名に注意
+	if( !(bUnic) &&  !(bUtf8) ){	StringCchCopy( gstFile.atFileName, MAX_PATH, atFilePath );	}
 
 	hFile = CreateFile( atFilePath, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL );
 	if( INVALID_HANDLE_VALUE == hFile )
@@ -408,14 +422,13 @@ HRESULT DocFileSave( HWND hWnd, UINT bStyle )
 	iNullTmt = 1;
 	iCrLf = CH_CRLF_CCH;
 	SetFilePointer( hFile, 0, NULL, FILE_BEGIN );
-	//	ユニコードモードなら、BOMをつける
-	if( bStyle & D_UNI )
+
+	if( bUnic )	//	ユニコードモードなら、BOMをつける
 	{
 		WriteFile( hFile, &rtHead, 2, &wrote, NULL );
 		iNullTmt = 2;
 		iCrLf *= 2;
 	}
-
 
 	if( isAST )
 	{
@@ -426,33 +439,43 @@ HRESULT DocFileSave( HWND hWnd, UINT bStyle )
 		pbSplit = malloc( 30 );
 		ZeroMemory( pbSplit, 30 );
 
-		if( bStyle & D_UNI )
+		if( bUnic )
 		{
 			cbSplSz = (MLT_SPRT_CCH + CH_CRLF_CCH) * 2;
 			StringCchPrintfW( (LPTSTR)pbSplit, 15, TEXT("%s%s"), MLT_SEPARATERW, CH_CRLFW );
 		}
-		else
+		else	//	UTF8の場合は、ASCII文字はそのままでおｋ
 		{
 			cbSplSz = MLT_SPRT_CCH + CH_CRLF_CCH;
 			StringCchPrintfA( (LPSTR)pbSplit, 30, ("%s%s"), MLT_SEPARATERA, CH_CRLFA );
 		}
 	}
 
+	//	本文の取込はユニコードでやる必要がある
+	if( bUnic || bUtf8 ){	bStyle |= D_UNI;	}
+
 	for( i = 0; iPages > i; i++ )	//	全頁保存
 	{
-		if( isAST )
+		if( isAST )	//	ＡＳＴの場合は、頁先頭にタイトルが入ってる
 		{
+			//	返り値の確保バイト数にはＮＵＬＬターミネータ含んでるので注意
 			cbSplSz = DocAstSeparatorGetAlloc( i, bStyle, &pbSplit, gitFileIt );
+
+			if( bUtf8 ){	cbSplSz = DocUnicode2UTF8( &pbSplit );	}
+			//	pbSplitの中身を付け替える
 
 			WriteFile( hFile , pbSplit, (cbSplSz- iNullTmt), &wrote, NULL );
 			FREE(pbSplit);
 		}
-		else
+		else	//	MLTの場合は、二つ目以降で区切りが必要
 		{
 			if( 1 <= i ){	WriteFile( hFile , pbSplit, cbSplSz, &wrote, NULL );	}
 		}
 
 		iByteSize = DocAllTextGetAlloc( i, bStyle, &pBuffer, gitFileIt );
+
+		if( bUtf8 ){	iByteSize = DocUnicode2UTF8( &pBuffer );	}
+		//	pBufferの中身を付け替える
 
 		if( (i+1) == iPages ){	iByteSize -=  iCrLf;	}
 		//	最終頁の末端の改行は不要のはず
@@ -466,8 +489,8 @@ HRESULT DocFileSave( HWND hWnd, UINT bStyle )
 
 	FREE( pbSplit );
 
-	DocModifyContent( FALSE  );
-
+	//	エクスポートなので保存してないことに
+	if( !(bUnic) &&  !(bUtf8) ){	DocModifyContent( FALSE );	}
 
 	//	なんかメッセージ
 	if( bExtChg )
@@ -488,10 +511,46 @@ HRESULT DocFileSave( HWND hWnd, UINT bStyle )
 			AppTitleChange( atFilePath );
 		}
 
-		NotifyBalloonExist( TEXT("保存したのです。あぅあぅ"), TEXT("ファイル出力したのです"), NIIF_INFO );
+		if( bUnic || bUtf8 )
+		{
+			NotifyBalloonExist( TEXT("保存したのです。あぅ"), TEXT("エクスポートしたのです"), NIIF_INFO );
+		}
+		else
+		{
+			NotifyBalloonExist( TEXT("保存したのです。あぅあぅ"), TEXT("ファイル出力したのです"), NIIF_INFO );
+		}
 	}
 
 	return 0;
+}
+//-------------------------------------------------------------------------------------------------
+
+/*!
+	ユニコード文字列を受け取って、ＵＴＦ８のアドレスを確保してもどす。
+	@param[in,out]	pText	動的ユニコード文字列受取・動的ＵＴＦ８文字列入れる。メモリの扱い注意
+	@return	INT	確保したバイト数・NULLターミネータ含む
+*/
+INT DocUnicode2UTF8( LPVOID *pText )
+{
+	UINT_PTR	cchSz;	//	ユニコード用
+	INT	cbSize, rslt;	//	UTF8用
+	LPVOID		pUtf8;	//	確保
+
+	StringCchLength( (LPTSTR)(*pText), STRSAFE_MAX_CCH, &cchSz );
+
+	//	必要バイト数確認
+	cbSize = WideCharToMultiByte( CP_UTF8, 0, (LPTSTR)(*pText), -1, NULL, 0, NULL, NULL );
+	TRACE( TEXT("cbSize[%d]"), cbSize );
+	pUtf8 = (LPSTR)malloc( cbSize );
+	ZeroMemory( pUtf8, cbSize );
+	rslt = WideCharToMultiByte( CP_UTF8, 0, (LPTSTR)(*pText), -1, (LPSTR)(pUtf8), cbSize, NULL, NULL );
+	TRACE( TEXT("rslt[%d]"), rslt );
+
+	FREE( *pText );	//	ユニコード文字列のほうは破壊する
+
+	*pText = pUtf8;	//	ＵＴＦ８のほうに付け替える
+
+	return cbSize;
 }
 //-------------------------------------------------------------------------------------------------
 

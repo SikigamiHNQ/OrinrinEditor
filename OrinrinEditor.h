@@ -314,6 +314,14 @@ typedef struct tagAATEMPLATE
 typedef vector<AATEMPLATE>::iterator	TEMPL_ITR;	
 //-----------------------------
 
+//	リバーの位置確定用
+typedef struct tagREBARLAYOUTINFO
+{
+	UINT	wID;
+	UINT	cx;
+	UINT	fStyle;
+
+} REBARLAYOUTINFO, *LPREBARLAYOUTINFO;
 
 //-------------------------------------------------------------------------------------------------
 
@@ -358,6 +366,7 @@ LONG_PTR	WndTagGet( HWND );
 HRESULT		InitWindowPos( UINT, UINT, LPRECT );
 INT			InitParamValue( UINT, UINT, INT );
 HRESULT		InitParamString( UINT, UINT, LPTSTR );
+HRESULT		InitToolBarLayout( UINT, INT, LPREBARLAYOUTINFO );
 
 BOOLEAN		SelectDirectoryDlg( HWND, LPTSTR, UINT_PTR );
 
@@ -376,6 +385,8 @@ HWND		MaaTmpltInitialise( HINSTANCE, HWND, LPRECT );
 VOID		MaaTabBarSizeGet( LPRECT  );	//!<	
 
 HRESULT		AaItemsTipSizeChange( INT, UINT );
+
+HRESULT		ViewingFontGet( LPLOGFONT );	//!<	
 
 #ifndef _ORRVW
 
@@ -415,6 +426,8 @@ HRESULT		ToolBarOnSize( HWND, UINT, INT, INT );
 LRESULT		ToolBarOnNotify( HWND, INT, LPNMHDR );
 LRESULT		ToolBarOnContextMenu( HWND, HWND, LONG, LONG );
 VOID		ToolBarPseudoDropDown( HWND, INT );
+UINT		ToolBarBandInfoGet( LPVOID );
+HRESULT		ToolBarBandReset( HWND );
 
 UINT		AppClientAreaCalc( LPRECT );
 

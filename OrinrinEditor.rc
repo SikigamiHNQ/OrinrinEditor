@@ -52,6 +52,8 @@ BEGIN
         MENUITEM "名前を付けて保存(&M)\tCtrl + Alt + S", IDM_RENAMESAVE
         MENUITEM "現在頁を画像にして保存(&I)",             IDM_IMAGE_SAVE
         MENUITEM SEPARATOR
+        MENUITEM "ファイルを閉じる(&C)\tCtrl + F4",     IDM_FILE_CLOSE
+        MENUITEM SEPARATOR
         MENUITEM "一般設定(&G)",                    IDM_GENERAL_OPTION
         MENUITEM "右クリックメニュー編集",                 IDM_MENUEDIT_DLG_OPEN
         MENUITEM "AA一覧ツリーを再構築(&T)",             IDM_TREE_RECONSTRUCT
@@ -125,8 +127,8 @@ BEGIN
             MENUITEM "枠編集(&A)",                     IDM_INSFRAME_EDIT
         END
         MENUITEM SEPARATOR
-		MENUITEM "文字ＡＡ変換ボックス(&M)",	IDM_MOZI_SCR_OPEN
-		MENUITEM "縦書き変換ボックス(&V)",		IDM_VERT_SCRIPT_OPEN
+        MENUITEM "文字ＡＡ変換ボックス(&M)",              IDM_MOZI_SCR_OPEN
+        MENUITEM "縦書き変換ボックス(&V)",               IDM_VERT_SCRIPT_OPEN
         MENUITEM SEPARATOR
         POPUP "ユーザ定義(&U)"
         BEGIN
@@ -310,14 +312,15 @@ END
 
 IDC_ORINRINEDITOR ACCELERATORS 
 BEGIN
-    "A",            IDM_ALLSEL,             VIRTKEY, CONTROL, NOINVERT
-    "B",            IDM_SQSELECT,           VIRTKEY, CONTROL, ALT, NOINVERT
-    "C",            IDM_COPY,               VIRTKEY, CONTROL, NOINVERT
-    "C",            IDM_PAGEL_DUPLICATE,    VIRTKEY, ALT, NOINVERT
-    "C",            IDM_SJISCOPY_ALL,       VIRTKEY, SHIFT, CONTROL, NOINVERT
-    "E",            IDM_DOTDIFF_ADJT,       VIRTKEY, CONTROL, ALT, NOINVERT
-    "F",            IDM_FIND_DLG_OPEN,      VIRTKEY, CONTROL, NOINVERT
-    "F",            IDM_FIND_HIGHLIGHT_OFF, VIRTKEY, SHIFT, CONTROL, NOINVERT
+    "A",            IDM_ALLSEL,				VIRTKEY, CONTROL, NOINVERT
+    "B",            IDM_SQSELECT,			VIRTKEY, CONTROL, ALT, NOINVERT
+    "C",            IDM_COPY,				VIRTKEY, CONTROL, NOINVERT
+    "C",            IDM_PAGEL_DUPLICATE,	VIRTKEY, ALT, NOINVERT
+    "C",            IDM_SJISCOPY_ALL,		VIRTKEY, SHIFT, CONTROL, NOINVERT
+	"D",			IDM_PAGEL_DELETE,		VIRTKEY, ALT, NOINVERT
+    "E",            IDM_DOTDIFF_ADJT,		VIRTKEY, CONTROL, ALT, NOINVERT
+    "F",            IDM_FIND_DLG_OPEN,		VIRTKEY, CONTROL, NOINVERT
+    "F",            IDM_FIND_HIGHLIGHT_OFF,	VIRTKEY, SHIFT, CONTROL, NOINVERT
     "G",            IDM_DEL_LASTLETTER,     VIRTKEY, SHIFT, CONTROL, NOINVERT
     "G",            IDM_DEL_LASTSPACE,      VIRTKEY, CONTROL, NOINVERT
     "G",            IDM_FILL_SPACE,         VIRTKEY, CONTROL, ALT, NOINVERT
@@ -377,7 +380,7 @@ CAPTION "バージョン情報 - Orinrin Editor"
 FONT 9, "MS UI Gothic"
 BEGIN
     ICON            IDI_ORINRINEDITOR,IDC_MYICON,6,6,20,20
-    LTEXT           "Orinrin Editor, Version 0.27 Aurora (2012.112.2200.920)",IDC_STATIC,36,6,168,8,SS_NOPREFIX
+    LTEXT           "Orinrin Editor, Version 0.28 Aurora (2012.202.2200.920)",IDC_STATIC,36,6,168,8,SS_NOPREFIX
     LTEXT           "Copyright (C) 2011 - 2012 SikigamiHNQ",IDC_STATIC,36,18,168,8
     LTEXT           "Site ： お燐ちゃんは俺の嫁．ｃｏｍ",IDC_STATIC,36,30,168,8
     DEFPUSHBUTTON   "OK",IDOK,84,180,48,12,WS_GROUP
@@ -454,7 +457,7 @@ BEGIN
     CONTROL         "",IDSP_RIGHT_OFFSET,"msctls_updown32",UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_HORZ | UDS_HOTTRACK,120,72,12,12
 END
 
-IDD_FRAME_EDIT_DLG_2 DIALOG 0, 0, 187, 239
+IDD_FRAME_EDIT_DLG_2 DIALOG  0, 0, 187, 239
 STYLE DS_SETFONT | DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_TOOLWINDOW
 CAPTION "枠の設定Zwei"
@@ -495,7 +498,7 @@ BEGIN
     EDITTEXT        IDE_PAGENAME,6,18,156,12,ES_AUTOHSCROLL
 END
 
-IDD_GENERAL_OPTION_DLG DIALOG  0, 0, 342, 322
+IDD_GENERAL_OPTION_DLG DIALOG 0, 0, 342, 322
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_TOOLWINDOW
 CAPTION "設定いろいろ"
@@ -568,6 +571,7 @@ BEGIN
     CONTROL         "レイヤボックス",IDRB_DRTSUB_SET_LAYER,"Button",BS_AUTORADIOBUTTON,138,288,54,8
     CONTROL         "コピー(Unicode)",IDRB_DRTSUB_CLIP_UNI,"Button",BS_AUTORADIOBUTTON,198,288,60,8
     CONTROL         "コピー(ShiftJIS)",IDRB_DRTSUB_CLIP_SJIS,"Button",BS_AUTORADIOBUTTON,264,288,60,8
+    PUSHBUTTON      "フォント変更\r\n（再起動後に有効）",IDB_CHOOSEFONT,270,228,66,24,BS_MULTILINE
 END
 
 IDD_TRACEADJUST_DLG DIALOG  0, 0, 139, 281
@@ -791,8 +795,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 2012,112,2200,920
- PRODUCTVERSION 0,27,0,920
+ FILEVERSION 2012,202,2200,920
+ PRODUCTVERSION 0,28,0,920
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -817,8 +821,8 @@ BEGIN
             VALUE "LegalTrademarks", "License : GPLv3"
             VALUE "PrivateBuild", "Build by Visual C++ 2008 Express"
             VALUE "SpecialBuild", "Not Speciality"
-            VALUE "FileVersion", "2012.112.2200.920"
-            VALUE "ProductVersion", "0.27.0.920"
+            VALUE "FileVersion", "2012.202.2200.920"
+            VALUE "ProductVersion", "0.28.0.920"
             VALUE "FileDescription", "AsciiArt Story Editor by Orinrin!"
             VALUE "OriginalFilename", "OrinrinEditor.exe"
             VALUE "InternalName", "Orinrin Editor"
@@ -984,6 +988,10 @@ IDBMQ_MOZI_SCRIPT       BITMAP                  "resource\\MoziScript_q.bmp"
 IDBMP_MOZI_WRITE        BITMAP                  "resource\\MoziWrite.bmp"
 IDBMP_MOZI_ADVANCE      BITMAP                  "resource\\MoziAdv.bmp"
 IDBMQ_MOZI_ADVANCE      BITMAP                  "resource\\MoziAdv_q.bmp"
+IDBMP_VERT_LEFT         BITMAP                  "resource\\VertLeft.bmp"
+IDBMQ_VERT_LEFT         BITMAP                  "resource\\VertLeft_q.bmp"
+IDBMP_VERT_TRANS        BITMAP                  "resource\\VertTrans.bmp"
+IDBMQ_VERT_TRANS        BITMAP                  "resource\\VertTrans_q.bmp"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -997,12 +1005,6 @@ BEGIN
     BEGIN
         RIGHTMARGIN, 186
         BOTTOMMARGIN, 182
-    END
-
-    IDD_GENERAL_OPTION_DLG, DIALOG
-    BEGIN
-        RIGHTMARGIN, 290
-        BOTTOMMARGIN, 256
     END
 END
 #endif    // APSTUDIO_INVOKED

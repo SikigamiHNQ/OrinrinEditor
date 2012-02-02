@@ -222,7 +222,7 @@ HRESULT DocMultiFileSelect( LPARAM uqNumber )
 
 	PageListBuild( NULL );	//	ページリスト作り直し
 
-	AppTitleChange( itNow->atFileName );
+	AppTitleChange( itNow->atFileName );	//	キャプションの内容も変更
 
 	gixFocusPage = itNow->dNowPage;
 
@@ -598,6 +598,9 @@ LPARAM DocFileInflate( LPTSTR ptFileName )
 	}
 
 	StringCchLength( ptString, STRSAFE_MAX_CCH, &cchSize );
+
+	//	ファイルの内容を全確認して、先にメモリ確保しておく？
+
 
 /*
 	//	拡張子を確認・ドット込みだよ～ん

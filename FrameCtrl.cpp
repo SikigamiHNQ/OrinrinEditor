@@ -143,6 +143,9 @@ HRESULT	FrameInfoDisp( HWND );
 #ifdef FRAME_MLINE
 VOID	FrameDataTranslate( LPTSTR, UINT );
 INT		FramePartsSizeCalc( LPTSTR, PINT );
+
+UINT	FrameMultiSubstring( LPCTSTR, CONST UINT, LPTSTR, CONST UINT_PTR );
+
 #endif
 
 
@@ -339,7 +342,9 @@ HRESULT FrameNameLoad( UINT dNumber, LPTSTR ptNamed, UINT_PTR cchSize )
 HRESULT InitFrameItem( UINT dMode, UINT dNumber, LPFRAMEINFO pstInfo )
 {
 	TCHAR	atAppName[MIN_STRING], atBuff[MIN_STRING];
+#ifdef FRAME_MLINE
 	TCHAR	atBuffer[PARTS_CCH];
+#endif
 
 	//	所定のAPP名を作る
 	StringCchPrintf( atAppName, MIN_STRING, TEXT("Frame%u"), dNumber );
@@ -642,6 +647,8 @@ INT_PTR Frm_OnDrawItem( HWND hDlg, CONST LPDRAWITEMSTRUCT pstDrawItem )
 
 	//	枠描画領域を確保
 	xMaxDot = pstDrawItem->rcItem.right - (SPACE_ZEN * 2);
+
+//ここから複数行処理すればいいか
 
 	//	上線の文字数
 	xNoonLen  = xMaxDot - ( pstInfo->stMorning.dDot + pstInfo->stAfternoon.dDot );
@@ -1051,15 +1058,48 @@ INT FramePartsSizeCalc( LPTSTR ptParts, PINT pLine )
 }
 //-------------------------------------------------------------------------------------------------
 
+
+/*!
+	改行を含む文字列を受け取って、指定行の内容をバッファに入れる
+	@param[in]	ptSrc	元文字列
+	@param[in]	dLine	切り出す行番号・０インデックス
+	@param[out]	ptDest	切り出した文字列を入れるバッファへのポインター
+	@param[in]	cchSz	バッファの文字数・バイトに非ず
+	@return	UINT	行数
+*/
+UINT FrameMultiSubstring( LPCTSTR ptSrc, CONST UINT dLine, LPTSTR ptDest, CONST UINT_PTR cchSz )
+{
+	UINT_PTR	cchSrc, c, d;
+	UINT		iLnCnt;
+
+	StringCchLength( ptSrc, STRSAFE_MAX_CCH , &cchSrc );	//	元文字列の長さ確認
+
+	ZeroMemory( ptDest, cchSz * sizeof(TCHAR) );	//	とりあえずウケを浄化
+
+	iLnCnt = 0;	d = 0;
+	for( c = 0; cchSrc > c; c++ )
+	{
+		if( 0x000D == ptSrc[c] )	//	かいぎょうはっけん
+		{
+			c++;	//	0x0Aを飛ばす
+			iLnCnt++;	//	フォーカス行数
+		}
+		else	//	普通の文字
+		{
+			if( dLine == iLnCnt )	//	行が一致したら
+			{
+				if( cchSz > d ){	ptDest[d] = ptSrc[c];	d++;	}
+			}
+		}
+	}
+
+	ptDest[(cchSz-1)] = NULL;	//	ヌルターミネータ
+
+	iLnCnt++;	//	０インデックスなので１増やすのが正解
+	return iLnCnt;
+}
+//-------------------------------------------------------------------------------------------------
 #endif
-
-
-
-
-
-
-
-
 
 
 

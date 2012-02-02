@@ -33,6 +33,27 @@ TEXT("‚ ‚È‚½‚Í‚±‚ÌƒvƒƒOƒ‰ƒ€‚Æ‹¤‚ÉAGNUˆê”ÊŒöO—˜—p‹–‘ø‘‚ÌƒRƒs[‚ðˆê•”Žó‚¯Žæ‚Á‚
 TEXT("‚à‚µŽó‚¯Žæ‚Á‚Ä‚¢‚È‚¯‚ê‚ÎA<http://www.gnu.org/licenses/> ‚ð‚²——‚­‚¾‚³‚¢B\r\n\r\n")
 };
 
+//-------------------------------------------------------------------------------------------------
+
+//	•\Ž¦—pƒtƒHƒ“ƒgƒx[ƒXƒe[ƒuƒ‹E‚±‚ê‚ðƒRƒs[‚µ‚ÄŽg‚¤
+static LOGFONT	gstBaseFont = {
+	FONTSZ_NORMAL,			//	ƒtƒHƒ“ƒg‚Ì‚‚³
+	0,						//	•½‹Ï•
+	0,						//	•¶Žš‘—‚è‚Ì•ûŒü‚ÆXŽ²‚Æ‚ÌŠp“x
+	0,						//	ƒx[ƒXƒ‰ƒCƒ“‚ÆXŽ²‚Æ‚ÌŠp“x
+	FW_NORMAL,				//	•¶Žš‚Ì‘¾‚³(0~1000‚Ü‚ÅE400=nomal)
+	FALSE,					//	ƒCƒ^ƒŠƒbƒN‘Ì
+	FALSE,					//	ƒAƒ“ƒ_[ƒ‰ƒCƒ“
+	FALSE,					//	‘Å‚¿Á‚µü
+	DEFAULT_CHARSET,		//	•¶ŽšƒZƒbƒg
+	OUT_OUTLINE_PRECIS,		//	o—Í¸“x
+	CLIP_DEFAULT_PRECIS,	//	ƒNƒŠƒbƒsƒ“ƒO¸“x
+	PROOF_QUALITY,			//	o—Í•iŽ¿
+	VARIABLE_PITCH,			//	ŒÅ’è•‚©‰Â•Ï•
+	TEXT("‚l‚r ‚oƒSƒVƒbƒN")	//	ƒtƒHƒ“ƒg–¼
+};
+//-------------------------------------------------------------------------------------------------
+
 static  UINT	gdUseMode;		//!<	‘}“üƒŒƒCƒ„ƒNƒŠƒbƒvŽwŽ¦EÝ’è‚É’ˆÓ
 static  UINT	gdUseSubMode;	//!<	
 
@@ -47,6 +68,8 @@ extern  UINT	gdClickDrt;	//
 //------------------------------------------------------------------------------------------------------------------------
 
 BOOLEAN	SelectFolderDlg( HWND, LPTSTR, UINT_PTR );
+
+HRESULT	ViewingFontNameLoad( VOID );
 //------------------------------------------------------------------------------------------------------------------------
 
 
@@ -90,6 +113,8 @@ INT APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 
 	gdUseMode    = InitParamValue( INIT_LOAD, VL_MAA_LCLICK, MAA_SJISCLIP );
 	gdUseSubMode = InitParamValue( INIT_LOAD, VL_MAA_MCLICK, MAA_SJISCLIP );
+
+	ViewingFontNameLoad(  );	//	ƒtƒHƒ“ƒg–¼Šm•Û
 
 	//	ƒAƒvƒŠƒP[ƒVƒ‡ƒ“‚Ì‰Šú‰»‚ðŽÀs‚µ‚Ü‚·:
 	ghMaaWnd = MaaTmpltInitialise( hInstance, GetDesktopWindow(), NULL );
@@ -272,6 +297,7 @@ HRESULT InitParamString( UINT dMode, UINT dStyle, LPTSTR ptFile )
 	{
 		case VS_PROFILE_NAME:	StringCchCopy( atKeyName, SUB_STRING, TEXT("ProfilePath") );	break;
 		case VS_PAGE_FORMAT:	StringCchCopy( atKeyName, SUB_STRING, TEXT("PageFormat")  );	break;
+		case VS_FONT_NAME:		StringCchCopy( atKeyName, SUB_STRING, TEXT("FontName") );		break;
 		default:	return E_INVALIDARG;
 	}
 
@@ -687,6 +713,39 @@ UINT ViewMaaItemsModeGet( PUINT pdSubMode )
 	return gdUseMode;
 }
 //-------------------------------------------------------------------------------------------------
+
+/*!
+	•\Ž¦—pƒtƒHƒ“ƒg‚Ì–¼‘O‚ð’¸‚­
+*/
+HRESULT ViewingFontNameLoad( VOID )
+{
+	TCHAR	atName[LF_FACESIZE];
+
+	ZeroMemory( atName, sizeof(atName) );	//	ƒfƒtƒHƒl[ƒ€
+	StringCchCopy( atName, LF_FACESIZE, TEXT("‚l‚r ‚oƒSƒVƒbƒN") );
+
+	InitParamString( INIT_LOAD, VS_FONT_NAME, atName );	//	ƒQƒbƒcI
+
+	StringCchCopy( gstBaseFont.lfFaceName, LF_FACESIZE, atName );
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+
+/*!
+	•\Ž¦—pƒtƒHƒ“ƒgƒf[ƒ^‚ðƒRƒs[‚·‚é
+	@param[in]	pstLogFont	ƒf[ƒ^ƒRƒs‚é\‘¢‘Ì‚Ö‚Ìƒ|ƒCƒ“ƒ^[
+*/
+HRESULT ViewingFontGet( LPLOGFONT pstLogFont )
+{
+	ZeroMemory( pstLogFont, sizeof(LOGFONT) );	//	”O‚Ì‚½‚ß‹ó”’‚É‚·‚é
+
+	*pstLogFont = gstBaseFont;
+	//	\‘¢‘Ì‚ÍƒRƒs[‚Å‚¨‚‹
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+
 
 
 #ifdef _DEBUG

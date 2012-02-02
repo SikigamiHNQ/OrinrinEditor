@@ -186,23 +186,22 @@ static  HBRUSH	gahBrush[BRUSHS_MAX];
 
 //-------------------------------------------------------------------------------------------------
 
-static LOGFONT	gstBaseFont = {
-	FONTSZ_NORMAL,			//	フォントの高さ
-	0,						//	平均幅
-	0,						//	文字送りの方向とX軸との角度
-	0,						//	ベースラインとX軸との角度
-	FW_NORMAL,				//	文字の太さ(0~1000まで・400=nomal)
-	FALSE,					//	イタリック体
-	FALSE,					//	アンダーライン
-	FALSE,					//	打ち消し線
-	DEFAULT_CHARSET,		//	文字セット
-	OUT_OUTLINE_PRECIS,		//	出力精度
-	CLIP_DEFAULT_PRECIS,	//	クリッピング精度
-	PROOF_QUALITY,			//	出力品質
-	VARIABLE_PITCH,			//	固定幅か可変幅
-	TEXT("ＭＳ Ｐゴシック")	//	フォント名
-};
-
+//static LOGFONT	gstBaseFont = {
+//	FONTSZ_NORMAL,			//	フォントの高さ
+//	0,						//	平均幅
+//	0,						//	文字送りの方向とX軸との角度
+//	0,						//	ベースラインとX軸との角度
+//	FW_NORMAL,				//	文字の太さ(0~1000まで・400=nomal)
+//	FALSE,					//	イタリック体
+//	FALSE,					//	アンダーライン
+//	FALSE,					//	打ち消し線
+//	DEFAULT_CHARSET,		//	文字セット
+//	OUT_OUTLINE_PRECIS,		//	出力精度
+//	CLIP_DEFAULT_PRECIS,	//	クリッピング精度
+//	PROOF_QUALITY,			//	出力品質
+//	VARIABLE_PITCH,			//	固定幅か可変幅
+//	TEXT("ＭＳ Ｐゴシック")	//	フォント名
+//};
 
 //-------------------------------------------------------------------------------------------------
 
@@ -244,8 +243,12 @@ INT_PTR	ColourEditDrawItem( HWND, CONST LPDRAWITEMSTRUCT, LPCOLOUROBJECT );
 
 VOID AaFontCreate( UINT bMode )
 {
-	if( bMode )	ghAaFont = CreateFontIndirect( &gstBaseFont );
-	else		DeleteFont( ghAaFont );
+	LOGFONT	stFont;
+
+	ViewingFontGet( &stFont );
+
+	if( bMode ){	ghAaFont = CreateFontIndirect( &stFont );	}	//	gstBaseFont
+	else{			DeleteFont( ghAaFont  );	}
 
 	return;
 }
@@ -361,7 +364,7 @@ HWND ViewInitialise( HINSTANCE hInstance, HWND hParentWnd, LPRECT pstFrame, LPTS
 	if( !ghViewWnd ){	return NULL;	}
 
 
-	stFont = gstBaseFont;
+	ViewingFontGet( &stFont );	//	stFont = gstBaseFont;
 	stFont.lfPitchAndFamily = FIXED_PITCH;
 	StringCchCopy( stFont.lfFaceName, LF_FACESIZE, TEXT("ＭＳ ゴシック") );
 	ghNumFont4L = CreateFontIndirect( &stFont );
@@ -376,7 +379,6 @@ HWND ViewInitialise( HINSTANCE hInstance, HWND hParentWnd, LPRECT pstFrame, LPTS
 	stFont.lfPitchAndFamily = VARIABLE_PITCH;
 	StringCchCopy( stFont.lfFaceName, LF_FACESIZE, TEXT("MS UI Gothic") );
 	ghRulerFont = CreateFontIndirect( &stFont );
-//	ghRulerFont = CreateFont( FONTSZ_REDUCE, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE, DEFAULT_CHARSET, OUT_OUTLINE_PRECIS, CLIP_DEFAULT_PRECIS, PROOF_QUALITY, VARIABLE_PITCH, TEXT("MS UI Gothic") );
 
 	GetClientRect( ghViewWnd, &vwRect );	//	スクロールバーは含んでない
 	gstViewArea.cx = vwRect.right - LINENUM_WID;
@@ -718,6 +720,7 @@ HRESULT ViewEditReset( VOID )
 LRESULT CALLBACK ViewWndProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam )
 {
 	HIMC	hImc;
+	LOGFONT	stFont;
 
 	switch( message )
 	{
@@ -737,16 +740,6 @@ LRESULT CALLBACK ViewWndProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lPa
 		HANDLE_MSG(hWnd, WM_LBUTTONUP,      Evw_OnLButtonUp );		//	
 		HANDLE_MSG(hWnd, WM_RBUTTONDOWN,    Evw_OnRButtonDown );	//	
 		HANDLE_MSG(hWnd, WM_CONTEXTMENU,    Evw_OnContextMenu );	//	
-
-/* void Cls_OnSysKey(HWND hwnd, UINT vk, BOOL fDown, int cRepeat, UINT flags) */
-		//case WM_SYSKEYDOWN:
-		//	TRACE( TEXT("VIEW_WM_SYSKEYDOWN[0x%X][0x%X]"), wParam, lParam );
-		//	if( VK_LEFT == wParam || VK_RIGHT == wParam )
-		//	{
-		//		Evw_OnKey( hWnd, wParam, TRUE, (INT)(SHORT)LOWORD(lParam), (UINT)HIWORD(lParam) );
-		//		return 0;
-		//	}
-		//	break;
 
 /* void Cls_OnSetFocus(HWND hwnd, HWND hwndOldFocus) */
 		case WM_SETFOCUS:
@@ -779,7 +772,8 @@ LRESULT CALLBACK ViewWndProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lPa
 				hImc = ImmGetContext( ghViewWnd );	//	IMEハンドル確保
 				if( hImc )	//	確保出来たら
 				{
-					ImmSetCompositionFont( hImc, &gstBaseFont );
+					ViewingFontGet( &stFont );
+					ImmSetCompositionFont( hImc , &stFont );	//	gstBaseFont
 					ImmReleaseContext( ghViewWnd , hImc );
 				}
 			break;
@@ -2376,6 +2370,8 @@ VOID OperationOnCommand( HWND hWnd, INT id, HWND hWndCtl, UINT codeNotify )
 
 		//	頁分割
 		case IDM_PAGEL_DIVIDE:	DocPageDivide( hWnd, ghInst, gdDocLine );	break;
+
+		case IDM_REBER_DORESET:	ToolBarBandReset( hWnd );	break;
 
 		//	PageCtrlへ飛ばす
 		case IDM_PAGEL_ADD:

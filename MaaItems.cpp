@@ -40,22 +40,22 @@ typedef struct tagAATITLE
 } AATITLE, *LPAATITLE;
 //-------------------------------------------------------------------------------------------------
 
-static LOGFONT	gstBaseFont = {
-	FONTSZ_NORMAL,			//	フォントの高さ
-	0,						//	平均幅
-	0,						//	文字送りの方向とX軸との角度
-	0,						//	ベースラインとX軸との角度
-	FW_NORMAL,				//	文字の太さ(0~1000まで・400=nomal)
-	FALSE,					//	イタリック体
-	FALSE,					//	アンダーライン
-	FALSE,					//	打ち消し線
-	DEFAULT_CHARSET,		//	文字セット
-	OUT_OUTLINE_PRECIS,		//	出力精度
-	CLIP_DEFAULT_PRECIS,	//	クリッピング精度
-	PROOF_QUALITY,			//	出力品質
-	VARIABLE_PITCH,			//	固定幅か可変幅
-	TEXT("ＭＳ Ｐゴシック")	//	フォント名
-};
+//static LOGFONT	gstBaseFont = {
+//	FONTSZ_NORMAL,			//	フォントの高さ
+//	0,						//	平均幅
+//	0,						//	文字送りの方向とX軸との角度
+//	0,						//	ベースラインとX軸との角度
+//	FW_NORMAL,				//	文字の太さ(0~1000まで・400=nomal)
+//	FALSE,					//	イタリック体
+//	FALSE,					//	アンダーライン
+//	FALSE,					//	打ち消し線
+//	DEFAULT_CHARSET,		//	文字セット
+//	OUT_OUTLINE_PRECIS,		//	出力精度
+//	CLIP_DEFAULT_PRECIS,	//	クリッピング精度
+//	PROOF_QUALITY,			//	出力品質
+//	VARIABLE_PITCH,			//	固定幅か可変幅
+//	TEXT("ＭＳ Ｐゴシック")	//	フォント名
+//};
 //-------------------------------------------------------------------------------------------------
 
 #define TITLECBX_HEI	200
@@ -99,13 +99,11 @@ static vector<AATITLE>		gvcAaTitle;		//!<
 
 LRESULT	Aai_OnNotify( HWND , INT, LPNMHDR );				//!<	
 VOID	Aai_OnMouseMove( HWND, INT, INT, UINT );			//!<	
-VOID	Aai_OnLButtonDown( HWND, BOOL, INT, INT, UINT );	//!<	
-VOID	Aai_OnMButtonDown( HWND, BOOL, INT, INT, UINT );	//!<	
+VOID	Aai_OnLButtonUp( HWND, INT, INT, UINT );			//!<	
+VOID	Aai_OnMButtonUp( HWND, INT, INT, UINT );			//!<	
 VOID	Aai_OnContextMenu( HWND, HWND, UINT, UINT );		//!<	
 VOID	Aai_OnDropFiles( HWND , HDROP );					//!<	
 
-
-HRESULT	AaItemsFavUpload( LPSTR, UINT );	//!<	
 HRESULT	AaItemsFavDelete( LPSTR, UINT );	//!<	
 UINT	AaItemsDoSelect( HWND, UINT );		//!<	
 
@@ -130,6 +128,7 @@ HRESULT AaItemsInitialise( HWND hWnd, HINSTANCE hInst, LPRECT ptRect )
 	SCROLLINFO	stScrollInfo;
 	INT		ttSize;
 	RECT	rect;
+	LOGFONT	stFont;
 
 	if( !(hWnd) )
 	{
@@ -180,16 +179,14 @@ HRESULT AaItemsInitialise( HWND hWnd, HINSTANCE hInst, LPRECT ptRect )
 	SetScrollInfo( ghScrollWnd, SB_CTL, &stScrollInfo, TRUE );
 
 	//	表示用メインフォント
-//	ghAaFont = CreateFont( FONTSZ_NORMAL, 0, 0, 0, FW_REGULAR, FALSE, FALSE, FALSE, DEFAULT_CHARSET, OUT_OUTLINE_PRECIS, CLIP_DEFAULT_PRECIS, PROOF_QUALITY, VARIABLE_PITCH, TEXT("ＭＳ Ｐゴシック") );
-	ghAaFont = CreateFontIndirect( &gstBaseFont );
-	//	フォントの高さ	平均幅	文字送りの方向とX軸との角度	ベースラインとX軸との角度	文字の太さ(0~1000まで・400=nomal)	イタリック体	アンダーライン	ストライクアウト	文字セット	出力精度	クリッピング精度	出力品質	固定幅か可変幅	フォント名
+	ViewingFontGet( &stFont );
+	ghAaFont = CreateFontIndirect( &stFont );	//	gstBaseFont
 	SetWindowFont( ghItemsWnd, ghAaFont, TRUE );
 
 	//	ポッパップチップ用・12/9pt兼用
 	ttSize = InitParamValue( INIT_LOAD, VL_MAATIP_SIZE, 16 );	//	サイズ確認
-//	ghTipFont = CreateFont( (FONTSZ_REDUCE == ttSize) ? FONTSZ_REDUCE : FONTSZ_NORMAL, 0, 0, 0, FW_REGULAR, FALSE, FALSE, FALSE, DEFAULT_CHARSET, OUT_OUTLINE_PRECIS, CLIP_DEFAULT_PRECIS, PROOF_QUALITY, VARIABLE_PITCH, TEXT("ＭＳ Ｐゴシック") );
-	gstBaseFont.lfHeight = (FONTSZ_REDUCE == ttSize) ? FONTSZ_REDUCE : FONTSZ_NORMAL;
-	ghTipFont = CreateFontIndirect( &gstBaseFont );
+	stFont.lfHeight = (FONTSZ_REDUCE == ttSize) ? FONTSZ_REDUCE : FONTSZ_NORMAL;
+	ghTipFont = CreateFontIndirect( &stFont );
 	SetWindowFont( ghToolTipWnd, ghTipFont, TRUE );
 
 	//	ツールチップをコールバックで割り付け
@@ -357,8 +354,8 @@ LRESULT CALLBACK gpfAaItemsProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 
 		HANDLE_MSG( hWnd, WM_NOTIFY,      Aai_OnNotify );		//	コモンコントロールの個別イベント
 		HANDLE_MSG( hWnd, WM_MOUSEMOVE,   Aai_OnMouseMove );	//	マウスいごいた
-		HANDLE_MSG( hWnd, WM_LBUTTONDOWN, Aai_OnLButtonDown );	//	マウス左ボタンダウン
-		HANDLE_MSG( hWnd, WM_MBUTTONDOWN, Aai_OnMButtonDown );	//	マウス中ボタンダウン
+		HANDLE_MSG( hWnd, WM_LBUTTONUP,   Aai_OnLButtonUp );	//	マウス左ボタンダウン
+		HANDLE_MSG( hWnd, WM_MBUTTONUP,   Aai_OnMButtonUp );	//	マウス中ボタンダウン
 		HANDLE_MSG( hWnd, WM_CONTEXTMENU, Aai_OnContextMenu );	//	コンテキストメニュー発生
 		HANDLE_MSG( hWnd, WM_DROPFILES,   Aai_OnDropFiles );	//	ドラグンドロップの受付
 
@@ -549,15 +546,14 @@ VOID Aai_OnMouseMove( HWND hWnd, INT x, INT y, UINT keyFlags )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	マウスの左ボタンがダウン(ダブルクルッコ）したときの処理
+	マウスの左ボタンがうｐしたときの処理
 	@param[in]	hWnd			親ウインドウハンドル
-	@param[in]	fDoubleClick	ダブルクルッコされたときなら非０となる
 	@param[in]	x				クライアント座標Ｘ
 	@param[in]	y				クライアント座標Ｙ
 	@param[in]	keyFlags		押されてる他のボタン
 	@return		なし
 */
-VOID Aai_OnLButtonDown( HWND hWnd, BOOL fDoubleClick, INT x, INT y, UINT keyFlags )
+VOID Aai_OnLButtonUp( HWND hWnd, INT x, INT y, UINT keyFlags )
 {
 	AaItemsDoSelect( hWnd, MAA_DEFAULT );
 
@@ -566,15 +562,14 @@ VOID Aai_OnLButtonDown( HWND hWnd, BOOL fDoubleClick, INT x, INT y, UINT keyFlag
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	マウスの中ボタンがダウン(ダブルクルッコ）したときの処理
+	マウスの中ボタンがうｐしたときの処理
 	@param[in]	hWnd			親ウインドウハンドル
-	@param[in]	fDoubleClick	ダブルクルッコされたときなら非０となる
 	@param[in]	x				クライアント座標Ｘ
 	@param[in]	y				クライアント座標Ｙ
 	@param[in]	keyFlags		押されてる他のボタン
 	@return		なし
 */
-VOID Aai_OnMButtonDown( HWND hWnd, BOOL fDoubleClick, INT x, INT y, UINT keyFlags )
+VOID Aai_OnMButtonUp( HWND hWnd, INT x, INT y, UINT keyFlags )
 {
 	AaItemsDoSelect( hWnd, MAA_SUBDEFAULT );
 
@@ -964,15 +959,17 @@ UINT AaItemsDoSelect( HWND hWnd, UINT dMode )
 */
 HRESULT AaItemsTipSizeChange( INT ttSize, UINT bView )
 {
+	LOGFONT	stFont;
+
 	gbAAtipView = bView ? TRUE : FALSE;
 
 	SetWindowFont( ghToolTipWnd, GetStockFont(DEFAULT_GUI_FONT), FALSE );
 	DeleteFont( ghTipFont );
 
 	//	今使ってるヤツぶっ壊してから、新しいのつくってくっつける
-//	ghTipFont = CreateFont( (FONTSZ_REDUCE == ttSize) ? FONTSZ_REDUCE : FONTSZ_NORMAL, 0, 0, 0, FW_REGULAR, FALSE, FALSE, FALSE, DEFAULT_CHARSET, OUT_OUTLINE_PRECIS, CLIP_DEFAULT_PRECIS, PROOF_QUALITY, VARIABLE_PITCH, TEXT("ＭＳ Ｐゴシック") );
-	gstBaseFont.lfHeight = (FONTSZ_REDUCE == ttSize) ? FONTSZ_REDUCE : FONTSZ_NORMAL;
-	ghTipFont = CreateFontIndirect( &gstBaseFont );
+	ViewingFontGet( &stFont );	//	gstBaseFont
+	stFont.lfHeight = (FONTSZ_REDUCE == ttSize) ? FONTSZ_REDUCE : FONTSZ_NORMAL;
+	ghTipFont = CreateFontIndirect( &stFont );
 
 	SetWindowFont( ghToolTipWnd, ghTipFont, TRUE );
 

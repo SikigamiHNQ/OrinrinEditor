@@ -132,6 +132,8 @@ HWND PageListInitialise( HINSTANCE hInstance, HWND hParentWnd, LPRECT pstFrame )
 	HBITMAP		hImg, hMsq;
 	INT			spPos;
 
+	LOGFONT	stFont;
+
 	WNDCLASSEX	wcex;
 	RECT	wdRect, clRect, rect;
 
@@ -216,14 +218,14 @@ HWND PageListInitialise( HINSTANCE hInstance, HWND hParentWnd, LPRECT pstFrame )
 	SendMessage( ghToolWnd, TB_BUTTONSTRUCTSIZE, (WPARAM)sizeof(TBBUTTON), 0 );
 	//	ツールチップ文字列を設定・ボタンテキストがツールチップになる
 	StringCchCopy( atBuff, MAX_STRING, TEXT("末尾に新規作成\r\nAlt + Shift + I ") );	gstPgTlBarInfo[ 0].iString = SendMessage( ghToolWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-	StringCchCopy( atBuff, MAX_STRING, TEXT("選択頁の次に挿入\r\nAlt + I") );		gstPgTlBarInfo[ 1].iString = SendMessage( ghToolWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-	StringCchCopy( atBuff, MAX_STRING, TEXT("選択頁を複製\r\nAlt + C") );		gstPgTlBarInfo[ 2].iString = SendMessage( ghToolWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-	StringCchCopy( atBuff, MAX_STRING, TEXT("選択頁を削除") );					gstPgTlBarInfo[ 3].iString = SendMessage( ghToolWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-	StringCchCopy( atBuff, MAX_STRING, TEXT("次の頁と統合\r\nAlt + G") );		gstPgTlBarInfo[ 4].iString = SendMessage( ghToolWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-	StringCchCopy( atBuff, MAX_STRING, TEXT("頁を上へ移動\r\nAlt + U") );		gstPgTlBarInfo[ 5].iString = SendMessage( ghToolWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-	StringCchCopy( atBuff, MAX_STRING, TEXT("頁を下へ移動\r\nAlt + J") );		gstPgTlBarInfo[ 6].iString = SendMessage( ghToolWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-	StringCchCopy( atBuff, MAX_STRING, TEXT("頁名称の変更\r\nAlt + N") );		gstPgTlBarInfo[ 7].iString = SendMessage( ghToolWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-	StringCchCopy( atBuff, MAX_STRING, TEXT("最新の情報に更新") );				gstPgTlBarInfo[ 8].iString = SendMessage( ghToolWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING, TEXT("選択頁の次に挿入\r\nAlt + I") );			gstPgTlBarInfo[ 1].iString = SendMessage( ghToolWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING, TEXT("選択頁を複製\r\nAlt + C") );				gstPgTlBarInfo[ 2].iString = SendMessage( ghToolWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING, TEXT("選択頁を削除\r\nAlt + D") );				gstPgTlBarInfo[ 3].iString = SendMessage( ghToolWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING, TEXT("次の頁と統合\r\nAlt + G") );				gstPgTlBarInfo[ 4].iString = SendMessage( ghToolWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING, TEXT("頁を上へ移動\r\nAlt + U") );				gstPgTlBarInfo[ 5].iString = SendMessage( ghToolWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING, TEXT("頁を下へ移動\r\nAlt + J") );				gstPgTlBarInfo[ 6].iString = SendMessage( ghToolWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING, TEXT("頁名称の変更\r\nAlt + N") );				gstPgTlBarInfo[ 7].iString = SendMessage( ghToolWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING, TEXT("最新の情報に更新") );						gstPgTlBarInfo[ 8].iString = SendMessage( ghToolWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
 
 	SendMessage( ghToolWnd, TB_SETROWS, MAKEWPARAM(PGTB_ITEMS,TRUE), (LPARAM)(&tbRect) );
 
@@ -261,9 +263,11 @@ HWND PageListInitialise( HINSTANCE hInstance, HWND hParentWnd, LPRECT pstFrame )
 	ghPageTipWnd = CreateWindowEx( WS_EX_TOPMOST, TOOLTIPS_CLASS, NULL, TTS_NOPREFIX | TTS_ALWAYSTIP,
 		CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, ghPageWnd, NULL, hInstance, NULL );
 
-	ghPgTipFont = CreateFont( FONTSZ_REDUCE, 0, 0, 0, FW_REGULAR, FALSE, FALSE, FALSE,
-		DEFAULT_CHARSET, OUT_OUTLINE_PRECIS, CLIP_DEFAULT_PRECIS, PROOF_QUALITY, VARIABLE_PITCH,
-		TEXT("ＭＳ Ｐゴシック") );
+
+	ViewingFontGet( &stFont );
+	stFont.lfHeight = FONTSZ_REDUCE;
+	ghPgTipFont = CreateFontIndirect( &stFont );
+//	ghPgTipFont = CreateFont( FONTSZ_REDUCE, 0, 0, 0, FW_REGULAR, FALSE, FALSE, FALSE, DEFAULT_CHARSET, OUT_OUTLINE_PRECIS, CLIP_DEFAULT_PRECIS, PROOF_QUALITY, VARIABLE_PITCH, TEXT("ＭＳ Ｐゴシック") );
 	SetWindowFont( ghPageTipWnd, ghPgTipFont, TRUE );
 
 	//	ツールチップをコールバックで割り付け
@@ -429,7 +433,6 @@ VOID Plt_OnCommand( HWND hWnd, INT id, HWND hWndCtl, UINT codeNotify )
 
 		case IDM_PAGEL_DELETE:	//	この頁を削除
 			//	確認入れて
-			//mRslt = MessageBox( hWnd, TEXT("削除しちゃったら復帰できないのですよ・・・\r\n本当に削除していいのですか？"), TEXT("確認なのです。あぅあぅ"), MB_YESNO | MB_ICONQUESTION | MB_DEFBUTTON2 );
 			mRslt = MessageBoxCheckBox( hWnd, ghInst, 2 );
 			if( IDYES == mRslt ){	DocPageDelete( iItem  );	}
 			break;
@@ -439,7 +442,6 @@ VOID Plt_OnCommand( HWND hWnd, INT id, HWND hWndCtl, UINT codeNotify )
 
 		case IDM_PAGEL_COMBINE:	//	統合
 			//	確認入れて
-			//mRslt = MessageBox( hWnd, TEXT("統合しちゃったら復帰できないのですよ・・・\r\n本当に統合していいのですか？"), TEXT("確認なのです。あぅあぅ"), MB_YESNO | MB_ICONQUESTION | MB_DEFBUTTON2 );
 			mRslt = MessageBoxCheckBox( hWnd, ghInst, 0 );
 			if( IDYES == mRslt ){	PageListCombine( hWnd , iItem );	}
 			break;

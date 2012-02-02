@@ -866,6 +866,22 @@
 					RelativePath=".\resource\UserDef_q.bmp"
 					>
 				</File>
+				<File
+					RelativePath=".\resource\VertLeft.bmp"
+					>
+				</File>
+				<File
+					RelativePath=".\resource\VertLeft_q.bmp"
+					>
+				</File>
+				<File
+					RelativePath=".\resource\VertTrans.bmp"
+					>
+				</File>
+				<File
+					RelativePath=".\resource\VertTrans_q.bmp"
+					>
+				</File>
 			</Filter>
 		</Filter>
 	</Files>

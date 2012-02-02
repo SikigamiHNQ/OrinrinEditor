@@ -1398,8 +1398,8 @@ HRESULT DocPositionShift( UINT vk, PINT pXdot, INT dLine )
 	if( 0 > iTop )		iTop = 0;
 	if( 0 > iBottom )	iBottom = iLines - 1;
 
-//容量が狂う・選択状態ならここで gdSelByte をリセットを？
-	if( bSeled ){	DocSelByteSet(  0 );	}
+	//	そのままだと容量が狂う・一旦選択状態を解除して計算しなおす
+	if( bSeled ){	DocPageSelStateToggle( -1 );	}
 
 	//	壱行ずつ面倒見ていく
 	for( i = iTop; iBottom >= i; i++ )
@@ -1465,13 +1465,21 @@ HRESULT DocPositionShift( UINT vk, PINT pXdot, INT dLine )
 			if( bSeled )	//	選択状態でヤッてたのなら、選択状態を維持する
 			{
 				DocRangeSelStateToggle( -1, -1, i , 1 );	//	該当行全体を選択状態にする
-				DocReturnSelStateToggle( i, 1 );	//	改行も選択で
+				//	次の行があるなら改行も選択で
+				if( iBottom > i )	DocReturnSelStateToggle( i, 1 );
 			}
 
 			DocBadSpaceCheck( i );	//	状態をリセット
 			ViewRedrawSetLine( i );
 		}
 	}
+
+	if( bSeled )	//	選択範囲はり直し
+	{
+		gstFile.vcCont.at( gixFocusPage ).dSelLineTop    = iTop;
+		gstFile.vcCont.at( gixFocusPage ).dSelLineBottom = iBottom;
+	}
+
 
 	//	キャレット位置適当に調整
 	iDot = 0;

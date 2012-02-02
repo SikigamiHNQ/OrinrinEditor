@@ -74,13 +74,13 @@ IDD_MOZI_SCRIPT_DLG
 #define MOZIVIEW_CLASS	TEXT("MOZIVIEW_CLASS")
 //-------------------------------------------------------------------------------------------------
 
-#define TB_ITEMS	5
+#define TB_ITEMS	3	//	5
 static  TBBUTTON	gstMztbInfo[] = {
 	{  0,	IDM_MOZI_DECIDE,	TBSTATE_ENABLED,	TBSTYLE_BUTTON | TBSTYLE_AUTOSIZE,	0,	0  },	//	
 	{  1,	IDM_MOZI_REFRESH,	TBSTATE_ENABLED,	TBSTYLE_BUTTON | TBSTYLE_AUTOSIZE,	0,	0  },	//	
-	{  2,	IDM_MOZI_SETTING,	TBSTATE_ENABLED,	TBSTYLE_CHECK | TBSTYLE_AUTOSIZE,	0,	0  },	//	
-	{  0,	0,					TBSTATE_ENABLED,	TBSTYLE_SEP,						0,	0  },
-	{  3,	IDM_MOZI_ADVANCE,	0,					TBSTYLE_CHECK | TBSTYLE_AUTOSIZE,	0,	0  }	//	
+	{  2,	IDM_MOZI_SETTING,	TBSTATE_ENABLED,	TBSTYLE_CHECK | TBSTYLE_AUTOSIZE,	0,	0  }	//	
+//	{  0,	0,					TBSTATE_ENABLED,	TBSTYLE_SEP,						0,	0  },
+//	{  3,	IDM_MOZI_ADVANCE,	0,					TBSTYLE_CHECK | TBSTYLE_AUTOSIZE,	0,	0  }	//	
 };	//	
 //-------------------------------------------------------------------------------------------------
 
@@ -142,6 +142,8 @@ static INT			gdMaxLine;		//!<	最大占有行
 
 static LPTSTR		gptMzBuff;		//!<	テキスト枠から文字確保枠・可変
 static DWORD		gcchMzBuf;		//!<	確保枠の文字数・バイトじゃないぞ
+
+static BOOLEAN		gbQuickClose;	//!<	貼り付けたらすぐ閉じる
 
 static sqlite3		*gpMoziTable;	//!<	文字一覧のオンメモリデタベ
 
@@ -268,10 +270,10 @@ INT MoziInitialise( LPTSTR ptCurrent, HINSTANCE hInstance )
 	ImageList_Add( ghMoziImgLst, hImg, hMsq );	//	設定
 	DeleteBitmap( hImg );	DeleteBitmap( hMsq );
 
-	hImg = LoadBitmap( hInstance, MAKEINTRESOURCE( IDBMP_MOZI_ADVANCE ) );
-	hMsq = LoadBitmap( hInstance, MAKEINTRESOURCE( IDBMQ_MOZI_ADVANCE ) );
-	ImageList_Add( ghMoziImgLst, hImg, hMsq );	//	アドバンズド
-	DeleteBitmap( hImg );	DeleteBitmap( hMsq );
+	//hImg = LoadBitmap( hInstance, MAKEINTRESOURCE( IDBMP_MOZI_ADVANCE ) );
+	//hMsq = LoadBitmap( hInstance, MAKEINTRESOURCE( IDBMQ_MOZI_ADVANCE ) );
+	//ImageList_Add( ghMoziImgLst, hImg, hMsq );	//	アドバンズド
+	//DeleteBitmap( hImg );	DeleteBitmap( hMsq );
 
 //	オンメモリSQLを、ガワだけ作っておく
 	MoziSqlTableOpenClose( M_CREATE );
@@ -346,6 +348,8 @@ HWND MoziScripterCreate( HINSTANCE hInst, HWND hPrWnd )
 
 	gdNowMode = 0;
 
+	gbQuickClose = TRUE;
+
 	//	ツールバー
 	ghMoziToolBar = CreateWindowEx( WS_EX_CLIENTEDGE, TOOLBARCLASSNAME, TEXT("mozitoolbar"), WS_CHILD | WS_VISIBLE | TBSTYLE_FLAT | TBSTYLE_LIST | TBSTYLE_TOOLTIPS, 0, 0, 0, 0, ghMoziWnd, (HMENU)IDTB_MZSCR_TOOLBAR, hInst, NULL );
 
@@ -364,14 +368,19 @@ HWND MoziScripterCreate( HINSTANCE hInst, HWND hPrWnd )
 	SendMessage( ghMoziToolBar, TB_BUTTONSTRUCTSIZE, (WPARAM)sizeof(TBBUTTON), 0 );
 
 	//	ツールチップ文字列を設定・ボタンテキストがツールチップになる
-	StringCchCopy( atBuffer, MAX_STRING, TEXT("文字ＡＡ挿入") );	gstMztbInfo[0].iString = SendMessage( ghMoziToolBar, TB_ADDSTRING, 0, (LPARAM)atBuffer );
+	StringCchCopy( atBuffer, MAX_STRING, TEXT("文字ＡＡ挿入") );					gstMztbInfo[0].iString = SendMessage( ghMoziToolBar, TB_ADDSTRING, 0, (LPARAM)atBuffer );
 	StringCchCopy( atBuffer, MAX_STRING, TEXT("文字列更新 / 使用ファイル更新") );	gstMztbInfo[1].iString = SendMessage( ghMoziToolBar, TB_ADDSTRING, 0, (LPARAM)atBuffer );
-	StringCchCopy( atBuffer, MAX_STRING, TEXT("使用ファイル設定") );	gstMztbInfo[2].iString = SendMessage( ghMoziToolBar, TB_ADDSTRING, 0, (LPARAM)atBuffer );
-	StringCchCopy( atBuffer, MAX_STRING, TEXT("アドバンズド") );	gstMztbInfo[4].iString = SendMessage( ghMoziToolBar, TB_ADDSTRING, 0, (LPARAM)atBuffer );
+	StringCchCopy( atBuffer, MAX_STRING, TEXT("使用ファイル設定") );				gstMztbInfo[2].iString = SendMessage( ghMoziToolBar, TB_ADDSTRING, 0, (LPARAM)atBuffer );
+//	StringCchCopy( atBuffer, MAX_STRING, TEXT("アドバンズド") );					gstMztbInfo[4].iString = SendMessage( ghMoziToolBar, TB_ADDSTRING, 0, (LPARAM)atBuffer );
 
 	SendMessage( ghMoziToolBar , TB_ADDBUTTONS, (WPARAM)TB_ITEMS, (LPARAM)&gstMztbInfo );	//	ツールバーにボタンを挿入
 
 	SendMessage( ghMoziToolBar , TB_AUTOSIZE, 0, 0 );	//	ボタンのサイズに合わせてツールバーをリサイズ
+
+	//	貼り付けたら閉じるチェックボックスを付ける
+	CreateWindowEx( 0, WC_BUTTON, TEXT("挿入したら閉じる"), WS_CHILD | WS_VISIBLE | BS_AUTOCHECKBOX, 128, 2, 170, 23, ghMoziToolBar, (HMENU)IDCB_MZSCR_QUICKCLOSE, hInst, NULL );
+	CheckDlgButton( ghMoziToolBar, IDCB_MZSCR_QUICKCLOSE, gbQuickClose ? BST_CHECKED : BST_UNCHECKED );
+
 	InvalidateRect( ghMoziToolBar , NULL, TRUE );		//	クライアント全体を再描画する命令
 
 	GetClientRect( ghMoziWnd, &rect );
@@ -396,8 +405,6 @@ HWND MoziScripterCreate( HINSTANCE hInst, HWND hPrWnd )
 	ghTextWnd = CreateWindowEx( 0, WC_EDIT, TEXT(""), WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | WS_HSCROLL | ES_MULTILINE,
 		0, height, rect.right, rect.bottom - height, ghMoziWnd, (HMENU)IDE_MZSCR_TEXT, hInst, NULL );
 	SetWindowFont( ghTextWnd, ghAaFont, TRUE );
-
-	//アドバンズド枠は後で・いらなぇ？
 
 	//設定枠
 	ghSettiLvWnd = CreateWindowEx( 0, WC_LISTVIEW, TEXT("mozisetting"),
@@ -916,7 +923,13 @@ VOID Mzs_OnCommand( HWND hWnd, INT id, HWND hWndCtl, UINT codeNotify )
 
 	switch( id )
 	{
-		case IDM_MOZI_DECIDE:	if( !(0x10 & gdNowMode) ){	MoziScriptInsert( hWnd );	}	break;
+		case IDM_MOZI_DECIDE:
+			if( !(0x10 & gdNowMode) )
+			{
+				MoziScriptInsert( hWnd );
+				if( gbQuickClose  ){	DestroyWindow( hWnd );	}	//	直ぐ閉じる？
+			}
+			break;
 
 		case IDM_MOZI_REFRESH:
 			if( 0x10 & gdNowMode  ){	MoziFileRefresh( hWnd );	 return;	}	//	設定
@@ -957,7 +970,12 @@ VOID Mzs_OnCommand( HWND hWnd, INT id, HWND hWndCtl, UINT codeNotify )
 			}
 			break;
 
-		case IDM_MOZI_ADVANCE:	break;
+//		case IDM_MOZI_ADVANCE:	break;
+
+		case IDCB_MZSCR_QUICKCLOSE:
+			gbQuickClose = IsDlgButtonChecked( GetDlgItem(hWnd,IDTB_MZSCR_TOOLBAR), IDCB_MZSCR_QUICKCLOSE ) ? TRUE : FALSE;
+			SetFocus( hWnd );
+			break;
 
 		case IDM_MOZI_LISTDEL:	MoziFileListDelete( hWnd  );	break;
 

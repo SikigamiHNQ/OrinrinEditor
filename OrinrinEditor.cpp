@@ -19,123 +19,90 @@ If not, see <http://www.gnu.org/licenses/>.
 
 //	大日本帝国公用語は↓を見られたい
 
+//考え中
+//	頁削除メッセージの確認無しは、起動中だけにしたほうがいい？
 
-//	TODO:	Viewer、右クリメニューからのドラフトボードが開かない？・追加されない？
+//バグ
+//	TODO:	サムネからだと使用履歴に反映されない＜ＯＫ？
 
-//	TODO:	ViewerEXEの場合、最前面に表示になってたらドラフトボード・サムネが裏になってまう
+//	TODO:	台詞Enter、空白だけ出っ張ってるときとかにキャレット位置がおかしくなる
+//	TODO:	「矩形選択」と「部分抽出」の両方にチェックを入れた状態でドラッグすると落ちる
+//	TODO:	頁分割したら容量表示がおかしい？
+//	TODO:	ページ分割処理、改行の数とかおかしい？
+//	TODO:	枠編集のサンプルがおかしいときがある・描画ルーチン治すか＜複数行対応にする
 
-//	TODO:	文字ＡＡの入力とか、レイヤボックスの編集とかで、キーボードショートカット使えるように
+//	TODO:	使用のアレ、別MLTに同じAAが有ったらハッシュが同じってことでラリってまう。どうしよう
+//ベースネーム書換で対処はできる
 
-//	TODO:	フォント変更出来るように
-
-//	TODO:	最大化して終わる＞起動して、最大化解除すると、メインスプリットバーが見えなくなる
-//右にイッちゃってるまま
-//	TODO:	メインスプリットバーの位置情報リセットが居るかも
-//	TODO:	位置情報のリセット機能・システムメニューに搭載する
-
-
+//変更・修正
 //	TODO:	デカいファイル開こうとしたときはメッセージ出すとか
 //	TODO:	デカいファイル開いたら時間かかる（1000コマとか）
-//逐次読み込みにするとか、先読みしたらvector確保してからいれるとか
-//vectorじゃなくlistにするとか？
-//壱行毎のサイズ確認して、確保してからブチ込むとか
-
-//	TODO:	ＡＡ文字入力のアレ、配置したら即閉じるオプショッ
-
-//	TODO:	複数ファイルタブ、右クリメニューでファイル情報出す
-
-//	TODO:	複数行テンプレ窓の主タブでホイールスクロールが効かない？
-//メイン窓の編集スペース、Page List、複数行テンプレ窓のAA一覧ツリーなど、他の場所では問題ない
-
-//	TODO:	ASD対応＜読込は作ったがどこで使う？
-
-//	TODO:	MAAやサムネ、Draughtで、中クルック動作を付けられないか
-
-//	TODO:	MMAビュー、AAのスクロールをアイテム区切りでなく行スクロールも出来るように
-
-//	TODO:	MAAのファイル名検索、フォルダも検索出来るように？開くときは？
-
-//	TODO:	SQLのINSERT、prepareは重い。クエリつくって、resetしながら回すのがいいんじゃ
-
-//	TODO:	「矩形選択」と「部分抽出」の両方にチェックを入れた状態でドラッグすると落ちる
-
-//	TODO:	頁分割したら容量表示がおかしい
-//	TODO:	ページ分割処理、改行の数とかおかしい？
-
-//	TODO:	バックアップ機能の強化・上書き保存したらバックアップとか・頁新規作成したら保存
-
-//	TODO:	保存するとき、同名ファイルがあったら、日時くっつけてバックアップとか
-
-//	TODO:	MLTのブックマーク機能・タブ増やすか、ツリーに増やすか・副タブじゃいけない？
-
-//	TODO:	カーソルのところに上書き挿入、的な機能・レイヤボックス介さずに直で。
-
-//	TODO:	MAA窓を非使用するオプショッ
-
-//	TODO:	枠機能で、複数行パーツを使いたい
-
-//	TODO:	頁リスト、直前に選択していた頁を灰色にしておく機能
-
-//	TODO:	ファイル内容統計機能が欲しい。全バイト数、頁数とか
-
-//	TODO:	Ctrl+Kの統計機能・PageListの項目増やして対処・Ctrl+Kでリフレッシュとか
-//	連続半角とか、行末空白とか・いろんな情報をだす・リヤルタイムだと重いので操作でリフレッシュ
-
+//			逐次読み込みにするとか、先読みしたらvector確保してからいれるとかvectorじゃなくlistにするとか？
+//			壱行毎のサイズ確認して、確保してからブチ込むとか
 //	TODO:	枠挿入したら、右が妙に空く。ユニコ使うときは、調整開けは不要か
-
-//	TODO:	枠編集のサンプルがおかしいときがある・描画ルーチン治すか
-
+//	TODO:	Viewer、右クリメニューからのドラフトボードが開かない？・追加されない？
+//	TODO:	ViewerEXEの場合、最前面に表示になってたらドラフトボード・サムネが裏になってまう
+//	TODO:	最大化して終わる＞起動して、最大化解除すると、メインスプリットバーが見えなくなる//右にイッちゃってるまま
+//	TODO:	メインスプリットバーの位置情報リセットが居るかも
+//	TODO:	位置情報のリセット機能・システムメニューに搭載する
+//	TODO:	複数行テンプレ窓の主タブでホイールスクロールが効かない？
+//			メイン窓の編集スペース、Page List、複数行テンプレ窓のAA一覧ツリーなど、他の場所では問題ない
+//	TODO:	SQLのINSERT、prepareは重い。クエリつくって、resetしながら回すのがいいんじゃ
 //	TODO:	トレス機能、点滅コントラスト？と輝度調整の幅が狭いのがちょいと苦しいらしい
 //	TODO:	トレスモード窓に、グリッドON/OFFを付ける
 //	TODO:	トレスモード、各入力値は直入力できるように
 //	TODO:	トレスモードボタンは、TOGGLEできるようにする
+//	TODO:	DocBadSpaceCheck内の更新指令の最適化が必要
+//	TODO:	ファイルタブの[変更]が重い？変更したら、弐回目以降は書かないように//みてるファイル変えたときのステータスバーの書き直しに注意
+//	TODO:	テンプレの「常に最前面に表示」Orinrinediterを表示している時だけ最前面に来るように//もしくは、メイン窓に統合とか
+
+//機能追加
+//	TODO:	viewerの主タブをマウスとスクロールバーだけでなく、キーボードの矢印やPageUp,PageDnキーで操作出来る様にならない？
+//	TODO:	未保存で閉じようとしたときのメッセージのYes/Noを逆にしてほしい。
+//			未保存のまま閉じようとした場合の確認は『セーブしますか? Yes（Save)/No/Cancel』だが、Orinrinは『終了していいですか? Yes/No』なのでYesとNoの動作が逆になっていて紛らわしいため。
+//	TODO:	スペース文字が二個以上連続しているところをAAと台詞の区切りだと認識するようなロジックは？
+//	TODO:	フリーカーソルモード
+//	TODO:	ユニコード調整有効なら、右そろえ線の調整をドットではなくユニコード空白で
+//	TODO:	行頭が5dot空白の場合、半角スペースではなくユニコード空白に変換
+//	TODO:	View部分をサムネ表示できるように
+//	TODO:	フォント変更出来るように・即時書換を？
+//	TODO:	頁一覧を、複数選択して一発削除できるように
+//	TODO:	枠機能で、複数行パーツを使いたい
+//	TODO:	レイヤボックス自体の操作、上書き実行とかもキボドショトカトで出来るように
+//	TODO:	文字ＡＡの入力とか、レイヤボックスの編集とかで、キーボードショートカット使えるように
+//	TODO:	ドラフトボード・サムネ、ツールチップ表示出来るように
+//	TODO:	ドラフトボード・サムネ、サイズ変更できるように
+//	TODO:	複数ファイルタブ、右クリメニューでファイル情報出す
+//	TODO:	ASD対応＜読込は作ったがどこで使う？
+//	TODO:	MMAビュー、AAのスクロールをアイテム区切りでなく行スクロールも出来るように
+//	TODO:	バックアップ機能の強化・上書き保存したらバックアップとか・頁新規作成したら保存
+//	TODO:	保存するとき、同名ファイルがあったら、日時くっつけてバックアップとか
+//	TODO:	MLTのブックマーク機能・タブ増やすか、ツリーに増やすか・副タブじゃいけない？
+//	TODO:	カーソルのところに上書き挿入、的な機能・レイヤボックス介さずに直で。
+//	TODO:	MAA窓を非使用するオプショッ
+//	TODO:	頁リスト、直前に選択していた頁を灰色にしておく機能
+//	TODO:	ファイル内容統計機能が欲しい。全バイト数、頁数とか
+//	TODO:	Ctrl+Kの統計機能・PageListの項目増やして対処・Ctrl+Kでリフレッシュとか
+//			連続半角とか、行末空白とか・いろんな情報をだす・リヤルタイムだと重いので操作でリフレッシュ
+//	TODO:	ツールチップ付けたい
+//	TODO:	文字の検索・痴漢機能	ユニコード空白一括検索とか
+//	TODO:	右揃え線消し
+//	TODO:	切り抜きリファレンスAAを使って、文字のとこだけ切り抜き、ないところだけ切り抜き、とかできるようにしたい
+//	TODO:	バックアップメッセージ、ステータスバーに出せないか
+//	TODO:	全部保存作る
+//	TODO:	ALT+Nを、頁名称一括編集にする？
+//	TODO:	ダブルクルックでSpaceエリアとかの部分選択
+//	TODO:	ファイルを開き直す機能
+//	TODO:	使用履歴をファイル出力できるように
+//	TODO:	よく使うユニコードを纏めておけないか、ユーザ定義でいいんじゃね
+//	TODO:	テンプレのコンボックスを、リストボックス型と切り替えられるとか
+//	TODO:	頁に、ヘッダフッタ挿入機能。ヘッダには頁番号、フッタには容量、とか
+//	TODO:	起動中に、ラインテンプレートのリストを開く＆再読み込みできるようにして欲しい//	Brushも同じか。右クリメニューで
 //	TODO:	トレスの１画面、２画面切り替えモード
 //	TODO:	トレスの２画面だと、背景絵はどっちのペインでも表示出来るようにしたい
 //	TODO:	トレスで、画像をつまんで直接移動できるように
 
 
-//	TODO:	使用のアレ、別MLTに同じAAが有ったらハッシュが同じってことでラリってまう。どうしよう
-
-
-//	TODO:	ツールチップ付けたい
-
-//	TODO:	文字の検索・痴漢機能
-//ユニコード空白一括検索とか
-
-//	TODO:	右揃え線消し
-
-
-//	TODO:	切り抜きリファレンスAAを使って、文字のとこだけ切り抜き、ないところだけ切り抜き、とかできるようにしたい
-
-//	TODO:	バックアップメッセージ、ステータスバーに出せないか
-//	TODO:	全部保存作る
-//	TODO:	ALT+Nを、頁名称一括編集にする？
-
-//	TODO:	ダブルクルックでSpaceエリアとかの部分選択
-
-//	TODO:	ファイルを開き直す機能
-
-//	TODO:	DocBadSpaceCheck内の更新指令の最適化が必要
-
-//	TODO:	テンプレの「常に最前面に表示」Orinrinediterを表示している時だけ最前面に来るように
-//もしくは、メイン窓に統合とか
-
-//	TODO:	使用履歴をファイル出力できるように
-
-
-//	TODO:	リバーの、状態リセットが必要
-
-//	TODO:	よく使うユニコードを纏めておけないか、ユーザ定義でいいんじゃね
-
-//	TODO:	テンプレのコンボックスを、リストボックス型と切り替えられるとか
-
-//	TODO:	頁に、ヘッダフッタ挿入機能。ヘッダには頁番号、フッタには容量、とか
-
-//	TODO:	ファイルタブの[変更]が重い？変更したら、弐回目以降は書かないように
-//みてるファイル変えたときのステータスバーの書き直しに注意
-
-//	TODO:	起動中に、ラインテンプレートのリストを開く＆再読み込みできるようにして欲しい
-//	Brushも同じか。右クリメニューで
 
 
 
@@ -145,7 +112,6 @@ If not, see <http://www.gnu.org/licenses/>.
 
 //外部スクリプトはどのように実現するか。Rubyの組込とかつかえない？
 //(д)EditはFreePascal？
-
 
 
 //	メニューのコレ外した
@@ -168,13 +134,9 @@ If not, see <http://www.gnu.org/licenses/>.
 
 
 //OK?
-//	TODO:	複数ファイルタブ、マウスオーバーでフルパス表示
-//	TODO:	バック選択してると、先頭行が選択されない・行番号で全選択と噛んでるか
-//	TODO:	台詞用Enter機能。Shift+Enterとかで、改行挿入ではなく、その行の末端からの直前の
-//	TODO:	縦書き機能・行間調整機能とか
-//	TODO:	選択して、全体ドットズラしすると選択容量がおかしくなる・常に加算してるようだ
-
-//	TODO:	ALT+上下すると変更状態になってまう
+//	TODO:	頁削除のAlt+D付ける。注意ダイヤログ出す。
+//	TODO:	UTF8でもセーブ出来るように・エクスポートでいいか
+//	TODO:	リバーの、状態リセットと記憶が必要
 
 
 //	TODO:	ブラシや壱行テンプレ、マウスオーバーツールチップで、横幅ドット数表示させたい
@@ -358,11 +320,16 @@ ASDファイル　　壱行が壱コンテンツ
 					ファイル毎のCaret位置を保存するようにした
 					起動したまま、壱行テンプレ、ブラシテンプレのリロードできるようんした
 					起動するとき、最後に開けてたファイルを開くとか選択できるようにした
-2012/01/12	0.27	編集窓のファイルタブで、マウスオーバーでフルパス表示
+2012/01/16	0.27	編集窓のファイルタブで、マウスオーバーでフルパス表示
 					ＭＡＡとドラフトボードで、中クルックの場合処理を増やした（Viewer込み）
 					台詞用Enter機能。Shift+Enterで、改行挿入ではなく次の行に空白とかで台詞位置合わせできる
 					縦書き機能
 					バグ修正いろいろ
+2012/01/31	0.28	ＵＴＦ８でエクスポート出来るようにした
+					フォント変更機能
+					頁削除のAlt+D追加
+					サムネから使ったら、使用タブに追加されないのを修正
+					リバーの位置記憶と初期状態に戻す実装
 
 
 更新日時注意
@@ -396,6 +363,26 @@ TEXT("詳しくはGNU一般公衆利用許諾書をご覧ください。\r\n\r\n")
 TEXT("あなたはこのプログラムと共に、GNU一般公衆利用許諾書のコピーを一部受け取っているはずです。\r\n\r\n")
 TEXT("もし受け取っていなければ、<http://www.gnu.org/licenses/> をご覧ください。\r\n\r\n")
 };
+//-------------------------------------------------------------------------------------------------
+
+//	表示用フォントベーステーブル・これをコピーして使う
+static LOGFONT	gstBaseFont = {
+	FONTSZ_NORMAL,			//	フォントの高さ
+	0,						//	平均幅
+	0,						//	文字送りの方向とX軸との角度
+	0,						//	ベースラインとX軸との角度
+	FW_NORMAL,				//	文字の太さ(0~1000まで・400=nomal)
+	FALSE,					//	イタリック体
+	FALSE,					//	アンダーライン
+	FALSE,					//	打ち消し線
+	DEFAULT_CHARSET,		//	文字セット
+	OUT_OUTLINE_PRECIS,		//	出力精度
+	CLIP_DEFAULT_PRECIS,	//	クリッピング精度
+	PROOF_QUALITY,			//	出力品質
+	VARIABLE_PITCH,			//	固定幅か可変幅
+	TEXT("ＭＳ Ｐゴシック")	//	フォント名
+};
+//-------------------------------------------------------------------------------------------------
 
 // グローバル変数:
 static  HINSTANCE	ghInst;						//!<	現在のインターフェイス
@@ -477,6 +464,8 @@ VOID	Cls_OnContextMenu(HWND,HWND,UINT,UINT );	//!<
 VOID	Cls_OnHotKey(HWND, INT, UINT, UINT );		//!<	
 
 INT_PTR	CALLBACK OptionDlgProc( HWND, UINT, WPARAM, LPARAM );	//!<	
+
+HRESULT	ViewingFontNameLoad( VOID );
 //-------------------------------------------------------------------------------------------------
 
 
@@ -567,6 +556,8 @@ INT APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 	}
 
 	InitParamValue( INIT_SAVE, VL_CLASHCOVER, 1 );
+
+	ViewingFontNameLoad(  );	//	フォント名確保
 
 	// アプリケーションの初期化を実行します:
 	if( !InitInstance( hInstance, nCmdShow , atArgv ) ){	return FALSE;	}
@@ -1297,6 +1288,8 @@ VOID Cls_OnDestroy( HWND hWnd )
 	Shell_NotifyIcon( NIM_DELETE, &nid );
 #endif
 
+	ToolBarBandInfoGet( NULL );
+
 	PreviewInitialise( NULL, NULL );
 
 	TraceInitialise( hWnd, FALSE );
@@ -1401,10 +1394,10 @@ VOID Cls_OnContextMenu( HWND hWnd, HWND hWndContext, UINT xPos, UINT yPos )
 	stPost.x = (SHORT)xPos;	//	画面座標はマイナスもありうる
 	stPost.y = (SHORT)yPos;
 
-	TRACE( TEXT("MAIN CONTEXT") );
-	//リバーの、バー名称と左の取っ手のところは発生する・
+	TRACE( TEXT("MAIN CONTEXT[%d x %d]"), stPost.x, stPost.y );
 
-	ToolBarOnContextMenu( hWnd, hWndContext, stPost.x, stPost.y );
+	//リバーの、バー名称と左の取っ手のところは発生する・
+	if( ToolBarOnContextMenu( hWnd, hWndContext, stPost.x, stPost.y ) ){	 return;	}
 
 	//	複数タブ以外にはない
 	if( ghFileTabWnd != hWndContext )	return;
@@ -1704,7 +1697,7 @@ UINT AppClientAreaCalc( LPRECT pstRect )
 INT InitMultipleFile( UINT dMode, UINT dCount, LPTSTR ptFile, LPTSTR ptBase )
 {
 	TCHAR	atKeyName[MIN_STRING], atBuff[MIN_STRING];
-	INT	dBuff = 0;
+	INT	iBuff = 0;
 
 	if( ptFile )
 	{
@@ -1730,7 +1723,7 @@ INT InitMultipleFile( UINT dMode, UINT dCount, LPTSTR ptFile, LPTSTR ptBase )
 		if( dMode  )	//	ロード
 		{
 			GetPrivateProfileString( TEXT("MaaSubOpen"), TEXT("Count"), TEXT("0"), atBuff, MIN_STRING, gatIniPath );
-			dBuff = StrToInt( atBuff );
+			iBuff = StrToInt( atBuff );
 		}
 		else	//	セーブ
 		{
@@ -1742,7 +1735,7 @@ INT InitMultipleFile( UINT dMode, UINT dCount, LPTSTR ptFile, LPTSTR ptBase )
 			WritePrivateProfileString( TEXT("MaaSubOpen"), TEXT("Count"), atBuff, gatIniPath );
 		}
 
-		return dBuff;
+		return iBuff;
 	}
 
 
@@ -1760,14 +1753,14 @@ INT InitMultipleFile( UINT dMode, UINT dCount, LPTSTR ptFile, LPTSTR ptBase )
 INT InitTraceValue( UINT dMode, LPTRACEPARAM pstInfo )
 {
 	TCHAR	atBuff[MIN_STRING];
-	INT	dBuff = 0;
+	INT	iBuff = 0;
 
 	if( dMode )	//	ロード
 	{
-		dBuff = GetPrivateProfileInt( TEXT("Trace"), TEXT("Turning"), -1, gatIniPath );
-		if( 0 > dBuff )	return 0;
+		iBuff = GetPrivateProfileInt( TEXT("Trace"), TEXT("Turning"), -1, gatIniPath );
+		if( 0 > iBuff )	return 0;
 
-		pstInfo->dTurning     = dBuff;
+		pstInfo->dTurning     = iBuff;
 		pstInfo->dZooming     = GetPrivateProfileInt( TEXT("Trace"), TEXT("Zooming"), 0, gatIniPath );
 		pstInfo->dGrayMoph    = GetPrivateProfileInt( TEXT("Trace"), TEXT("GrayMoph"), 0, gatIniPath );
 		pstInfo->dGamma       = GetPrivateProfileInt( TEXT("Trace"), TEXT("Gamma"), 0, gatIniPath );
@@ -1855,6 +1848,62 @@ COLORREF InitColourValue( UINT dMode, UINT dStyle, COLORREF nColour )
 //-------------------------------------------------------------------------------------------------
 
 /*!
+	リバー配置のセーブロード
+	@param[in]		dMode	非０ロード　０セーブ
+	@param[in]		items	バンドの数
+	@param[in,out]	pstInfo	データを出したり入れたりする構造体配列へのポインター
+	@return	HRESULT	終了状態コード
+*/
+HRESULT InitToolBarLayout( UINT dMode, INT items, LPREBARLAYOUTINFO pstInfo )
+{
+	TCHAR	atKeyName[MIN_STRING], atBuff[MIN_STRING];
+	UINT	dValue;
+	INT	i;
+
+
+	if( dMode )	//	ロード
+	{
+		//	存在確認
+		dValue = GetPrivateProfileInt( TEXT("ReBar"), TEXT("IDX0_ID"), 0, gatIniPath );
+		if( 0 == dValue ){	return E_NOTIMPL;	}	//	ＩＤなので０にはならない
+
+		for( i = 0; items > i; i++ )	//	インデックス順
+		{
+			StringCchPrintf( atKeyName, MIN_STRING, TEXT("IDX%d_ID"), i );
+			pstInfo[i].wID = GetPrivateProfileInt( TEXT("ReBar"), atKeyName, pstInfo[i].wID, gatIniPath );
+
+			StringCchPrintf( atKeyName, MIN_STRING, TEXT("IDX%d_CX"), i );
+			pstInfo[i].cx = GetPrivateProfileInt( TEXT("ReBar"), atKeyName, pstInfo[i].cx, gatIniPath );
+
+			StringCchPrintf( atKeyName, MIN_STRING, TEXT("IDX%d_STYLE"), i );
+			pstInfo[i].fStyle = GetPrivateProfileInt( TEXT("ReBar"), atKeyName, pstInfo[i].fStyle, gatIniPath );
+		}
+	}
+	else	//	セーブ
+	{
+		WritePrivateProfileSection( TEXT("ReBar"), NULL, gatIniPath );	//	一旦全削除
+
+		for( i = 0; items > i; i++ )	//	インデックス順
+		{
+			StringCchPrintf( atKeyName, MIN_STRING, TEXT("IDX%d_ID"), i );
+			StringCchPrintf( atBuff, MIN_STRING, TEXT("%u"), pstInfo[i].wID );
+			WritePrivateProfileString( TEXT("ReBar"), atKeyName, atBuff, gatIniPath );
+
+			StringCchPrintf( atKeyName, MIN_STRING, TEXT("IDX%d_CX"), i );
+			StringCchPrintf( atBuff, MIN_STRING, TEXT("%u"), pstInfo[i].cx );
+			WritePrivateProfileString( TEXT("ReBar"), atKeyName, atBuff, gatIniPath );
+
+			StringCchPrintf( atKeyName, MIN_STRING, TEXT("IDX%d_STYLE"), i );
+			StringCchPrintf( atBuff, MIN_STRING, TEXT("%u"), pstInfo[i].fStyle );
+			WritePrivateProfileString( TEXT("ReBar"), atKeyName, atBuff, gatIniPath );
+		}
+	}
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+
+/*!
 	パラメータ値のセーブロード
 	@param[in]	dMode	非０ロード　０セーブ
 	@param[in]	dStyle	パラメータの種類
@@ -1864,7 +1913,7 @@ COLORREF InitColourValue( UINT dMode, UINT dStyle, COLORREF nColour )
 INT InitParamValue( UINT dMode, UINT dStyle, INT nValue )
 {
 	TCHAR	atKeyName[MIN_STRING], atBuff[MIN_STRING];
-	INT	dBuff = 0;
+	INT	iBuff = 0;
 
 	switch( dStyle )
 	{
@@ -1913,14 +1962,14 @@ INT InitParamValue( UINT dMode, UINT dStyle, INT nValue )
 	if( dMode )	//	ロード
 	{
 		GetPrivateProfileString( TEXT("General"), atKeyName, atBuff, atBuff, MIN_STRING, gatIniPath );
-		dBuff = StrToInt( atBuff );
+		iBuff = StrToInt( atBuff );
 	}
 	else	//	セーブ
 	{
 		WritePrivateProfileString( TEXT("General"), atKeyName, atBuff, gatIniPath );
 	}
 
-	return dBuff;
+	return iBuff;
 }
 //-------------------------------------------------------------------------------------------------
 
@@ -1928,7 +1977,7 @@ INT InitParamValue( UINT dMode, UINT dStyle, INT nValue )
 	文字列の設定内容をセーブロード
 	@param[in]		dMode	非０ロード　０セーブ
 	@param[in]		dStyle	パラメータの種類
-	@param[in,out]	ptFile	MAX_PATHであること
+	@param[in,out]	ptFile	ロード：デフォルト文字列　セーブ：保存する文字列　MAX_PATHであること
 	@return			HRESULT	終了状態コード
 */
 HRESULT InitParamString( UINT dMode, UINT dStyle, LPTSTR ptFile )
@@ -1991,7 +2040,7 @@ HRESULT InitMaaFldrOpen( UINT dMode, LPTSTR ptFile )
 INT InitWindowTopMost( UINT dMode, UINT dStyle, INT nValue )
 {
 	TCHAR	atAppName[MIN_STRING], atBuff[MIN_STRING];
-	INT	dBuff = 0;
+	INT	iBuff = 0;
 
 	switch( dStyle )
 	{
@@ -2007,14 +2056,14 @@ INT InitWindowTopMost( UINT dMode, UINT dStyle, INT nValue )
 	if( dMode )	//	ロード
 	{
 		GetPrivateProfileString( atAppName, TEXT("TopMost"), atBuff, atBuff, MIN_STRING, gatIniPath );
-		dBuff = StrToInt( atBuff );
+		iBuff = StrToInt( atBuff );
 	}
 	else	//	セーブ
 	{
 		WritePrivateProfileString( atAppName, TEXT("TopMost"), atBuff, gatIniPath );
 	}
 
-	return dBuff;
+	return iBuff;
 }
 //-------------------------------------------------------------------------------------------------
 
@@ -2151,12 +2200,17 @@ HRESULT OptionDialogueOpen( VOID )
 	HMENU	hSubMenu;
 	UINT	bURHbuff, bABUIbuff, bCpNodBuf;
 
+	TCHAR	atFontName[LF_FACESIZE];	//	フォント名変更に備える
+	//	項目増えたら、構造体にしちゃう
+
+	ZeroMemory( atFontName, sizeof(atFontName) );
+
 	bURHbuff  = gbUniRadixHex;
 	bABUIbuff = gdBUInterval;
 	bCpNodBuf = gbCpModSwap;
 
 	//	改行コード変更ならバイト数再計算が必要か
-	DialogBoxParam( ghInst, MAKEINTRESOURCE(IDD_GENERAL_OPTION_DLG), ghMainWnd, OptionDlgProc, NULL );
+	DialogBoxParam( ghInst, MAKEINTRESOURCE(IDD_GENERAL_OPTION_DLG), ghMainWnd, OptionDlgProc, (LPARAM)atFontName );
 
 	//	設定変更されてたら内容入替
 	if( bURHbuff != gbUniRadixHex ){	UnicodeRadixExchange( NULL );	};
@@ -2167,6 +2221,12 @@ HRESULT OptionDialogueOpen( VOID )
 	}
 
 	SqnSetting(   );	//	グループアンドゥのアレ
+
+	if( NULL != atFontName[ 0] )	//	フォント名、なんか入ってたら変更されたと見なす
+	{
+		InitParamString( INIT_SAVE, VS_FONT_NAME, atFontName );
+		//	記録する・書換はあとで
+	}
 
 //@@コピー処理
 	if( bCpNodBuf != gbCpModSwap )	//	コピーモード入替
@@ -2204,13 +2264,19 @@ INT_PTR CALLBACK OptionDlgProc( HWND hDlg, UINT message, WPARAM wParam, LPARAM l
 	static  UINT	cdGrXp, cdGrYp, cdRtRr;
 
 	UINT	id;
-	INT		dValue, dBuff;
+	INT		dValue, iBuff;
 	TCHAR	atBuff[SUB_STRING];
 //	TCHAR	atPath[MAX_PATH];
+
+	static LPTSTR	ptFontName;
+	CHOOSEFONT	stChooseFont;
+	LOGFONT		stLogFont;
 
 	switch( message )
 	{
 		case WM_INITDIALOG:
+			ptFontName = (LPTSTR)lParam;	//	フォント名入れるやつ
+
 			//	スライダ初期値・小さいほど薄くなる
 			SendDlgItemMessage( hDlg, IDSL_LAYERBOX_TRANCED, TBM_SETRANGE, TRUE, MAKELPARAM( 0, 0xE0 ) );	//	0xE0
 
@@ -2348,6 +2414,19 @@ INT_PTR CALLBACK OptionDlgProc( HWND hDlg, UINT message, WPARAM wParam, LPARAM l
 					}
 					return (INT_PTR)TRUE;
 	#endif
+				case IDB_CHOOSEFONT:	//	フォント変更のアレ
+					ViewingFontGet( &stLogFont );
+					ZeroMemory( &stChooseFont, sizeof(CHOOSEFONT) );
+					stChooseFont.lStructSize = sizeof(CHOOSEFONT);
+					stChooseFont.hwndOwner = hDlg;
+					stChooseFont.lpLogFont = &stLogFont;
+					stChooseFont.Flags = CF_SCREENFONTS | CF_INITTOLOGFONTSTRUCT;
+					if( ChooseFont(&stChooseFont) )	//	確定したのなら中身コピっておく
+					{
+						StringCchCopy( ptFontName, LF_FACESIZE, stLogFont.lfFaceName );
+					}
+					break;
+
 				case IDB_APPLY://適用
 				case IDOK:
 	#ifndef MAA_PROFILE
@@ -2359,9 +2438,9 @@ INT_PTR CALLBACK OptionDlgProc( HWND hDlg, UINT message, WPARAM wParam, LPARAM l
 					dValue = FONTSZ_NORMAL;
 					if( IsDlgButtonChecked( hDlg, IDRB_POPUP_REDUCE ) ){	dValue =  FONTSZ_REDUCE;	}
 					InitParamValue( INIT_SAVE, VL_MAATIP_SIZE, dValue );
-					dBuff = IsDlgButtonChecked( hDlg, IDCB_POPUP_VISIBLE );
-					AaItemsTipSizeChange( dValue, dBuff );
-					InitParamValue( INIT_SAVE, VL_MAATIP_VIEW, dBuff );
+					iBuff = IsDlgButtonChecked( hDlg, IDCB_POPUP_VISIBLE );
+					AaItemsTipSizeChange( dValue, iBuff );
+					InitParamValue( INIT_SAVE, VL_MAATIP_VIEW, iBuff );
 
 					//	右寄せ基準ドット
 					Edit_GetText( GetDlgItem(hDlg,IDE_RIGHTSLIDE_DOT), atBuff, SUB_STRING );
@@ -2443,15 +2522,15 @@ INT_PTR CALLBACK OptionDlgProc( HWND hDlg, UINT message, WPARAM wParam, LPARAM l
 					else{	dValue = MAA_INSERT;	}	//	IDRB_SEL_INS_EDIT
 					InitParamValue( INIT_SAVE, VL_MAA_LCLICK, dValue );
 
-					if( IsDlgButtonChecked( hDlg, IDRB_SELSUB_INTRPT_EDIT )   ){	dBuff = MAA_INTERRUPT;	}
-					else if( IsDlgButtonChecked( hDlg, IDRB_SELSUB_SET_LAYER ) ){	dBuff = MAA_LAYERED;	}
-					else if( IsDlgButtonChecked( hDlg, IDRB_SELSUB_CLIP_UNI ) ){	dBuff = MAA_UNICLIP;	}
-					else if( IsDlgButtonChecked( hDlg, IDRB_SELSUB_CLIP_SJIS ) ){	dBuff = MAA_SJISCLIP;	}
-					else if( IsDlgButtonChecked( hDlg, IDRB_SELSUB_DRAUGHT )  ){	dBuff = MAA_DRAUGHT;	}
-					else{	dBuff =  MAA_INSERT;	}	//	IDRB_SEL_INS_EDIT
-					InitParamValue( INIT_SAVE, VL_MAA_MCLICK, dBuff );
+					if( IsDlgButtonChecked( hDlg, IDRB_SELSUB_INTRPT_EDIT )   ){	iBuff = MAA_INTERRUPT;	}
+					else if( IsDlgButtonChecked( hDlg, IDRB_SELSUB_SET_LAYER ) ){	iBuff = MAA_LAYERED;	}
+					else if( IsDlgButtonChecked( hDlg, IDRB_SELSUB_CLIP_UNI ) ){	iBuff = MAA_UNICLIP;	}
+					else if( IsDlgButtonChecked( hDlg, IDRB_SELSUB_CLIP_SJIS ) ){	iBuff = MAA_SJISCLIP;	}
+					else if( IsDlgButtonChecked( hDlg, IDRB_SELSUB_DRAUGHT )  ){	iBuff = MAA_DRAUGHT;	}
+					else{	iBuff =  MAA_INSERT;	}	//	IDRB_SEL_INS_EDIT
+					InitParamValue( INIT_SAVE, VL_MAA_MCLICK, iBuff );
 
-					ViewMaaItemsModeSet( dValue, dBuff );	//	MAAにも設定おくる
+					ViewMaaItemsModeSet( dValue, iBuff );	//	MAAにも設定おくる
 
 					//	ドラフトボードの操作
 					if( IsDlgButtonChecked( hDlg, IDRB_DRT_INTRPT_EDIT )  ){	gdClickDrt = MAA_INTERRUPT;	}
@@ -2628,7 +2707,7 @@ HRESULT MultiFileTabSelect( LPARAM dNumber )
 {
 	INT	iRslt;
 
-	iRslt = MultiFileTabSearch( dNumber );
+	iRslt = MultiFileTabSearch( dNumber );	//	指定の通し番号をもったタブをさがす
 
 	if( 0 <= iRslt )
 	{
@@ -2722,11 +2801,11 @@ HRESULT MultiFileTabRename( LPARAM dNumber, LPTSTR ptName )
 */
 INT InitMultiFileTabOpen( UINT dMode, INT iTgt, LPTSTR ptFile )
 {
-	if( dMode )
+	if( dMode )	//	よびだし
 	{
 		return DocMultiFileFetch( iTgt, ptFile, gatIniPath );
 	}
-	else
+	else	//	セーブ
 	{
 		DocMultiFileStore( gatIniPath );
 	}
@@ -2759,6 +2838,38 @@ HRESULT MultiFileTabClose( VOID )
 		MultiFileTabSelect( dSele );
 	}
 
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+
+/*!
+	表示用フォントの名前を頂く
+*/
+HRESULT ViewingFontNameLoad( VOID )
+{
+	TCHAR	atName[LF_FACESIZE];
+
+	ZeroMemory( atName, sizeof(atName) );	//	デフォネーム
+	StringCchCopy( atName, LF_FACESIZE, TEXT("ＭＳ Ｐゴシック") );
+
+	InitParamString( INIT_LOAD, VS_FONT_NAME, atName );	//	ゲッツ！
+
+	StringCchCopy( gstBaseFont.lfFaceName, LF_FACESIZE, atName );
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+
+/*!
+	表示用フォントデータをコピーする
+	@param[in]	pstLogFont	データコピる構造体へのポインター
+*/
+HRESULT ViewingFontGet( LPLOGFONT pstLogFont )
+{
+	ZeroMemory( pstLogFont, sizeof(LOGFONT) );	//	念のため空白にする
+
+	*pstLogFont = gstBaseFont;
+	//	構造体はコピーでおｋ
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------

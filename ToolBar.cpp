@@ -21,6 +21,8 @@ If not, see <http://www.gnu.org/licenses/>.
 #include "OrinrinEditor.h"
 //-------------------------------------------------------------------------------------------------
 
+//-------------------------------------------------------------------------------------------------
+
 static  HWND	ghRebarWnd;		//!<	リバーのほうがいい？どうやって配置の再現を？
 
 static  HWND	ghMainTBWnd;	//!<	メインツールバーのウインドウハンドル
@@ -112,8 +114,17 @@ static TBBUTTON gstViewTBInfo[] = {
 	{  2, IDM_ON_PREVIEW,			TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,	0,	0 },	//	
 	{  3, IDM_DRAUGHT_OPEN,			TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,	0,	0 },	//	
 	{  4, IDM_MAA_THUMBNAIL_OPEN,	TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,	0,	0 } 	//	
-
 };
+
+//全体
+#define TB_BAND_COUNT	5
+static CONST REBARLAYOUTINFO	gcstReBarDef[] = {
+	{ 1002,  180, 132 },	//	メイン
+	{ 1007,  450, 132 },	//	編集
+	{ 1008,  280, 133 },	//	挿入
+	{ 1005,  310, 132 },	//	整形
+	{ 1006,  140, 132 } 	//	表示
+};	//	初期構成
 //-------------------------------------------------------------------------------------------------
 
 /*!
@@ -155,9 +166,10 @@ VOID ToolBarCreate( HWND hWnd, HINSTANCE lcInst )
 //	TBADDBITMAP	stToolBmp;
 	TCHAR	atBuff[MAX_STRING];
 
-	UINT			ici, resnum;
+	UINT			ici, resnum, d;
 	REBARINFO		stRbrInfo;
 	REBARBANDINFO	stRbandInfo;
+	REBARLAYOUTINFO	stInfo[TB_BAND_COUNT];
 
 	HBITMAP	hImg, hMsq;
 
@@ -170,16 +182,22 @@ VOID ToolBarCreate( HWND hWnd, HINSTANCE lcInst )
 	stRbrInfo.cbSize = sizeof(REBARINFO);
 	SendMessage( ghRebarWnd, RB_SETBARINFO, 0, (LPARAM)&stRbrInfo );
 
-	ZeroMemory( &stRbandInfo, sizeof(REBARBANDINFO) );
-	stRbandInfo.cbSize     = sizeof(REBARBANDINFO);
-	stRbandInfo.fMask      = RBBIM_TEXT | RBBIM_STYLE | RBBIM_CHILD | RBBIM_CHILDSIZE | RBBIM_SIZE | RBBIM_ID;
-	stRbandInfo.fStyle     = RBBS_CHILDEDGE | RBBS_GRIPPERALWAYS;
-	stRbandInfo.cxMinChild = 0;
-	stRbandInfo.cyMinChild = 25;
+	//	初期値
+	ZeroMemory( stInfo, sizeof(stInfo) );
+	for( d = 0; TB_BAND_COUNT > d; d++ )
+	{
+		stInfo[d].wID    = gcstReBarDef[d].wID;
+		stInfo[d].cx     = gcstReBarDef[d].cx;
+		stInfo[d].fStyle = gcstReBarDef[d].fStyle;
+	}
+	//	保存状態読込
+	InitToolBarLayout( INIT_LOAD, TB_BAND_COUNT, stInfo );
+	//	データ有れば書き換わる、なかったら初期値そのまま
+
 
 //メインツールバー
-	ghMainTBWnd = CreateWindowEx( 0, TOOLBARCLASSNAME, TEXT("toolbar"),
-		WS_CHILD | WS_VISIBLE | TBSTYLE_FLAT | TBSTYLE_LIST | TBSTYLE_TOOLTIPS | CCS_NORESIZE | CCS_NODIVIDER
+	ghMainTBWnd = CreateWindowEx( 0, TOOLBARCLASSNAME, TEXT("maintb"),
+		WS_CHILD | WS_VISIBLE | TBSTYLE_FLAT | TBSTYLE_LIST | TBSTYLE_TOOLTIPS | CCS_NOPARENTALIGN | CCS_NORESIZE | CCS_NODIVIDER
 		, 0, 0, 0, 0, ghRebarWnd, (HMENU)IDTB_MAIN_TOOLBAR, lcInst, NULL);
 	//	自動ツールチップスタイルを追加
 	SendMessage( ghMainTBWnd, TB_SETEXTENDEDSTYLE, 0, TBSTYLE_EX_MIXEDBUTTONS );
@@ -212,16 +230,11 @@ VOID ToolBarCreate( HWND hWnd, HINSTANCE lcInst )
 	//	ツールバーサブクラス化
 	gpfOrigTBProc = SubclassWindow( ghMainTBWnd, gpfToolbarProc );
 
-	stRbandInfo.lpText    = TEXT("ファイル");
-	stRbandInfo.wID       = IDTB_MAIN_TOOLBAR;
-	stRbandInfo.cx        = 180;
-	stRbandInfo.hwndChild = ghMainTBWnd;
-	SendMessage( ghRebarWnd, RB_INSERTBAND, (WPARAM)-1, (LPARAM)&stRbandInfo );
 
 
 //編集ツールバー
 	ghEditTBWnd = CreateWindowEx( 0, TOOLBARCLASSNAME, TEXT("edittb"),
-		WS_CHILD | WS_VISIBLE | TBSTYLE_FLAT | TBSTYLE_LIST | TBSTYLE_TOOLTIPS | CCS_NORESIZE | CCS_NODIVIDER
+		WS_CHILD | WS_VISIBLE | TBSTYLE_FLAT | TBSTYLE_LIST | TBSTYLE_TOOLTIPS | CCS_NOPARENTALIGN | CCS_NORESIZE | CCS_NODIVIDER
 		, 0, 0, 0, 0, ghRebarWnd, (HMENU)IDTB_EDIT_TOOLBAR, lcInst, NULL);
 	//	自動ツールチップスタイルを追加
 	SendMessage( ghEditTBWnd, TB_SETEXTENDEDSTYLE, 0, TBSTYLE_EX_MIXEDBUTTONS );
@@ -271,16 +284,10 @@ VOID ToolBarCreate( HWND hWnd, HINSTANCE lcInst )
 	//	ツールバーサブクラス化
 	gpfOrigTBProc = SubclassWindow( ghEditTBWnd, gpfToolbarProc );
 
-	stRbandInfo.lpText    = TEXT("編集");
-	stRbandInfo.wID       = IDTB_EDIT_TOOLBAR;
-	stRbandInfo.cx        = 450;
-	stRbandInfo.hwndChild = ghEditTBWnd;
-	SendMessage( ghRebarWnd, RB_INSERTBAND, (WPARAM)-1, (LPARAM)&stRbandInfo );
-
 
 //挿入ツールバー
 	ghInsertTBWnd = CreateWindowEx( 0, TOOLBARCLASSNAME, TEXT("inserttb"),
-		WS_CHILD | WS_VISIBLE | TBSTYLE_FLAT | TBSTYLE_LIST | TBSTYLE_TOOLTIPS | CCS_NORESIZE | CCS_NODIVIDER,
+		WS_CHILD | WS_VISIBLE | TBSTYLE_FLAT | TBSTYLE_LIST | TBSTYLE_TOOLTIPS | CCS_NOPARENTALIGN | CCS_NORESIZE | CCS_NODIVIDER,
 		0, 0, 0, 0, ghRebarWnd, (HMENU)IDTB_INSERT_TOOLBAR, lcInst, NULL);
 	//	自動ツールチップスタイルを追加	ドロップダウンメニューを有効にする
 	SendMessage( ghInsertTBWnd, TB_SETEXTENDEDSTYLE, 0, TBSTYLE_EX_MIXEDBUTTONS | TBSTYLE_EX_DRAWDDARROWS );
@@ -319,17 +326,10 @@ VOID ToolBarCreate( HWND hWnd, HINSTANCE lcInst )
 	//	ツールバーサブクラス化
 	gpfOrigTBProc = SubclassWindow( ghInsertTBWnd, gpfToolbarProc );
 
-	stRbandInfo.lpText    = TEXT("挿入");
-	stRbandInfo.wID       = IDTB_INSERT_TOOLBAR;
-	stRbandInfo.cx        = 280;
-	stRbandInfo.fStyle    = RBBS_BREAK;
-	stRbandInfo.hwndChild = ghInsertTBWnd;
-	SendMessage( ghRebarWnd, RB_INSERTBAND, (WPARAM)-1, (LPARAM)&stRbandInfo );
-
 
 //整形ツールバー
 	ghLayoutTBWnd = CreateWindowEx( 0, TOOLBARCLASSNAME, TEXT("layouttb"),
-		WS_CHILD | WS_VISIBLE | TBSTYLE_FLAT | TBSTYLE_LIST | TBSTYLE_TOOLTIPS | CCS_NORESIZE | CCS_NODIVIDER,
+		WS_CHILD | WS_VISIBLE | TBSTYLE_FLAT | TBSTYLE_LIST | TBSTYLE_TOOLTIPS | CCS_NOPARENTALIGN | CCS_NORESIZE | CCS_NODIVIDER,
 		0, 0, 0, 0, ghRebarWnd, (HMENU)IDTB_LAYOUT_TOOLBAR, lcInst, NULL);
 	//	自動ツールチップスタイルを追加
 	SendMessage( ghLayoutTBWnd, TB_SETEXTENDEDSTYLE, 0, TBSTYLE_EX_MIXEDBUTTONS );
@@ -370,17 +370,10 @@ VOID ToolBarCreate( HWND hWnd, HINSTANCE lcInst )
 	//	ツールバーサブクラス化
 	gpfOrigTBProc = SubclassWindow( ghLayoutTBWnd, gpfToolbarProc );
 
-	stRbandInfo.lpText    = TEXT("整形");
-	stRbandInfo.wID       = IDTB_LAYOUT_TOOLBAR;
-	stRbandInfo.cx        = 310;
-	stRbandInfo.fStyle    = 0;
-	stRbandInfo.hwndChild = ghLayoutTBWnd;
-	SendMessage( ghRebarWnd, RB_INSERTBAND, (WPARAM)-1, (LPARAM)&stRbandInfo );
-
 
 //表示ツールバー
 	ghViewTBWnd = CreateWindowEx( 0, TOOLBARCLASSNAME, TEXT("viewtb"),
-		WS_CHILD | WS_VISIBLE | TBSTYLE_FLAT | TBSTYLE_LIST | TBSTYLE_TOOLTIPS | CCS_NORESIZE | CCS_NODIVIDER,
+		WS_CHILD | WS_VISIBLE | TBSTYLE_FLAT | TBSTYLE_LIST | TBSTYLE_TOOLTIPS | CCS_NOPARENTALIGN | CCS_NORESIZE | CCS_NODIVIDER,
 		0, 0, 0, 0, ghRebarWnd, (HMENU)IDTB_VIEW_TOOLBAR, lcInst, NULL);
 	//	自動ツールチップスタイルを追加
 	SendMessage( ghViewTBWnd, TB_SETEXTENDEDSTYLE, 0, TBSTYLE_EX_MIXEDBUTTONS );
@@ -414,12 +407,52 @@ VOID ToolBarCreate( HWND hWnd, HINSTANCE lcInst )
 	//	ツールバーサブクラス化
 	gpfOrigTBProc = SubclassWindow( ghViewTBWnd, gpfToolbarProc );
 
-	stRbandInfo.lpText    = TEXT("表示");
-	stRbandInfo.wID       = IDTB_VIEW_TOOLBAR;
-	stRbandInfo.cx        = 140;
-	stRbandInfo.fStyle    = 0;
-	stRbandInfo.hwndChild = ghViewTBWnd;
-	SendMessage( ghRebarWnd, RB_INSERTBAND, (WPARAM)-1, (LPARAM)&stRbandInfo );
+
+	//配置
+	ZeroMemory( &stRbandInfo, sizeof(REBARBANDINFO) );
+	stRbandInfo.cbSize     = sizeof(REBARBANDINFO);
+	stRbandInfo.fMask      = RBBIM_TEXT | RBBIM_STYLE | RBBIM_CHILD | RBBIM_CHILDSIZE | RBBIM_SIZE | RBBIM_ID;
+	stRbandInfo.cxMinChild = 0;
+	stRbandInfo.cyMinChild = 25;
+
+	for( d = 0; TB_BAND_COUNT > d; d++ )
+	{
+		switch( stInfo[d].wID )
+		{
+			case IDTB_MAIN_TOOLBAR:
+				stRbandInfo.lpText    = TEXT("ファイル");
+				stRbandInfo.hwndChild = ghMainTBWnd;
+				break;
+
+			case IDTB_EDIT_TOOLBAR:
+				stRbandInfo.lpText    = TEXT("編集");
+				stRbandInfo.hwndChild = ghEditTBWnd;
+				break;
+
+			case IDTB_INSERT_TOOLBAR:
+				stRbandInfo.lpText    = TEXT("挿入");
+				stRbandInfo.hwndChild = ghInsertTBWnd;
+				break;
+
+			case IDTB_LAYOUT_TOOLBAR:
+				stRbandInfo.lpText    = TEXT("整形");
+				stRbandInfo.hwndChild = ghLayoutTBWnd;
+				break;
+
+			case IDTB_VIEW_TOOLBAR:
+				stRbandInfo.lpText    = TEXT("表示");
+				stRbandInfo.hwndChild = ghViewTBWnd;
+				break;
+
+			default:	continue;	break;
+		}
+
+		stRbandInfo.wID       = stInfo[d].wID;
+		stRbandInfo.cx        = stInfo[d].cx;
+		stRbandInfo.fStyle    = stInfo[d].fStyle;
+
+		SendMessage( ghRebarWnd, RB_INSERTBAND, (WPARAM)-1, (LPARAM)&stRbandInfo );
+	}
 
 	return;
 }
@@ -533,10 +566,16 @@ VOID ToolBarPseudoDropDown( HWND hWnd, INT itemID )
 */
 LRESULT ToolBarOnContextMenu( HWND hWnd, HWND hWndContext, LONG xPos, LONG yPos )
 {
+	HMENU	hPopupMenu;
+
 	if( ghRebarWnd != hWndContext ){	return 0;	}
 
 	TRACE( TEXT("REBAR CONTEXT[%d x %d]"), xPos, yPos );
 
+	hPopupMenu = CreatePopupMenu(  );
+	AppendMenu( hPopupMenu, MF_STRING, IDM_REBER_DORESET, TEXT("配置を初期状態に戻す") );
+	TrackPopupMenu( hPopupMenu, 0, xPos, yPos, 0, hWnd, NULL );
+	DestroyMenu( hPopupMenu );
 
 	return 1;
 }
@@ -566,6 +605,7 @@ LRESULT ToolBarOnNotify( HWND hWnd, INT idFrom, LPNMHDR pstNmhdr )
 			if( !( AppClientAreaCalc( &rect ) ) )	return 0;
 			ViewSizeMove( hWnd, &rect );
 			InvalidateRect( hWnd, NULL, TRUE );
+			InvalidateRect( ghRebarWnd, NULL, TRUE );
 		}
 	}
 
@@ -622,6 +662,70 @@ LRESULT ToolBarOnNotify( HWND hWnd, INT idFrom, LPNMHDR pstNmhdr )
 	}
 
 	return 1;
+}
+//-------------------------------------------------------------------------------------------------
+
+/*!
+	リバーの配置を元に戻す
+*/
+HRESULT ToolBarBandReset( HWND hWnd )
+{
+	INT		index;
+	UINT	d;
+	REBARBANDINFO	stRbandInfo;
+
+	TRACE( TEXT("REBAR RESET") );
+
+	ZeroMemory( &stRbandInfo, sizeof(REBARBANDINFO) );
+	stRbandInfo.cbSize = sizeof(REBARBANDINFO);
+	stRbandInfo.fMask  = RBBIM_STYLE | RBBIM_SIZE;
+
+	for( d = 0; TB_BAND_COUNT > d; d++ )
+	{
+		index = SendMessage( ghRebarWnd, RB_IDTOINDEX, gcstReBarDef[d].wID, 0 );
+		if( 0 > index ){	continue;	}
+
+		SendMessage( ghRebarWnd, RB_MOVEBAND, index, d );
+
+		stRbandInfo.cx     = gcstReBarDef[d].cx;
+		stRbandInfo.fStyle = gcstReBarDef[d].fStyle;
+		SendMessage( ghRebarWnd, RB_SETBANDINFO, (WPARAM)d, (LPARAM)&stRbandInfo );
+	}
+
+	InvalidateRect( ghRebarWnd, NULL, TRUE );
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+
+/*!
+	リバーの配置情報を確認する
+*/
+UINT ToolBarBandInfoGet( LPVOID pVoid )
+{
+	UINT	d;
+	REBARBANDINFO	stBandInfo;
+	REBARLAYOUTINFO	stInfo[TB_BAND_COUNT];
+
+	ZeroMemory( &stBandInfo, sizeof(REBARBANDINFO) );
+	stBandInfo.cbSize = sizeof(REBARBANDINFO);
+	stBandInfo.fMask = RBBIM_ID | RBBIM_STYLE | RBBIM_SIZE;
+
+	ZeroMemory( stInfo, sizeof(stInfo) );
+
+	for( d = 0; TB_BAND_COUNT > d; d++ )
+	{
+		SendMessage( ghRebarWnd, RB_GETBANDINFO, (WPARAM)d, (LPARAM)(&stBandInfo) );
+		TRACE( TEXT("ID[%u]  CX[%d]  STYLE[%u]"), stBandInfo.wID, stBandInfo.cx, stBandInfo.fStyle );
+
+		stInfo[d].wID    = stBandInfo.wID;
+		stInfo[d].cx     = stBandInfo.cx;
+		stInfo[d].fStyle = stBandInfo.fStyle;
+	}
+
+	InitToolBarLayout( INIT_SAVE, TB_BAND_COUNT, stInfo );	//	保存
+
+	return TB_BAND_COUNT;
 }
 //-------------------------------------------------------------------------------------------------
 

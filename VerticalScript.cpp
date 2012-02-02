@@ -45,8 +45,8 @@ If not, see <http://www.gnu.org/licenses/>.
 #ifdef VERTICAL_TEXT
 
 #define VERTSCRIPT_CLASS	TEXT("VERTSCRIPT_CLASS")
-#define VT_WIDTH	340
-#define VT_HEIGHT	280
+#define VT_WIDTH	320
+#define VT_HEIGHT	240
 
 #define VT_PARAMHEI	25
 
@@ -57,6 +57,17 @@ If not, see <http://www.gnu.org/licenses/>.
 
 #define VERTVIEW_CLASS	TEXT("VERTVIEW_CLASS")
 //-------------------------------------------------------------------------------------------------
+
+#define TB_ITEMS	5
+static  TBBUTTON	gstVttbInfo[] = {
+	{  0,	IDM_VLINE_DECIDE,		TBSTATE_ENABLED,	TBSTYLE_BUTTON | TBSTYLE_AUTOSIZE,	0,	0  },	//	
+	{  0,	0,						TBSTATE_ENABLED,	TBSTYLE_SEP,						0,	0  },
+	{  1,	IDM_VLINE_REFRESH,		TBSTATE_ENABLED,	TBSTYLE_BUTTON | TBSTYLE_AUTOSIZE,	0,	0  },	//	
+	{  2,	IDCB_VLINE_LEFT_GO,		TBSTATE_ENABLED,	TBSTYLE_CHECK | TBSTYLE_AUTOSIZE,	0,	0  },	//	
+	{  3,	IDM_VLINE_TRANSPARENT,	TBSTATE_ENABLED,	TBSTYLE_CHECK | TBSTYLE_AUTOSIZE,	0,	0  }	//	
+};	//	
+//-------------------------------------------------------------------------------------------------
+
 
 typedef struct tagVERTITEM
 {
@@ -84,12 +95,14 @@ extern  HWND		ghViewWnd;		//	編集ビューウインドウのハンドル
 extern INT			gdHideXdot;		//	左の隠れ部分
 extern INT			gdViewTopLine;	//	表示中の最上部行番号
 
+static  HWND		ghVertToolBar;	//!<	
+static HIMAGELIST	ghVertImgLst;	//!<	
 
 static  ATOM		gVertAtom;		//!<	
 EXTERNED HWND		ghVertWnd;		//!<	
 
 static  HWND		ghTextWnd;		//!<	文字列入力枠
-//static INT			gdToolBarHei;	//!<	ツールバー太さ
+static INT			gdToolBarHei;	//!<	ツールバー太さ
 
 static  ATOM		gVertViewAtom;
 static  HWND		ghVertViewWnd;	//!<	表示スタティック
@@ -101,9 +114,12 @@ static POINT		gstFrmSz;		//!<	ウインドウエッジから描画領域までのオフセット
 static INT			gdVertInterval;	//!<	行間隔ドット数・デフォを２２で
 static  UINT		gbLeftGo;		//!<	非０左から　０右から配置する
 
+static  UINT		gbSpTrans;		//!<	空白を　非０透過　０透過しない
+
 static LPTSTR		gptVtBuff;		//!<	テキスト枠から文字確保枠・可変
 static DWORD		gcchVtBuf;		//!<	確保枠の文字数・バイトじゃないぞ
 
+static BOOLEAN		gbQuickClose;	//!<	貼り付けたら直ぐ閉じる
 
 static  vector<VERTITEM>	gvcVertItem;
 typedef vector<VERTITEM>::iterator	VTIM_ITR;
@@ -138,6 +154,7 @@ HRESULT	VertScriptInsert( HWND );	//!<
 INT VertInitialise( LPTSTR ptCurrent, HINSTANCE hInstance )
 {
 	WNDCLASSEX	wcex;
+	HBITMAP		hImg, hMsq;
 
 	if( !(ptCurrent) || !(hInstance) )
 	{
@@ -168,8 +185,6 @@ INT VertInitialise( LPTSTR ptCurrent, HINSTANCE hInstance )
 
 	ghVertWnd = NULL;
 
-
-
 	ZeroMemory( &gstViewOrigin, sizeof(POINT) );
 
 
@@ -195,6 +210,29 @@ INT VertInitialise( LPTSTR ptCurrent, HINSTANCE hInstance )
 	ZeroMemory( gptVtBuff, MAX_PATH * sizeof(TCHAR) );
 	gcchVtBuf = MAX_PATH;
 
+	//	アイコン　確定・更新・左から・透過
+	ghVertImgLst = ImageList_Create( 16, 16, ILC_COLOR24 | ILC_MASK, 4, 1 );
+
+	hImg = LoadBitmap( hInstance, MAKEINTRESOURCE( IDBMP_MOZI_WRITE ) );	//	対象名前注意
+	hMsq = LoadBitmap( hInstance, MAKEINTRESOURCE( IDBMQ_PAGENAMECHANGE ) );
+	ImageList_Add( ghVertImgLst, hImg, hMsq );	//	確定
+	DeleteBitmap( hImg );	DeleteBitmap( hMsq );
+
+	hImg = LoadBitmap( hInstance, MAKEINTRESOURCE( IDBMP_REFRESH ) );
+	hMsq = LoadBitmap( hInstance, MAKEINTRESOURCE( IDBMQ_REFRESH ) );
+	ImageList_Add( ghVertImgLst, hImg, hMsq );	//	更新
+	DeleteBitmap( hImg );	DeleteBitmap( hMsq );
+
+	hImg = LoadBitmap( hInstance, MAKEINTRESOURCE( IDBMP_VERT_LEFT ) );
+	hMsq = LoadBitmap( hInstance, MAKEINTRESOURCE( IDBMQ_VERT_LEFT ) );
+	ImageList_Add( ghVertImgLst, hImg, hMsq );	//	左から
+	DeleteBitmap( hImg );	DeleteBitmap( hMsq );
+
+	hImg = LoadBitmap( hInstance, MAKEINTRESOURCE( IDBMP_VERT_TRANS ) );
+	hMsq = LoadBitmap( hInstance, MAKEINTRESOURCE( IDBMQ_VERT_TRANS ) );
+	ImageList_Add( ghVertImgLst, hImg, hMsq );	//	透過
+	DeleteBitmap( hImg );	DeleteBitmap( hMsq );
+
 
 	return 1;
 }
@@ -210,6 +248,7 @@ HWND VertScripterCreate( HINSTANCE hInst, HWND hPrWnd )
 	LONG	x, y;
 	HWND	hDktpWnd;
 	UINT	height;
+	TCHAR	atBuffer[MAX_STRING];
 	RECT	rect, vwRect, dtRect;
 
 	hDktpWnd = GetDesktopWindow(  );
@@ -231,28 +270,57 @@ HWND VertScripterCreate( HINSTANCE hInst, HWND hPrWnd )
 
 	gbLeftGo = 0;
 
+	gbSpTrans = 0;
+
+	gbQuickClose = 1;	//	初期状態で直ぐ閉じる
+
 	//	本体ウインドウ
 	ghVertWnd = CreateWindowEx( WS_EX_TOOLWINDOW | WS_EX_TOPMOST, VERTSCRIPT_CLASS,
 		TEXT("縦書き"), WS_POPUP | WS_CAPTION | WS_SYSMENU,
 		rect.right, rect.top, VT_WIDTH, VT_HEIGHT, NULL, NULL, hInst, NULL );
 
+	//	ツールバー
+	ghVertToolBar = CreateWindowEx( WS_EX_CLIENTEDGE, TOOLBARCLASSNAME, TEXT("verttoolbar"), WS_CHILD | WS_VISIBLE | TBSTYLE_FLAT | TBSTYLE_LIST | TBSTYLE_TOOLTIPS, 0, 0, 0, 0, ghVertWnd, (HMENU)IDTB_VLINE_TOOLBAR, hInst, NULL );
+
+	if( 0 == gdToolBarHei )	//	数値未取得なら
+	{
+		GetWindowRect( ghVertToolBar, &rect );
+		gdToolBarHei = rect.bottom - rect.top;
+	}
+
+	//	自動ツールチップスタイルを追加
+	SendMessage( ghVertToolBar, TB_SETEXTENDEDSTYLE, 0, TBSTYLE_EX_MIXEDBUTTONS );
+
+	SendMessage( ghVertToolBar, TB_SETIMAGELIST, 0, (LPARAM)ghVertImgLst );
+	SendMessage( ghVertToolBar, TB_SETBUTTONSIZE, 0, MAKELPARAM(16,16) );
+
+	SendMessage( ghVertToolBar, TB_BUTTONSTRUCTSIZE, (WPARAM)sizeof(TBBUTTON), 0 );
+
+	//	ツールチップ文字列を設定・ボタンテキストがツールチップになる
+	StringCchCopy( atBuffer, MAX_STRING, TEXT("文字列挿入") );	gstVttbInfo[0].iString = SendMessage( ghVertToolBar, TB_ADDSTRING, 0, (LPARAM)atBuffer );
+	StringCchCopy( atBuffer, MAX_STRING, TEXT("文字列更新") );	gstVttbInfo[2].iString = SendMessage( ghVertToolBar, TB_ADDSTRING, 0, (LPARAM)atBuffer );
+	StringCchCopy( atBuffer, MAX_STRING, TEXT("左から配置") );	gstVttbInfo[3].iString = SendMessage( ghVertToolBar, TB_ADDSTRING, 0, (LPARAM)atBuffer );
+	StringCchCopy( atBuffer, MAX_STRING, TEXT("空白を透過") );	gstVttbInfo[4].iString = SendMessage( ghVertToolBar, TB_ADDSTRING, 0, (LPARAM)atBuffer );
+
+	SendMessage( ghVertToolBar , TB_ADDBUTTONS, (WPARAM)TB_ITEMS, (LPARAM)&gstVttbInfo );	//	ツールバーにボタンを挿入
+
+	SendMessage( ghVertToolBar , TB_AUTOSIZE, 0, 0 );	//	ボタンのサイズに合わせてツールバーをリサイズ
+	InvalidateRect( ghVertToolBar , NULL, TRUE );		//	クライアント全体を再描画する命令
+
 	GetClientRect( ghVertWnd, &rect );
 
-	//	確定
-	CreateWindowEx( 0, WC_BUTTON, TEXT("確定"), WS_CHILD | WS_VISIBLE, 1, 0, 55, VT_PARAMHEI, ghVertWnd, (HMENU)IDM_VLINE_DECIDE, hInst, NULL );
-	//	更新
-	CreateWindowEx( 0, WC_BUTTON, TEXT("更新"), WS_CHILD | WS_VISIBLE, 57, 0, 55, VT_PARAMHEI, ghVertWnd, (HMENU)IDM_VLINE_REFRESH, hInst, NULL );
 	//	文字間STATIC
-	CreateWindowEx( 0, WC_STATIC, TEXT("行間"), WS_CHILD | WS_VISIBLE | SS_CENTERIMAGE | SS_RIGHT, 115, 0, 45, VT_PARAMHEI, ghVertWnd, (HMENU)IDS_VLINE_INTERVAL, hInst, NULL );
+	CreateWindowEx( 0, WC_STATIC, TEXT("行間"), WS_CHILD | WS_VISIBLE | SS_CENTERIMAGE | SS_RIGHT, 2, gdToolBarHei, 45, VT_PARAMHEI, ghVertWnd, (HMENU)IDS_VLINE_INTERVAL, hInst, NULL );
 	//	文字間EDIT
 	gdVertInterval = 22;
-	CreateWindowEx( 0, WC_EDIT, TEXT("22"), WS_CHILD | WS_VISIBLE | WS_BORDER | ES_READONLY, 162, 0, 50, VT_PARAMHEI, ghVertWnd, (HMENU)IDE_VLINE_INTERVAL, hInst, NULL );
+	CreateWindowEx( 0, WC_EDIT, TEXT("22"), WS_CHILD | WS_VISIBLE | WS_BORDER | ES_READONLY, 49, gdToolBarHei, 50, VT_PARAMHEI, ghVertWnd, (HMENU)IDE_VLINE_INTERVAL, hInst, NULL );
 	//	文字間SPIN
-	CreateWindowEx( 0, UPDOWN_CLASS, TEXT("intervalspin"), WS_CHILD | WS_VISIBLE | UDS_AUTOBUDDY, 212, 0, 10, VT_PARAMHEI, ghVertWnd, (HMENU)IDUD_VLINE_INTERVAL, hInst, NULL );
-	//	左からチェックボックス・チェック無しで右から
-	CreateWindowEx( 0, WC_BUTTON, TEXT("左から配置"), WS_CHILD | WS_VISIBLE | BS_AUTOCHECKBOX, 230, 0, 100, VT_PARAMHEI, ghVertWnd, (HMENU)IDCB_VLINE_LEFT_GO, hInst, NULL );
+	CreateWindowEx( 0, UPDOWN_CLASS, TEXT("intervalspin"), WS_CHILD | WS_VISIBLE | UDS_AUTOBUDDY, 99, gdToolBarHei, 10, VT_PARAMHEI, ghVertWnd, (HMENU)IDUD_VLINE_INTERVAL, hInst, NULL );
 
-	height = VT_PARAMHEI;
+	CreateWindowEx( 0, WC_BUTTON, TEXT("確定したら閉じる"), WS_CHILD | WS_VISIBLE | BS_AUTOCHECKBOX, 120, gdToolBarHei, 180, VT_PARAMHEI, ghVertWnd, (HMENU)IDCB_VLINE_QUICKCLOSE, hInst, NULL );
+	CheckDlgButton( ghVertWnd, IDCB_VLINE_QUICKCLOSE, gbQuickClose ? BST_CHECKED : BST_UNCHECKED );
+
+	height = gdToolBarHei + VT_PARAMHEI;
 
 	//文字列入力枠
 	ghTextWnd = CreateWindowEx( 0, WC_EDIT, TEXT(""), WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | WS_HSCROLL | ES_MULTILINE,
@@ -330,28 +398,41 @@ LRESULT CALLBACK VertProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam
 */
 VOID Vrt_OnCommand( HWND hWnd, INT id, HWND hWndCtl, UINT codeNotify )
 {
+	LRESULT	lRslt;
+
 	switch( id )
 	{
-		case IDM_VLINE_DECIDE:	VertScriptInsert( hWnd );	break;
+		case  IDM_VLINE_DECIDE:	//	確定
+			VertScriptInsert( hWnd );
+			if( gbQuickClose  ){	DestroyWindow( hWnd );	}	//	直ぐ閉じる？
+			break;
 
-		case IDM_VLINE_REFRESH:	VertTextAssemble( hWnd );	break;
+		case  IDM_VLINE_REFRESH:	VertTextAssemble( hWnd );	break;
 
-		case IDE_VLINE_TEXT:	//	文字入力枠・リヤルタイムでビューを書換
+		case  IDE_VLINE_TEXT:	//	文字入力枠・リヤルタイムでビューを書換
 			if( EN_UPDATE == codeNotify ){	VertTextAssemble( hWnd );	}
 			break;
 
-		case IDCB_VLINE_LEFT_GO:
-			if( BN_CLICKED == codeNotify )
-			{
-				if( IsDlgButtonChecked( hWnd , IDCB_VLINE_LEFT_GO ) ){	gbLeftGo = 1;	}
-				else{	gbLeftGo = 0;	}	//	チェキ状態を確認して書き直す
-				VertTextAssemble( hWnd );
-			}
+		case  IDCB_VLINE_LEFT_GO:	//	左から
+			lRslt = SendMessage( ghVertToolBar, TB_ISBUTTONCHECKED, IDCB_VLINE_LEFT_GO, 0 );
+			if( lRslt ){	gbLeftGo = 1;	}	//	左から
+			else{	gbLeftGo = 0;	}	//	チェキ状態を確認して書き直す
+			VertTextAssemble( hWnd );
 			break;
 
-		case IDM_PASTE:	TRACE( TEXT("VT PASTE") );	SendMessage( ghTextWnd, WM_PASTE, 0, 0 );	return;
-		case IDM_COPY:	SendMessage( ghTextWnd, WM_COPY,  0, 0 );	return;
-		case IDM_CUT:	SendMessage( ghTextWnd, WM_CUT,   0, 0 );	return;
+		case  IDM_VLINE_TRANSPARENT:	//	空白透過
+			lRslt = SendMessage( ghVertToolBar, TB_ISBUTTONCHECKED, IDM_VLINE_TRANSPARENT, 0 );
+			if( lRslt ){	gbSpTrans = 1;	}	//	透過する
+			else{	gbSpTrans = 0;	}	//	透過しない
+			break;
+
+		case  IDCB_VLINE_QUICKCLOSE:	//	直ぐ閉じる
+			gbQuickClose = IsDlgButtonChecked( hWnd, IDCB_VLINE_QUICKCLOSE ) ? TRUE : FALSE;
+			break;
+
+		case  IDM_PASTE:	TRACE( TEXT("VT PASTE") );	SendMessage( ghTextWnd, WM_PASTE, 0, 0 );	return;
+		case  IDM_COPY:		SendMessage( ghTextWnd, WM_COPY,  0, 0 );	return;
+		case  IDM_CUT:		SendMessage( ghTextWnd, WM_CUT,   0, 0 );	return;
 
 		default:	return;
 	}
@@ -886,8 +967,8 @@ HRESULT	VertScriptInsert( HWND hWnd )
 	//	レイヤの位置を変更
 	GetWindowRect( ghVertViewWnd, &rect );
 	LayerBoxPositionChange( hLyrWnd, (rect.left + gstFrmSz.x), (rect.top + gstFrmSz.y) );
-	//	空白を全部透過指定にする
-	LayerTransparentToggle( hLyrWnd, 1 );
+	//	設定によれば、空白を全部透過指定にする
+	if( gbSpTrans ){	LayerTransparentToggle( hLyrWnd, 1 );	}
 	//	上書きする
 	LayerContentsImportable( hLyrWnd, IDM_LYB_OVERRIDE, &iX, &iY, D_INVISI );
 	ViewPosResetCaret( iX, iY );	

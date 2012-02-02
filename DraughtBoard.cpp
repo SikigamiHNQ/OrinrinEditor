@@ -18,35 +18,15 @@ If not, see <http://www.gnu.org/licenses/>.
 //-------------------------------------------------------------------------------------------------
 
 /*
-Safariのリーディングリストみたいな機能。
-エフェクト合成のときとか、気になるAAをいくつか登録しておき、右クリとかで呼び出せるようにしておく。
-終わったらリセットとか、削除とか。
-MAAから取り込む、クリップボードから取り込む、とかできるといいかも。取り込みはドラッグドロップできない？
-使用するヤツをくっつける先は？クリップボード、レイヤボックスとか？
-MLT/ASTにエクスポート、みたいなことも出来ると良い。機能自体はオンメモリでいい。UseItLater的なもの。
-リストの中身の確認どうするか。なんとかしてサムネイル表示を？PNGにして表示とか？
-サムネは128x128くらいで。5x3に並べるとか。スクロールバーも考慮
-メニューにポップアップはできないのか
-Ctrl+Spaceでサムネイルウインドウ出したり閉じたり。選択して使える。MAAのほうでもなんか出来ない？
-右クリにはボード呼出とか、選択範囲をボードに追加とか？
-名称：DraughtBoard　ドラフトボードとかいいかも
-
-ボードからの仕様・エヂタに挿入、クルッペボード、レイヤボッキスあたりか
-
-記録形式どうするか。SQLiteかvector？　サムネールイメージをどうするかによって変わるか
-
-MAAのサムネ表示にも使うなら、スクロールバー考慮。呼出キーバインドも考える。Ctrl+Tとか？
-
 ツールチップの表示非表示と文字サイズはＭＡＡに従う
 */
 
 #include "stdafx.h"
 #include "OrinrinEditor.h"
+
+#include "MaaTemplate.h"
 //-------------------------------------------------------------------------------------------------
 
-//	TODO:	サムネがDCリソース食い過ぎか。非表示のは積極的にOFFるほうがよさそう
-//もしくはサムネサイズに縮小して保持するか
-//ＤＣまで要らない、ＢＭＰだけでいいかも
 
 #define DRAUGHT_BOARD_CLASS	TEXT("DRAUGHT_BOARD")
 
@@ -97,11 +77,11 @@ static  HWND	ghScrBarWnd;	//!<	サムネ用スクロールバァー
 static vector<AAMATRIX>	gvcDrtItems;	//!<	
 //-------------------------------------------------------------------------------------------------
 
-INT		DraughtTargetItemSet( LPPOINT );		//!<	
-DOUBLE	DraughtAspectKeeping( LPSIZE, UINT );	//!<	
-INT		DraughtItemDelete( CONST INT  );		//!<	
-HRESULT	DraughtItemUse( INT );					//!<	
-HRESULT	DraughtItemExport( HWND, LPTSTR );		//!<	
+INT		DraughtTargetItemSet( LPPOINT );				//!<	
+DOUBLE	DraughtAspectKeeping( LPSIZE, UINT );			//!<	
+INT		DraughtItemDelete( CONST INT  );				//!<	
+HRESULT	DraughtItemUse( HWND, INT );					//!<	
+HRESULT	DraughtItemExport( HWND, LPTSTR );				//!<	
 VOID	DraughtButtonUp( HWND, INT, INT, UINT, UINT );	//!<	
 
 LRESULT CALLBACK DraughtProc( HWND, UINT, WPARAM, LPARAM );
@@ -362,9 +342,9 @@ VOID Drt_OnCommand( HWND hWnd, INT id, HWND hWndCtl, UINT codeNotify )
 		case IDM_DRAUGHT_LAYERBOX:
 #endif
 		case IDM_DRAUGHT_UNICLIP:
-		case IDM_DRAUGHT_SJISCLIP:	DraughtItemUse( id );	DestroyWindow( hWnd );	break;
+		case IDM_DRAUGHT_SJISCLIP:	DraughtItemUse( hWnd , id );	DestroyWindow( hWnd );	break;
 
-		case IDM_THUMB_DRAUGHT_ADD:	DraughtItemUse( id );	break;	//	Draught追加なら閉じない方がいいだろう
+		case IDM_THUMB_DRAUGHT_ADD:	DraughtItemUse( hWnd , id );	break;	//	Draught追加なら閉じない方がいいだろう
 
 		case IDM_DRAUGHT_DELETE:	DraughtItemDelete( giTarget );	InvalidateRect( hWnd , NULL, TRUE );	break;
 
@@ -1038,8 +1018,11 @@ UINT DraughtAaImageing( LPAAMATRIX pstItem )
 
 /*!
 	Targetアイテムを使う・クルップボードへ・他に使いたいときは？
+	@param[in]	hWnd	ウインドウハンドル
+	@param[in]	id		動作モードＩＤ
+	@return		HRESULT	終了状態コード
 */
-HRESULT DraughtItemUse( INT id )
+HRESULT DraughtItemUse( HWND hWnd, INT id )
 {
 	LPSTR		pcAaItem;
 	INT_PTR		iItems, i, iOffset, iTarget;
@@ -1069,6 +1052,14 @@ HRESULT DraughtItemUse( INT id )
 		StringCchLengthA( pcAaItem, STRSAFE_MAX_CCH, &cbSize );
 
 		ViewMaaMaterialise( pcAaItem, cbSize, dMode );
+
+		if( id != IDM_THUMB_DRAUGHT_ADD )
+		{
+			//	ここでお気に入りに入れる・大丈夫か？
+			AaItemsFavUpload( pcAaItem, cbSize );
+			FavContsRedrawRequest( hWnd );
+		}
+
 		FREE(pcAaItem);
 	}
 	else
