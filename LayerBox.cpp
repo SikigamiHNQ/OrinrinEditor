@@ -943,7 +943,7 @@ HRESULT LayerTransparentToggle( HWND hWnd, UINT bMode )
 {
 	TCHAR	chb;
 	INT_PTR	iLines, iL;
-	LTR_ITR	itMozi;
+	LETR_ITR	itMozi;
 	LAYER_ITR	itLyr;
 
 	for( itLyr = gltLayer.begin(); itLyr != gltLayer.end(); itLyr++ )
@@ -991,7 +991,7 @@ INT LayerTransparentAdjust( LAYER_ITR itLyr, INT dNowDot, INT rdLine )
 	INT_PTR	i, iCount, iLines, iLetter;
 	INT		dDotCnt = 0, dPrvCnt = 0, rdWidth = 0;
 	TCHAR	ch, chb;
-	LTR_ITR	itMozi, itHead, itTail, itTemp;
+	LETR_ITR	itMozi, itHead, itTail, itTemp;
 
 
 	//	çsÇÃÇÕÇ›èoÇµÇÅH
@@ -1611,7 +1611,7 @@ HRESULT LayerContentsImportable( HWND hWnd, UINT cmdID, LPINT pXdot, LPINT pYlin
 
 	LAYER_ITR	itLyr;
 
-	LTR_ITR	itLtr, itDel;
+	LETR_ITR	itLtr, itDel;
 	wstring	wsBuff;
 
 	for( itLyr = gltLayer.begin(); itLyr != gltLayer.end(); itLyr++ )
@@ -1858,7 +1858,7 @@ HRESULT LayerContentsImportable( HWND hWnd, UINT cmdID, LPINT pXdot, LPINT pYlin
 HRESULT LayerForClipboard( HWND hWnd, UINT bStyle )
 {
 	INT_PTR	iLines, iL, cchSize, cbSize;
-	LTR_ITR	itMozi;
+	LETR_ITR	itMozi;
 
 	LAYER_ITR	itLyr;
 

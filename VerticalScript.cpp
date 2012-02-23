@@ -41,8 +41,7 @@ If not, see <http://www.gnu.org/licenses/>.
 確定・更新・透過・左から
 チェキボキスで終わったら閉じる
 */
-
-#ifdef VERTICAL_TEXT
+//-------------------------------------------------------------------------------------------------
 
 #define VERTSCRIPT_CLASS	TEXT("VERTSCRIPT_CLASS")
 #define VT_WIDTH	320
@@ -83,7 +82,7 @@ typedef struct tagVERTITEM
 //-------------------------------------------------------------------------------------------------
 
 extern FILES_ITR	gitFileIt;		//!<	今見てるファイルの本体
-#define gstFile	(*gitFileIt)		//!<	イテレータを構造体と見なす
+//#define gstFile	(*gitFileIt)		//!<	イテレータを構造体と見なす
 
 extern INT			gixFocusPage;	//	注目中のページ・０インデックス
 
@@ -1020,4 +1019,4 @@ HRESULT VertMoveFromView( HWND hWnd, UINT state )
 }
 //-------------------------------------------------------------------------------------------------
 
-#endif	//	VERTICAL_TEXT
+

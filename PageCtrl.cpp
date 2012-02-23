@@ -33,7 +33,6 @@ If not, see <http://www.gnu.org/licenses/>.
 //	ホイホイ共有していいのだらうか
 
 extern FILES_ITR	gitFileIt;	//!<	今見てるファイルの本体
-#define gstFile	(*gitFileIt)	//!<	イテレータを構造体と見なす
 
 extern INT		gixFocusPage;	//!<	注目中のページ・とりあえず０・０インデックス
 extern INT		gixDropPage;	//!<	投下ホット番号
@@ -672,7 +671,7 @@ LRESULT PageListNotify( HWND hWnd, LPNMLISTVIEW pstLv )
 			//	再描画せずともリヤルに変わる
 			if( 2 == lvClmn )
 			{
-				if( PAGE_BYTE_MAX < gstFile.vcCont.at( lvLine ).dByteSz )
+				if( PAGE_BYTE_MAX < (*gitFileIt).vcCont.at( lvLine ).dByteSz )
 					pstDraw->clrTextBk = 0x000000FF;
 				else
 					pstDraw->clrTextBk = 0xFF000000;
@@ -813,7 +812,7 @@ HRESULT PageListBuild( LPVOID pVoid )
 	stLvi.mask  = LVIF_TEXT;
 
 	i = 0;
-	for( itPage = gstFile.vcCont.begin(); itPage != gstFile.vcCont.end(); itPage++ )
+	for( itPage = (*gitFileIt).vcCont.begin(); itPage != (*gitFileIt).vcCont.end(); itPage++ )
 	{
 		stLvi.iItem    = i;
 		StringCchPrintf( atBuffer, MIN_STRING, TEXT("%u"), i + 1 );
@@ -830,7 +829,11 @@ HRESULT PageListBuild( LPVOID pVoid )
 		stLvi.iSubItem =  2;
 		ListView_SetItem( ghPageListWnd, &stLvi );
 
+#ifdef LINE_VEC_LIST
+		StringCchPrintf( atBuffer, MIN_STRING, TEXT("%u"), itPage->ltPage.size() );
+#else
 		StringCchPrintf( atBuffer, MIN_STRING, TEXT("%u"), itPage->vcPage.size() );
+#endif
 		stLvi.iSubItem =  3;
 		ListView_SetItem( ghPageListWnd, &stLvi );
 
@@ -866,8 +869,7 @@ HRESULT PageListSpinning( HWND hWnd, INT iPage, INT bDir )
 	TRACE( TEXT("頁移動処理[%d]"), iPage );
 
 	//	街頭位置までイテレータをもっていく
-	itPage = gstFile.vcCont.begin(  );
-	//for( i = 0; iPage > i; i++ ){	itPage++;	}
+	itPage = (*gitFileIt).vcCont.begin(  );
 	advance( itPage, iPage );
 
 	//	スワップ対象
@@ -957,13 +959,17 @@ HRESULT PageListViewRewrite( INT dPage )
 	StringCchPrintf( atBuffer, MIN_STRING, TEXT("%d"), dPage + 1 );
 	ListView_SetItemText( ghPageListWnd, dPage, 0, atBuffer );
 
-	ListView_SetItemText( ghPageListWnd, dPage, 1, gstFile.vcCont.at( dPage ).atPageName );
+	ListView_SetItemText( ghPageListWnd, dPage, 1, (*gitFileIt).vcCont.at( dPage ).atPageName );
 
-	dBytes = gstFile.vcCont.at( dPage ).dByteSz;
+	dBytes = (*gitFileIt).vcCont.at( dPage ).dByteSz;
 	StringCchPrintf( atBuffer, MIN_STRING, TEXT("%d"), dBytes );	//	byte
 	ListView_SetItemText( ghPageListWnd, dPage, 2, atBuffer );
 
-	dLines = gstFile.vcCont.at( dPage ).vcPage.size( );
+#ifdef LINE_VEC_LIST
+	dLines = (*gitFileIt).vcCont.at( dPage ).ltPage.size( );
+#else
+	dLines = (*gitFileIt).vcCont.at( dPage ).vcPage.size( );
+#endif
 	StringCchPrintf( atBuffer, MIN_STRING, TEXT("%d"), dLines );	//	line
 	ListView_SetItemText( ghPageListWnd, dPage, 3, atBuffer );
 
@@ -1015,14 +1021,14 @@ INT_PTR CALLBACK PageNameDlgProc( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 	{
 		case WM_INITDIALOG:
 			cdPage = lParam;
-			Edit_SetText( GetDlgItem(hDlg,IDE_PAGENAME), gstFile.vcCont.at( cdPage ).atPageName );
+			Edit_SetText( GetDlgItem(hDlg,IDE_PAGENAME), (*gitFileIt).vcCont.at( cdPage ).atPageName );
 			SetFocus( GetDlgItem(hDlg,IDE_PAGENAME) );
 			return (INT_PTR)FALSE;
 
 		case WM_COMMAND:
 			if( IDOK == LOWORD(wParam) )
 			{
-				Edit_GetText( GetDlgItem(hDlg,IDE_PAGENAME), gstFile.vcCont.at( cdPage ).atPageName, SUB_STRING );
+				Edit_GetText( GetDlgItem(hDlg,IDE_PAGENAME), (*gitFileIt).vcCont.at( cdPage ).atPageName, SUB_STRING );
 				EndDialog( hDlg, IDOK );
 				return (INT_PTR)TRUE;
 			}
@@ -1051,7 +1057,7 @@ HRESULT PageListNameChange( INT dPage )
 	iRslt = DialogBoxParam( ghInst, MAKEINTRESOURCE(IDD_PAGE_NAME_DLG), ghPageWnd, PageNameDlgProc, dPage );
 	if( IDOK == iRslt )
 	{
-		PageListNameSet( dPage, gstFile.vcCont.at( dPage ).atPageName );
+		PageListNameSet( dPage, (*gitFileIt).vcCont.at( dPage ).atPageName );
 		return S_OK;
 	}
 
@@ -1116,7 +1122,7 @@ HRESULT PageListDuplicate( HWND hWnd, INT iNowPage )
 
 	TRACE( TEXT("頁複製") );
 
-	//iTotal = gstFile.vcCont.size(  );
+	//iTotal = (*gitFileIt).vcCont.size(  );
 	//iNext = iNowPage + 1;	//	次の頁
 	//if( iTotal <= iNext ){	iNext =  -1;	}	//	全頁より多いなら末端指定
 
@@ -1124,11 +1130,19 @@ HRESULT PageListDuplicate( HWND hWnd, INT iNowPage )
 	PageListInsert( iNewPage  );	//	ページリストビューに追加
 
 	//	空の壱行が作られてるので、削除しておく
-	gstFile.vcCont.at( iNewPage ).vcPage.clear(  );
+#ifdef LINE_VEC_LIST
+	(*gitFileIt).vcCont.at( iNewPage ).ltPage.clear(  );
 
-	std::copy(	gstFile.vcCont.at( iNowPage ).vcPage.begin(),
-				gstFile.vcCont.at( iNowPage ).vcPage.end(),
-				back_inserter( gstFile.vcCont.at( iNewPage ).vcPage ) );
+	std::copy(	(*gitFileIt).vcCont.at( iNowPage ).ltPage.begin(),
+				(*gitFileIt).vcCont.at( iNowPage ).ltPage.end(),
+				back_inserter( (*gitFileIt).vcCont.at( iNewPage ).ltPage ) );
+#else
+	(*gitFileIt).vcCont.at( iNewPage ).vcPage.clear(  );
+
+	std::copy(	(*gitFileIt).vcCont.at( iNowPage ).vcPage.begin(),
+				(*gitFileIt).vcCont.at( iNowPage ).vcPage.end(),
+				back_inserter( (*gitFileIt).vcCont.at( iNewPage ).vcPage ) );
+#endif
 
 	return S_OK;
 }
@@ -1151,7 +1165,7 @@ HRESULT PageListCombine( HWND hWnd, INT iNowPage )
 
 	TRACE( TEXT("頁統合") );
 
-	iTotal = gstFile.vcCont.size(  );
+	iTotal = (*gitFileIt).vcCont.size(  );
 
 	//	頁数が足りないならナニもしない
 	if( 1 >= iTotal )	return E_ACCESSDENIED;
@@ -1161,14 +1175,22 @@ HRESULT PageListCombine( HWND hWnd, INT iNowPage )
 	if( iTotal <= iNext ){	return E_OUTOFMEMORY;	}	//	末端頁なら何もしない
 
 	//	区切りとして改行入れて
-	gstFile.vcCont.at( iNowPage ).vcPage.push_back( stLine );
+#ifdef LINE_VEC_LIST
+	(*gitFileIt).vcCont.at( iNowPage ).ltPage.push_back( stLine );
 
 	//	次の頁の全体をコピーしちゃう
-	std::copy(	gstFile.vcCont.at( iNext ).vcPage.begin(),
-				gstFile.vcCont.at( iNext ).vcPage.end(),
-				back_inserter( gstFile.vcCont.at( iNowPage ).vcPage ) );
+	std::copy(	(*gitFileIt).vcCont.at( iNext ).ltPage.begin(),
+				(*gitFileIt).vcCont.at( iNext ).ltPage.end(),
+				back_inserter( (*gitFileIt).vcCont.at( iNowPage ).ltPage ) );
+#else
+	(*gitFileIt).vcCont.at( iNowPage ).vcPage.push_back( stLine );
 
-	SqnFreeAll( &(gstFile.vcCont.at( iNowPage ).stUndoLog) );	//	アンドゥログ削除
+	//	次の頁の全体をコピーしちゃう
+	std::copy(	(*gitFileIt).vcCont.at( iNext ).vcPage.begin(),
+				(*gitFileIt).vcCont.at( iNext ).vcPage.end(),
+				back_inserter( (*gitFileIt).vcCont.at( iNowPage ).vcPage ) );
+#endif
+	SqnFreeAll( &((*gitFileIt).vcCont.at( iNowPage ).stUndoLog) );	//	アンドゥログ削除
 
 	DocPageDelete( iNext  );	//	次の頁は削除しちゃう
 
@@ -1243,35 +1265,37 @@ LRESULT Plv_OnNotify( HWND hWnd, INT idFrom, LPNMHDR pstNmhdr )
 	UINT_PTR		rdLength;
 	LPNMTTDISPINFO	pstDispInfo;
 
-
 	if( TTN_GETDISPINFO == pstNmhdr->code )	//	ツールチップの内容の問い合わせだったら
 	{
-		pstDispInfo = (LPNMTTDISPINFO)pstNmhdr;
-
-		ZeroMemory( &(pstDispInfo->szText), sizeof(pstDispInfo->szText) );
-		pstDispInfo->lpszText = NULL;
-
-		FREE( gptPgTipBuf );
-
-		if( !(gbPgTipView) ){	return 0;	}	//	非表示なら何もしないでおｋ
-
-		if( 0 > gixMouseSel ){	return 0;	}
-
-		//	該当ページから引っ張る
-		dBytes = DocAllTextGetAlloc( gixMouseSel, D_UNI, (LPVOID *)(&gptPgTipBuf), gitFileIt );
-
-		StringCchLength( gptPgTipBuf, STRSAFE_MAX_CCH, &rdLength );
-		if( 2 <= rdLength )
+		if( IDLV_PAGELISTVIEW == idFrom )
 		{
-			//	末端に余計な改行があるので消しておく
-			gptPgTipBuf[rdLength-1] = NULL;
-			gptPgTipBuf[rdLength-2] = NULL;
-			rdLength -= 2;
+			pstDispInfo = (LPNMTTDISPINFO)pstNmhdr;
+
+			ZeroMemory( &(pstDispInfo->szText), sizeof(pstDispInfo->szText) );
+			pstDispInfo->lpszText = NULL;
+
+			FREE( gptPgTipBuf );
+
+			if( !(gbPgTipView) ){	return 0;	}	//	非表示なら何もしないでおｋ
+
+			if( 0 > gixMouseSel ){	return 0;	}
+
+			//	該当ページから引っ張る
+			dBytes = DocAllTextGetAlloc( gixMouseSel, D_UNI, (LPVOID *)(&gptPgTipBuf), gitFileIt );
+
+			StringCchLength( gptPgTipBuf, STRSAFE_MAX_CCH, &rdLength );
+			if( 2 <= rdLength )
+			{
+				//	末端に余計な改行があるので消しておく
+				gptPgTipBuf[rdLength-1] = NULL;
+				gptPgTipBuf[rdLength-2] = NULL;
+				rdLength -= 2;
+			}
+
+			pstDispInfo->lpszText = gptPgTipBuf;
+
+			return 0;
 		}
-
-		pstDispInfo->lpszText = gptPgTipBuf;
-
-		return 0;
 	}
 
 //	TRACE( TEXT("%u"), pstNmhdr->code );

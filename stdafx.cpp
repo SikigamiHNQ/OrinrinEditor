@@ -65,6 +65,7 @@ LONG_PTR WndTagGet( HWND hWnd )
 //-------------------------------------------------------------------------------------------------
 
 /*!
+ファイルの拡張子を比較
 	@param[in]	adMozi	チェキりたいユニコード文字
 	@param[in]	adMozi	チェキりたいユニコード文字
 	@return		BOOLEAN	非０該当拡張子である　０違うか、拡張子が無い
@@ -504,4 +505,21 @@ INT_PTR MessageBoxCheckBox( HWND hWnd, HINSTANCE hInst, UINT dStyle )
 }
 //-------------------------------------------------------------------------------------------------
 
+#ifdef DO_TRY_CATCH
+/*!
+	例外きゃっち
+*/
+LRESULT ExceptionMessage( LPCSTR pcExpMsg, LPCSTR pcFuncName, UINT dLine, LPARAM lReturn )
+{
+	CHAR	acMessage[BIG_STRING];
+
+	StringCchPrintfA( acMessage, BIG_STRING, ("異常発生＜%s＞[%s:%u]\r\nプログラムを続行できません。"), pcExpMsg, pcFuncName, dLine );
+
+	MessageBoxA( GetDesktopWindow(), acMessage, ("致命的エラー発生"), MB_OK );
+
+	return lReturn;
+}
+//-------------------------------------------------------------------------------------------------
+
+#endif
 

@@ -997,41 +997,45 @@ LRESULT Ltl_OnNotify( HWND hWnd, INT idFrom, LPNMHDR pstNmhdr )
 	pstLv = (LPNMLISTVIEW)pstNmhdr;
 
 	//	リストビュー自体のプロシージャなので
-	hLvWnd = hWnd;//pstLv->hdr.hwndFrom;
+	hLvWnd = hWnd;		//pstLv->hdr.hwndFrom;<--ツールチップのハンドルになってるかもだ
 	nmCode = pstLv->hdr.code;
 
 	if( TTN_GETDISPINFO == nmCode )
 	{
-		ZeroMemory( &stHitTestInfo, sizeof(LVHITTESTINFO) );
-		GetCursorPos( &(stHitTestInfo.pt) );
-		ScreenToClient( hLvWnd, &(stHitTestInfo.pt) );
-		ListView_SubItemHitTest( hLvWnd, &stHitTestInfo );
-
-		iItem = stHitTestInfo.iItem;
-		iSubItem = stHitTestInfo.iSubItem;
-		iPos = iItem * gLnClmCnt + iSubItem;
-
-		TRACE( TEXT("LLvTT[%d]"), iPos );
-
-		pstDispInfo = (LPNMTTDISPINFO)pstNmhdr;
-
-		ZeroMemory( &(pstDispInfo->szText), sizeof(pstDispInfo->szText) );
-		pstDispInfo->lpszText = pstDispInfo->szText;
-
-		if( 0 < gvcTmples.size( ) )
+		TRACE( TEXT("LT_TOOL %u"), idFrom );
+		if( IDLV_LT_ITEMVIEW == idFrom )
 		{
-			items = gvcTmples.at( gNowGroup ).vcItems.size( );
+			ZeroMemory( &stHitTestInfo, sizeof(LVHITTESTINFO) );
+			GetCursorPos( &(stHitTestInfo.pt) );
+			ScreenToClient( hLvWnd, &(stHitTestInfo.pt) );
+			ListView_SubItemHitTest( hLvWnd, &stHitTestInfo );
 
-			if( 0 <= iPos && iPos <  items )	//	なんか選択した
+			iItem = stHitTestInfo.iItem;
+			iSubItem = stHitTestInfo.iSubItem;
+			iPos = iItem * gLnClmCnt + iSubItem;
+
+			TRACE( TEXT("LLvTT[%d]"), iPos );
+
+			pstDispInfo = (LPNMTTDISPINFO)pstNmhdr;
+
+			ZeroMemory( &(pstDispInfo->szText), sizeof(pstDispInfo->szText) );
+			pstDispInfo->lpszText = pstDispInfo->szText;
+
+			if( 0 < gvcTmples.size( ) )
 			{
-				StringCchCopy( atItem, SUB_STRING, gvcTmples.at( gNowGroup ).vcItems.at( iPos ).c_str( ) );
-				iDot = ViewStringWidthGet( atItem );
+				items = gvcTmples.at( gNowGroup ).vcItems.size( );
 
-				StringCchPrintf( pstDispInfo->szText, 80, TEXT("%s [%d Dot]"), atItem, iDot );
+				if( 0 <= iPos && iPos <  items )	//	なんか選択した
+				{
+					StringCchCopy( atItem, SUB_STRING, gvcTmples.at( gNowGroup ).vcItems.at( iPos ).c_str( ) );
+					iDot = ViewStringWidthGet( atItem );
+
+					StringCchPrintf( pstDispInfo->szText, 80, TEXT("%s [%d Dot]"), atItem, iDot );
+				}
 			}
-		}
 
-		return 0;
+			return 0;
+		}
 	}
 
 	return CallWindowProc( gpfOrigLineItemProc, hWnd, WM_NOTIFY, (WPARAM)idFrom, (LPARAM)pstNmhdr );

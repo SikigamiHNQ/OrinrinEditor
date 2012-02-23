@@ -99,7 +99,7 @@ typedef struct tagMOZIITEM
 
 
 extern FILES_ITR	gitFileIt;		//!<	今見てるファイルの本体
-#define gstFile	(*gitFileIt)		//!<	イテレータを構造体と見なす
+//#define gstFile	(*gitFileIt)		//!<	イテレータを構造体と見なす
 
 extern INT			gixFocusPage;	//	注目中のページ・０インデックス
 

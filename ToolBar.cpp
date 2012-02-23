@@ -23,21 +23,25 @@ If not, see <http://www.gnu.org/licenses/>.
 
 //-------------------------------------------------------------------------------------------------
 
-static  HWND	ghRebarWnd;		//!<	リバーのほうがいい？どうやって配置の再現を？
+static  HWND	ghRebarWnd;			//!<	リバーのほうがいい？どうやって配置の再現を？
 
-static  HWND	ghMainTBWnd;	//!<	メインツールバーのウインドウハンドル
-static  HWND	ghEditTBWnd;	//!<	編集ツールバーのウインドウハンドル
-static  HWND	ghInsertTBWnd;	//!<	挿入ツールバーのウインドウハンドル
-static  HWND	ghLayoutTBWnd;	//!<	整形ツールバーのウインドウハンドル
-static  HWND	ghViewTBWnd;	//!<	表示ツールバーのウインドウハンドル
+static  HWND	ghMainTBWnd;		//!<	メインツールバーのウインドウハンドル
+static  HWND	ghEditTBWnd;		//!<	編集ツールバーのウインドウハンドル
+static  HWND	ghInsertTBWnd;		//!<	挿入ツールバーのウインドウハンドル
+static  HWND	ghLayoutTBWnd;		//!<	整形ツールバーのウインドウハンドル
+static  HWND	ghViewTBWnd;		//!<	表示ツールバーのウインドウハンドル
 
-static HIMAGELIST	ghMainImgLst;
-static HIMAGELIST	ghEditImgLst;
-static HIMAGELIST	ghInsertImgLst;
-static HIMAGELIST	ghLayoutImgLst;
-static HIMAGELIST	ghViewImgLst;
+static HIMAGELIST	ghMainImgLst;	//!<	
+static HIMAGELIST	ghEditImgLst;	//!<	
+static HIMAGELIST	ghInsertImgLst;	//!<	
+static HIMAGELIST	ghLayoutImgLst;	//!<	
+static HIMAGELIST	ghViewImgLst;	//!<	
 
-static WNDPROC	gpfOrigTBProc;	//!<	
+static WNDPROC	gpfOrigTBProc;		//!<	
+
+#ifdef OPEN_HISTORY
+extern HMENU	ghHistyMenu;		//	履歴表示する部分・動的に内容作成せないかん
+#endif
 //-------------------------------------------------------------------------------------------------
 
 static LRESULT	CALLBACK gpfToolbarProc( HWND, UINT, WPARAM, LPARAM );
@@ -47,7 +51,7 @@ static LRESULT	CALLBACK gpfToolbarProc( HWND, UINT, WPARAM, LPARAM );
 #define TB_MAIN_ITEMS	5
 static TBBUTTON gstMainTBInfo[] = {
 	{  0,	IDM_NEWFILE,		TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,	0,	0 },	//	
-	{  1,	IDM_OPEN,			TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,	0,	0 },	//	
+	{  1,	IDM_OPEN,			TBSTATE_ENABLED,	TBSTYLE_DROPDOWN | TBSTYLE_AUTOSIZE,	0,	0 },	//	
 	{  2,	IDM_OVERWRITESAVE,	TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,	0,	0 },	//	
 	{  0,	0,					TBSTATE_ENABLED,	TBSTYLE_SEP,		0,	0 },
 	{  3,	IDM_GENERAL_OPTION,	TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,	0,	0 } 	//	
@@ -200,7 +204,7 @@ VOID ToolBarCreate( HWND hWnd, HINSTANCE lcInst )
 		WS_CHILD | WS_VISIBLE | TBSTYLE_FLAT | TBSTYLE_LIST | TBSTYLE_TOOLTIPS | CCS_NOPARENTALIGN | CCS_NORESIZE | CCS_NODIVIDER
 		, 0, 0, 0, 0, ghRebarWnd, (HMENU)IDTB_MAIN_TOOLBAR, lcInst, NULL);
 	//	自動ツールチップスタイルを追加
-	SendMessage( ghMainTBWnd, TB_SETEXTENDEDSTYLE, 0, TBSTYLE_EX_MIXEDBUTTONS );
+	SendMessage( ghMainTBWnd, TB_SETEXTENDEDSTYLE, 0, TBSTYLE_EX_MIXEDBUTTONS | TBSTYLE_EX_DRAWDDARROWS );
 
 	ghMainImgLst = ImageList_Create( 16, 16, ILC_COLOR24 | ILC_MASK, 4, 1 );
 	resnum = IDBMPQ_MAIN_TB_FIRST;
@@ -542,15 +546,28 @@ HRESULT ToolBarOnSize( HWND hWnd, UINT state, INT cx, INT cy )
 VOID ToolBarPseudoDropDown( HWND hWnd, INT itemID )
 {
 	NMTOOLBAR	stNmToolBar;
+	INT	iFrom;
+
 
 	ZeroMemory( &stNmToolBar, sizeof(NMTOOLBAR) );
 
-	stNmToolBar.hdr.hwndFrom = ghInsertTBWnd;
-	stNmToolBar.hdr.idFrom   = IDTB_INSERT_TOOLBAR;
+	switch( itemID )
+	{
+		case IDM_IN_UNI_SPACE:
+		case IDM_INSTAG_COLOUR:
+		case IDM_USERINS_NA:
+			stNmToolBar.hdr.hwndFrom = ghInsertTBWnd;
+			iFrom = IDTB_INSERT_TOOLBAR;
+			break;
+
+		default:	 return;	//	することはない
+	}
+
+	stNmToolBar.hdr.idFrom   = iFrom;
 	stNmToolBar.hdr.code     = TBN_DROPDOWN;
 	stNmToolBar.iItem        = itemID;
 
-	ToolBarOnNotify( hWnd, IDTB_INSERT_TOOLBAR, (LPNMHDR)(&stNmToolBar) );
+	ToolBarOnNotify( hWnd, iFrom, (LPNMHDR)(&stNmToolBar) );
 
 	return;
 }
@@ -609,8 +626,8 @@ LRESULT ToolBarOnNotify( HWND hWnd, INT idFrom, LPNMHDR pstNmhdr )
 		}
 	}
 
-	//	ツールバーのドロップダウンメニュー
-	if( IDTB_INSERT_TOOLBAR == idFrom && TBN_DROPDOWN == pstNmhdr->code )
+	//	ツールバーのドロップダウンメニュー	IDTB_INSERT_TOOLBAR == idFrom && 
+	if( TBN_DROPDOWN == pstNmhdr->code )
 	{
 		TRACE( TEXT("ドロップダウン発生") );
 		pstNmToolBar = (LPNMTOOLBAR)pstNmhdr;
@@ -631,6 +648,10 @@ LRESULT ToolBarOnNotify( HWND hWnd, INT idFrom, LPNMHDR pstNmhdr )
 
 		switch( iItem )
 		{
+			case IDM_OPEN:
+				TrackPopupMenuEx( ghHistyMenu, TPM_VERTICAL, rect.left, rect.bottom, hWnd, &stTpmParam );
+				break;
+
 			case IDM_IN_UNI_SPACE:
 				hPopupMenu = GetSubMenu( GetSubMenu(hMainMenu,2), 0 );
 				TrackPopupMenuEx( hPopupMenu, TPM_VERTICAL, rect.left, rect.bottom, hWnd, &stTpmParam );

@@ -21,8 +21,10 @@ If not, see <http://www.gnu.org/licenses/>.
 #include "OrinrinEditor.h"
 //-------------------------------------------------------------------------------------------------
 
+extern list<ONEFILE>	gltMultiFiles;	//!<	複数ファイル保持
+
 extern FILES_ITR	gitFileIt;	//!<	今見てるファイルの本体
-#define gstFile	(*gitFileIt)	//!<	イテレータを構造体と見なす
+//#define gstFile	(*gitFileIt)	//!<	イテレータを構造体と見なす
 
 extern INT		gixFocusPage;	//!<	注目中のページ・とりあえず０・０インデックス
 //-------------------------------------------------------------------------------------------------

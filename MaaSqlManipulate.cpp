@@ -85,7 +85,6 @@ HRESULT SqlDatabaseOpenClose( BYTE mode, LPCTSTR ptDbase )
 		rslt = sqlite3_open16( atDbPath, &gpDataBase );
 		if( SQLITE_OK != rslt ){	SQL_DEBUG( gpDataBase );	return E_FAIL;	}
 
-#ifdef MAA_PROFILE
 		if( 0 == StrCmp( atDbPath, TEXT(":memory:") ) )
 		{
 			StringCchCopy( atDbPath, MAX_PATH, TEXT("memory.qor") );
@@ -95,7 +94,6 @@ HRESULT SqlDatabaseOpenClose( BYTE mode, LPCTSTR ptDbase )
 		PathRemoveExtension( atDbPath );	//	拡張子を外す
 
 		SqlTreeTableCreate( atDbPath );	//	プロファイル名として渡す
-#endif
 	}
 	else if( M_DESTROY == mode )
 	{
@@ -113,99 +111,6 @@ HRESULT SqlDatabaseOpenClose( BYTE mode, LPCTSTR ptDbase )
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-
-#ifndef MAA_PROFILE
-/*!
-	テーブルの存在を確認して、なかったら作成。有るところに作ろうとするとエラーなる
-	@param[in]	pVoid	なにか
-	@return		HRESULT	終了状態コード
-*/
-HRESULT SqlFavTableCreate( LPVOID pVoid )
-{
-	//	AA情報
-	CONST CHAR	cacArtListTable[]  = { ("CREATE TABLE ArtList ( id INTEGER PRIMARY KEY, count INTEGER NOT NULL, folder TEXT NOT NULL, lastuse  REAL NOT NULL, hash INTEGER NOT NULL, conts BLOB NOT NULL )") };
-
-
-	CHAR	acBuildVer[SUB_STRING], acText[MAX_PATH];
-	SYSTEMTIME	stSysTime;
-
-	BYTE	yMode = FALSE;	//	Tableあったとかなかったとか
-	INT		rslt;
-#ifdef _DEBUG
-	INT		i;
-#endif
-	sqlite3_stmt	*statement;
-
-	ZeroMemory( acText, sizeof(acText) );
-
-	//	テーブルの存在を確認する
-	rslt = sqlite3_prepare( gpDataBase, cacDetectTable, -1, &statement, NULL );
-	if( SQLITE_OK != rslt ){	SQL_DEBUG( gpDataBase );	return E_ACCESSDENIED;	}
-
-	rslt = sqlite3_step( statement );
-	if( SQLITE_ROW == rslt )
-	{
-#ifdef _DEBUG
-		for( i = 0; 10 > i; i++ )
-		{
-			StringCchPrintfA( acText, MAX_PATH, ("%s (%u)\r\n"), (LPCSTR)sqlite3_column_text( statement, 0 ), __LINE__ );
-			OutputDebugStringA( acText );
-			rslt = sqlite3_step( statement );
-			if( SQLITE_DONE == rslt ){	break;	}
-		}
-#endif
-		rslt = sqlite3_finalize( statement );
-		yMode = TRUE;
-	}
-	//	まず、てーぶりょが有るか無いかについて
-
-	if( !yMode )
-	{
-#ifdef _DEBUG
-		OutputDebugString( TEXT("テーブルが見つからなかった\r\n") );
-#endif
-		rslt = sqlite3_finalize( statement );	//	どっちにしても解除
-
-
-		//VERSION番号テーブル作成＜表には出ない
-		//	テーブルを作成
-		rslt = sqlite3_prepare( gpDataBase, cacVersionTable, -1, &statement, NULL );
-		if( SQLITE_OK != rslt ){	SQL_DEBUG( gpDataBase );	return E_ACCESSDENIED;	}
-
-		rslt = sqlite3_step( statement );	//	実行
-		if( SQLITE_DONE != rslt ){	SQL_DEBUG( gpDataBase );	return E_ACCESSDENIED;	}
-
-		rslt = sqlite3_finalize(statement);
-
-		//	内容を作成
-		GetLocalTime( &stSysTime );
-		StringCchPrintfA( acBuildVer, SUB_STRING, ("%d.%02d%02d.%02d%02d.%d"), stSysTime.wYear, stSysTime.wMonth, stSysTime.wDay, stSysTime.wHour, stSysTime.wMinute, TABLE_VER );
-		StringCchPrintfA( acText, MAX_PATH, cacVerStrInsFmt, TABLE_VER, acBuildVer );
-		//	初期データぶち込む
-		rslt = sqlite3_prepare( gpDataBase, acText, -1, &statement, NULL );
-		if( SQLITE_OK != rslt ){	SQL_DEBUG( gpDataBase );	return E_ACCESSDENIED;	}
-
-		sqlite3_reset( statement );
-		rslt = sqlite3_step( statement );
-		sqlite3_finalize(statement);
-
-		//AAテーブルを生成
-		rslt = sqlite3_prepare( gpDataBase, cacArtListTable, -1, &statement, NULL );
-		if( SQLITE_OK != rslt ){	SQL_DEBUG( gpDataBase );	return E_ACCESSDENIED;	}
-
-		rslt = sqlite3_step( statement );	//	実行
-		if( SQLITE_DONE != rslt ){	SQL_DEBUG( gpDataBase );	return E_ACCESSDENIED;	}
-
-		rslt = sqlite3_finalize(statement);
-	}
-
-	return S_OK;
-}
-//-------------------------------------------------------------------------------------------------
-#endif
-
-
-
 
 /*!
 	登録されている個数とID最大値確保・ディレクトリ毎か全体ＯＫ
@@ -521,8 +426,6 @@ HRESULT SqlFavFolderDelete( LPTSTR ptBaseName )
 
 
 
-
-#ifdef MAA_PROFILE
 
 #if 0
 /*!
@@ -1366,8 +1269,4 @@ HRESULT SqlMultiTabDelete( VOID )
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-
-#endif	//	MAA_PROFILE
-
-
 

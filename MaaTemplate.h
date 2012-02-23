@@ -91,20 +91,23 @@ VOID		AaTitleClear( VOID );
 INT			AaTitleAddString( UINT, LPSTR );
 VOID		AaTitleSelect( HWND, UINT );
 
+VOID		Aai_OnKey( HWND, UINT, BOOL, INT, UINT );
 VOID		Aai_OnVScroll( HWND , HWND, UINT, INT );	//!<	
 
 DWORD		AacAssembleFile( HWND, LPTSTR );	//!<	
 HRESULT		AacMatrixClear( VOID  );			//!<	
 DWORD		AacAssembleSql( HWND, LPCTSTR );	//!<	
 
+#ifdef OPEN_PROFILE
+HRESULT		OpenProfileLoad( HWND, INT );	//!<	
+HRESULT		OpenProfileLogging( HWND, LPCTSTR );	//!<	
+#endif
+
 #ifndef _ORRVW
 HRESULT		AacItemAdding( HWND, LPTSTR );
 #endif
 
 HRESULT		SqlDatabaseOpenClose( BYTE, LPCTSTR );	//!<	
-#ifndef MAA_PROFILE
-HRESULT		SqlFavTableCreate( LPVOID );		//!<	
-#endif
 
 HRESULT		SqlFavFolderEnum( BUFFERBACK );	//!<	
 UINT		SqlFavCount( LPCTSTR, PUINT );	//!<	
@@ -112,8 +115,6 @@ HRESULT		SqlFavArtEnum( LPCTSTR, BUFFERBACK );	//!<
 HRESULT		SqlFavUpload( LPTSTR, DWORD, LPSTR, UINT );	//!<	
 HRESULT		SqlFavDelete( LPTSTR, DWORD );	//!<	
 HRESULT		SqlFavFolderDelete( LPTSTR );	//!<	
-
-#ifdef MAA_PROFILE
 
 INT			TreeProfileMake( HWND, LPTSTR );
 INT			TreeProfileOpen( HWND );
@@ -152,6 +153,5 @@ UINT		SqlMultiTabInsert( LPTSTR, LPTSTR );
 UINT		SqlMultiTabSelect( INT, LPTSTR, LPTSTR );
 HRESULT		SqlMultiTabDelete( VOID );
 
-#endif
 
 

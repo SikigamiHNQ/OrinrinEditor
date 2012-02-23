@@ -45,23 +45,24 @@ IDC_ORINRINEDITOR MENU
 BEGIN
     POPUP "ファイル(&F)"
     BEGIN
-        MENUITEM "新規作成(&N)\tCtrl + N",          IDM_NEWFILE
-        MENUITEM "ファイル開く(&O)\tCtrl + O",        IDM_OPEN
+        MENUITEM "新規作成(&N)\tCtrl + N",		IDM_NEWFILE
+        MENUITEM "ファイル開く(&O)\tCtrl + O",	IDM_OPEN
+		MENUITEM "ファイル使用履歴(&H)",		IDM_OPEN_HISTORY
         MENUITEM SEPARATOR
-        MENUITEM "上書き保存(&S)\tCtrl + S",         IDM_OVERWRITESAVE
-        MENUITEM "名前を付けて保存(&M)\tCtrl + Alt + S", IDM_RENAMESAVE
-        MENUITEM "現在頁を画像にして保存(&I)",             IDM_IMAGE_SAVE
+        MENUITEM "上書き保存(&S)\tCtrl + S",				IDM_OVERWRITESAVE
+        MENUITEM "名前を付けて保存(&M)\tCtrl + Alt + S",	IDM_RENAMESAVE
+        MENUITEM "現在頁を画像にして保存(&I)",				IDM_IMAGE_SAVE
         MENUITEM SEPARATOR
-        MENUITEM "ファイルを閉じる(&C)\tCtrl + F4",     IDM_FILE_CLOSE
+        MENUITEM "ファイルを閉じる(&C)\tCtrl + F4",	IDM_FILE_CLOSE
         MENUITEM SEPARATOR
-        MENUITEM "一般設定(&G)",                    IDM_GENERAL_OPTION
-        MENUITEM "右クリックメニュー編集",                 IDM_MENUEDIT_DLG_OPEN
-        MENUITEM "AA一覧ツリーを再構築(&T)",             IDM_TREE_RECONSTRUCT
-        MENUITEM "編集エリアの配色編集",                  IDM_COLOUR_EDIT_OPEN
+        MENUITEM "一般設定(&G)",				IDM_GENERAL_OPTION
+        MENUITEM "右クリックメニュー編集",		IDM_MENUEDIT_DLG_OPEN
+        MENUITEM "AA一覧ツリーを再構築(&T)",	IDM_TREE_RECONSTRUCT
+        MENUITEM "編集エリアの配色編集",		IDM_COLOUR_EDIT_OPEN
         MENUITEM SEPARATOR
-        MENUITEM "バージョン情報(&A)",                 IDM_ABOUT
+        MENUITEM "バージョン情報(&A)",			IDM_ABOUT
         MENUITEM SEPARATOR
-        MENUITEM "終了(&Q)",                      IDM_EXIT
+        MENUITEM "終了(&Q)",					IDM_EXIT
     END
     POPUP "編集(&E)"
     BEGIN
@@ -230,16 +231,18 @@ IDM_AATREE_POPUP MENU
 BEGIN
     POPUP "複数行テンプレツリーのアレ"
     BEGIN
-        MENUITEM "プロファイル作成／開く(&N)",             IDM_MAA_PROFILE_MAKE
-        MENUITEM "AA一覧ツリーを再構築(&T)",             IDM_TREE_RECONSTRUCT
-        MENUITEM "ファイル名で検索(&F)",                IDM_FINDMAA_DLG_OPEN
+        MENUITEM "プロファイル作成／開く(&N)",	IDM_MAA_PROFILE_MAKE
+        MENUITEM "AA一覧ツリーを再構築(&T)",	IDM_TREE_RECONSTRUCT
+		MENUITEM "プロファイル使用履歴(&H)",	IDM_OPEN_HISTORY
         MENUITEM SEPARATOR
-        MENUITEM "（名称未設定）",                     IDM_DUMMY, GRAYED
-        MENUITEM "主タブで開く(&M)",                  IDM_AATREE_MAINOPEN
-        MENUITEM "副タブを追加(&S)",                  IDM_AATREE_SUBADD
-        MENUITEM "編集ビューに開く(&E)",                IDM_AATREE_GOEDIT
+        MENUITEM "ファイル名で検索(&F)",		IDM_FINDMAA_DLG_OPEN
         MENUITEM SEPARATOR
-        MENUITEM "アイテム追加(&A)",                  IDM_MAA_IADD_OPEN
+        MENUITEM "（名称未設定）",			IDM_DUMMY, GRAYED
+        MENUITEM "主タブで開く(&M)",		IDM_AATREE_MAINOPEN
+        MENUITEM "副タブを追加(&S)",		IDM_AATREE_SUBADD
+        MENUITEM "編集ビューに開く(&E)",	IDM_AATREE_GOEDIT
+        MENUITEM SEPARATOR
+        MENUITEM "アイテム追加(&A)",		IDM_MAA_IADD_OPEN
     END
 END
 
@@ -380,7 +383,7 @@ CAPTION "バージョン情報 - Orinrin Editor"
 FONT 9, "MS UI Gothic"
 BEGIN
     ICON            IDI_ORINRINEDITOR,IDC_MYICON,6,6,20,20
-    LTEXT           "Orinrin Editor, Version 0.28 Aurora (2012.202.2200.920)",IDC_STATIC,36,6,168,8,SS_NOPREFIX
+    LTEXT           "Orinrin Editor, Version 0.28 Aurora (2012.222.2200.920)",IDC_STATIC,36,6,168,8,SS_NOPREFIX
     LTEXT           "Copyright (C) 2011 - 2012 SikigamiHNQ",IDC_STATIC,36,18,168,8
     LTEXT           "Site ： お燐ちゃんは俺の嫁．ｃｏｍ",IDC_STATIC,36,30,168,8
     DEFPUSHBUTTON   "OK",IDOK,84,180,48,12,WS_GROUP
@@ -795,7 +798,7 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 2012,202,2200,920
+ FILEVERSION 2012,222,2200,920
  PRODUCTVERSION 0,28,0,920
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
@@ -821,7 +824,7 @@ BEGIN
             VALUE "LegalTrademarks", "License : GPLv3"
             VALUE "PrivateBuild", "Build by Visual C++ 2008 Express"
             VALUE "SpecialBuild", "Not Speciality"
-            VALUE "FileVersion", "2012.202.2200.920"
+            VALUE "FileVersion", "2012.222.2200.920"
             VALUE "ProductVersion", "0.28.0.920"
             VALUE "FileDescription", "AsciiArt Story Editor by Orinrin!"
             VALUE "OriginalFilename", "OrinrinEditor.exe"

@@ -28,12 +28,12 @@ If not, see <http://www.gnu.org/licenses/>.
 
 extern list<ONEFILE>	gltMultiFiles;	//!<	複数ファイル保持
 
-extern FILES_ITR	gitFileIt;	//!<	今見てるファイルの本体
-#define gstFile	(*gitFileIt)	//!<	イテレータを構造体と見なす
+extern FILES_ITR	gitFileIt;		//!<	今見てるファイルの本体
+//#define gstFile	(*gitFileIt)	//!<	イテレータを構造体と見なす
 
 extern INT		gixFocusPage;		//!<	注目中のページ・とりあえず０・０インデックス
 
-extern  UINT	gbAutoBUmsg;	//	自動バックアップメッセージ出すか？
+extern  UINT	gbAutoBUmsg;		//	自動バックアップメッセージ出すか？
 
 static TCHAR	gatBackUpDirty[MAX_PATH];
 
@@ -42,6 +42,26 @@ static TCHAR	gatBackUpDirty[MAX_PATH];
 INT	DocAstSeparatorGetAlloc( INT, UINT, LPVOID *, FILES_ITR );
 
 INT	DocUnicode2UTF8( LPVOID * );
+//-------------------------------------------------------------------------------------------------
+
+
+/*!
+	該当するファイルは開き済か
+	@param[in]	ptFile	確認したいファイル名
+	@return	UINT	負：無し　１以上：ヒットしたやつのUNIQUE番号
+*/
+LPARAM DocOpendFileCheck( LPTSTR ptFile )
+{
+	FILES_ITR	itFile;
+
+	for( itFile = gltMultiFiles.begin(); gltMultiFiles.end() != itFile; itFile++ )
+	{
+		//	ヒットしたらそれでおｋ
+		if( !( StrCmp( itFile->atFileName, ptFile ) ) ){	return  itFile->dUnique;	}
+	}
+
+	return -1;
+}
 //-------------------------------------------------------------------------------------------------
 
 /*!
@@ -53,7 +73,7 @@ HRESULT DocFileOpen( HWND hWnd )
 {
 	OPENFILENAME	stOpenFile;
 	BOOLEAN	bOpened;
-	LPARAM	dNumber;
+//	LPARAM	dNumber;
 	TCHAR	atFilePath[MAX_PATH], atFileName[MAX_STRING];
 
 
@@ -82,16 +102,51 @@ HRESULT DocFileOpen( HWND hWnd )
 
 	if( !(bOpened) ){	return  E_ABORT;	}	//	キャンセルしてたら何もしない
 
-	dNumber = DocFileInflate( atFilePath );	//	開いて中身展開
-	if( !(dNumber) )
-	{
-		MessageBox( hWnd, TEXT("ファイルを開けなかったかしらー！？"), NULL, MB_OK | MB_ICONERROR );
-	}
-	else{	MultiFileTabAppend( dNumber, atFilePath );	}
+	DocDoOpenFile( hWnd, atFilePath );	//	開いて中身展開
+//	dNumber = DocFileInflate( atFilePath );	//	開いて中身展開
+//	if( !(dNumber) )
+//	{
+//		MessageBox( hWnd, TEXT("ファイルを開けなかったかしらー！？"), NULL, MB_OK | MB_ICONERROR );
+//	}
+//	else
+//	{
+//		MultiFileTabAppend( dNumber, atFilePath );	//	ダイヤログからファイルオーポン
+//#ifdef OPEN_HISTORY
+//		OpenHistoryLogging( hWnd , atFilePath );	//	ファイルオーポン記録を追加
+//#endif
+//	}
 
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
+
+/*!
+	ファイル名を受けて、オーポン処理する
+	@param[in]	ptFile	開くファイルフルパス
+	@return	HRESULT	終了状態コード
+*/
+HRESULT DocDoOpenFile( HWND hWnd, LPTSTR ptFile )
+{
+	LPARAM	dNumber;
+
+	dNumber = DocFileInflate( ptFile );	//	開いて中身展開
+	if( !(dNumber) )
+	{
+		MessageBox( hWnd, TEXT("ファイルを開けなかったかしらー！？"), NULL, MB_OK | MB_ICONERROR );
+		return E_HANDLE;
+	}
+	else
+	{
+		MultiFileTabAppend( dNumber, ptFile );	//	ダイヤログからファイルオーポン
+#ifdef OPEN_HISTORY
+		OpenHistoryLogging( hWnd , ptFile );	//	ファイルオーポン記録を追加
+#endif
+	}
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+
 
 /*!
 	バックアップディレクトリーを確保
@@ -308,7 +363,7 @@ HRESULT DocFileSave( HWND hWnd, UINT bStyle )
 
 	//	保存時は常に選択しているファイルを保存
 
-	iPages = gstFile.vcCont.size( );	//	総頁数
+	iPages = (*gitFileIt).vcCont.size( );	//	総頁数
 	if( 1 >= iPages )	isMLT = FALSE;
 	else				isMLT = TRUE;
 
@@ -322,10 +377,10 @@ HRESULT DocFileSave( HWND hWnd, UINT bStyle )
 
 	GetLocalTime( &stSysTile );
 
-	StringCchCopy( atFilePath, MAX_PATH, gstFile.atFileName );
+	StringCchCopy( atFilePath, MAX_PATH, (*gitFileIt).atFileName );
 
 	//	リネームか、ファイル名が無かったら保存ダイヤログ開く
-	if( (bStyle & D_RENAME) || NULL == gstFile.atFileName[0] )
+	if( (bStyle & D_RENAME) || NULL == (*gitFileIt).atFileName[0] )
 	{
 
 		//ここで FileSaveDialogue を出す
@@ -356,7 +411,7 @@ HRESULT DocFileSave( HWND hWnd, UINT bStyle )
 
 		if( bUnic || bUtf8 )
 		{	//	名無しのままエクスポートしようとしてたら無効
-			if( NULL == gstFile.atFileName[0] )
+			if( NULL == (*gitFileIt).atFileName[0] )
 			{
 				MessageBox( hWnd, TEXT("先に通常の保存をしておいて欲しいのです。"), NULL, MB_OK | MB_ICONINFORMATION );
 				return E_FAIL;
@@ -410,7 +465,7 @@ HRESULT DocFileSave( HWND hWnd, UINT bStyle )
 	//	同じ名前のファイルがあれば、ってことで
 
 	//	オリジナルファイル名に注意
-	if( !(bUnic) &&  !(bUtf8) ){	StringCchCopy( gstFile.atFileName, MAX_PATH, atFilePath );	}
+	if( !(bUnic) &&  !(bUtf8) ){	StringCchCopy( (*gitFileIt).atFileName, MAX_PATH, atFilePath );	}
 
 	hFile = CreateFile( atFilePath, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL );
 	if( INVALID_HANDLE_VALUE == hFile )
@@ -495,8 +550,8 @@ HRESULT DocFileSave( HWND hWnd, UINT bStyle )
 	//	なんかメッセージ
 	if( bExtChg )
 	{
-		InitLastOpen( INIT_SAVE, atFilePath );	//	ラストオーポンを書換
-		MultiFileTabRename( gstFile.dUnique, atFilePath );	//	タブ名称変更
+		//InitLastOpen( INIT_SAVE, atFilePath );	//	ラストオーポンを書換
+		MultiFileTabRename( (*gitFileIt).dUnique, atFilePath );	//	タブ名称変更
 		AppTitleChange( atFilePath );
 		StringCchPrintf( atBuffer, MAX_STRING, TEXT("拡張子を %s にして保存したのです。あぅあぅ"), aatExte[ddExten] );
 		NotifyBalloonExist( atBuffer, TEXT("拡張子を変更したのです"), NIIF_INFO );
@@ -506,8 +561,8 @@ HRESULT DocFileSave( HWND hWnd, UINT bStyle )
 		//	20110713	新規かリネームしてたらラストオーポンを書換
 		if( bLastChg )
 		{
-			InitLastOpen( INIT_SAVE, atFilePath );
-			MultiFileTabRename( gstFile.dUnique, atFilePath );	//	タブ名称変更
+			//InitLastOpen( INIT_SAVE, atFilePath );
+			MultiFileTabRename( (*gitFileIt).dUnique, atFilePath );	//	タブ名称変更
 			AppTitleChange( atFilePath );
 		}
 
@@ -599,17 +654,38 @@ INT DocAstSeparatorGetAlloc( INT dPage, UINT bStyle, LPVOID *pText, FILES_ITR it
 */
 INT DocAllTextGetAlloc( INT dPage, UINT bStyle, LPVOID *pText, FILES_ITR itFile )
 {
-	UINT_PTR	iLines, i, iLetters, j, iSize;
+	UINT_PTR	iLines, iLetters, j, iSize;
 
 	string	srString;
 	wstring	wsString;
 
+#ifdef LINE_VEC_LIST
+	LINE_ITR	itLines;
+#else
+	UINT_PTR	i;
+#endif
+
 	srString.clear( );
 	wsString.clear( );
 
+	//	全文字を頂く
+#ifdef LINE_VEC_LIST
+	iLines = itFile->vcCont.at( dPage ).ltPage.size( );
+
+	for( itLines = itFile->vcCont.at( dPage ).ltPage.begin();
+	itLines != itFile->vcCont.at( dPage ).ltPage.end();
+	itLines++ )
+	{
+		iLetters = itLines->vcLine.size( );
+
+		for( j = 0; iLetters > j; j++ )
+		{
+			srString +=  string( itLines->vcLine.at( j ).acSjis );
+			wsString += itLines->vcLine.at( j ).cchMozi;
+		}
+#else
 	iLines = itFile->vcCont.at( dPage ).vcPage.size( );
 
-	//	全文字を頂く
 	for( i = 0; iLines > i; i++ )
 	{
 		iLetters = itFile->vcCont.at( dPage ).vcPage.at( i ).vcLine.size( );
@@ -619,7 +695,8 @@ INT DocAllTextGetAlloc( INT dPage, UINT bStyle, LPVOID *pText, FILES_ITR itFile 
 			srString +=  string( itFile->vcCont.at( dPage ).vcPage.at( i ).vcLine.at( j ).acSjis );
 			wsString += itFile->vcCont.at( dPage ).vcPage.at( i ).vcLine.at( j ).cchMozi;
 		}
-		
+#endif
+
 		if( !(1 == iLines && 0 == iLetters) )	//	壱行かつ零文字は空である
 		{
 			//	構造上、常に改行は必要

@@ -413,14 +413,14 @@ HWND ViewInitialise( HINSTANCE hInstance, HWND hParentWnd, LPRECT pstFrame, LPTS
 		dNumber = DocFileInflate( atFile  );
 		if( 0 < dNumber )	//	有効なら
 		{
-			if( !(bOpen) )	//	最初のいっこ
+			if( !(bOpen) )
 			{
-				MultiFileTabFirst( atFile );
+				MultiFileTabFirst( atFile );	//	最初のいっこ
 				bOpen = TRUE;
 			}
 			else
 			{
-				MultiFileTabAppend( dNumber, atFile );
+				MultiFileTabAppend( dNumber, atFile );	//	起動時の前回オーポンを開く
 			}
 			AppTitleChange( atFile );
 		}
@@ -436,14 +436,14 @@ HWND ViewInitialise( HINSTANCE hInstance, HWND hParentWnd, LPRECT pstFrame, LPTS
 		dNumber = DocFileInflate( atFirstStep );
 		if( 0 < dNumber )	//	有効なら
 		{
-			if( !(bOpen) )	//	最初のいっこ
+			if( !(bOpen) )
 			{
-				MultiFileTabFirst( atFirstStep );
+				MultiFileTabFirst( atFirstStep );	//	最初のいっこ
 				bOpen = TRUE;
 			}
 			else
 			{
-				MultiFileTabAppend( dNumber, atFirstStep );
+				MultiFileTabAppend( dNumber , atFirstStep );	//	説明ＡＳＴを開く
 			}
 			AppTitleChange( atFirstStep );
 
@@ -457,7 +457,7 @@ HWND ViewInitialise( HINSTANCE hInstance, HWND hParentWnd, LPRECT pstFrame, LPTS
 		iNewPage = DocPageCreate( -1 );	//	ページ作っておく
 		PageListInsert( iNewPage  );	//	ページリストビューに追加
 		DocPageChange( 0 );
-		MultiFileTabFirst( atFile );
+		MultiFileTabFirst( atFile );	//	完全新規作成
 		AppTitleChange( atFile );
 	}
 
@@ -2067,6 +2067,23 @@ VOID OperationOnCommand( HWND hWnd, INT id, HWND hWndCtl, UINT codeNotify )
 		return;
 	}
 
+	//	ファイルオーポン履歴
+#ifdef OPEN_HISTORY
+
+	if( IDM_OPEN_HIS_FIRST <= id && id <= IDM_OPEN_HIS_LAST )	//	開く
+	{
+		OpenHistoryLoad( hWnd, id );
+		return;
+	}
+	else if( IDM_OPEN_HIS_CLEAR ==  id )	//	ファイルオーポン履歴クルヤー
+	{
+		OpenHistoryLogging( hWnd, NULL );
+		return;
+	}
+#endif
+
+
+
 	switch( id )
 	{
 		default:					TRACE( TEXT("未実装") );	break;
@@ -2104,17 +2121,12 @@ VOID OperationOnCommand( HWND hWnd, INT id, HWND hWndCtl, UINT codeNotify )
 		//	文字スクリプト窓開く
 		case  IDM_MOZI_SCR_OPEN:	MoziScripterCreate( ghInst , hWnd );	break;
 
-#ifdef VERTICAL_TEXT
 		//	縦書きスクリプト開く
 		case IDM_VERT_SCRIPT_OPEN:	VertScripterCreate( ghInst , hWnd );	break;
-#endif
 
+		//	色編集ダイヤログ開く
 		case IDM_COLOUR_EDIT_OPEN:	ViewColourEditDlg( hWnd );	break;
 
-#ifndef MAA_PROFILE
-		//Profileモードなら外すようにする
-		case IDM_TREE_RECONSTRUCT:	FORWARD_WM_COMMAND( ghMaaWnd, IDM_TREE_RECONSTRUCT, NULL, 0 , PostMessage );	break;
-#endif
 		//	ツールバーのドロップダウンメニューの呼出
 		case IDM_IN_UNI_SPACE:
 		case IDM_INSTAG_COLOUR:

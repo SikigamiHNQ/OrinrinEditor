@@ -56,7 +56,8 @@ HRESULT	UserDefAppendMenu( HWND );	//!<
 */
 HRESULT UserDefObliterate( HWND hWnd )
 {
-	UINT_PTR	i, j, iLine;
+	UINT_PTR	i, iLine;
+	UINT_PTR	j;
 
 	for( i = 0; USER_ITEM_MAX > i; i++ )
 	{
@@ -260,11 +261,7 @@ HRESULT UserDefAppendMenu( HWND hWnd )
 	hMenu = GetMenu( hWnd );
 	hSubMenu = GetSubMenu( hMenu, 2 );
 	hMenu = hSubMenu;
-#ifdef VERTICAL_TEXT
 	hSubMenu = GetSubMenu( hMenu, 10 );
-#else
-	hSubMenu = GetSubMenu( hMenu, 9 );
-#endif
 
 	UserDefMenuWrite( hSubMenu );
 
@@ -301,6 +298,8 @@ LPTSTR UserDefTextLineAlloc( UINT idNum, INT uLine )
 {
 	INT_PTR	iLines, iLetters, i, cchSz;
 	LPTSTR	ptText;
+	LETR_ITR	itLetter;
+
 
 	if( gdItemCnt <= idNum )	return NULL;
 
@@ -314,10 +313,11 @@ LPTSTR UserDefTextLineAlloc( UINT idNum, INT uLine )
 	ptText = (LPTSTR)malloc( cchSz * sizeof(TCHAR) );
 	ZeroMemory( ptText, cchSz * sizeof(TCHAR) );
 
-	for( i = 0; iLetters > i; i++ )
-	{
-		ptText[i] = gstUserItem[idNum].vcUnits.at( uLine ).vcLine.at( i ).cchMozi;
-	}
+//	for( i = 0; iLetters > i; i++ ){	ptText[i] = gstUserItem[idNum].vcUnits.at( uLine ).vcLine.at( i ).cchMozi;	}
+	for( itLetter = gstUserItem[idNum].vcUnits.at( uLine ).vcLine.begin(), i = 0;
+		itLetter != gstUserItem[idNum].vcUnits.at( uLine ).vcLine.end(); i++, itLetter++ )
+	{	ptText[i] = itLetter->cchMozi;	}
+
 	ptText[i] = NULL;
 
 	return ptText;

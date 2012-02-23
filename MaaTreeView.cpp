@@ -39,6 +39,10 @@ typedef struct tagMULTIPLEMAA
 
 extern  HWND		ghSplitaWnd;	//	スプリットバーハンドル
 
+#ifdef OPEN_PROFILE
+extern HMENU		ghProfHisMenu;	//	履歴表示する部分・動的に内容作成せないかん
+#endif
+
 static HFONT		ghTabFont;
 
 static  HWND		ghTabWnd;		//!<	選択タブのハンドル
@@ -65,17 +69,11 @@ static list<MULTIPLEMAA>	gltMultiFiles;	//!<	複数ファイルの保持
 typedef  list<MULTIPLEMAA>::iterator	MLTT_ITR;
 //-------------------------------------------------------------------------------------------------
 
-#ifdef MAA_PROFILE
 #ifdef MAA_VIRTUAL_TREE
 HRESULT	TreeItemFromSqlII( HTREEITEM );
 #else
 UINT	TreeItemFromSql( LPCTSTR, HTREEITEM, UINT );
 #endif
-#else
-HRESULT	TreeItemFind( LPCTSTR, HTREEITEM, UINT );	//!<	
-#endif
-
-
 
 HRESULT	TabMultipleRestore( HWND );
 INT		TabMultipleSelect( HWND, INT, UINT );	//!<	
@@ -196,6 +194,9 @@ LRESULT CALLBACK gpfFavListProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 		HANDLE_MSG( hWnd, WM_CHAR,    Maa_OnChar  );	//	
 		HANDLE_MSG( hWnd, WM_COMMAND, Maa_OnCommand );	//	アクセロリータ用
 
+		HANDLE_MSG( hWnd, WM_KEYDOWN, Aai_OnKey );			//	20120221
+		HANDLE_MSG( hWnd, WM_KEYUP,   Aai_OnKey );			//	
+
 		case WM_MOUSEWHEEL:
 			ulRslt = Maa_OnMouseWheel( hWnd, (int)(short)LOWORD(lParam), (int)(short)HIWORD(lParam), (int)(short)HIWORD(wParam), (UINT)(short)LOWORD(wParam) );
 			if( ulRslt )	return 0;
@@ -226,6 +227,9 @@ LRESULT CALLBACK gpfTreeViewProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPa
 		HANDLE_MSG( hWnd, WM_CHAR,    Maa_OnChar  );	//	
 		HANDLE_MSG( hWnd, WM_COMMAND, Maa_OnCommand );	//	アクセロリータ用
 
+		HANDLE_MSG( hWnd, WM_KEYDOWN, Aai_OnKey );			//	20120221
+		HANDLE_MSG( hWnd, WM_KEYUP,   Aai_OnKey );			//	
+
 		case WM_MOUSEWHEEL:
 			ulRslt = Maa_OnMouseWheel( hWnd, (int)(short)LOWORD(lParam), (int)(short)HIWORD(lParam), (int)(short)HIWORD(wParam), (UINT)(short)LOWORD(wParam) );
 			if( ulRslt )	return 0;
@@ -252,6 +256,9 @@ LRESULT	CALLBACK gpfTabMultiProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPa
 	{
 		HANDLE_MSG( hWnd, WM_CHAR,    Maa_OnChar  );	
 		HANDLE_MSG( hWnd, WM_COMMAND, Maa_OnCommand );	//	アクセロリータ用
+
+		HANDLE_MSG( hWnd, WM_KEYDOWN, Aai_OnKey );			//	20120221
+		HANDLE_MSG( hWnd, WM_KEYUP,   Aai_OnKey );			//	
 
 		default:	break;
 	}
@@ -324,7 +331,7 @@ VOID Maa_OnContextMenu( HWND hWnd, HWND hWndContext, UINT xPos, UINT yPos )
 	LONG_PTR	rdExStyle;
 #endif
 	TCHAR	atSelName[MAX_PATH], atMenuStr[MAX_PATH], atMenuStr2[MAX_PATH];
-	MULTIPLEMAA	stMulti;
+	MULTIPLEMAA		stMulti;
 	POINT			stPost;
 	TVHITTESTINFO	stTvHitInfo;
 	TCHITTESTINFO	stTcHitInfo;
@@ -352,8 +359,7 @@ VOID Maa_OnContextMenu( HWND hWnd, HWND hWndContext, UINT xPos, UINT yPos )
 		StringCchPrintf( atMenuStr,  MAX_PATH, TEXT("[ %s ]で副タブを追加"), atSelName );
 		StringCchPrintf( atMenuStr2, MAX_PATH, TEXT("[ %s ]グループを削除"), atSelName );
 
-
-
+		//	メニューは常に動的に作成する
 		hMenu = CreatePopupMenu(  );
 		//	お気にリストのセットを副タブに表示する機能
 		AppendMenu( hMenu, MF_STRING, IDM_AATREE_SUBADD, atMenuStr );
@@ -392,11 +398,6 @@ VOID Maa_OnContextMenu( HWND hWnd, HWND hWndContext, UINT xPos, UINT yPos )
 		hMenu = LoadMenu( GetModuleHandle(NULL), MAKEINTRESOURCE(IDM_AATREE_POPUP) );
 		hSubMenu = GetSubMenu( hMenu, 0 );
 
-#ifndef MAA_PROFILE
-		DeleteMenu( hSubMenu, 2, MF_BYPOSITION );
-		DeleteMenu( hSubMenu, 1, MF_BYPOSITION );
-		DeleteMenu( hSubMenu, 0, MF_BYPOSITION );
-#endif
 		stTvHitInfo.pt = stPost;
 		ScreenToClient( ghTreeWnd, &(stTvHitInfo.pt) );
 		hTvHitItem = TreeView_HitTest( ghTreeWnd, &stTvHitInfo );
@@ -415,12 +416,17 @@ VOID Maa_OnContextMenu( HWND hWnd, HWND hWndContext, UINT xPos, UINT yPos )
 			EnableMenuItem( hSubMenu, IDM_MAA_IADD_OPEN, MF_GRAYED );
 		}
 
+#ifdef OPEN_PROFILE
+		//	プロフ履歴入替
+		ModifyMenu( hSubMenu, IDM_OPEN_HISTORY, MF_BYCOMMAND | MF_POPUP, (UINT_PTR)ghProfHisMenu, TEXT("ファイル使用履歴(&H)") );
+#endif
+
 		//	右クリではノード選択されないようだ
 		dRslt = TrackPopupMenu( hSubMenu, TPM_RETURNCMD, stPost.x, stPost.y, 0, hWnd, NULL );	//	TPM_CENTERALIGN | TPM_VCENTERALIGN | 
 		DestroyMenu( hMenu );
 		switch( dRslt )
 		{
-#if defined(MAA_PROFILE) && !defined(_ORRVW)
+#ifndef _ORRVW
 			//	プロフファイル開く
 			case IDM_MAA_PROFILE_MAKE:	TreeProfileOpen( hWnd );	break;
 
@@ -436,7 +442,16 @@ VOID Maa_OnContextMenu( HWND hWnd, HWND hWndContext, UINT xPos, UINT yPos )
 #endif
 			case  IDM_MAA_IADD_OPEN:	TreeSelItemProc( hWnd, hTvHitItem , 3 );	break;
 
-			default:	break;
+#ifdef OPEN_PROFILE
+			case IDM_OPEN_HIS_CLEAR:	OpenProfileLogging( hWnd, NULL );	break;
+#endif
+			default:
+#ifdef OPEN_PROFILE
+				if( IDM_OPEN_HIS_FIRST <= dRslt && dRslt <= IDM_OPEN_HIS_LAST )
+				{
+				}
+#endif
+				break;
 		}
 
 		return;
@@ -534,20 +549,6 @@ HRESULT TreeResize( HWND hWnd, LPRECT ptRect )
 }
 //-------------------------------------------------------------------------------------------------
 
-#if 0//def MAA_PROFILE
-
-LRESULT CALLBACK TreeTest( UINT id, UINT type, UINT prnt, LPCVOID pVoida )
-{
-//	TCHAR	atBuff[MAX_STRING];
-
-	TRACE( TEXT("%4u\t%4u\t%4u\t%s"), id, type, prnt, (LPCTSTR)pVoida );
-	
-	return 0;
-}
-//-------------------------------------------------------------------------------------------------
-
-#endif
-
 /*!
 	カレントダディレクトリを受け取って、ツリーをアッセンブリーする
 	@param[in]	hWnd		親ウインドウハンドル
@@ -596,16 +597,11 @@ HRESULT TreeConstruct( HWND hWnd, LPCTSTR ptCurrent, BOOLEAN bSubTabReb )
 
 	//	プロファイルモードなら、常にSQLからでおｋ
 
-#ifdef MAA_PROFILE
 	//	SQLから展開
-  #ifdef MAA_VIRTUAL_TREE
+#ifdef MAA_VIRTUAL_TREE
 	//ここでは展開しない
-  #else
-	TreeItemFromSql( ptCurrent, ghTreeRoot, 0 );
-  #endif
 #else
-	//	ファイルから構築
-	TreeItemFind( ptCurrent, ghTreeRoot, 0 );	//	カレント以下を再帰検索
+	TreeItemFromSql( ptCurrent, ghTreeRoot, 0 );
 #endif
 
 	StatusBarMsgSet( 2, TEXT("") );
@@ -664,9 +660,6 @@ UINT TreeNodePathGet( HTREEITEM hNode, LPTSTR ptPath )
 	return 1;
 }
 //-------------------------------------------------------------------------------------------------
-
-
-#ifdef MAA_PROFILE
 
 #ifdef MAA_VIRTUAL_TREE
 /*!
@@ -913,97 +906,6 @@ HTREEITEM MaaSelectIDfile( HWND hDlg, INT tgtID )
 }
 //-------------------------------------------------------------------------------------------------
 
-
-
-
-
-#else	//	NOT MAA_PROFILE
-
-//ファイルから引っ張っている・プロファイルモードなら使わないか？
-/*!
-	ディレクトリとファイルをツリービューに展開・再帰に注意セヨ
-	@param[in]	ptRootName	検索するディレクトリ名
-	@param[in]	hTreeParent	対象ディレクトリのツリーアイテム・こいつにぶら下げていく
-	@param[in]	dPrntID		SQLのID・ディレクトリ番号
-	@return		HRESULT		終了状態コード
-*/
-HRESULT TreeItemFind( LPCTSTR ptRootName, HTREEITEM hTreeParent, UINT dPrntID )
-{
-	HANDLE	hFind;
-	TCHAR	atPath[MAX_PATH], atNewTop[MAX_PATH], atTarget[MAX_PATH];
-	BOOL	bRslt;
-	UINT	dPnID = 0;
-
-	WIN32_FIND_DATA	stFindData;
-
-	HTREEITEM	hNewParent, hLastDir = TVI_FIRST;
-	TVINSERTSTRUCT	stTreeIns;
-	SHFILEINFO	stShFileInfo;
-
-	ZeroMemory( &stTreeIns, sizeof(TVINSERTSTRUCT) );
-	stTreeIns.hParent      = hTreeParent;
-	stTreeIns.hInsertAfter = TVI_LAST;
-	stTreeIns.item.mask    = TVIF_TEXT | TVIF_PARAM | TVIF_IMAGE | TVIF_SELECTEDIMAGE;
-
-	ZeroMemory( atTarget, sizeof(atTarget) );
-	StringCchCopy( atTarget, MAX_PATH, ptRootName );
-	PathAppend( atTarget, TEXT("*") );
-
-
-	hFind = FindFirstFile( atTarget, &stFindData );	//	TEXT("*")
-	do{
-		if( lstrcmp( stFindData.cFileName, TEXT("..") ) && lstrcmp( stFindData.cFileName, TEXT(".") ) )
-		{
-			StringCchCopy( atPath, MAX_PATH, ptRootName );
-			PathAppend( atPath, stFindData.cFileName );
-
-			if( stFindData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY )
-			{	//	ディレクトリの場合
-				SHGetFileInfo( atPath, 0, &stShFileInfo, sizeof(SHFILEINFO), (SHGFI_SYSICONINDEX|SHGFI_SMALLICON) );
-				stTreeIns.item.iImage = stShFileInfo.iIcon;
-				SHGetFileInfo( atPath, 0, &stShFileInfo, sizeof(SHFILEINFO), (SHGFI_SYSICONINDEX|SHGFI_SMALLICON|SHGFI_OPENICON) );
-				stTreeIns.item.iSelectedImage = stShFileInfo.iIcon;
-
-				stTreeIns.item.pszText = stFindData.cFileName;
-				stTreeIns.item.lParam  = 1;
-				stTreeIns.hInsertAfter = hLastDir;
-				hNewParent = TreeView_InsertItem( ghTreeWnd, &stTreeIns );
-				hLastDir = hNewParent;
-
-				StringCchCopy( atNewTop, MAX_PATH, ptRootName );
-				PathAppend( atNewTop, stFindData.cFileName );
-
-				TreeItemFind( atNewTop, hNewParent, dPnID );	//	該当ディレクトリ内を再帰検索
-			}
-			else
-			{	//	ファイルの場合
-				bRslt  = PathMatchSpec( stFindData.cFileName, TEXT("*.mlt") );	//	ヒットしたらTRUE
-				bRslt |= PathMatchSpec( stFindData.cFileName, TEXT("*.ast") );	//	ヒットしたらTRUE
-				if( bRslt )	//	20110720	ASTもイケるようにする
-				{
-					SHGetFileInfo( atPath, 0, &stShFileInfo, sizeof(SHFILEINFO), (SHGFI_SYSICONINDEX|SHGFI_SMALLICON) );
-					stTreeIns.item.iImage = stShFileInfo.iIcon;
-					SHGetFileInfo( atPath, 0, &stShFileInfo, sizeof(SHFILEINFO), (SHGFI_SYSICONINDEX|SHGFI_SMALLICON|SHGFI_OPENICON) );
-					stTreeIns.item.iSelectedImage = stShFileInfo.iIcon;
-
-					stTreeIns.hInsertAfter = TVI_LAST;
-					stTreeIns.item.pszText = stFindData.cFileName;
-					stTreeIns.item.lParam  = 0;
-					hNewParent = TreeView_InsertItem( ghTreeWnd, &stTreeIns );
-				}
-			}
-		}
-
-	}while( FindNextFile( hFind, &stFindData ) );
-
-	FindClose( hFind );
-
-	return S_OK;
-}
-//-------------------------------------------------------------------------------------------------
-
-#endif	//	NOT MAA_PROFILE
-
 /*!
 	ツリーのアイテムの名前とＰＡＲＡＭ情報を確保
 	@param[in]	hTrItem	アイテムハンドル
@@ -1095,7 +997,7 @@ INT TreeSelItemProc( HWND hWnd, HTREEITEM hSelItem, UINT dMode )
 	TCHAR	atName[MAX_PATH], atPath[MAX_PATH], atBaseName[MAX_PATH];
 	LPARAM	lParam;
 #ifndef _ORRVW
-	LPARAM	dNumber;
+//	LPARAM	dNumber;
 #endif
 	HTREEITEM	hParentItem;
 
@@ -1163,9 +1065,15 @@ INT TreeSelItemProc( HWND hWnd, HTREEITEM hSelItem, UINT dMode )
 			break;
 #ifndef _ORRVW
 		case  2:	//	編集ビューで開く場合
-			dNumber = DocFileInflate( atPath  );	//	開いて中身展開
-
-			if( dNumber ){	MultiFileTabAppend( dNumber, atPath );	}
+			DocDoOpenFile( hWnd , atPath );	//	開いて中身展開
+//			dNumber = DocFileInflate( atPath  );	//	開いて中身展開
+//			if( dNumber )
+//			{
+//				MultiFileTabAppend( dNumber, atPath );	//	MAAをツリーから編集エリアで開く
+//#ifdef OPEN_HISTORY
+//				OpenHistoryLogging( hWnd , atPath );	//	ファイルオーポン記録を追加
+//#endif
+//			}
 
 			break;
 
@@ -1339,7 +1247,7 @@ INT TabMultipleSelect( HWND hWnd, INT tabSel, UINT dMode )
 	MLTT_ITR	itNulti;
 	TCHAR	atName[MAX_PATH];
 #ifndef _ORRVW
-	LPARAM	dNumber;
+//	LPARAM	dNumber;
 #endif
 
 	if( 0 == dMode )	gixUseTab = tabSel;
@@ -1377,9 +1285,16 @@ INT TabMultipleSelect( HWND hWnd, INT tabSel, UINT dMode )
 #ifndef _ORRVW
 			else	//	ファイル名を確保して、さらに編集ビュー側で開く処理をする
 			{
-				dNumber = DocFileInflate( itNulti->atFilePath );	//	開いて中身展開
-
-				if( dNumber ){	MultiFileTabAppend( dNumber, itNulti->atFilePath );	}
+				DocDoOpenFile( hWnd, itNulti->atFilePath );
+//				dNumber = DocFileInflate( itNulti->atFilePath );	//	開いて中身展開
+//
+//				if( dNumber )
+//				{
+//					MultiFileTabAppend( dNumber , itNulti->atFilePath );	//	MAAを副タブから編集エリアに開く
+//#ifdef OPEN_HISTORY
+//					OpenHistoryLogging( hWnd, itNulti->atFilePath );	//	ファイルオーポン記録を追加
+//#endif
+//				}
 			}
 #endif
 			return 1;
@@ -1428,23 +1343,13 @@ HRESULT TabMultipleStore( HWND hWnd )
 {
 	MLTT_ITR	itNulti;
 
-#ifdef MAA_PROFILE
 	//	一旦全消しして書き直ししてる
 	SqlMultiTabDelete(  );
 	for( itNulti = gltMultiFiles.begin( ); gltMultiFiles.end( ) != itNulti; itNulti++ )
 	{
 		SqlMultiTabInsert( itNulti->atFilePath, itNulti->atBase );
 	}
-#else
-	UINT_PTR	iRslt;
 
-	iRslt = gltMultiFiles.size( );
-	InitMultipleFile( INIT_SAVE, iRslt, NULL, NULL );
-	for( i = 0, itNulti = gltMultiFiles.begin( ); gltMultiFiles.end( ) != itNulti; i++, itNulti++ )
-	{
-		InitMultipleFile( INIT_SAVE, i, itNulti->atFilePath, itNulti->atBase );
-	}
-#endif
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
@@ -1461,19 +1366,14 @@ HRESULT TabMultipleRestore( HWND hWnd )
 
 	TabMultipleDeleteAll( hWnd );
 
-#ifdef MAA_PROFILE
 	iCount = SqlTreeCount( 2, NULL );
-#else
-	iCount = InitMultipleFile( INIT_LOAD, 0, NULL, NULL );
-#endif
+
 	for( i = 0; iCount > i; i++ )
 	{
 		ZeroMemory( &stMulti, sizeof(MULTIPLEMAA) );
-#ifdef MAA_PROFILE
+
 		SqlMultiTabSelect( i+1, stMulti.atFilePath, stMulti.atBase );
-#else
-		InitMultipleFile( INIT_LOAD, i, stMulti.atFilePath, stMulti.atBase );
-#endif
+
 		gltMultiFiles.push_back( stMulti );
 		TabMultipleAppend( hWnd );
 	}

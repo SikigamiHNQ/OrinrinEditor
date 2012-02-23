@@ -43,7 +43,7 @@ extern list<ONEFILE>	gltMultiFiles;	//!<	複数ファイル保持
 //イテレータのtypedefはヘッダへ
 
 extern FILES_ITR	gitFileIt;	//	今見てるファイルの本体
-#define gstFile	(*gitFileIt)	//!<	イテレータを構造体と見なす
+//#define gstFile	(*gitFileIt)	//!<	イテレータを構造体と見なす
 
 extern INT		gixFocusPage;	//	注目中のページ・とりあえず０・０インデックス
 
@@ -355,14 +355,18 @@ HRESULT FindPageHitHighlight( INT iOffset, INT iRange, INT iPage, FILES_ITR itFi
 {
 	UINT_PTR	ln, iLetters;//, iLines;
 	INT_PTR		dMozis;
-	INT			iTotal, iDot, iWid, iLnTop, iSlide, mz, iNext;
+	INT			iTotal, iDot, iLnTop, iSlide, mz, iNext, iWid = 0;
 	RECT		inRect;
 
 	LINE_ITR	itLine, itLnEnd;
 
+#ifdef LINE_VEC_LIST
+	itLine  = itFile->vcCont.at( iPage ).ltPage.begin();
+	itLnEnd = itFile->vcCont.at( iPage ).ltPage.end();
+#else
 	itLine  = itFile->vcCont.at( iPage ).vcPage.begin();
 	itLnEnd = itFile->vcCont.at( iPage ).vcPage.end();
-
+#endif
 
 	iTotal = 0;
 	iLnTop = 0;
@@ -479,50 +483,16 @@ INT FindPageHighlightOff( INT iPage, FILES_ITR itFile )
 
 	ZeroMemory( gatNowPtn, sizeof(gatNowPtn) );
 
-//	iLines = itFile->vcCont.at( iPage ).vcPage.size( );
-//	for( ln = 0; iLines > ln; ln++ )
+#ifdef LINE_VEC_LIST
+	itLine  = itFile->vcCont.at( iPage ).ltPage.begin();
+	itLnEnd = itFile->vcCont.at( iPage ).ltPage.end();
+#else
 	itLine  = itFile->vcCont.at( iPage ).vcPage.begin();
 	itLnEnd = itFile->vcCont.at( iPage ).vcPage.end();
-
+#endif
 	for( ln = 0; itLnEnd != itLine; itLine++, ln++ )
 	{
 		FindLineHighlightOff( ln, itLine );
-#if 0
-		iDot = 0;	//	そこまでのドット数をため込む
-		inRect.top    = ln * LINE_HEIGHT;
-		inRect.bottom = inRect.top + LINE_HEIGHT;
-
-		//iLetters = itFile->vcCont.at( iPage ).vcPage.at( ln ).vcLine.size( );	//	この行の文字数確認して
-		iLetters = itLine->vcLine.size();
-		//	壱文字ずつ、全部をチェキっていく
-		for( mz = 0; iLetters > mz; mz++ )
-		{
-			//	直前の状態
-			//dStyle = itFile->vcCont.at( iPage ).vcPage.at( ln ).vcLine.at( mz ).mzStyle;
-			//iWid   = itFile->vcCont.at( iPage ).vcPage.at( ln ).vcLine.at( mz ).rdWidth;
-			dStyle = itLine->vcLine.at( mz ).mzStyle;
-			iWid   = itLine->vcLine.at( mz ).rdWidth;
-
-			inRect.left  = iDot;
-			inRect.right = iDot + iWid;
-
-			//itFile->vcCont.at( iPage ).vcPage.at( ln ).vcLine.at( mz ).mzStyle &= ~CT_FINDED;
-			itLine->vcLine.at( mz ).mzStyle &= ~CT_FINDED;
-			if( dStyle & CT_FINDED )	ViewRedrawSetRect( &inRect );
-
-			iDot += iWid;
-		}
-
-		//	壱行終わったら末尾状況確認。改行・本文末端に改行はない・選択のときのみ
-		//dStyle = itFile->vcCont.at( iPage ).vcPage.at( ln ).dStyle;
-		dStyle = itLine->dStyle;
-		inRect.left  = iDot;
-		inRect.right = iDot + 20;	//	改行描画エリア・大体これくらい
-
-		//itFile->vcCont.at( iPage ).vcPage.at( ln ).dStyle &=  ~CT_FINDRTN;
-		itLine->dStyle &=  ~CT_FINDRTN;
-		if( dStyle & CT_FINDRTN )	ViewRedrawSetRect( &inRect );
-#endif
 	}
 
 //	ViewRedrawSetLine( -1 );	//	画面表示更新

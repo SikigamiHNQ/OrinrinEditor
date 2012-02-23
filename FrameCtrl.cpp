@@ -85,7 +85,7 @@ static  TBBUTTON	gstFIBTBInfo[] = {
 
 
 extern FILES_ITR	gitFileIt;	//!<	今見てるファイルの本体
-#define gstFile	(*gitFileIt)	//!<	イテレータを構造体と見なす
+//#define gstFile	(*gitFileIt)	//!<	イテレータを構造体と見なす
 
 extern INT		gixFocusPage;	//!<	注目中のページ・とりあえず０・０インデックス
 
@@ -142,7 +142,7 @@ HRESULT	FrameInfoDisp( HWND );
 
 #ifdef FRAME_MLINE
 VOID	FrameDataTranslate( LPTSTR, UINT );
-INT		FramePartsSizeCalc( LPTSTR, PINT );
+//INT		FramePartsSizeCalc( LPTSTR, PINT );
 
 UINT	FrameMultiSubstring( LPCTSTR, CONST UINT, LPTSTR, CONST UINT_PTR );
 
@@ -604,7 +604,8 @@ HRESULT FramePartsUpdate( HWND hDlg, HWND hWndCtl, LPFRAMEITEM pstItem )
 
 	//	ドット数確認して
 #ifdef FRAME_MLINE
-	pstItem->dDot = FramePartsSizeCalc( pstItem->atParts, &(pstItem->iLine) );
+	//pstItem->dDot = FramePartsSizeCalc( pstItem->atParts, &(pstItem->iLine) );
+	pstItem->iLine = DocStringInfoCount( pstItem->atParts, 0, &(pstItem->dDot), NULL );
 #else
 	pstItem->dDot = ViewStringWidthGet( pstItem->atParts );
 #endif
@@ -771,14 +772,24 @@ HRESULT FrameDataGet( UINT dNumber, LPFRAMEINFO pstFrame )
 	InitFrameItem( INIT_LOAD, dNumber, pstFrame );
 
 #ifdef FRAME_MLINE
-	pstFrame->stDaybreak.dDot  = FramePartsSizeCalc( pstFrame->stDaybreak.atParts,  &(pstFrame->stDaybreak.iLine) );
-	pstFrame->stMorning.dDot   = FramePartsSizeCalc( pstFrame->stMorning.atParts,   &(pstFrame->stMorning.iLine) );
-	pstFrame->stNoon.dDot      = FramePartsSizeCalc( pstFrame->stNoon.atParts,      &(pstFrame->stNoon.iLine) );
-	pstFrame->stAfternoon.dDot = FramePartsSizeCalc( pstFrame->stAfternoon.atParts, &(pstFrame->stAfternoon.iLine) );
-	pstFrame->stNightfall.dDot = FramePartsSizeCalc( pstFrame->stNightfall.atParts, &(pstFrame->stNightfall.iLine) );
-	pstFrame->stTwilight.dDot  = FramePartsSizeCalc( pstFrame->stTwilight.atParts,  &(pstFrame->stTwilight.iLine) );
-	pstFrame->stMidnight.dDot  = FramePartsSizeCalc( pstFrame->stMidnight.atParts,  &(pstFrame->stMidnight.iLine) );
-	pstFrame->stDawn.dDot      = FramePartsSizeCalc( pstFrame->stDawn.atParts,      &(pstFrame->stDawn.iLine) );
+	//pstFrame->stDaybreak.dDot  = FramePartsSizeCalc( pstFrame->stDaybreak.atParts,  &(pstFrame->stDaybreak.iLine) );
+	//pstFrame->stMorning.dDot   = FramePartsSizeCalc( pstFrame->stMorning.atParts,   &(pstFrame->stMorning.iLine) );
+	//pstFrame->stNoon.dDot      = FramePartsSizeCalc( pstFrame->stNoon.atParts,      &(pstFrame->stNoon.iLine) );
+	//pstFrame->stAfternoon.dDot = FramePartsSizeCalc( pstFrame->stAfternoon.atParts, &(pstFrame->stAfternoon.iLine) );
+	//pstFrame->stNightfall.dDot = FramePartsSizeCalc( pstFrame->stNightfall.atParts, &(pstFrame->stNightfall.iLine) );
+	//pstFrame->stTwilight.dDot  = FramePartsSizeCalc( pstFrame->stTwilight.atParts,  &(pstFrame->stTwilight.iLine) );
+	//pstFrame->stMidnight.dDot  = FramePartsSizeCalc( pstFrame->stMidnight.atParts,  &(pstFrame->stMidnight.iLine) );
+	//pstFrame->stDawn.dDot      = FramePartsSizeCalc( pstFrame->stDawn.atParts,      &(pstFrame->stDawn.iLine) );
+
+	pstFrame->stDaybreak.iLine  = DocStringInfoCount( pstFrame->stDaybreak.atParts,  0, &(pstFrame->stDaybreak.dDot), NULL );
+	pstFrame->stMorning.iLine   = DocStringInfoCount( pstFrame->stMorning.atParts,   0, &(pstFrame->stMorning.dDot), NULL );
+	pstFrame->stNoon.iLine      = DocStringInfoCount( pstFrame->stNoon.atParts,      0, &(pstFrame->stNoon.dDot), NULL );
+	pstFrame->stAfternoon.iLine = DocStringInfoCount( pstFrame->stAfternoon.atParts, 0, &(pstFrame->stAfternoon.dDot), NULL );
+	pstFrame->stNightfall.iLine = DocStringInfoCount( pstFrame->stNightfall.atParts, 0, &(pstFrame->stNightfall.dDot), NULL );
+	pstFrame->stTwilight.iLine  = DocStringInfoCount( pstFrame->stTwilight.atParts,  0, &(pstFrame->stTwilight.dDot), NULL );
+	pstFrame->stMidnight.iLine  = DocStringInfoCount( pstFrame->stMidnight.atParts,  0, &(pstFrame->stMidnight.dDot), NULL );
+	pstFrame->stDawn.iLine      = DocStringInfoCount( pstFrame->stDawn.atParts,      0, &(pstFrame->stDawn.dDot), NULL );
+
 #else
 	pstFrame->stDaybreak.dDot  = ViewStringWidthGet( pstFrame->stDaybreak.atParts );
 	pstFrame->stMorning.dDot   = ViewStringWidthGet( pstFrame->stMorning.atParts );
@@ -846,13 +857,15 @@ HRESULT DocFrameInsert( INT dMode, INT dStyle )
 
 	FrameDataGet( dMode, &stInfo );
 
-
-	//	ページ全体の行数
-	iLines = gstFile.vcCont.at( gixFocusPage ).vcPage.size( );
+#ifdef LINE_VEC_LIST
+	iLines = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.size( );	//	ページ全体の行数
+#else
+	iLines = (*gitFileIt).vcCont.at( gixFocusPage ).vcPage.size( );	//	ページ全体の行数
+#endif
 
 	//	開始地点から開始	//	D_SQUARE
-	iTop = gstFile.vcCont.at( gixFocusPage ).dSelLineTop;
-	iBtm = gstFile.vcCont.at( gixFocusPage ).dSelLineBottom;
+	iTop = (*gitFileIt).vcCont.at( gixFocusPage ).dSelLineTop;
+	iBtm = (*gitFileIt).vcCont.at( gixFocusPage ).dSelLineBottom;
 	if( 0 >  iTop ){	iTop = 0;	}
 	if( 0 >  iBtm ){	iBtm = iLines - 1;	}
 
@@ -937,7 +950,11 @@ HRESULT DocFrameInsert( INT dMode, INT dStyle )
 		ViewRedrawSetLine( i );
 	}
 	//	改行してるから、これ以降全部再描画必要
-	iLns = gstFile.vcCont.at( gixFocusPage ).vcPage.size( );	//	現在行数再認識
+#ifdef LINE_VEC_LIST
+	iLns = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.size( );	//	現在行数再認識
+#else
+	iLns = (*gitFileIt).vcCont.at( gixFocusPage ).vcPage.size( );	//	現在行数再認識
+#endif
 	for( ; iLns >  i; i++ ){	ViewRedrawSetLine(  i );	}
 	ViewRedrawSetLine( ++i );	//	念のため
 
@@ -1016,6 +1033,7 @@ VOID FrameDataTranslate( LPTSTR ptData, UINT bMode )
 }
 //-------------------------------------------------------------------------------------------------
 
+#if 0
 /*!
 	パーツの文字列を受けて、最大ドット数と行数を返す
 	@param[in]	ptParts	パーツ文字列へのポインター
@@ -1057,7 +1075,7 @@ INT FramePartsSizeCalc( LPTSTR ptParts, PINT pLine )
 	return iMax;
 }
 //-------------------------------------------------------------------------------------------------
-
+#endif
 
 /*!
 	改行を含む文字列を受け取って、指定行の内容をバッファに入れる

@@ -21,20 +21,17 @@ If not, see <http://www.gnu.org/licenses/>.
 #include "OrinrinEditor.h"
 //-------------------------------------------------------------------------------------------------
 /*
-	ファイルの管理する構造体を用意・それをリストでつないでおけば複数ファイルになる
-	中身を、壱行毎にリストで管理、各行の内容をこれまた管理する
-	内容はユニコードで管理するか・見た目は変わらないはず
-
 	文字数は、キャレットの左側の文字数で数える。キャレットが左端なら０文字目
-
 */
-
-//	TODO:	複数ファイルを同時に保持できるようにする
 
 //-------------------------------------------------------------------------------------------------
 
 //	構造体宣言はコモンへ移動
 
+//-------------------------------------------------------------------------------------------------
+
+#define PAGE_LINE_MAX	80
+#define LINE_MOZI_MAX	255
 //-------------------------------------------------------------------------------------------------
 
 /*
@@ -52,14 +49,16 @@ gstFileを、マクロでイテレータポインタに仕立て上げる
 (*ltrItr).cchMozi;	これでおｋっぽい
 */
 
+//#define FILE_PRELOAD	//	先に頁のvectorを確保してみる・リストで要らない・文字用にいるか？
+
 
 EXTERNED list<ONEFILE>	gltMultiFiles;	//!<	複数ファイル保持
 //イテレータのtypedefはヘッダへ
 
-static LPARAM	gdNextNumber;	//!<	開いたファイルの通し番号・常にインクリ
+static LPARAM	gdNextNumber;		//!<	開いたファイルの通し番号・常にインクリ
 
-EXTERNED FILES_ITR	gitFileIt;	//!<	今見てるファイルの本体
-#define gstFile	(*gitFileIt)	//!<	イテレータを構造体と見なす
+EXTERNED FILES_ITR	gitFileIt;		//!<	今見てるファイルの本体
+//#define gstFile	(*gitFileIt)	//!<	イテレータを構造体と見なす
 
 EXTERNED INT		gixFocusPage;	//!<	注目中のページ・とりあえず０・０インデックス
 
@@ -95,10 +94,14 @@ BOOLEAN DocRangeIsError( INT iPage, INT iLine )
 
 	if( 0 > iPage || 0 > iLine )	return TRUE;
 
-	iSize = gstFile.vcCont.size( );
+	iSize = (*gitFileIt).vcCont.size( );
 	if( 0 >= iSize || iPage >= iSize )	return TRUE;
 
-	iSize = gstFile.vcCont.at( iPage ).vcPage.size( );
+#ifdef LINE_VEC_LIST
+	iSize = (*gitFileIt).vcCont.at( iPage ).ltPage.size( );
+#else
+	iSize = (*gitFileIt).vcCont.at( iPage ).vcPage.size( );
+#endif
 	if( 0 >= iSize || iLine >= iSize )	return TRUE;
 
 	return FALSE;
@@ -115,7 +118,7 @@ HRESULT DocModifyContent( UINT dMode )
 {
 	if( dMode )
 	{
-		if( gstFile.dModify )	return S_FALSE;
+		if( (*gitFileIt).dModify )	return S_FALSE;
 		//	変更のとき、已に変更の処理してたら何もしなくて良い
 
 		StatusBarSetText( SB_MODIFY, MODIFY_MSG );
@@ -127,7 +130,7 @@ HRESULT DocModifyContent( UINT dMode )
 
 	DocMultiFileModify( dMode );
 
-	gstFile.dModify =  dMode;	//	ここで記録しておく
+	(*gitFileIt).dModify =  dMode;	//	ここで記録しておく
 
 	return S_OK;
 }
@@ -142,6 +145,10 @@ LPARAM DocMultiFileCreate( LPTSTR ptDmyName )
 {
 	ONEFILE	stFile;
 	FILES_ITR	itNew;
+
+#ifdef DO_TRY_CATCH
+	try{
+#endif
 
 	ZeroMemory( stFile.atFileName, sizeof(stFile.atFileName) );
 	stFile.dModify   = FALSE;
@@ -170,6 +177,12 @@ LPARAM DocMultiFileCreate( LPTSTR ptDmyName )
 
 	gitFileIt = itNew;	//	ファイルなう
 
+#ifdef DO_TRY_CATCH
+	}
+	catch( exception &err ){	return (INT)ETC_MSG( err.what(), 0 );	}
+	catch( ... ){	return (INT)ETC_MSG( ("etc error"), 0 );	}
+#endif
+
 	return stFile.dUnique;
 }
 //-------------------------------------------------------------------------------------------------
@@ -183,14 +196,14 @@ HRESULT DocMultiFileModify( UINT dMode )
 {
 	TCHAR	atFile[MAX_PATH];	//!<	ファイル名
 
-	StringCchCopy( atFile, MAX_PATH, gstFile.atFileName );
-	if( 0 == atFile[0] ){	StringCchCopy( atFile, MAX_PATH , gstFile.atDummyName );	}
+	StringCchCopy( atFile, MAX_PATH, (*gitFileIt).atFileName );
+	if( 0 == atFile[0] ){	StringCchCopy( atFile, MAX_PATH , (*gitFileIt).atDummyName );	}
 
 	PathStripPath( atFile );
 
 	if( dMode ){	StringCchCat( atFile, MAX_PATH, MODIFY_MSG );	}
 
-	MultiFileTabRename( gstFile.dUnique, atFile );
+	MultiFileTabRename( (*gitFileIt).dUnique, atFile );
 
 	return S_OK;
 }
@@ -198,7 +211,7 @@ HRESULT DocMultiFileModify( UINT dMode )
 
 /*!
 	ファイルタブを選択した
-	@param[in]	uqNumber	選択されたタブの通し番号
+	@param[in]	uqNumber	選択されたファイルのUNIQUE番号
 	@return		HRESULT	終了状態コード
 */
 HRESULT DocMultiFileSelect( LPARAM uqNumber )
@@ -244,20 +257,36 @@ HRESULT DocMultiFileSelect( LPARAM uqNumber )
 */
 HRESULT DocMultiFileDeleteAll( VOID )
 {
-	UINT_PTR	i, j, iPage, iLine;
+	UINT_PTR	i, iPage, iLine;
 	FILES_ITR	itNow;
+#ifdef LINE_VEC_LIST
+	LINE_ITR	itLine;
+#else
+	UINT_PTR	j;
+#endif
 
 	for( itNow = gltMultiFiles.begin( ); itNow != gltMultiFiles.end(); itNow++ )
 	{
 		iPage = itNow->vcCont.size( );
 		for( i = 0; iPage > i; i++ )
 		{
+#ifdef LINE_VEC_LIST
+			iLine  = itNow->vcCont.at( i ).ltPage.size( );
+
+			itLine = itNow->vcCont.at( i ).ltPage.begin();
+			for( itLine = itNow->vcCont.at( i ).ltPage.begin(); itLine != itNow->vcCont.at( i ).ltPage.end(); itLine++ )
+			{
+				itLine->vcLine.clear( );	//	各行の中身全消し
+			}
+			itNow->vcCont.at( i ).ltPage.clear( );	//	行を全消し
+#else
 			iLine = itNow->vcCont.at( i ).vcPage.size( );
 			for( j = 0; iLine > j; j++ )
 			{
-				itNow->vcCont.at( i ).vcPage.at( j ).vcLine.clear(   );	//	各行の中身全消し
+				itNow->vcCont.at( i ).vcPage.at( j ).vcLine.clear( );	//	各行の中身全消し
 			}
-			itNow->vcCont.at( i ).vcPage.clear(  );	//	行を全消し
+			itNow->vcCont.at( i ).vcPage.clear( );	//	行を全消し
+#endif
 			SqnFreeAll( &(itNow->vcCont.at( i ).stUndoLog) );
 		}
 		itNow->vcCont.clear(  );	//	ページを全消し
@@ -278,10 +307,15 @@ HRESULT DocMultiFileDeleteAll( VOID )
 LPARAM DocMultiFileDelete( HWND hWnd, LPARAM uqNumber )
 {
 	INT			iRslt;
-	UINT_PTR	i, j, iPage, iLine;
+	UINT_PTR	i, iPage, iLine;
 	UINT_PTR	iCount;
 	LPARAM	dNowNum, dPrevi;
 	FILES_ITR	itNow;
+#ifdef LINE_VEC_LIST
+	LINE_ITR	itLine;
+#else
+	UINT_PTR	j;
+#endif
 
 	//	一つしか開いてないなら閉じない
 	iCount = gltMultiFiles.size();
@@ -315,12 +349,23 @@ LPARAM DocMultiFileDelete( HWND hWnd, LPARAM uqNumber )
 	iPage = itNow->vcCont.size( );
 	for( i = 0; iPage > i; i++ )
 	{
+#ifdef LINE_VEC_LIST
+		iLine = itNow->vcCont.at( i ).ltPage.size( );
+
+		for( itLine = itNow->vcCont.at( i ).ltPage.begin(); itLine != itNow->vcCont.at( i ).ltPage.end(); itLine++ )
+		{
+			itLine->vcLine.clear( );	//	各行の中身全消し
+		}
+		itNow->vcCont.at( i ).ltPage.clear( );	//	行を全消し
+
+#else
 		iLine = itNow->vcCont.at( i ).vcPage.size( );
 		for( j = 0; iLine > j; j++ )
 		{
 			itNow->vcCont.at( i ).vcPage.at( j ).vcLine.clear(   );	//	各行の中身全消し
 		}
 		itNow->vcCont.at( i ).vcPage.clear(  );	//	行を全消し
+#endif
 		SqnFreeAll( &(itNow->vcCont.at( i ).stUndoLog) );
 	}
 	itNow->vcCont.clear(  );	//	ページを全消し
@@ -469,7 +514,7 @@ HRESULT DocOpenFromNull( HWND hWnd )
 	//	新しいファイル置き場の準備
 	dNumber = DocMultiFileCreate( atDummyName );
 
-	MultiFileTabAppend( dNumber, gstFile.atDummyName );
+	MultiFileTabAppend( dNumber, (*gitFileIt).atDummyName );	//	ファイルの新規作成した
 
 	AppTitleChange( atDummyName );
 
@@ -493,6 +538,7 @@ INT DocFileCloseCheck( HWND hWnd, UINT dMode )
 {
 	INT		rslt, ret;
 
+	TCHAR	atMessage[BIG_STRING];
 	BOOLEAN	bMod = FALSE;
 	FILES_ITR	itFiles;
 
@@ -501,11 +547,23 @@ INT DocFileCloseCheck( HWND hWnd, UINT dMode )
 	{
 		if( itFiles->dModify )
 		{
-			bMod = TRUE;
-			break;
+			StringCchPrintf( atMessage, BIG_STRING, TEXT("あぅあぅ！？\r\n%s は保存してないのです！\r\nここで保存するのですか？"), itFiles->atFileName[0] ? PathFindFileName( itFiles->atFileName ) : itFiles->atDummyName );
+			rslt = MessageBox( hWnd, atMessage, TEXT("／(^o^)＼"), MB_YESNOCANCEL | MB_ICONQUESTION );
+			if( IDCANCEL ==  rslt ){	return 0;	}	//	キャンセルなら終わること自体とりやめ
+			if( IDYES == rslt ){	DocFileSave( hWnd, D_SJIS );	}	//	保存するならセーブを呼ぶ
+			//	NOなら何もせず次を確認
+			bMod = TRUE;	//	未保存があった
 		}
 	}
 
+	if( !(bMod) )	//	未保存がなかったなら確認メッセージ
+	{
+		rslt = MessageBox( hWnd, TEXT("あぅ？\r\n終わるのですか？"), TEXT("＼(^o^)／"), MB_YESNO | MB_ICONQUESTION );
+		if( IDYES == rslt ){	ret = 1;	}
+		else{					ret = 0;	}
+	}
+
+#if 0
 	if( bMod )	//	更新がのこってる＝保存されてないなら
 	{
 		rslt = MessageBox( hWnd, TEXT("あぅあぅ！？\r\n保存してないファイルがあるのですよ！\r\n終わっちゃっていいのですか？"), TEXT("／(^o^)＼"), MB_YESNO | MB_ICONQUESTION );
@@ -525,6 +583,7 @@ INT DocFileCloseCheck( HWND hWnd, UINT dMode )
 			ret = 1;
 		}
 	}
+#endif
 
 	return ret;
 }
@@ -552,9 +611,16 @@ LPARAM DocFileInflate( LPTSTR ptFileName )
 
 	LPARAM	dNumber;
 
+#ifdef _DEBUG
+	DWORD	dTcStart, dTcEnd;
+#endif
+
 	//TCHAR	atBuff[10];
 	//ZeroMemory( atBuff, sizeof(atBuff) );
 
+#ifdef _DEBUG
+	dTcStart = GetTickCount(  );
+#endif
 	assert( ptFileName );	//	ファイル開けないのはバグ
 
 	//	ファイル名が空っぽだったら自動的にアウツ！
@@ -564,10 +630,11 @@ LPARAM DocFileInflate( LPTSTR ptFileName )
 	hFile = CreateFile( ptFileName, GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL );
 	if( INVALID_HANDLE_VALUE == hFile ){	return 0;	}
 
-	InitLastOpen( INIT_SAVE, ptFileName );	//	複数ファイルでは意味が無い
+	//InitLastOpen( INIT_SAVE, ptFileName );	//	複数ファイルでは意味が無い
 
 	//	新しいファイル置き場の準備
 	dNumber = DocMultiFileCreate( NULL );
+	if( 0 >= dNumber )	return 0;
 
 	iByteSize = GetFileSize( hFile, NULL );
 	pBuffer = malloc( iByteSize + 2 );
@@ -577,7 +644,7 @@ LPARAM DocFileInflate( LPTSTR ptFileName )
 	ReadFile( hFile, pBuffer, iByteSize, &readed, NULL );
 	CloseHandle( hFile );	//	内容全部取り込んだから開放
 
-	StringCchCopy( gstFile.atFileName, MAX_PATH, ptFileName );
+	StringCchCopy( (*gitFileIt).atFileName, MAX_PATH, ptFileName );
 
 	//	ユニコードチェック
 	CopyMemory( &rtUniBuf, pBuffer, 2 );
@@ -602,22 +669,6 @@ LPARAM DocFileInflate( LPTSTR ptFileName )
 	//	ファイルの内容を全確認して、先にメモリ確保しておく？
 
 
-/*
-	//	拡張子を確認・ドット込みだよ～ん
-	ptExten = PathFindExtension( ptFileName );	//	拡張子が無いならNULL、というか末端になる
-	if( 0 == *ptExten )
-	{
-		//	拡張子指定がないなら
-	}
-	else	//	既存の拡張子があったら
-	{
-		StringCchCopy( atExBuf, 10, ptExten );
-		CharLower( atExBuf );	//	比較のために小文字にしちゃう
-
-		//	既存の拡張子が、ASTならそれを優先する
-		if( !( StrCmp( atExBuf, aatExte[0] ) ) )	//	ASTであるなら
-*/
-
 	//	もしASTなら、先頭は[AA]になってるはず・分割は中でやる
 	if( StrCmpN( AST_SEPARATERW, ptString, 4 ) )
 	{
@@ -636,7 +687,11 @@ LPARAM DocFileInflate( LPTSTR ptFileName )
 	DocPageChange( 0  );	//	全部読み込んだので最初のページを表示する
 
 	AppTitleChange( ptFileName );
-	
+
+#ifdef _DEBUG
+	dTcEnd = GetTickCount(  );
+	TRACE( TEXT("LOAD START[%u]  END[%u]    ELAPSE[%u]"), dTcStart, dTcEnd, (dTcEnd - dTcStart) );
+#endif
 
 	return dNumber;
 }
@@ -674,6 +729,54 @@ UINT CALLBACK DocPageLoad( LPTSTR ptName, LPTSTR ptCont, INT cchSize )
 }
 //-------------------------------------------------------------------------------------------------
 
+#ifdef FILE_PRELOAD
+/*!
+	ＭＬＴもしくはＴＸＴの頁数を調べる
+	@param[in]	ptStr	分解対象文字列へのポインター
+	@param[in]	cchSize	その文字列の文字数
+	@return		UINT	頁数
+*/
+UINT DocPreloadMLT( LPTSTR ptString, INT cchSize )
+{
+	LPTSTR	ptCaret;	//	読込開始・現在位置
+	LPTSTR	ptEnd;		//	ページの末端位置・セパレータの直前
+	INT		iLines, iDots, iMozis;
+	UINT	dPage;
+	UINT_PTR	cchItem;
+	BOOLEAN	bLast = FALSE;
+
+	ptCaret = ptString;	//	まずは最初から
+
+	dPage = 0;
+
+	//	始点にはセパレータ無いものとみなす。連続するセパレータは、空白内容として扱う
+	do
+	{
+		ptEnd = StrStr( ptCaret, MLT_SEPARATERW );	//	セパレータを探す
+		if( !ptEnd )	//	見つからなかったら＝これが最後なら＝NULL
+		{
+			ptEnd = ptString + cchSize;
+			bLast = TRUE;
+		}
+		cchItem = ptEnd - ptCaret;	//	WCHAR単位なので計算結果は文字数のようだ
+		//	最終頁でない場合は末端の改行分引く
+		if( !(bLast) && 0 < cchItem ){	cchItem -=  CH_CRLF_CCH;	}
+
+		dPage++;
+
+		//	頁の情報を確保
+		iLines = DocStringInfoCount( ptCaret, cchItem, &iDots, &iMozis );
+
+		ptCaret = NextLineW( ptEnd );	//	セパレータの次の行からが本体
+
+	}while( *ptCaret  );	//	データ有る限りループで探す
+
+
+	return dPage;
+}
+//-------------------------------------------------------------------------------------------------
+#endif
+
 /*!
 	ＭＬＴもしくはＴＸＴなユニコード文字列を受け取って分解しつつページに入れる
 	@param[in]	ptStr		分解対象文字列へのポインター
@@ -686,16 +789,21 @@ UINT DocStringSplitMLT( LPTSTR ptStr, INT cchSize, PAGELOAD pfPageLoad )
 	LPTSTR	ptCaret;	//	読込開始・現在位置
 	LPTSTR	ptEnd;		//	ページの末端位置・セパレータの直前
 	UINT	iNumber;	//	通し番号カウント
+#ifdef FILE_PRELOAD
+	UINT	dPage;		
+#endif
 	UINT	cchItem;
 //	INT		dmyX = 0, dmyY = 0;
-	BOOLEAN	bLast;
+	BOOLEAN	bLast = FALSE;
 
 	ptCaret = ptStr;	//	まずは最初から
 
 	iNumber = 0;	//	通し番号０インデックス
 	//	始点にはセパレータ無いものとみなす。連続するセパレータは、空白内容として扱う
 
-	bLast = FALSE;
+#ifdef FILE_PRELOAD
+	dPage = DocPreloadMLT( ptStr, cchSize );
+#endif
 
 	do
 	{
@@ -707,16 +815,14 @@ UINT DocStringSplitMLT( LPTSTR ptStr, INT cchSize, PAGELOAD pfPageLoad )
 		}
 		cchItem = ptEnd - ptCaret;	//	WCHAR単位なので計算結果は文字数のようだ
 
-		if( !(bLast) && 0 < cchItem )	//	最終頁でない場合は末端の改行分引く
-		{
-			cchItem -= CH_CRLF_CCH;
-		}
+		//	最終頁でない場合は末端の改行分引く
+		if( !(bLast) && 0 < cchItem ){	cchItem -=  CH_CRLF_CCH;	}
 
 		pfPageLoad( NULL, ptCaret, cchItem );
 
 		iNumber++;
 
-		ptCaret = NextLineW( ptEnd );
+		ptCaret = NextLineW( ptEnd );	//	セパレータの次の行からが本体
 
 	}while( *ptCaret );	//	データ有る限りループで探す
 
@@ -888,7 +994,7 @@ UINT DocImportSplitASD( LPSTR pcStr, INT cbSize, PAGELOAD pfPageLoad )
 */
 HRESULT DocPageNameSet( LPTSTR ptName )
 {
-	StringCchCopy( gstFile.vcCont.at( gixFocusPage ).atPageName, SUB_STRING, ptName );
+	StringCchCopy( (*gitFileIt).vcCont.at( gixFocusPage ).atPageName, SUB_STRING, ptName );
 
 	PageListNameSet( gixFocusPage, ptName );
 
@@ -912,6 +1018,9 @@ UINT DocPageCreate( INT iAdding )
 
 	PAGE_ITR	itPage;
 
+#ifdef DO_TRY_CATCH
+	try{
+#endif
 
 	ZeroONELINE( &stLine  );	//	新規作成したら、壱行目が０文字な枠を作る
 
@@ -919,15 +1028,20 @@ UINT DocPageCreate( INT iAdding )
 	ZeroMemory( stPage.atPageName, sizeof(stPage.atPageName) );
 //	stPage.dDotCnt = 0;
 	stPage.dByteSz = 0;
+#ifdef LINE_VEC_LIST
+	stPage.ltPage.clear(  );
+	stPage.ltPage.push_back( stLine );	//	１頁の枠を作って
+#else
 	stPage.vcPage.clear(  );
 	stPage.vcPage.push_back( stLine );	//	１頁の枠を作って
+#endif
 	stPage.dSelLineTop    =  -1;		//	無効は－１を注意
 	stPage.dSelLineBottom =  -1;		//	
 
 	SqnInitialise( &(stPage.stUndoLog) );
 
 	//	今の頁の次に作成
-	iTotal = gstFile.vcCont.size(  );
+	iTotal = (*gitFileIt).vcCont.size(  );
 
 	if( 0 <= iAdding )
 	{
@@ -941,19 +1055,25 @@ UINT DocPageCreate( INT iAdding )
 
 	if( 0 >  iNext )	//	末尾に追加
 	{
-		gstFile.vcCont.push_back( stPage  );	//	ファイル構造体に追加
+		(*gitFileIt).vcCont.push_back( stPage  );	//	ファイル構造体に追加
 
-		iAddPage = gstFile.vcCont.size( );
+		iAddPage = (*gitFileIt).vcCont.size( );
 		iAddPage--;	//	末端に追加したんだから、個数数えて－１したら０インデックス番号
 	}
 	else
 	{
-		itPage = gstFile.vcCont.begin(  );
+		itPage = (*gitFileIt).vcCont.begin(  );
 		for( i = 0; iNext >  i; i++ ){	itPage++;	}
-		gstFile.vcCont.insert( itPage, stPage );
+		(*gitFileIt).vcCont.insert( itPage, stPage );
 
 		iAddPage = iNext;
 	}
+
+#ifdef DO_TRY_CATCH
+	}
+	catch( exception &err ){	return (UINT)ETC_MSG( err.what(), 0 );	}
+	catch( ... ){	return (UINT)ETC_MSG( ("etc error"), 0 );	}
+#endif
 
 	return iAddPage;	//	追加したページ番号
 }
@@ -969,16 +1089,16 @@ HRESULT DocPageDelete( INT iPage )
 	INT	i, iNew;
 	PAGE_ITR	itPage;
 
-	if( 1 >= gstFile.vcCont.size( ) )	return E_ACCESSDENIED;
+	if( 1 >= (*gitFileIt).vcCont.size( ) )	return E_ACCESSDENIED;
 
 	//	ここでバックアップを？
 
 	//	街頭位置までイテレータをもっていく
-	itPage = gstFile.vcCont.begin(  );
+	itPage = (*gitFileIt).vcCont.begin(  );
 	for( i = 0; iPage > i; i++ ){	itPage++;	}
 
-	SqnFreeAll( &(itPage->stUndoLog) );	//	アンドゥログ削除
-	gstFile.vcCont.erase( itPage  );	//	さっくり削除
+	SqnFreeAll( &(itPage->stUndoLog)  );	//	アンドゥログ削除
+	(*gitFileIt).vcCont.erase( itPage  );	//	さっくり削除
 	gixFocusPage = -1;	//	頁選択無効にする
 
 	PageListDelete( iPage );
@@ -999,14 +1119,23 @@ HRESULT DocPageDelete( INT iPage )
 HRESULT DocPageChange( INT dPageNum )
 {
 	//	今の表示内容破棄とかいろいろある
+#ifdef DO_TRY_CATCH
+	try{
+#endif
 
 	ViewSelPageAll( -1 );	//	範囲選択を破棄
 
 	gixFocusPage = dPageNum;	//	先に変更して
 
-	gstFile.dNowPage = dPageNum;	//	記録
+	(*gitFileIt).dNowPage = dPageNum;	//	記録
 
 	PageListViewChange( dPageNum );
+
+#ifdef DO_TRY_CATCH
+	}
+	catch( exception &err ){	return (HRESULT)ETC_MSG( err.what(), E_UNEXPECTED );	}
+	catch( ... ){	return (HRESULT)ETC_MSG( ("etc error") , E_UNEXPECTED );	}
+#endif
 
 	return S_OK;
 }
@@ -1042,11 +1171,21 @@ VOID ZeroONELINE( LPONELINE pstLine )
 */
 BOOLEAN DocBadSpaceIsExist( INT rdLine )
 {
+#ifdef LINE_VEC_LIST
+	LINE_ITR	itLine;
+#endif
 	//	状態確認
 	if( DocRangeIsError( gixFocusPage, rdLine ) ){	return 0;	}
 	//	ここの範囲外発生は必然なので特に警告は不要
 
-	return gstFile.vcCont.at( gixFocusPage ).vcPage.at( rdLine ).bBadSpace;
+#ifdef LINE_VEC_LIST
+	itLine = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.begin();
+	std::advance( itLine, rdLine );
+
+	return itLine->bBadSpace;
+#else
+	return (*gitFileIt).vcCont.at( gixFocusPage ).vcPage.at( rdLine ).bBadSpace;
+#endif
 }
 //-------------------------------------------------------------------------------------------------
 
@@ -1058,9 +1197,12 @@ BOOLEAN DocBadSpaceIsExist( INT rdLine )
 UINT DocBadSpaceCheck( INT rdLine )
 {
 	UINT_PTR	iCount, iRslt;
-	BOOLEAN	bWarn;
-	TCHAR	ch, chn;
-	LTR_ITR	ltrItr, ltrEnd, ltrNext;
+	BOOLEAN		bWarn;
+	TCHAR		ch, chn;
+	LETR_ITR	ltrItr, ltrEnd, ltrNext;
+#ifdef LINE_VEC_LIST
+	LINE_ITR	itLine;
+#endif
 
 //末端空白はDocLineDataGetAllocでも見てる
 
@@ -1072,24 +1214,47 @@ UINT DocBadSpaceCheck( INT rdLine )
 	}
 
 	//	文字数確認
-	iCount = gstFile.vcCont.at( gixFocusPage ).vcPage.at( rdLine ).vcLine.size( );
+#ifdef LINE_VEC_LIST
+	itLine = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.begin();
+	std::advance( itLine, rdLine );
+
+	iCount = itLine->vcLine.size( );
 	if( 0 == iCount )	//	０なら何も確認することがないので、エラー消して終わり
 	{
 		//	エラー残ってたら
-		if( gstFile.vcCont.at( gixFocusPage ).vcPage.at( rdLine ).bBadSpace )
+		if( itLine->bBadSpace )
 		{
-			gstFile.vcCont.at( gixFocusPage ).vcPage.at( rdLine ).bBadSpace = 0;
+			itLine->bBadSpace = 0;
 			ViewRedrawSetLine( rdLine );	//	ルーラごと行再描画
 		}
 		return 0;
 	}
+#else
+	iCount = (*gitFileIt).vcCont.at( gixFocusPage ).vcPage.at( rdLine ).vcLine.size( );
+	if( 0 == iCount )	//	０なら何も確認することがないので、エラー消して終わり
+	{
+		//	エラー残ってたら
+		if( (*gitFileIt).vcCont.at( gixFocusPage ).vcPage.at( rdLine ).bBadSpace )
+		{
+			(*gitFileIt).vcCont.at( gixFocusPage ).vcPage.at( rdLine ).bBadSpace = 0;
+			ViewRedrawSetLine( rdLine );	//	ルーラごと行再描画
+		}
+		return 0;
+	}
+#endif
 
 	iRslt = 0;
 
 	bWarn = FALSE;
-	ltrEnd = gstFile.vcCont.at( gixFocusPage ).vcPage.at( rdLine ).vcLine.end( );
+#ifdef LINE_VEC_LIST
+	ltrEnd = itLine->vcLine.end( );
 
-	for( ltrItr = gstFile.vcCont.at( gixFocusPage ).vcPage.at( rdLine ).vcLine.begin(); ltrEnd != ltrItr; ltrItr++ )
+	for( ltrItr = itLine->vcLine.begin(); ltrEnd != ltrItr; ltrItr++ )
+#else
+	ltrEnd = (*gitFileIt).vcCont.at( gixFocusPage ).vcPage.at( rdLine ).vcLine.end( );
+
+	for( ltrItr = (*gitFileIt).vcCont.at( gixFocusPage ).vcPage.at( rdLine ).vcLine.begin(); ltrEnd != ltrItr; ltrItr++ )
+#endif
 	{
 		ch = ltrItr->cchMozi;
 		//	面倒なので警告は一旦消しておく
@@ -1130,12 +1295,20 @@ UINT DocBadSpaceCheck( INT rdLine )
 	if( iswspace( ltrEnd->cchMozi ) ){	iRslt = 1;	}
 
 	//	行頭に半角空白ないか確認
-	ch = gstFile.vcCont.at( gixFocusPage ).vcPage.at( rdLine ).vcLine.at( 0 ).cchMozi;
+#ifdef LINE_VEC_LIST
+	ch = itLine->vcLine.at( 0 ).cchMozi;
+#else
+	ch = (*gitFileIt).vcCont.at( gixFocusPage ).vcPage.at( rdLine ).vcLine.at( 0 ).cchMozi;
+#endif
 	if( 0xFF >= ch )	//	半角だったら
 	{
 		if( isspace( ch ) )
 		{
-			gstFile.vcCont.at( gixFocusPage ).vcPage.at( rdLine ).vcLine.at( 0 ).mzStyle |= CT_WARNING;
+#ifdef LINE_VEC_LIST
+			itLine->vcLine.at( 0 ).mzStyle |= CT_WARNING;
+#else
+			(*gitFileIt).vcCont.at( gixFocusPage ).vcPage.at( rdLine ).vcLine.at( 0 ).mzStyle |= CT_WARNING;
+#endif
 			iRslt = 1;
 		}
 	}
@@ -1143,12 +1316,21 @@ UINT DocBadSpaceCheck( INT rdLine )
 #pragma message ("DocBadSpaceCheck内の更新指令の最適化が必要")
 
 	//	前回までと状況が違っていたら
-	if( iRslt != gstFile.vcCont.at( gixFocusPage ).vcPage.at( rdLine ).bBadSpace )
+#ifdef LINE_VEC_LIST
+	if( iRslt != itLine->bBadSpace )
 	{
-//		ViewRedrawSetVartRuler( rdLine );	//	ルーラ再描画
 		ViewRedrawSetLine( rdLine );	//	ルーラごと行再描画
 	}
-	gstFile.vcCont.at( gixFocusPage ).vcPage.at( rdLine ).bBadSpace = iRslt;
+
+	itLine->bBadSpace = iRslt;
+#else
+	if( iRslt != (*gitFileIt).vcCont.at( gixFocusPage ).vcPage.at( rdLine ).bBadSpace )
+	{
+		ViewRedrawSetLine( rdLine );	//	ルーラごと行再描画
+	}
+
+	(*gitFileIt).vcCont.at( gixFocusPage ).vcPage.at( rdLine ).bBadSpace = iRslt;
+#endif
 
 	return iRslt;
 }
@@ -1160,7 +1342,7 @@ UINT DocBadSpaceCheck( INT rdLine )
 */
 INT_PTR DocPageCount( VOID )
 {
-	return gstFile.vcCont.size( );
+	return (*gitFileIt).vcCont.size( );
 }
 //-------------------------------------------------------------------------------------------------
 
@@ -1175,9 +1357,18 @@ UINT DocPageParamGet( PINT pdMozi, PINT pdByte )
 	INT_PTR	iLines, i, dMozis = 0;
 	INT		dBytes = 0;
 
-	iLines = gstFile.vcCont.at( gixFocusPage ).vcPage.size( );
+#ifdef LINE_VEC_LIST
+	LINE_ITR	itLine;
+
+	iLines = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.size( );
+
+	itLine = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.begin();
+	for( i = 0; iLines > i; i++, itLine++ )
+#else
+	iLines = (*gitFileIt).vcCont.at( gixFocusPage ).vcPage.size( );
 
 	for( i = 0; iLines > i; i++ )
+#endif
 	{
 		//	改行のバイト数・2ch、YY＝6byte・したらば＝4byte
 		if( 1 <= i )	//	弐行目から改行分追加
@@ -1186,14 +1377,19 @@ UINT DocPageParamGet( PINT pdMozi, PINT pdByte )
 			else				dBytes += STRB_CRLF;
 		}
 
-		dMozis += gstFile.vcCont.at( gixFocusPage ).vcPage.at( i ).vcLine.size( );
-		dBytes += gstFile.vcCont.at( gixFocusPage ).vcPage.at( i ).iByteSz;
+#ifdef LINE_VEC_LIST
+		dMozis += itLine->vcLine.size( );
+		dBytes += itLine->iByteSz;
+#else
+		dMozis += (*gitFileIt).vcCont.at( gixFocusPage ).vcPage.at( i ).vcLine.size( );
+		dBytes += (*gitFileIt).vcCont.at( gixFocusPage ).vcPage.at( i ).iByteSz;
+#endif
 	}
 
 	if( pdMozi )	*pdMozi = dMozis;
 	if( pdByte )	*pdByte = dBytes;
 
-	gstFile.vcCont.at( gixFocusPage ).dByteSz = dBytes;
+	(*gitFileIt).vcCont.at( gixFocusPage ).dByteSz = dBytes;
 
 	DocPageInfoRenew( -1, 1 );
 
@@ -1210,7 +1406,7 @@ INT DocPageByteCount( INT dPage, PINT pMozi )
 {
 	INT		iBytes, iMozis;
 	LINE_ITR	itLine, endLine;
-	LTR_ITR		itMozi, endMozi;
+	LETR_ITR	itMozi, endMozi;
 
 	if( 0 > dPage ){	dPage = gixFocusPage;	}
 
@@ -1219,9 +1415,13 @@ INT DocPageByteCount( INT dPage, PINT pMozi )
 	iBytes = 0;
 	iMozis = 0;
 
-	itLine  = gstFile.vcCont.at( dPage ).vcPage.begin();
-	endLine = gstFile.vcCont.at( dPage ).vcPage.end();
-
+#ifdef LINE_VEC_LIST
+	itLine  = (*gitFileIt).vcCont.at( dPage ).ltPage.begin();
+	endLine = (*gitFileIt).vcCont.at( dPage ).ltPage.end();
+#else
+	itLine  = (*gitFileIt).vcCont.at( dPage ).vcPage.begin();
+	endLine = (*gitFileIt).vcCont.at( dPage ).vcPage.end();
+#endif
 	for( ; itLine != endLine; itLine++ )
 	{
 		itMozi  = itLine->vcLine.begin();
@@ -1234,7 +1434,7 @@ INT DocPageByteCount( INT dPage, PINT pMozi )
 		}
 	}
 
-	gstFile.vcCont.at( dPage ).dByteSz = iBytes;
+	(*gitFileIt).vcCont.at( dPage ).dByteSz = iBytes;
 
 	if( pMozi ){	*pMozi = iMozis;	}
 
@@ -1257,7 +1457,7 @@ HRESULT DocPageInfoRenew( INT dPage, UINT bMode )
 	if( 0 > dPage ){	dPage = gixFocusPage;	}
 
 
-	dBytes = gstFile.vcCont.at( dPage ).dByteSz;
+	dBytes = (*gitFileIt).vcCont.at( dPage ).dByteSz;
 	
 	if( bMode )
 	{
@@ -1266,8 +1466,11 @@ HRESULT DocPageInfoRenew( INT dPage, UINT bMode )
 		StatusBarSetText( SB_BYTECNT, atBuff );
 	}
 
-	dLines = gstFile.vcCont.at( dPage ).vcPage.size( );
-
+#ifdef LINE_VEC_LIST
+	dLines = (*gitFileIt).vcCont.at( dPage ).ltPage.size( );
+#else
+	dLines = (*gitFileIt).vcCont.at( dPage ).vcPage.size( );
+#endif
 	PageListInfoSet( dPage, dBytes, dLines );
 
 	return S_OK;
@@ -1285,14 +1488,28 @@ INT DocPageMaxDotGet( INT dTop, INT dBottom )
 	INT		maxDot = 0, thisDot, i;
 	UINT_PTR	iLines;
 
-	iLines = gstFile.vcCont.at( gixFocusPage ).vcPage.size( );
+#ifdef LINE_VEC_LIST
+	LINE_ITR	itLine;
+
+	iLines = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.size( );
+#else
+	iLines = (*gitFileIt).vcCont.at( gixFocusPage ).vcPage.size( );
+#endif
 	if( 0 > dTop )		dTop = 0;
 	if( 0 > dBottom )	dBottom = iLines - 1;
 
+#ifdef LINE_VEC_LIST
+	itLine = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.begin();
+	std::advance( itLine, dTop );
+
+	for( i = dTop; dBottom >= i; i++, itLine++ )
+	{
+		thisDot = itLine->iDotCnt;
+#else
 	for( i = dTop; dBottom >= i; i++ )
 	{
-		thisDot = gstFile.vcCont.at( gixFocusPage ).vcPage.at( i ).iDotCnt;
-	//	TRACE( TEXT("MAX:%d THIS:%d"), maxDot, thisDot );
+		thisDot = (*gitFileIt).vcCont.at( gixFocusPage ).vcPage.at( i ).iDotCnt;
+#endif
 		if( maxDot < thisDot )	maxDot = thisDot;
 	}
 
@@ -1312,12 +1529,23 @@ INT DocLineParamGet( INT rdLine, PINT pdMozi, PINT pdByte )
 	INT_PTR	iCount, i, iLines;
 	INT		dDotCnt, dByteCnt;
 
-	iLines = gstFile.vcCont.at( gixFocusPage ).vcPage.size( );
+#ifdef LINE_VEC_LIST
+	LINE_ITR	itLine;
+
+	iLines = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.size( );
+#else
+	iLines = (*gitFileIt).vcCont.at( gixFocusPage ).vcPage.size( );
+#endif
 	if( iLines <= rdLine )	return -1;
 
+#ifdef LINE_VEC_LIST
+	itLine = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.begin();
+	std::advance( itLine, rdLine );
 
-	iCount = gstFile.vcCont.at( gixFocusPage ).vcPage.at( rdLine ).vcLine.size( );
-
+	iCount = itLine->vcLine.size( );
+#else
+	iCount = (*gitFileIt).vcCont.at( gixFocusPage ).vcPage.at( rdLine ).vcLine.size( );
+#endif
 	//	文字数必要なら
 	if( pdMozi )	*pdMozi = iCount;
 
@@ -1325,19 +1553,27 @@ INT DocLineParamGet( INT rdLine, PINT pdMozi, PINT pdByte )
 	dByteCnt = 0;
 	for( i = 0; iCount > i; i++ )
 	{
-		dDotCnt += gstFile.vcCont.at( gixFocusPage ).vcPage.at( rdLine ).vcLine.at( i ).rdWidth;
+#ifdef LINE_VEC_LIST
+		dDotCnt  += itLine->vcLine.at( i ).rdWidth;
+		dByteCnt += itLine->vcLine.at( i ).mzByte;	//	総バイト数
+#else
+		dDotCnt += (*gitFileIt).vcCont.at( gixFocusPage ).vcPage.at( rdLine ).vcLine.at( i ).rdWidth;
 
 		//	総バイト数
-		dByteCnt += gstFile.vcCont.at( gixFocusPage ).vcPage.at( rdLine ).vcLine.at( i ).mzByte;
-		
+		dByteCnt += (*gitFileIt).vcCont.at( gixFocusPage ).vcPage.at( rdLine ).vcLine.at( i ).mzByte;
+#endif
 	}
 
 	if( pdByte )	*pdByte = dByteCnt;
 
 	//	自分のサイズいれとく
-	gstFile.vcCont.at( gixFocusPage ).vcPage.at( rdLine ).iDotCnt = dDotCnt;
-	gstFile.vcCont.at( gixFocusPage ).vcPage.at( rdLine ).iByteSz = dByteCnt;
-
+#ifdef LINE_VEC_LIST
+	itLine->iDotCnt = dDotCnt;
+	itLine->iByteSz = dByteCnt;
+#else
+	(*gitFileIt).vcCont.at( gixFocusPage ).vcPage.at( rdLine ).iDotCnt = dDotCnt;
+	(*gitFileIt).vcCont.at( gixFocusPage ).vcPage.at( rdLine ).iByteSz = dByteCnt;
+#endif
 	return dDotCnt;
 }
 //-------------------------------------------------------------------------------------------------
@@ -1355,6 +1591,13 @@ INT DocLetterPosGetAdjust( PINT pNowDot, INT rdLine, INT round )
 	INT		iLetter;	//	キャレットの左側の文字数
 	INT		dDotCnt = 0, dPrvCnt = 0, rdWidth = 0;
 
+#ifdef LINE_VEC_LIST
+	LINE_ITR	itLine;
+
+	itLine = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.begin();
+	std::advance( itLine, rdLine );
+#endif
+
 	assert( pNowDot );
 
 	//	行のはみ出しと文字数確認
@@ -1366,7 +1609,11 @@ INT DocLetterPosGetAdjust( PINT pNowDot, INT rdLine, INT round )
 		if( dDotCnt >= *pNowDot ){	break;	}
 
 		dPrvCnt = dDotCnt;
-		rdWidth = gstFile.vcCont.at( gixFocusPage ).vcPage.at( rdLine ).vcLine.at( i ).rdWidth;
+#ifdef LINE_VEC_LIST
+		rdWidth = itLine->vcLine.at( i ).rdWidth;
+#else
+		rdWidth = (*gitFileIt).vcCont.at( gixFocusPage ).vcPage.at( rdLine ).vcLine.at( i ).rdWidth;
+#endif
 		dDotCnt += rdWidth;
 	}	//	振り切るようなら末端
 
@@ -1414,10 +1661,14 @@ INT DocLetterShiftPos( INT nowDot, INT rdLine, INT bDirect, PINT pdAbsDot, PBOOL
 	INT_PTR	iCount, iLetter, iLines;	//	キャレットの左側の文字数
 	INT		dLtrDot = 0;//dDotCnt = 0;
 
-	iLines = gstFile.vcCont.at( gixFocusPage ).vcPage.size( );
-	if( iLines <=  rdLine )	return -1;
+#ifdef LINE_VEC_LIST
+	LINE_ITR	itLine;
 
-
+	iLines = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.size( );
+#else
+	iLines = (*gitFileIt).vcCont.at( gixFocusPage ).vcPage.size( );
+#endif
+	if( iLines <=  rdLine ){	return -1;	}
 
 	if( 0 == bDirect )
 	{
@@ -1426,8 +1677,14 @@ INT DocLetterShiftPos( INT nowDot, INT rdLine, INT bDirect, PINT pdAbsDot, PBOOL
 		return nowDot;	//	移動方向無しでは意味が無い
 	}
 
-	iCount = gstFile.vcCont.at( gixFocusPage ).vcPage.at( rdLine ).vcLine.size( );	//	この行の文字数確認して
+#ifdef LINE_VEC_LIST
+	itLine = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.begin();
+	std::advance( itLine, rdLine );
 
+	iCount = itLine->vcLine.size( );	//	この行の文字数確認して
+#else
+	iCount = (*gitFileIt).vcCont.at( gixFocusPage ).vcPage.at( rdLine ).vcLine.size(  );	//	この行の文字数確認して
+#endif
 	//	文字数カウント
 	iLetter = DocLetterPosGetAdjust( &nowDot, rdLine, 0 );
 
@@ -1444,14 +1701,22 @@ INT DocLetterShiftPos( INT nowDot, INT rdLine, INT bDirect, PINT pdAbsDot, PBOOL
 
 	if( 0 > bDirect )	//	左(先頭)へ移動
 	{
-		dLtrDot = gstFile.vcCont.at( gixFocusPage ).vcPage.at( rdLine ).vcLine.at( iLetter-1 ).rdWidth;
+#ifdef LINE_VEC_LIST
+		dLtrDot = itLine->vcLine.at( iLetter-1 ).rdWidth;
+#else
+		dLtrDot = (*gitFileIt).vcCont.at( gixFocusPage ).vcPage.at( rdLine ).vcLine.at( iLetter-1 ).rdWidth;
+#endif
 		//	直前の文字の幅を確認
 		nowDot -= dLtrDot;
 	}//	dDotCnt
 
 	if( 0 < bDirect )	//	右(末尾)へ移動
 	{
-		dLtrDot = gstFile.vcCont.at( gixFocusPage ).vcPage.at( rdLine ).vcLine.at( iLetter ).rdWidth;
+#ifdef LINE_VEC_LIST
+		dLtrDot = itLine->vcLine.at( iLetter ).rdWidth;
+#else
+		dLtrDot = (*gitFileIt).vcCont.at( gixFocusPage ).vcPage.at( rdLine ).vcLine.at( iLetter ).rdWidth;
+#endif
 		//	直後の文字の幅を確認
 		nowDot += dLtrDot;
 	}//	dDotCnt
@@ -1479,14 +1744,23 @@ INT DocLineDataGetAlloc( INT rdLine, INT iStart, LPLETTER *pstTexts, PINT pchLen
 
 	//	始点と終点を使えるようにする	//	－１なら末端
 
-	assert( pdFlag );
-	assert( pchLen );
+#ifdef LINE_VEC_LIST
+	LINE_ITR	itLine;
 
-	iLines = gstFile.vcCont.at( gixFocusPage ).vcPage.size( );
+	iLines = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.size( );
+#else
+	iLines = (*gitFileIt).vcCont.at( gixFocusPage ).vcPage.size( );
+#endif
 	if( iLines <=  rdLine )	return -1;
 
-	iCount = (gstFile.vcCont.at( gixFocusPage ).vcPage.at( rdLine ).vcLine.size( ) );
+#ifdef LINE_VEC_LIST
+	itLine = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.begin();
+	std::advance( itLine, rdLine );
 
+	iCount = itLine->vcLine.size( );
+#else
+	iCount = (*gitFileIt).vcCont.at( gixFocusPage ).vcPage.at( rdLine ).vcLine.size( );
+#endif
 	*pdFlag = 0;
 
 	if( 0 == iCount )	//	文字列の中身がない
@@ -1513,16 +1787,27 @@ INT DocLineDataGetAlloc( INT rdLine, INT iStart, LPLETTER *pstTexts, PINT pchLen
 		dotCnt = 0;
 		for( i = iStart, j = 0; iCount > i; i++, j++ )
 		{
-			(*pstTexts)[j].cchMozi = gstFile.vcCont.at( gixFocusPage ).vcPage.at( rdLine ).vcLine.at( i ).cchMozi;
-			(*pstTexts)[j].rdWidth = gstFile.vcCont.at( gixFocusPage ).vcPage.at( rdLine ).vcLine.at( i ).rdWidth;
-			(*pstTexts)[j].mzStyle = gstFile.vcCont.at( gixFocusPage ).vcPage.at( rdLine ).vcLine.at( i ).mzStyle;
+#ifdef LINE_VEC_LIST
+			(*pstTexts)[j].cchMozi = itLine->vcLine.at( i ).cchMozi;
+			(*pstTexts)[j].rdWidth = itLine->vcLine.at( i ).rdWidth;
+			(*pstTexts)[j].mzStyle = itLine->vcLine.at( i ).mzStyle;
 
-			dotCnt += gstFile.vcCont.at( gixFocusPage ).vcPage.at( rdLine ).vcLine.at( i ).rdWidth;
+			dotCnt += itLine->vcLine.at( i ).rdWidth;
+#else
+			(*pstTexts)[j].cchMozi = (*gitFileIt).vcCont.at( gixFocusPage ).vcPage.at( rdLine ).vcLine.at( i ).cchMozi;
+			(*pstTexts)[j].rdWidth = (*gitFileIt).vcCont.at( gixFocusPage ).vcPage.at( rdLine ).vcLine.at( i ).rdWidth;
+			(*pstTexts)[j].mzStyle = (*gitFileIt).vcCont.at( gixFocusPage ).vcPage.at( rdLine ).vcLine.at( i ).mzStyle;
 
+			dotCnt += (*gitFileIt).vcCont.at( gixFocusPage ).vcPage.at( rdLine ).vcLine.at( i ).rdWidth;
+#endif
 		}
 
 		//	末端がspaceかどうか確認
-		if( iswspace( gstFile.vcCont.at( gixFocusPage ).vcPage.at( rdLine ).vcLine.at( iCount-1 ).cchMozi ) )
+#ifdef LINE_VEC_LIST
+		if( iswspace( itLine->vcLine.at( iCount-1 ).cchMozi ) )
+#else
+		if( iswspace( (*gitFileIt).vcCont.at( gixFocusPage ).vcPage.at( rdLine ).vcLine.at( iCount-1 ).cchMozi ) )
+#endif
 		{	*pdFlag |= CT_LASTSP;	}
 	}
 
@@ -1530,45 +1815,66 @@ INT DocLineDataGetAlloc( INT rdLine, INT iStart, LPLETTER *pstTexts, PINT pchLen
 	else						*pdFlag |= CT_EOF;		//	ないならこの行末端がEOF
 
 	//	改行の状態を確保
-	*pdFlag |= gstFile.vcCont.at( gixFocusPage ).vcPage.at( rdLine ).dStyle;
-
+#ifdef LINE_VEC_LIST
+	*pdFlag |= itLine->dStyle;
+#else
+	*pdFlag |= (*gitFileIt).vcCont.at( gixFocusPage ).vcPage.at( rdLine ).dStyle;
+#endif
 	return dotCnt;
 }
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	文字列の行数を数える・ユニコード用
+	文字列の行数と、一番長いドットと文字数を数える・ユニコード用
 	@param[in]	ptStr	数えたい文字列
-	@param[in]	cchSize	文字数
+	@param[in]	cchSize	文字数・０ならこっちで調べる
+	@param[out]	pMaxDot	最大ドット幅
+	@param[out]	pMaxLtr	最大文字数
 	@return		行数
 */
-INT DocLineCount( LPTSTR ptStr, UINT cchSize )
+INT DocStringInfoCount( LPTSTR ptStr, UINT_PTR cchSize, PINT pMaxDot, PINT pMaxLtr )
 {
-	INT	lineCnt = 0;
-	LPTSTR	ptEnd, ptCaret;
+	INT	iDot, iLine, iMax, iMozi, e;
+	UINT_PTR	d;
+	wstring	wsBuffer;
 
-	ptCaret = ptStr;
+	//	文字数指定がないならここで調べておく
+	if(  0 == cchSize ){	StringCchLength( ptStr, STRSAFE_MAX_CCH, &cchSize );	}
 
-	do
+	wsBuffer.clear();
+	iDot = 0;	iLine = 0;	iMax = 0;	iMozi = 0;
+
+	for( d = 0, e = 0; cchSize >= d; d++ )	//	終端処理が必要
 	{
-		ptEnd = StrStr( ptCaret, CH_CRLFW );	//	改行を探す
-		if( !ptEnd )	//	見つからなかったら＝これが最後なら＝NULL
+		if( cchSize <= d || 0x000D == ptStr[d] )
 		{
-			lineCnt++;
-			break;
+			iLine++;	//	壱行
+			iDot = ViewStringWidthGet( wsBuffer.c_str() );
+			if( iMax  < iDot ){	iMax  = iDot;	}	//	ドット長
+			if( iMozi < e ){	iMozi = e;		}	//	文字数
+
+			if( cchSize <= d )	break;	//	終わりならここまで
+
+			d++;	//	次の行の為に
+
+			e = 0;
+			wsBuffer.clear();
 		}
+		else	//	文字列を壱行ずつ確認していく
+		{
+			wsBuffer.push_back( ptStr[d] );
+		}
+	}
 
-		ptCaret = NextLineW( ptEnd );
+	if( pMaxDot ){	*pMaxDot = iMax;	}
+	if( pMaxLtr ){	*pMaxLtr = iMozi;	}
 
-		lineCnt++;
-
-	}while( *ptCaret );	//	データ有る限りループで探す
-
-	TRACE( TEXT("LINE COUNT [%d]"), lineCnt );
-
-	return lineCnt;
+	return iLine;
 }
 //-------------------------------------------------------------------------------------------------
+
+
+
 
 
 /*!
@@ -1587,22 +1893,29 @@ INT DocPageTextAllGetAlloc( UINT bStyle, LPVOID *pText )
 	string	srString;	//	ユニコード・シフトJISで確保
 	wstring	wsString;
 
+#ifdef LINE_VEC_LIST
+	LINE_ITR	itLine;
+#endif
+
 	srString.clear( );
 	wsString.clear( );
 
 	//	ページ全体の行数
-	iLines = gstFile.vcCont.at( gixFocusPage ).vcPage.size( );
+#ifdef LINE_VEC_LIST
+	iLines = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.size( );
 
-	for( i = 0; iLines > i; i++ )
+	itLine = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.begin();
+
+	for( i = 0; iLines > i; i++, itLine++ )
 	{
 		//	各行の文字数
-		iLetters = gstFile.vcCont.at( gixFocusPage ).vcPage.at( i ).vcLine.size( );
+		iLetters = itLine->vcLine.size( );
 
 		if( bStyle & D_UNI )
 		{
 			for( j = 0; iLetters > j; j++ )
 			{
-				wsString += gstFile.vcCont.at( gixFocusPage ).vcPage.at( i ).vcLine.at( j ).cchMozi;
+				wsString += itLine->vcLine.at( j ).cchMozi;
 			}
 
 			if( iLines > (i+1) )	wsString += wstring( CH_CRLFW );
@@ -1611,13 +1924,41 @@ INT DocPageTextAllGetAlloc( UINT bStyle, LPVOID *pText )
 		{
 			for( j = 0; iLetters > j; j++ )
 			{
-				srString +=  string( gstFile.vcCont.at( gixFocusPage ).vcPage.at( i ).vcLine.at( j ).acSjis );
+				srString +=  string( itLine->vcLine.at( j ).acSjis );
 			}
 
 			if( iLines > (i+1) )	srString +=  string( CH_CRLFA );
 		}
 	}
 
+#else
+	iLines = (*gitFileIt).vcCont.at( gixFocusPage ).vcPage.size( );
+
+	for( i = 0; iLines > i; i++ )
+	{
+		//	各行の文字数
+		iLetters = (*gitFileIt).vcCont.at( gixFocusPage ).vcPage.at( i ).vcLine.size( );
+
+		if( bStyle & D_UNI )
+		{
+			for( j = 0; iLetters > j; j++ )
+			{
+				wsString += (*gitFileIt).vcCont.at( gixFocusPage ).vcPage.at( i ).vcLine.at( j ).cchMozi;
+			}
+
+			if( iLines > (i+1) )	wsString += wstring( CH_CRLFW );
+		}
+		else
+		{
+			for( j = 0; iLetters > j; j++ )
+			{
+				srString +=  string( (*gitFileIt).vcCont.at( gixFocusPage ).vcPage.at( i ).vcLine.at( j ).acSjis );
+			}
+
+			if( iLines > (i+1) )	srString +=  string( CH_CRLFA );
+		}
+	}
+#endif
 	if( bStyle & D_UNI )	//	ユニコードである
 	{
 		iSize = wsString.size( ) + 1;	//	NULLターミネータ分足す
@@ -1663,7 +2004,7 @@ LPSTR DocPageTextPreviewAlloc( INT iPage, PINT pdBytes )
 
 	string	srString;	//	シフトJISで確保
 	LINE_ITR	itLine, itLineEnd;
-	LTR_ITR		itLtr;
+	LETR_ITR	itLtr;
 
 	srString.clear( );
 
@@ -1672,11 +2013,17 @@ LPSTR DocPageTextPreviewAlloc( INT iPage, PINT pdBytes )
 	if( DocRangeIsError( iPage, 0 ) )	return NULL;
 
 	//	ページ全体の行数
-	iLines = gstFile.vcCont.at( iPage ).vcPage.size( );
+#ifdef LINE_VEC_LIST
+	iLines    = (*gitFileIt).vcCont.at( iPage ).ltPage.size( );
 
-	itLine    = gstFile.vcCont.at( iPage ).vcPage.begin( );
-	itLineEnd = gstFile.vcCont.at( iPage ).vcPage.end( );
+	itLine    = (*gitFileIt).vcCont.at( iPage ).ltPage.begin( );
+	itLineEnd = (*gitFileIt).vcCont.at( iPage ).ltPage.end( );
+#else
+	iLines    = (*gitFileIt).vcCont.at( iPage ).vcPage.size( );
 
+	itLine    = (*gitFileIt).vcCont.at( iPage ).vcPage.begin( );
+	itLineEnd = (*gitFileIt).vcCont.at( iPage ).vcPage.end( );
+#endif
 	for( i = 0; itLine != itLineEnd; i++, itLine++ )
 	{
 		//	各行の文字数
@@ -1722,29 +2069,56 @@ HRESULT UnicodeRadixExchange( LPVOID pVoid )
 	TCHAR	cchMozi;
 	CHAR	acSjis[10];
 
-	iPage = gstFile.vcCont.size(  );
+#ifdef LINE_VEC_LIST
+	LINE_ITR	itLine;
+#endif
+
+	iPage = (*gitFileIt).vcCont.size(  );
 
 	for( dP = 0; iPage >  dP; dP++ )	//	全頁
 	{
-		iLine = gstFile.vcCont.at( dP ).vcPage.size(  );
+#ifdef LINE_VEC_LIST
+		iLine = (*gitFileIt).vcCont.at( dP ).ltPage.size(  );
 
-		for( dL = 0; iLine >  dL; dL++ )	//	全行
+		itLine = (*gitFileIt).vcCont.at( dP ).ltPage.begin();
+		for( dL = 0; iLine >  dL; dL++, itLine++ )	//	全行
 		{
-			iMozi = gstFile.vcCont.at( dP ).vcPage.at( dL ).vcLine.size(  );
+			iMozi = itLine->vcLine.size(  );
 
 			for( dM = 0; iMozi >  dM; dM++ )	//	全字
 			{
-				if( gstFile.vcCont.at( dP ).vcPage.at( dL ).vcLine.at( dM ).mzStyle & CT_CANTSJIS )
+				if( itLine->vcLine.at( dM ).mzStyle & CT_CANTSJIS )
 				{
-					cchMozi = gstFile.vcCont.at( dP ).vcPage.at( dL ).vcLine.at( dM ).cchMozi;
+					cchMozi = itLine->vcLine.at( dM ).cchMozi;
 					if( gbUniRadixHex ){	StringCchPrintfA( acSjis, 10, ("&#x%X;"), cchMozi );	}
 					else{					StringCchPrintfA( acSjis, 10, ("&#%d;"),  cchMozi );	}
 
-					StringCchCopyA( gstFile.vcCont.at( dP ).vcPage.at( dL ).vcLine.at( dM ).acSjis, 10, acSjis );
+					StringCchCopyA( itLine->vcLine.at( dM ).acSjis, 10, acSjis );
 //	TODO:	バイト数再計算が必要
 				}
 			}
 		}
+#else
+		iLine = (*gitFileIt).vcCont.at( dP ).vcPage.size(  );
+
+		for( dL = 0; iLine >  dL; dL++ )	//	全行
+		{
+			iMozi = (*gitFileIt).vcCont.at( dP ).vcPage.at( dL ).vcLine.size(  );
+
+			for( dM = 0; iMozi >  dM; dM++ )	//	全字
+			{
+				if( (*gitFileIt).vcCont.at( dP ).vcPage.at( dL ).vcLine.at( dM ).mzStyle & CT_CANTSJIS )
+				{
+					cchMozi = (*gitFileIt).vcCont.at( dP ).vcPage.at( dL ).vcLine.at( dM ).cchMozi;
+					if( gbUniRadixHex ){	StringCchPrintfA( acSjis, 10, ("&#x%X;"), cchMozi );	}
+					else{					StringCchPrintfA( acSjis, 10, ("&#%d;"),  cchMozi );	}
+
+					StringCchCopyA( (*gitFileIt).vcCont.at( dP ).vcPage.at( dL ).vcLine.at( dM ).acSjis, 10, acSjis );
+//	TODO:	バイト数再計算が必要
+				}
+			}
+		}
+#endif
 	}
 
 	return S_OK;
@@ -1779,7 +2153,7 @@ HRESULT DocPageDivide( HWND hWnd, HINSTANCE hInst, INT iNow )
 	if( iLines <= iDivLine )	return E_OUTOFMEMORY;
 
 	//	今の頁の次に作成
-	//iTotal = gstFile.vcCont.size(  );
+	//iTotal = (*gitFileIt).vcCont.size(  );
 	//iNext = gixFocusPage + 1;	//	次の頁
 	//if( iTotal <= iNext ){	iNext =  -1;	}	//	全頁より多いなら末端指定
 
@@ -1787,18 +2161,30 @@ HRESULT DocPageDivide( HWND hWnd, HINSTANCE hInst, INT iNow )
 	PageListInsert( iNewPage  );	//	ページリストビューに追加
 
 	//	空の壱行が作られてるので、削除しておく
-	gstFile.vcCont.at( iNewPage ).vcPage.clear(  );
+#ifdef LINE_VEC_LIST
+	(*gitFileIt).vcCont.at( iNewPage ).ltPage.clear(  );
 
-	itLine = gstFile.vcCont.at( gixFocusPage ).vcPage.begin( );
+	itLine = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.begin( );
+	std::advance( itLine, iDivLine );
+
+	itEnd  = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.end( );
+
+	std::copy(	itLine, itEnd, back_inserter( (*gitFileIt).vcCont.at( iNewPage ).ltPage ) );
+
+	(*gitFileIt).vcCont.at( gixFocusPage ).ltPage.erase( itLine, itEnd );
+#else
+	(*gitFileIt).vcCont.at( iNewPage ).vcPage.clear(  );
+
+	itLine = (*gitFileIt).vcCont.at( gixFocusPage ).vcPage.begin( );
 	itLine += iDivLine;
 
-	itEnd  = gstFile.vcCont.at( gixFocusPage ).vcPage.end( );
+	itEnd  = (*gitFileIt).vcCont.at( gixFocusPage ).vcPage.end( );
 
-	std::copy(	itLine, itEnd, back_inserter( gstFile.vcCont.at( iNewPage ).vcPage ) );
+	std::copy(	itLine, itEnd, back_inserter( (*gitFileIt).vcCont.at( iNewPage ).vcPage ) );
 
-	gstFile.vcCont.at( gixFocusPage ).vcPage.erase( itLine, itEnd );
-
-	SqnFreeAll( &(gstFile.vcCont.at( gixFocusPage ).stUndoLog) );	//	アンドゥログ削除
+	(*gitFileIt).vcCont.at( gixFocusPage ).vcPage.erase( itLine, itEnd );
+#endif
+	SqnFreeAll( &((*gitFileIt).vcCont.at( gixFocusPage ).stUndoLog) );	//	アンドゥログ削除
 
 	//	バイト情報とかの取り直し
 	DocPageByteCount( gixFocusPage, NULL );

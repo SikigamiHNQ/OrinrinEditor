@@ -134,19 +134,22 @@ CONST  TCHAR	gatEOF[] = TEXT("[EOF]");
 #define CT_FINDRTN	0x1000	//	行末改行が検索ヒット
 //-------------------------------------------------------------------------------------------------
 
-#ifndef _ORRVW
 
-#ifdef OPEN_HISTORY
-//開いた履歴用
+#if defined(OPEN_HISTORY) || defined(OPEN_PROFILE)
+//開いた履歴用・プロファイルにも使う
 #define OPENHIST_MAX	12
 typedef struct tagOPENHISTORY
 {
-	TCHAR	atFile[MAX_PATH];
+	TCHAR	atFile[MAX_PATH];	//	ファイルパス
+	DWORD	dMenuNumber;		//	メニュー番号の割当
 
 } OPENHIST, *LPOPENHIST;
-typedef vector<OPENHIST>::iterator	OPHIS_ITR;
+typedef list<OPENHIST>::iterator	OPHIS_ITR;
 #endif
 //----------------
+
+
+#ifndef _ORRVW
 
 //	枠パーツデータ	20120105	複数行に向けて調整
 #define PARTS_CCH	32
@@ -238,7 +241,7 @@ typedef struct tagLETTER
 	INT_PTR	mzByte;		//!<	SJISバイトサイズ
 
 } LETTER, *LPLETTER;
-typedef vector<LETTER>::iterator	LTR_ITR;
+typedef vector<LETTER>::iterator	LETR_ITR;
 //-----------------------------
 
 //	壱行の管理
@@ -258,7 +261,11 @@ typedef struct tagONELINE
 //	INT		dOffset;	//!<	矩形選択したときのズレ
 
 } ONELINE, *LPONELINE;
+#ifdef LINE_VEC_LIST
+typedef list<ONELINE>::iterator		LINE_ITR;
+#else
 typedef vector<ONELINE>::iterator	LINE_ITR;
+#endif
 //-----------------------------
 
 //	SPLITページ壱分
@@ -271,10 +278,13 @@ typedef struct tagONEPAGE
 	//	選択状態について
 	INT		dSelLineTop;	//!<	一番上の選択がある行
 	INT		dSelLineBottom;	//!<	一番下の選択がある行
-
-	vector<ONELINE>	vcPage;	//!<	行全体
-
 	UNDOBUFF	stUndoLog;	//!<	操作履歴・アンドゥに使う
+
+#ifdef LINE_VEC_LIST
+	list<ONELINE>	ltPage;	//!<	行全体
+#else
+	vector<ONELINE>	vcPage;	//!<	行全体
+#endif
 
 } ONEPAGE, *LPONEPAGE;
 typedef vector<ONEPAGE>::iterator	PAGE_ITR;
@@ -366,7 +376,14 @@ LONG_PTR	WndTagGet( HWND );
 HRESULT		InitWindowPos( UINT, UINT, LPRECT );
 INT			InitParamValue( UINT, UINT, INT );
 HRESULT		InitParamString( UINT, UINT, LPTSTR );
-HRESULT		InitToolBarLayout( UINT, INT, LPREBARLAYOUTINFO );
+
+#ifdef OPEN_PROFILE
+HRESULT		OpenProfileInitialise( HWND );	//!<	
+HRESULT		InitProfHistory( UINT, UINT, LPTSTR );
+  #ifdef _ORRVW
+HRESULT		OpenProfMenuModify( HWND );
+  #endif
+#endif
 
 BOOLEAN		SelectDirectoryDlg( HWND, LPTSTR, UINT_PTR );
 
@@ -410,13 +427,15 @@ HRESULT		OptionDialogueOpen( VOID );
 
 COLORREF	InitColourValue( UINT, UINT, COLORREF );
 INT			InitTraceValue( UINT, LPTRACEPARAM );
-HRESULT		InitLastOpen( UINT, LPTSTR );
+//HRESULT	InitLastOpen( UINT, LPTSTR );
 INT			InitWindowTopMost( UINT, UINT, INT );
-#ifndef MAA_PROFILE
-HRESULT		InitMaaFldrOpen( UINT, LPTSTR );
-INT			InitMultipleFile( UINT, UINT, LPTSTR, LPTSTR );
-#endif
+HRESULT		InitToolBarLayout( UINT, INT, LPREBARLAYOUTINFO );
 
+#ifdef OPEN_HISTORY
+HRESULT		OpenHistoryInitialise( HWND );
+HRESULT		OpenHistoryLogging( HWND, LPTSTR );
+HRESULT		OpenHistoryLoad( HWND, INT );
+#endif
 
 VOID		ToolBarCreate( HWND, HINSTANCE );
 VOID		ToolBarDestroy( VOID );
@@ -457,6 +476,7 @@ HRESULT		MultiFileTabSelect( LPARAM );
 HRESULT		MultiFileTabSlide( INT );
 HRESULT		MultiFileTabRename( LPARAM, LPTSTR );
 HRESULT		MultiFileTabClose( VOID );
+INT			MultiFileTabSearch( LPARAM );
 INT			InitMultiFileTabOpen( UINT, INT, LPTSTR );
 
 VOID		OperationOnCommand( HWND, INT, HWND, UINT );
@@ -628,7 +648,7 @@ INT			DocStringErase( INT, INT, LPTSTR, INT );
 INT			DocInsertLetter( PINT, INT, TCHAR );
 INT			DocInsertString( PINT, PINT, PINT, LPTSTR, UINT, BOOLEAN );
 
-INT			DocIterateDelete( LTR_ITR, INT );
+INT			DocIterateDelete( LETR_ITR, INT );
 HRESULT		DocLineCombine( INT );
 
 BOOLEAN		DocLineErase( INT, BOOLEAN );
@@ -668,8 +688,10 @@ INT			DocSelectTextGetAlloc( UINT, LPVOID *, LPPOINT * );
 
 HRESULT		DocExtractExecute( HINSTANCE );
 
+LPARAM		DocOpendFileCheck( LPTSTR );
 HRESULT		DocFileSave( HWND, UINT );
 HRESULT		DocFileOpen( HWND );
+HRESULT		DocDoOpenFile( HWND, LPTSTR );
 INT			DocAllTextGetAlloc( INT, UINT, LPVOID *, FILES_ITR );
 HRESULT		DocImageSave( HWND, UINT, HFONT );
 
@@ -699,7 +721,7 @@ INT			DocDiffAdjBaseSet( INT );
 INT			DocDiffAdjExec( PINT, INT );
 
 VOID		ZeroONELINE( LPONELINE );
-INT			DocLineCount( LPTSTR, UINT );
+INT			DocStringInfoCount( LPTSTR, UINT_PTR, PINT, PINT );
 
 UINT		DocRangeDeleteByMozi( INT, INT, INT, INT, PBOOLEAN );
 
@@ -733,11 +755,9 @@ INT			MoziInitialise( LPTSTR, HINSTANCE );
 HWND		MoziScripterCreate( HINSTANCE, HWND );
 HRESULT		MoziMoveFromView( HWND, UINT );
 
-#ifdef VERTICAL_TEXT
 INT			VertInitialise( LPTSTR, HINSTANCE );
 HWND		VertScripterCreate( HINSTANCE, HWND );
 HRESULT		VertMoveFromView( HWND, UINT );
-#endif
 
 #ifdef FIND_STRINGS
 HRESULT		FindDialogueOpen( HINSTANCE, HWND );

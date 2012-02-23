@@ -104,15 +104,18 @@ using namespace	std;	//	このスコープ内ではstd::が省略できる
 static CONST GUID gcstGUID = { 0x66D3E881, 0x972B, 0x458B, { 0x93, 0x5E, 0x9E, 0x78, 0xB9, 0x26, 0xB4, 0x15 } };
 //-------------------------------------------------------------------------------------------------
 
-//#define OPEN_HISTORY	//	ファイル開いた履歴
+//機能ＯＫ
+#define LINE_VEC_LIST	//	行の保持をリストにしてみる
+#define OPEN_HISTORY	//	ファイル開いた履歴
+#define OPEN_PROFILE
+
+#define USE_NOTIFYICON	//	タスクトレイアイコンを有効
+
+//	作成中の機能
 //#define FIND_STRINGS	//	文字列検索機能
 //#define FRAME_MLINE	//	枠パーツ複数行
 
-#define VERTICAL_TEXT	//	縦書きモード
-
-//機能ＯＫ
-#define MAA_PROFILE		//	ツリー構成をプロファイルする機能
-#define USE_NOTIFYICON	//	タスクトレイアイコンを有効
+#define DO_TRY_CATCH	//	例外対策してみる
 //-------------------------------------------------------------------------------------------------
 
 //	単なる識別名　externで外部参照されてる変数にくっつけておく
@@ -124,11 +127,16 @@ static CONST GUID gcstGUID = { 0x66D3E881, 0x972B, 0x458B, { 0x93, 0x5E, 0x9E, 0
 #define TRACE(str,...)	OutputDebugStringPlus( GetLastError(), __FILE__, __LINE__, __FUNCTION__, str, __VA_ARGS__ )
 
 VOID	OutputDebugStringPlus( DWORD, LPSTR, INT, LPSTR, LPTSTR, ... );	//!<	
-
 VOID	SqlErrMsgView( sqlite3 *, DWORD );
 
 #else
 	#define TRACE(x,...)
+#endif
+
+#ifdef DO_TRY_CATCH
+#define ETC_MSG(str,ret)	ExceptionMessage( str, __FUNCTION__, __LINE__, ret )
+
+LRESULT	ExceptionMessage( LPCSTR, LPCSTR, UINT, LPARAM );
 #endif
 
 #define FREE(pp)	{if(pp){free(pp);pp=NULL;}}

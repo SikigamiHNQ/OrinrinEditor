@@ -65,6 +65,10 @@ extern  HWND	ghMaaFindDlg;	//!<	MAA検索ダイヤログハンドル
 extern HFONT	ghAaFont;		//!<	表示用のフォント
 
 extern  UINT	gdClickDrt;	//
+
+#ifdef OPEN_PROFILE
+extern HMENU	ghProfHisMenu;	//	履歴表示する部分・動的に内容作成せないかん
+#endif
 //------------------------------------------------------------------------------------------------------------------------
 
 BOOLEAN	SelectFolderDlg( HWND, LPTSTR, UINT_PTR );
@@ -178,66 +182,6 @@ INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 
 
 #pragma region ("設定内容読書")
-
-#ifndef MAA_PROFILE
-
-/*!
-	MAA複数ファイルのセーブロード・Editor側にもある
-	@param[in]	dMode	非０ロード　０セーブ
-	@param[in]	dCount	データの個数[NULL==ptFile]／通し番号
-	@param[out]	ptFile	フルパス・MAX_PATHであること
-	@param[out]	ptBase	基点ディレクトリー名・MAX_PATHであること
-	@return		INT	ロード：データの個数　セーブ：０
-*/
-INT InitMultipleFile( UINT dMode, UINT dCount, LPTSTR ptFile, LPTSTR ptBase )
-{
-	TCHAR	atKeyName[MIN_STRING], atBuff[MIN_STRING];
-	INT	dBuff = 0;
-
-	if( ptFile )
-	{
-		if( dMode  )	//	ロード
-		{
-			StringCchPrintf( atKeyName, MIN_STRING, TEXT("Item%d"), dCount );
-			GetPrivateProfileString( TEXT("MaaSubOpen"), atKeyName, TEXT(""), ptFile, MAX_PATH, gatIniPath );
-
-			StringCchPrintf( atKeyName, MIN_STRING, TEXT("Base%d"), dCount );
-			GetPrivateProfileString( TEXT("MaaSubOpen"), atKeyName, TEXT(""), ptBase, MAX_PATH, gatIniPath );
-		}
-		else	//	セーブ
-		{
-			StringCchPrintf( atKeyName, MIN_STRING, TEXT("Item%d"), dCount );
-			WritePrivateProfileString( TEXT("MaaSubOpen"), atKeyName, ptFile, gatIniPath );
-
-			StringCchPrintf( atKeyName, MIN_STRING, TEXT("Base%d"), dCount );
-			WritePrivateProfileString( TEXT("MaaSubOpen"), atKeyName, ptBase, gatIniPath );
-		}
-	}
-	else	//	個数
-	{
-		if( dMode  )	//	ロード
-		{
-			GetPrivateProfileString( TEXT("MaaSubOpen"), TEXT("Count"), TEXT("0"), atBuff, MIN_STRING, gatIniPath );
-			dBuff = StrToInt( atBuff );
-		}
-		else	//	セーブ
-		{
-			//	一旦セクションを空にする
-			ZeroMemory( atBuff, sizeof(atBuff) );
-			WritePrivateProfileSection( TEXT("MaaSubOpen"), atBuff, gatIniPath );
-
-			StringCchPrintf( atBuff, MIN_STRING, TEXT("%d"), dCount );
-			WritePrivateProfileString( TEXT("MaaSubOpen"), TEXT("Count"), atBuff, gatIniPath );
-		}
-
-		return dBuff;
-	}
-
-
-	return 0;
-}
-//-------------------------------------------------------------------------------------------------
-#endif
 
 /*!
 	パラメータ値のセーブロード・Editor側にもある
@@ -362,31 +306,65 @@ HRESULT InitWindowPos( UINT dMode, UINT dStyle, LPRECT pstRect )
 }
 //-------------------------------------------------------------------------------------------------
 
-#ifndef MAA_PROFILE
-
+#ifdef OPEN_PROFILE
 /*!
-	MLTディレクトリのセーブロード・Editor側にもある
-	@param[in]	dMode	非０ロード　０セーブ
-	@param[out]	ptFile	フルパス・MAX_PATHであること
-	@return		HRESULT	終了状態コード
+	プロフ履歴をINIから読んだり書いたり
+	@param[in]		dMode	非０ロード　０セーブ
+	@param[in]		dNumber	ロードセーブ番号
+	@param[in,out]	ptFile	ロード：中身を入れる　セーブ：保存する文字列　MAX_PATHであること・NULLなら内容消去
+	@return			HRESULT	終了状態コード
 */
-HRESULT InitMaaFldrOpen( UINT dMode, LPTSTR ptFile )
+HRESULT InitProfHistory( UINT dMode, UINT dNumber, LPTSTR ptFile )
 {
+	TCHAR	atKeyName[MIN_STRING], atDefault[MAX_PATH];
 
-	if(  !(ptFile) )	return 0;
-
-	if( dMode )	//	ロード
+	if( dMode  )	//	ロード
 	{
-		GetPrivateProfileString( TEXT("General"), TEXT("MultiLinePath"), TEXT(""), ptFile, MAX_PATH, gatIniPath );
+		ZeroMemory( ptFile, sizeof(TCHAR) * MAX_PATH );
+
+		StringCchPrintf( atKeyName, MIN_STRING, TEXT("Hist%X"), dNumber );
+		GetPrivateProfileString( TEXT("ProfHistory"), atKeyName, TEXT(""), atDefault, MAX_PATH, gatIniPath );
+
+		if( NULL == atDefault[0] )	return E_NOTIMPL;	//	記録無し
+
+		StringCchCopy( ptFile, MAX_PATH, atDefault );
 	}
-	else
+	else	//	セーブ
 	{
-		WritePrivateProfileString( TEXT("General"), TEXT("MultiLinePath"), ptFile, gatIniPath );
+		if( ptFile )
+		{
+			StringCchPrintf( atKeyName, MIN_STRING, TEXT("Hist%X"), dNumber );
+			WritePrivateProfileString( TEXT("ProfHistory"), atKeyName, ptFile, gatIniPath );
+		}
+		else	//	一旦全削除
+		{
+			WritePrivateProfileSection( TEXT("ProfHistory"), NULL, gatIniPath );
+		}
 	}
 
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
+
+/*!
+	メニューを書き換える
+*/
+HRESULT OpenProfMenuModify( HWND hWnd )
+{
+	HMENU	hMenu, hSubMenu;
+
+	hMenu = GetMenu( hWnd );
+	hSubMenu = GetSubMenu( hMenu, 0 );	//	機能
+
+	ModifyMenu( hSubMenu, 2, MF_BYPOSITION | MF_POPUP, (UINT_PTR)ghProfHisMenu, TEXT("ファイル使用履歴(&H)") );
+	//文字列固定はあまりイクナイ
+
+	DrawMenuBar( hWnd );
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+
 #endif
 
 #pragma endregion	//	("設定内容読書")
@@ -513,22 +491,15 @@ INT_PTR CALLBACK OptionDlgProc( HWND hDlg, UINT message, WPARAM wParam, LPARAM l
 {
 	UINT	id;
 	INT		dValue, dBuff;
-#ifndef MAA_PROFILE
-	TCHAR	atPath[MAX_PATH];//, atBuff[SUB_STRING];
-#endif
 
 	switch( message )
 	{
 		case WM_INITDIALOG:
 			//	MAA一覧
-#ifdef MAA_PROFILE
 			Edit_SetText( GetDlgItem(hDlg,IDE_AA_DIRECTORY), TEXT("ＡＡディレクトリはプロファイルから設定してね") );
 			EnableWindow( GetDlgItem(hDlg,IDE_AA_DIRECTORY), FALSE );
 			ShowWindow( GetDlgItem(hDlg,IDB_AADIR_SEARCH), SW_HIDE );
-#else
-			InitMaaFldrOpen( INIT_LOAD, atPath );
-			Edit_SetText( GetDlgItem(hDlg,IDE_AA_DIRECTORY), atPath );
-#endif
+
 			//	MAAポップアップについて
 			dValue = InitParamValue( INIT_LOAD, VL_MAATIP_SIZE, 16 );	//	サイズ確認
 			if( FONTSZ_REDUCE == dValue )	CheckRadioButton( hDlg, IDRB_POPUP_NOMAL, IDRB_POPUP_REDUCE, IDRB_POPUP_REDUCE );
@@ -564,23 +535,9 @@ INT_PTR CALLBACK OptionDlgProc( HWND hDlg, UINT message, WPARAM wParam, LPARAM l
 			id = LOWORD(wParam);
 			switch( id )
 			{
-	#ifndef MAA_PROFILE
-				case IDB_AADIR_SEARCH:	//	MAAディレクトリ探す
-					if( SelectFolderDlg( hDlg, atPath, MAX_PATH ) )
-					{
-						Edit_SetText( GetDlgItem(hDlg,IDE_AA_DIRECTORY), atPath );
-					}
-					return (INT_PTR)TRUE;
-#endif
 
 				case IDB_APPLY://適用
 				case IDOK:
-	#ifndef MAA_PROFILE
-					//	MAAのディレクトリー
-					Edit_GetText( GetDlgItem(hDlg,IDE_AA_DIRECTORY), atPath, MAX_PATH );
-					InitMaaFldrOpen( INIT_SAVE, atPath );
-	#endif
-
 					//	MAAポップアップについて
 					dValue = FONTSZ_NORMAL;
 					if( IsDlgButtonChecked( hDlg, IDRB_POPUP_REDUCE ) ){	dValue =  FONTSZ_REDUCE;	}

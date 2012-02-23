@@ -222,6 +222,7 @@ HWND BrushTmpleInitialise( HINSTANCE hInstance, HWND hParentWnd, LPRECT pstFrame
 
 	GetClientRect( ghBrTmplWnd, &clRect );
 
+	//	カテゴリコンボックス
 	ghCtgryBxWnd = CreateWindowEx( 0, WC_COMBOBOX, TEXT("BrCategory"),
 		WS_CHILD | WS_VISIBLE | WS_BORDER | CBS_DROPDOWNLIST,
 		0, tbRect.bottom, clRect.right, 127, ghBrTmplWnd,
@@ -239,7 +240,7 @@ HWND BrushTmpleInitialise( HINSTANCE hInstance, HWND hParentWnd, LPRECT pstFrame
 
 	GetClientRect( ghCtgryBxWnd, &cbxRect );
 
-	
+	//	一覧リストビュー
 	ghLvItemWnd = CreateWindowEx( 0, WC_LISTVIEW, TEXT("brushitem"),
 		WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | LVS_REPORT | LVS_NOSORTHEADER | LVS_NOCOLUMNHEADER | LVS_SINGLESEL,
 		0, tbRect.bottom + cbxRect.bottom, clRect.right, clRect.bottom - (cbxRect.bottom + tbRect.bottom),
@@ -831,41 +832,44 @@ LRESULT Blv_OnNotify( HWND hWnd, INT idFrom, LPNMHDR pstNmhdr )
 	pstLv = (LPNMLISTVIEW)pstNmhdr;
 
 	//	リストビュー自体のプロシージャなので
-	hLvWnd = hWnd;//pstLv->hdr.hwndFrom;
+	hLvWnd = hWnd;
 	nmCode = pstLv->hdr.code;
 
 	if( TTN_GETDISPINFO == nmCode )
 	{
-		ZeroMemory( &stHitTestInfo, sizeof(LVHITTESTINFO) );
-		GetCursorPos( &(stHitTestInfo.pt) );
-		ScreenToClient( hLvWnd, &(stHitTestInfo.pt) );
-		ListView_SubItemHitTest( hLvWnd, &stHitTestInfo );
-
-		iItem = stHitTestInfo.iItem;
-		iSubItem = stHitTestInfo.iSubItem;
-		iPos = iItem * gBrhClmCnt + iSubItem;
-
-		TRACE( TEXT("BLvTT[%d]"), iPos );
-
-		pstDispInfo = (LPNMTTDISPINFO)pstNmhdr;
-
-		ZeroMemory( &(pstDispInfo->szText), sizeof(pstDispInfo->szText) );
-		pstDispInfo->lpszText = pstDispInfo->szText;
-
-		if( 0 < gvcBrTmpls.size( ) )
+		if( IDLV_BT_ITEMVIEW == idFrom )
 		{
-			items = gvcBrTmpls.at( gNowGroup ).vcItems.size( );
+			ZeroMemory( &stHitTestInfo, sizeof(LVHITTESTINFO) );
+			GetCursorPos( &(stHitTestInfo.pt) );
+			ScreenToClient( hLvWnd, &(stHitTestInfo.pt) );
+			ListView_SubItemHitTest( hLvWnd, &stHitTestInfo );
 
-			if( 0 <= iPos && iPos <  items )	//	なんか選択した
+			iItem = stHitTestInfo.iItem;
+			iSubItem = stHitTestInfo.iSubItem;
+			iPos = iItem * gBrhClmCnt + iSubItem;
+
+			TRACE( TEXT("BLvTT[%d]"), iPos );
+
+			pstDispInfo = (LPNMTTDISPINFO)pstNmhdr;
+
+			ZeroMemory( &(pstDispInfo->szText), sizeof(pstDispInfo->szText) );
+			pstDispInfo->lpszText = pstDispInfo->szText;
+
+			if( 0 < gvcBrTmpls.size( ) )
 			{
-				StringCchCopy( atItem, SUB_STRING, gvcBrTmpls.at( gNowGroup ).vcItems.at( iPos ).c_str( ) );
-				iDot = ViewStringWidthGet( atItem );
+				items = gvcBrTmpls.at( gNowGroup ).vcItems.size( );
 
-				StringCchPrintf( pstDispInfo->szText, 80, TEXT("%s [%d Dot]"), atItem, iDot );
+				if( 0 <= iPos && iPos <  items )	//	なんか選択した
+				{
+					StringCchCopy( atItem, SUB_STRING, gvcBrTmpls.at( gNowGroup ).vcItems.at( iPos ).c_str( ) );
+					iDot = ViewStringWidthGet( atItem );
+
+					StringCchPrintf( pstDispInfo->szText, 80, TEXT("%s [%d Dot]"), atItem, iDot );
+				}
 			}
-		}
 
-		return 0;
+			return 0;
+		}
 	}
 
 	return CallWindowProc( gpfOrigBrushItemProc, hWnd, WM_NOTIFY, (WPARAM)idFrom, (LPARAM)pstNmhdr );

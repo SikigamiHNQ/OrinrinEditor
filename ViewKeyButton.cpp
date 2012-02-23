@@ -92,7 +92,7 @@ VOID ViewCombiKeyCheck( VOID )
 	@param[in]	flags	キーフラグいろいろ
 	@return		無し
 */
-VOID Evw_OnKey( HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UINT flags )
+VOID Evw_OnKey( HWND hWnd, UINT vk, BOOL fDown, INT cRepeat, UINT flags )
 {
 	INT		bXdirect = 0;	//	Ｘの移動方向
 	UINT	dXwidth;	//	Ｘの移動ドット

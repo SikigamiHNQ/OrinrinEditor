@@ -57,10 +57,14 @@ EXTERNED UINT	gbAAtipView;	//!<	非０で、ＡＡツールチップ表示
 
 EXTERNED HWND	ghMaaFindDlg;	//!<	MAA検索ダイヤログハンドル
 
-#ifdef MAA_PROFILE
 static TCHAR	gatProfilePath[MAX_PATH];	//!<	プロファイルディレクトリ
-#endif
+
 static TCHAR	gatTemplatePath[MAX_PATH];	//!<	MLTルートディレクトリ
+
+#ifdef OPEN_PROFILE
+static list<OPENHIST>	gltProfHist;	//!<	プロフ開いた履歴・
+EXTERNED HMENU	ghProfHisMenu;			//!<	履歴表示する部分・動的に内容作成せないかん
+#endif
 
 static CONST INT	giStbRoom[] = { 250 , 350 , -1 };
 //-------------------------------------------------------------------------------------------------
@@ -73,7 +77,6 @@ LRESULT	Maa_OnNotify( HWND , INT, LPNMHDR );			//!<
 VOID	Maa_OnDrawItem( HWND, CONST DRAWITEMSTRUCT * );	//!<	
 VOID	Maa_OnMeasureItem( HWND, MEASUREITEMSTRUCT * );	//!<	
 
-#ifdef MAA_PROFILE
 #define TREEPROF_AUTOCHECK
 
 INT_PTR	CALLBACK TreeProfileDlgProc( HWND, UINT, WPARAM, LPARAM );	//!<	
@@ -82,7 +85,6 @@ UINT	TreeLoadNodeProc( HWND, HWND, HTREEITEM, UINT );					//!<
 VOID	TreeProfCheckState( HWND, HTREEITEM, UINT );				//!<	
 #ifdef TREEPROF_AUTOCHECK
 UINT	TreeProfCheckExistent( HWND, LPTSTR, HWND, HTREEITEM, UINT );		//!<	
-#endif
 #endif
 //-------------------------------------------------------------------------------------------------
 
@@ -106,10 +108,8 @@ HWND MaaTmpltInitialise( HINSTANCE hInstance, HWND hParentWnd, LPRECT pstFrame )
 	INT	bTopMost;
 #endif
 
-#ifdef MAA_PROFILE
 	WIN32_FIND_DATA	stFindData;
 	HANDLE	hFind;
-#endif
 
 	ghMainWnd  = hParentWnd;
 	ghInst = hInstance;
@@ -185,12 +185,13 @@ HWND MaaTmpltInitialise( HINSTANCE hInstance, HWND hParentWnd, LPRECT pstFrame )
 	{	SetWindowPos( ghMaaWnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE );	}
 #endif
 
+	OpenProfileInitialise( ghMaaWnd );
+
 	ShowWindow( ghMaaWnd, SW_SHOW );
 	UpdateWindow( ghMaaWnd );
 
 	ZeroMemory( gatTemplatePath, sizeof(gatTemplatePath) );
 
-#ifdef MAA_PROFILE
 	//	プロファイルロード
 	ZeroMemory( gatProfilePath, sizeof(gatProfilePath) );
 	InitParamString( INIT_LOAD, VS_PROFILE_NAME, gatProfilePath );
@@ -205,19 +206,10 @@ HWND MaaTmpltInitialise( HINSTANCE hInstance, HWND hParentWnd, LPRECT pstFrame )
 		bMode = TreeProfileMake( ghMaaWnd, gatProfilePath );
 		if( 0 > bMode ){	bMode = 0;	}
 	}
-#else
-	//	MLTディレクトリの位置
-	InitMaaFldrOpen( INIT_LOAD, gatTemplatePath );
-	bMode = 0;
-#endif
+
 	TreeConstruct( ghMaaWnd, gatTemplatePath, TRUE );
 
 	gbAAtipView = InitParamValue( INIT_LOAD, VL_MAATIP_VIEW, 1 );
-
-#ifndef MAA_PROFILE
-	SqlDatabaseOpenClose( M_CREATE, MAA_FAVDB_FILE );
-	SqlFavTableCreate( NULL );
-#endif
 
 #ifndef _ORRVW
 	//	無効高さ値を持って帰る
@@ -256,8 +248,11 @@ LRESULT CALLBACK MaaTmpltWndProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM
 		HANDLE_MSG( hWnd, WM_DRAWITEM,    Maa_OnDrawItem  );	//	
 		HANDLE_MSG( hWnd, WM_MEASUREITEM, Maa_OnMeasureItem );	//	
 		HANDLE_MSG( hWnd, WM_CONTEXTMENU, Maa_OnContextMenu );	//	
-		
-		HANDLE_MSG( hWnd, WM_VSCROLL,     Aai_OnVScroll );	
+
+		HANDLE_MSG( hWnd, WM_KEYDOWN,     Aai_OnKey );			//	20120221
+		HANDLE_MSG( hWnd, WM_KEYUP,       Aai_OnKey );			//	
+
+		HANDLE_MSG( hWnd, WM_VSCROLL,     Aai_OnVScroll );		//	
 
 		case WM_MOUSEWHEEL:	//	返り値が必要な場合を考慮
 			uRslt = Maa_OnMouseWheel( hWnd, (INT)(SHORT)LOWORD(lParam), (INT)(SHORT)HIWORD(lParam), (INT)(SHORT)HIWORD(wParam), (UINT)(SHORT)LOWORD(wParam) );
@@ -319,6 +314,19 @@ VOID Maa_OnCommand( HWND hWnd, INT id, HWND hwndCtl, UINT codeNotify )
 {
 	LONG_PTR	rdExStyle;
 
+#if defined(_ORRVW)  && defined(OPEN_PROFILE)
+	if( IDM_OPEN_HIS_FIRST <= id && id <= IDM_OPEN_HIS_LAST )	//	開く
+	{
+		OpenProfileLoad( hWnd, id );
+		return;
+	}
+	else if( IDM_OPEN_HIS_CLEAR ==  id )	//	ファイルオーポン履歴クルヤー
+	{
+		OpenProfileLogging( hWnd, NULL );
+		return;
+	}
+#endif
+
 	switch( id )
 	{
 		//	リストスタティックでのクリックはここにくる
@@ -362,12 +370,6 @@ VOID Maa_OnCommand( HWND hWnd, INT id, HWND hwndCtl, UINT codeNotify )
 		case IDCB_AAITEMTITLE:	AaTitleSelect( hWnd, codeNotify );	break;
 
 		//	ここに来るのは、メインメニューからの選択のみ
-#ifndef MAA_PROFILE
-		case IDM_TREE_RECONSTRUCT:	//	プロフモードでは、ディレクトリ選択ダイヤログ出す
-			InitMaaFldrOpen( INIT_LOAD, gatTemplatePath );
-			TreeConstruct( hWnd , gatTemplatePath, FALSE );
-			break;
-#endif
 
 #ifdef _ORRVW
 		case IDM_ABOUT:	DialogBox( ghInst , MAKEINTRESOURCE(IDD_ORRVWR_ABOUTBOX), hWnd, About );	break;
@@ -377,10 +379,8 @@ VOID Maa_OnCommand( HWND hWnd, INT id, HWND hwndCtl, UINT codeNotify )
 			DialogBoxParam( ghInst, MAKEINTRESOURCE(IDD_ORRVWR_OPTION_DLG), hWnd, OptionDlgProc, NULL );
 			break;
 
-	#ifdef MAA_PROFILE
 		case IDM_MAA_PROFILE_MAKE:	TreeProfileOpen( hWnd );	break;
 		case IDM_TREE_RECONSTRUCT:	TreeProfileRebuild( hWnd  );	break;
-	#endif
 #else
 		case  IDM_WINDOW_CHANGE:	WindowFocusChange( WND_MAAT,  1 );	break;
 		case  IDM_WINDOW_CHG_RVRS:	WindowFocusChange( WND_MAAT, -1 );	break;
@@ -449,6 +449,8 @@ VOID Maa_OnDestroy( HWND hWnd )
 #ifdef _ORRVW
 
 	DraughtInitialise( NULL, NULL );
+
+	OpenProfileInitialise( NULL );
 
 	PostQuitMessage( 0 );
 #endif
@@ -581,8 +583,6 @@ VOID StatusBarMsgSet( UINT room, LPTSTR ptMsg )
 }
 //-------------------------------------------------------------------------------------------------
 
-#ifdef MAA_PROFILE
-
 /*!
 	プロッファイルを作ってMLTディレクトリも指定したり直ぐ開いたり
 	@param[in]	hWnd	ウインドウハンドル・どこのだろう？
@@ -650,6 +650,11 @@ INT TreeProfileMake( HWND hWnd, LPTSTR ptProf )
 
 	ZeroMemory( atFolder,  sizeof(atFolder) );
 
+#ifdef OPEN_PROFILE
+	//	開いたPROFILEを記録
+	OpenProfileLogging( hWnd, atFilePath );
+#endif
+
 	//	MLTディレクトリをセット
 	ZeroMemory( gatTemplatePath,  sizeof(gatTemplatePath) );
 	SqlTreeProfSelect( NULL, 0, gatTemplatePath, MAX_PATH );
@@ -686,6 +691,7 @@ INT TreeProfileOpen( HWND hWnd )
 
 	iRslt = TreeProfileMake( hWnd, NULL );
 	if( 0 > iRslt ){	return 0;	}	//	内容変更なので、負ならナニもしない。
+
 	//	ここで、構築するを呼べばよろしい
 	TreeConstruct( ghMaaWnd, gatTemplatePath, TRUE );
 	//既存の開くなら１、新規作成なら０が戻るはず
@@ -1107,7 +1113,8 @@ HRESULT TreeProfListUp( HWND hDlg, HWND hTvWnd, LPTSTR ptRoot, HTREEITEM hTreePr
 			{	//	ファイルの場合
 				bRslt  = PathMatchSpec( stFindData.cFileName, TEXT("*.mlt") );	//	ヒットしたらTRUE
 				bRslt |= PathMatchSpec( stFindData.cFileName, TEXT("*.ast") );	//	ヒットしたらTRUE
-				if( bRslt )	//	20110720	ASTもイケるようにする
+				bRslt |= PathMatchSpec( stFindData.cFileName, TEXT("*.txt") );	//	ヒットしたらTRUE
+				if( bRslt )	//	20110720	ASTを追加	20120223	TXTも追加
 				{
 					dPnID = SqlTreeCacheInsert( FILE_ATTRIBUTE_NORMAL, dPrntID, stFindData.cFileName );
 
@@ -1319,9 +1326,6 @@ LPTSTR StringLineGet( LPCTSTR ptSource, LPCTSTR *ptNextLn )
 
 */
 
-#endif	//	MAA_PROFILE
-
-
 /*!
 	検索してリストビューに入れる
 	@param[in]	hDlg	ダイヤログハンドル
@@ -1506,6 +1510,7 @@ INT_PTR CALLBACK TreeMaaFindDlgProc( HWND hDlg, UINT message, WPARAM wParam, LPA
 /*!
 	MAAファイル検索窓の処理
 	@param[in]	hWnd	ウインドウハンドル
+	@return	HRESULT	終了状態コード
 */
 HRESULT TreeMaaFileFind( HWND hWnd )
 {
@@ -1528,4 +1533,181 @@ HRESULT TreeMaaFileFind( HWND hWnd )
 }
 //-------------------------------------------------------------------------------------------------
 
+
+
+#ifdef OPEN_PROFILE
+
+/*!
+	ファイルからプロフ履歴取り込んだり書き込んだり
+	@param[in]	hWnd	ウインドウハンドル・NULLならデストロイ
+	@return	HRESULT	終了状態コード
+*/
+HRESULT OpenProfileInitialise( HWND hWnd )
+{
+	TCHAR	atString[MAX_PATH+10];
+	UINT	d;
+	UINT_PTR	dItems;
+	OPENHIST	stProfHist;
+	OPHIS_ITR	itHist;
+
+	if( hWnd )	//	ロード
+	{
+		gltProfHist.clear( );	//	とりあえず全削除
+
+		for( d = 0; OPENHIST_MAX > d; d++ )
+		{
+			ZeroMemory( &stProfHist, sizeof(OPENHIST) );
+
+			if( SUCCEEDED( InitProfHistory( INIT_LOAD, d, stProfHist.atFile ) ) )
+			{
+				gltProfHist.push_back( stProfHist );
+			}
+			else{	break;	}	//	中身があったら記録・無かったら終わり
+		}
+
+		if( ghProfHisMenu ){	DestroyMenu( ghProfHisMenu );	}
+		//	メニュー作成
+		ghProfHisMenu = CreatePopupMenu(  );
+		AppendMenu( ghProfHisMenu, MF_SEPARATOR, 0 , NULL );	//	セッパレター
+		AppendMenu( ghProfHisMenu, MF_STRING, IDM_OPEN_HIS_CLEAR, TEXT("履歴クリヤ") );
+		//	コマンドＩＤがファイルと同じであることに注意・受取は別だから問題無い
+
+		dItems = gltProfHist.size( );
+		if( 0 == dItems )
+		{
+			//	オーポン履歴が無い場合
+			InsertMenu( ghProfHisMenu, 0, MF_STRING | MF_BYPOSITION | MF_GRAYED, IDM_OPEN_HIS_FIRST, TEXT("(无)") );
+		}
+		else
+		{
+			//	オーポン履歴を並べる
+			for( itHist = gltProfHist.begin(), d = dItems-1; gltProfHist.end() != itHist; itHist++, d-- )
+			{
+				StringCchPrintf( atString, MAX_PATH+10, TEXT("(&%X) %s"), d, itHist->atFile );
+				InsertMenu( ghProfHisMenu, 0, MF_STRING | MF_BYPOSITION, (IDM_OPEN_HIS_FIRST + d), atString );
+				itHist->dMenuNumber = (IDM_OPEN_HIS_FIRST + d);
+			}
+		}
+		
+		//	コンテキストメニューは必要に応じてロードするので、ここではイジらない
+#ifdef _ORRVW
+		OpenProfMenuModify( hWnd );
+#endif
+	}
+	else	//	終了時
+	{
+		if( ghProfHisMenu ){	DestroyMenu( ghProfHisMenu );	}
+
+		InitProfHistory( INIT_SAVE, 0, NULL );	//	一旦全削除
+
+		//	中身を保存
+		for( itHist = gltProfHist.begin(), d = 0; gltProfHist.end() != itHist; itHist++, d++ )
+		{
+			InitProfHistory( INIT_SAVE, d, itHist->atFile );
+		}
+	}
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+
+
+/*!
+	開いたプロフ履歴を番号指定して読み込む
+	@param[in]	hWnd	ウインドウハンドル
+	@param[in]	id		履歴指定メッセージ・メニューＩＤである
+	@return	HRESULT	終了状態コード
+*/
+HRESULT OpenProfileLoad( HWND hWnd, INT id )
+{
+	UINT_PTR	dNumber, dItems;
+	TCHAR		atFilePath[MAX_PATH];
+	OPHIS_ITR	itHist;
+
+	WIN32_FIND_DATA	stFindData;
+	HANDLE	hFind;
+
+	dNumber = id - IDM_OPEN_HIS_FIRST;
+
+	TRACE( TEXT("プロフ -> %d"), dNumber );
+	if( OPENHIST_MAX <= dNumber ){	return E_OUTOFMEMORY;	}
+
+	dItems = gltProfHist.size();
+	dNumber = (dItems-1) - dNumber;
+
+	itHist = gltProfHist.begin();
+	advance( itHist , dNumber );	//	個数分進める
+
+	//	選択したプロフを開く
+	StringCchCopy( atFilePath, MAX_PATH, itHist->atFile );
+
+	//	そのファイルは存在するか？
+	hFind = FindFirstFile( atFilePath, &stFindData );	//	TEXT("*")
+	if( INVALID_HANDLE_VALUE != hFind ){	FindClose( hFind  );	}
+	else{	ZeroMemory( atFilePath, sizeof(atFilePath) );	};
+
+	if( NULL != atFilePath[0]  )	//	無ければ何もしない
+	{
+		StringCchCopy( gatProfilePath, MAX_PATH, atFilePath );
+		TreeProfileMake( ghMaaWnd, gatProfilePath );
+
+		InitParamString( INIT_SAVE, VS_PROFILE_NAME, gatProfilePath );
+
+		TreeConstruct( ghMaaWnd, gatTemplatePath, TRUE );
+	}
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+
+
+/*!
+	開いたPROFILEを記録
+	@param[in]	hWnd	ウインドウハンドル
+	@param[in]	ptProf	開いたプロフファイル名
+	@return	HRESULT	終了状態コード
+*/
+HRESULT OpenProfileLogging( HWND hWnd, LPCTSTR ptProf )
+{
+	UINT_PTR	dItems;
+	OPENHIST	stProfHist;
+	OPHIS_ITR	itHist;
+
+	if( ptProf )
+	{
+		ZeroMemory( &stProfHist, sizeof(OPENHIST) );
+
+		StringCchCopy( stProfHist.atFile, MAX_PATH, ptProf );
+		//既存の内容なら最新に入れ替えるので、検索しておく
+		for( itHist = gltProfHist.begin(); gltProfHist.end() != itHist; itHist++ )
+		{
+			if( !StrCmp( itHist->atFile, stProfHist.atFile ) )	//	同じものがあったら削除する
+			{
+				gltProfHist.erase( itHist );
+				break;
+			}
+		}
+
+		gltProfHist.push_back( stProfHist );	//	リスト末尾ほど新しい
+
+		//	もしはみ出すようなら古いのを削除する
+		dItems = gltProfHist.size( );
+		if( OPENHIST_MAX <  dItems )
+		{
+			gltProfHist.pop_front(  );
+		}
+	}
+	else	//	文字列指定無い場合は全クリ
+	{
+		gltProfHist.clear();
+	}
+
+	OpenProfileInitialise( NULL );	//	古いの破壊して
+	OpenProfileInitialise( hWnd );	//	最新の内容で作り直し
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+
+#endif
 

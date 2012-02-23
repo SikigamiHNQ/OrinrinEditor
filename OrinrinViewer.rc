@@ -47,6 +47,8 @@ BEGIN
     BEGIN
         MENUITEM "プロファイル作成／開く(&N)",	IDM_MAA_PROFILE_MAKE
         MENUITEM "AA一覧ツリーを再構築(&T)",	IDM_TREE_RECONSTRUCT
+		MENUITEM "プロファイル使用履歴(&H)",	IDM_OPEN_HISTORY
+        MENUITEM SEPARATOR
         MENUITEM "一般設定(&G)",				IDM_GENERAL_OPTION
         MENUITEM "ファイル名で検索(&F)",		IDM_FINDMAA_DLG_OPEN
         MENUITEM SEPARATOR
@@ -141,7 +143,7 @@ CAPTION "バージョン情報 - Orinrin Viewer"
 FONT 9, "MS UI Gothic"
 BEGIN
     ICON            IDI_ORINRINEDITOR,IDC_MYICON,6,6,18,21
-    LTEXT           "Orinrin Viewer, Version 8 Aurora (2012.202.2200.920)",IDC_STATIC,36,6,180,8,SS_NOPREFIX
+    LTEXT           "Orinrin Viewer, Version 8 Aurora (2012.222.2200.920)",IDC_STATIC,36,6,180,8,SS_NOPREFIX
     LTEXT           "Copyright (C) 2011 - 2012 SikigamiHNQ",IDC_STATIC,36,18,180,8
     LTEXT           "Site ： お燐ちゃんは俺の嫁．ｃｏｍ",IDC_STATIC,36,30,180,8
     DEFPUSHBUTTON   "OK",IDOK,85,180,50,14,WS_GROUP
@@ -208,7 +210,7 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 2012,202,2200,920
+ FILEVERSION 2012,222,2200,920
  PRODUCTVERSION 8,0,0,920
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
@@ -234,7 +236,7 @@ BEGIN
             VALUE "LegalTrademarks", "License : GPLv3"
             VALUE "PrivateBuild", "Build by Visual C++ 2008 Express"
             VALUE "SpecialBuild", "Not Speciality"
-            VALUE "FileVersion", "2012.202.2200.920"
+            VALUE "FileVersion", "2012.222.2200.920"
             VALUE "ProductVersion", "8.0.0.920"
             VALUE "FileDescription", "AsciiArt Viewer Ver8"
             VALUE "OriginalFilename", "OrinrinViewer.exe"

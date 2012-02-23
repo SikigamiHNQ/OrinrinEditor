@@ -351,6 +351,8 @@ LRESULT CALLBACK gpfAaItemsProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 	switch( msg )
 	{
 		HANDLE_MSG( hWnd, WM_CHAR,        Maa_OnChar );
+		HANDLE_MSG( hWnd, WM_KEYDOWN,     Aai_OnKey );			//	20120221
+		HANDLE_MSG( hWnd, WM_KEYUP,       Aai_OnKey );			//	
 
 		HANDLE_MSG( hWnd, WM_NOTIFY,      Aai_OnNotify );		//	コモンコントロールの個別イベント
 		HANDLE_MSG( hWnd, WM_MOUSEMOVE,   Aai_OnMouseMove );	//	マウスいごいた
@@ -500,6 +502,48 @@ VOID AaItemsMeasureItem( HWND hWnd, LPMEASUREITEMSTRUCT pstMeasureItem )
 //-------------------------------------------------------------------------------------------------
 #endif
 
+
+/*!
+	キーダウンが発生
+	@param[in]	hWnd	ウインドウハンドル・ビューのとは限らないので注意セヨ
+	@param[in]	vk		押されたキーが仮想キーコードで来る
+	@param[in]	fDown	非０ダウン　０アップ
+	@param[in]	cRepeat	連続オサレ回数・取れてない？
+	@param[in]	flags	キーフラグいろいろ
+	@return		無し
+*/
+VOID Aai_OnKey( HWND hWnd, UINT vk, BOOL fDown, INT cRepeat, UINT flags )
+{
+	TRACE( TEXT("KEY[%u]"), vk );
+
+	if( !(fDown) )	 return;	//	とりあえずキーアップはすることない
+
+//	反応しないコントロールとか確認セヨ
+
+	switch( vk )
+	{
+		default:	return;
+
+		case  VK_NEXT:	//	PageDown
+			Aai_OnVScroll( hWnd, ghScrollWnd, SB_PAGEDOWN, 0 );
+			break;
+
+		case  VK_DOWN:	//	下
+			Aai_OnVScroll( hWnd, ghScrollWnd, SB_LINEDOWN, 0 );
+			break;
+
+		case  VK_UP:	//	上
+			Aai_OnVScroll( hWnd, ghScrollWnd, SB_LINEUP, 0 );
+			break;
+
+		case  VK_PRIOR:	//	PageUp
+			Aai_OnVScroll( hWnd, ghScrollWnd, SB_PAGEUP, 0 );
+			break;
+	}
+
+	return;
+}
+//-------------------------------------------------------------------------------------------------
 
 /*!
 	マウスが動いたときの処理

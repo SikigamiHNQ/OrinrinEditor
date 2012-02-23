@@ -22,7 +22,7 @@ If not, see <http://www.gnu.org/licenses/>.
 //-------------------------------------------------------------------------------------------------
 
 extern FILES_ITR	gitFileIt;	//!<	今見てるファイルの本体
-#define gstFile	(*gitFileIt)	//!<	イテレータを構造体と見なす
+//#define gstFile	(*gitFileIt)	//!<	イテレータを構造体と見なす
 
 extern INT		gixFocusPage;	//!<	注目中のページ・とりあえず０・０インデックス
 
@@ -43,7 +43,7 @@ INT DocUndoExecute( PINT pxDot, PINT pyLine )
 {
 	INT	iRslt = 0;
 
-	iRslt = SqnUndoExec( &(gstFile.vcCont.at( gixFocusPage ).stUndoLog), pxDot, pyLine );
+	iRslt = SqnUndoExec( &((*gitFileIt).vcCont.at( gixFocusPage ).stUndoLog), pxDot, pyLine );
 
 	DocModifyContent( TRUE );
 
@@ -61,7 +61,7 @@ INT DocRedoExecute( PINT pxDot, PINT pyLine )
 {
 	INT	iRslt = 0;
 
-	iRslt = SqnRedoExec( &(gstFile.vcCont.at( gixFocusPage ).stUndoLog), pxDot, pyLine );
+	iRslt = SqnRedoExec( &((*gitFileIt).vcCont.at( gixFocusPage ).stUndoLog), pxDot, pyLine );
 
 	DocModifyContent( TRUE );
 

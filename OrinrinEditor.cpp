@@ -23,8 +23,6 @@ If not, see <http://www.gnu.org/licenses/>.
 //	頁削除メッセージの確認無しは、起動中だけにしたほうがいい？
 
 //バグ
-//	TODO:	サムネからだと使用履歴に反映されない＜ＯＫ？
-
 //	TODO:	台詞Enter、空白だけ出っ張ってるときとかにキャレット位置がおかしくなる
 //	TODO:	「矩形選択」と「部分抽出」の両方にチェックを入れた状態でドラッグすると落ちる
 //	TODO:	頁分割したら容量表示がおかしい？
@@ -35,18 +33,22 @@ If not, see <http://www.gnu.org/licenses/>.
 //ベースネーム書換で対処はできる
 
 //変更・修正
+//	TODO:	履歴から開こうとしたファイル・プロフが無かったらリストから消すべき
+
+//	TODO:	複数行テンプレ窓の主タブでホイールスクロールが効かない？
+//			メイン窓の編集スペース、Page List、複数行テンプレ窓のAA一覧ツリーなど、他の場所では問題ない
+//	TODO:	已に開いているファイルをさらに開く場合は該当ファイルにフォーカスする
+
+//	TODO:	改行が多くなるとパフォーマンスが落ちる。vectorじゃまずいか？
 //	TODO:	デカいファイル開こうとしたときはメッセージ出すとか
 //	TODO:	デカいファイル開いたら時間かかる（1000コマとか）
 //			逐次読み込みにするとか、先読みしたらvector確保してからいれるとかvectorじゃなくlistにするとか？
 //			壱行毎のサイズ確認して、確保してからブチ込むとか
 //	TODO:	枠挿入したら、右が妙に空く。ユニコ使うときは、調整開けは不要か
 //	TODO:	Viewer、右クリメニューからのドラフトボードが開かない？・追加されない？
-//	TODO:	ViewerEXEの場合、最前面に表示になってたらドラフトボード・サムネが裏になってまう
 //	TODO:	最大化して終わる＞起動して、最大化解除すると、メインスプリットバーが見えなくなる//右にイッちゃってるまま
 //	TODO:	メインスプリットバーの位置情報リセットが居るかも
 //	TODO:	位置情報のリセット機能・システムメニューに搭載する
-//	TODO:	複数行テンプレ窓の主タブでホイールスクロールが効かない？
-//			メイン窓の編集スペース、Page List、複数行テンプレ窓のAA一覧ツリーなど、他の場所では問題ない
 //	TODO:	SQLのINSERT、prepareは重い。クエリつくって、resetしながら回すのがいいんじゃ
 //	TODO:	トレス機能、点滅コントラスト？と輝度調整の幅が狭いのがちょいと苦しいらしい
 //	TODO:	トレスモード窓に、グリッドON/OFFを付ける
@@ -57,7 +59,13 @@ If not, see <http://www.gnu.org/licenses/>.
 //	TODO:	テンプレの「常に最前面に表示」Orinrinediterを表示している時だけ最前面に来るように//もしくは、メイン窓に統合とか
 
 //機能追加
-//	TODO:	viewerの主タブをマウスとスクロールバーだけでなく、キーボードの矢印やPageUp,PageDnキーで操作出来る様にならない？
+//	TODO:	viewerの主タブをマウスとスクロールバーだけでなく、ホウィール、キーボードの矢印やPageUp,PageDnキーで操作出来る様にならない？
+
+//	TODO:	使用履歴をファイル出力できるように
+//	TODO:	MLTのブックマーク機能・タブ増やすか、ツリーに増やすか・副タブじゃいけない？
+//	TODO:	viewの、プロファイルの使用履歴が欲しい
+//	TODO:	viewの使用のグループ名の変更機能・グループ自体、単体両方で
+//	TODO:	Viewの右クリメニューも編集出来るように
 //	TODO:	未保存で閉じようとしたときのメッセージのYes/Noを逆にしてほしい。
 //			未保存のまま閉じようとした場合の確認は『セーブしますか? Yes（Save)/No/Cancel』だが、Orinrinは『終了していいですか? Yes/No』なのでYesとNoの動作が逆になっていて紛らわしいため。
 //	TODO:	スペース文字が二個以上連続しているところをAAと台詞の区切りだと認識するようなロジックは？
@@ -65,19 +73,16 @@ If not, see <http://www.gnu.org/licenses/>.
 //	TODO:	ユニコード調整有効なら、右そろえ線の調整をドットではなくユニコード空白で
 //	TODO:	行頭が5dot空白の場合、半角スペースではなくユニコード空白に変換
 //	TODO:	View部分をサムネ表示できるように
-//	TODO:	フォント変更出来るように・即時書換を？
 //	TODO:	頁一覧を、複数選択して一発削除できるように
 //	TODO:	枠機能で、複数行パーツを使いたい
 //	TODO:	レイヤボックス自体の操作、上書き実行とかもキボドショトカトで出来るように
 //	TODO:	文字ＡＡの入力とか、レイヤボックスの編集とかで、キーボードショートカット使えるように
-//	TODO:	ドラフトボード・サムネ、ツールチップ表示出来るように
 //	TODO:	ドラフトボード・サムネ、サイズ変更できるように
 //	TODO:	複数ファイルタブ、右クリメニューでファイル情報出す
 //	TODO:	ASD対応＜読込は作ったがどこで使う？
 //	TODO:	MMAビュー、AAのスクロールをアイテム区切りでなく行スクロールも出来るように
 //	TODO:	バックアップ機能の強化・上書き保存したらバックアップとか・頁新規作成したら保存
 //	TODO:	保存するとき、同名ファイルがあったら、日時くっつけてバックアップとか
-//	TODO:	MLTのブックマーク機能・タブ増やすか、ツリーに増やすか・副タブじゃいけない？
 //	TODO:	カーソルのところに上書き挿入、的な機能・レイヤボックス介さずに直で。
 //	TODO:	MAA窓を非使用するオプショッ
 //	TODO:	頁リスト、直前に選択していた頁を灰色にしておく機能
@@ -93,15 +98,13 @@ If not, see <http://www.gnu.org/licenses/>.
 //	TODO:	ALT+Nを、頁名称一括編集にする？
 //	TODO:	ダブルクルックでSpaceエリアとかの部分選択
 //	TODO:	ファイルを開き直す機能
-//	TODO:	使用履歴をファイル出力できるように
 //	TODO:	よく使うユニコードを纏めておけないか、ユーザ定義でいいんじゃね
 //	TODO:	テンプレのコンボックスを、リストボックス型と切り替えられるとか
-//	TODO:	頁に、ヘッダフッタ挿入機能。ヘッダには頁番号、フッタには容量、とか
 //	TODO:	起動中に、ラインテンプレートのリストを開く＆再読み込みできるようにして欲しい//	Brushも同じか。右クリメニューで
 //	TODO:	トレスの１画面、２画面切り替えモード
 //	TODO:	トレスの２画面だと、背景絵はどっちのペインでも表示出来るようにしたい
 //	TODO:	トレスで、画像をつまんで直接移動できるように
-
+//	TODO:	プレビューをリヤルタイムに変更する
 
 
 
@@ -137,9 +140,11 @@ If not, see <http://www.gnu.org/licenses/>.
 //	TODO:	頁削除のAlt+D付ける。注意ダイヤログ出す。
 //	TODO:	UTF8でもセーブ出来るように・エクスポートでいいか
 //	TODO:	リバーの、状態リセットと記憶が必要
+//	TODO:	フォント変更出来るように
+//	TODO:	ViewerEXEの場合、最前面に表示になってたらドラフトボード・サムネが裏になってまう＜ＯＫ？
+//	TODO:	MAAのリストアップは、テキストも対象に入れる
+//	TODO:	サムネからだと使用履歴に反映されない＜ＯＫ？
 
-
-//	TODO:	ブラシや壱行テンプレ、マウスオーバーツールチップで、横幅ドット数表示させたい
 
 //コピーモード入れ替え、起動時の処理と、Ctrl+Cの表記
 //レイヤボックスで、SJISコピーしたら中身が内のを修正
@@ -325,11 +330,17 @@ ASDファイル　　壱行が壱コンテンツ
 					台詞用Enter機能。Shift+Enterで、改行挿入ではなく次の行に空白とかで台詞位置合わせできる
 					縦書き機能
 					バグ修正いろいろ
-2012/01/31	0.28	ＵＴＦ８でエクスポート出来るようにした
+2012/02/10	0.28	ＵＴＦ８でエクスポート出来るようにした
 					フォント変更機能
 					頁削除のAlt+D追加
 					サムネから使ったら、使用タブに追加されないのを修正
 					リバーの位置記憶と初期状態に戻す実装
+					ファイル開いた履歴を保持できるようにした
+					MAA部分に↑↓PageUpDownとか追加できたかもしれない
+					MAAのリストアップ対象にTXTを追加
+					改行が多いとパフォーマンスが落ちるのが少し改善できた気がする
+					終了時の確認メッセージ変更
+					バグ修正いろいろ
 
 
 更新日時注意
@@ -425,7 +436,8 @@ static TCHAR	gatIniPath[MAX_PATH];	//!<	ＩＮＩファイルの位置
 EXTERNED INT	gbTmpltDock;	//!<	テンプレのドッキング
 
 #ifdef OPEN_HISTORY
-static vector<OPENHIST>	gvcOpenHist;	//!<	ファイル開いた履歴・キューのほうがいいか？
+static list<OPENHIST>	gltOpenHist;	//!<	ファイル開いた履歴・
+EXTERNED HMENU	ghHistyMenu;			//!<	履歴表示する部分・動的に内容作成せないかん
 #endif
 
 #ifdef FIND_STRINGS
@@ -564,9 +576,7 @@ INT APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 
 	CntxEditInitialise( gatExePath, hInstance );
 
-#ifdef VERTICAL_TEXT
 	VertInitialise( gatExePath, hInstance );
-#endif
 
 	RegisterHotKey( ghMainWnd, IDHK_THREAD_DROP, MOD_CONTROL | MOD_SHIFT, VK_D );
 
@@ -667,9 +677,8 @@ BOOL InitInstance( HINSTANCE hInstance, INT nCmdShow, LPTSTR ptArgv )
 	INT		isMaxim = 0, sptBuf = PLIST_DOCK;
 //	DWORD	dwStyle;
 
-#ifdef MAA_PROFILE
 	HMENU	hSubMenu;
-#endif
+
 
 	ghInst = hInstance;	//	グローバル変数にインスタンス処理を格納します。
 
@@ -714,11 +723,10 @@ BOOL InitInstance( HINSTANCE hInstance, INT nCmdShow, LPTSTR ptArgv )
 	//InsertMenu( hSubMenu, 0, MF_BYPOSITION | MF_SEPARATOR, 0, 0 );
 
 	ghMenu = GetMenu( hWnd );
-#ifdef MAA_PROFILE
+
 	//	メニューにツリー構築はいらないのでカット
 	hSubMenu = GetSubMenu( ghMenu, 0 );
 	DeleteMenu( hSubMenu, IDM_TREE_RECONSTRUCT, MF_BYCOMMAND );
-#endif
 
 	hSubMenu = GetSubMenu( ghMenu, 1 );	//	編集
 	if( gbCpModSwap )
@@ -732,11 +740,7 @@ BOOL InitInstance( HINSTANCE hInstance, INT nCmdShow, LPTSTR ptArgv )
 	DeleteMenu( hSubMenu, 19, MF_BYPOSITION );	//	削除順番注意
 #endif
 
-#ifndef VERTICAL_TEXT
-	hSubMenu = GetSubMenu( ghMenu, 2 );	//	挿入
-	DeleteMenu( hSubMenu, IDM_VERT_SCRIPT_OPEN, MF_BYCOMMAND );
-
-#endif
+//	hSubMenu = GetSubMenu( ghMenu, 2 );	//	挿入
 
 	hSubMenu = GetSubMenu( ghMenu, 4 );	//	表示
 	if( gbTmpltDock )
@@ -784,6 +788,10 @@ BOOL InitInstance( HINSTANCE hInstance, INT nCmdShow, LPTSTR ptArgv )
 	FrameNameModifyMenu( hWnd );
 
 	TraceInitialise( hWnd, TRUE );
+
+	OpenHistoryInitialise( hWnd );
+
+	OpenProfileInitialise( hWnd );
 
 	SetFocus( ghViewWnd );
 
@@ -1294,6 +1302,10 @@ VOID Cls_OnDestroy( HWND hWnd )
 
 	TraceInitialise( hWnd, FALSE );
 
+	OpenHistoryInitialise( NULL );
+
+	OpenProfileInitialise( NULL );
+
 	BrushTmpleInitialise( NULL, NULL, NULL, NULL );
 
 	LayerBoxInitialise( NULL, NULL );
@@ -1302,9 +1314,7 @@ VOID Cls_OnDestroy( HWND hWnd )
 
 	MoziInitialise( NULL, NULL );
 
-#ifdef VERTICAL_TEXT
 	VertInitialise( NULL, NULL );
-#endif
 
 	DraughtInitialise( NULL, NULL );
 
@@ -1484,7 +1494,7 @@ LRESULT Cls_OnNotify( HWND hWnd, INT idFrom, LPNMHDR pstNmhdr )
 		}
 	}
 
-	if( IDTB_MULTIFILE == idFrom )
+	if( IDTB_MULTIFILE == idFrom )	//	ファイルタブ選択
 	{
 		if( TCN_SELCHANGE == pstNmhdr->code )
 		{
@@ -1539,7 +1549,7 @@ LRESULT Cls_OnNotify( HWND hWnd, INT idFrom, LPNMHDR pstNmhdr )
 VOID Cls_OnDropFiles( HWND hWnd, HDROP hDrop )
 {
 	TCHAR	atFileName[MAX_PATH];
-	LPARAM	dNumber;
+//	LPARAM	dNumber;
 
 	ZeroMemory( atFileName, sizeof(atFileName) );
 
@@ -1548,12 +1558,19 @@ VOID Cls_OnDropFiles( HWND hWnd, HDROP hDrop )
 
 	TRACE( TEXT("DROP[%s]"), atFileName );
 
-	dNumber = DocFileInflate( atFileName );	//	開いて中身展開
-	if( !(dNumber) )
-	{
-		MessageBox( hWnd, TEXT("ファイルを開けなかったかしらー！？"), NULL, MB_OK | MB_ICONERROR );
-	}
-	else{	MultiFileTabAppend( dNumber, atFileName );	}
+	DocDoOpenFile( hWnd, atFileName );	//	Ｄ＆Ｄで開く
+//	dNumber = DocFileInflate( atFileName );	//	開いて中身展開
+//	if( !(dNumber) )
+//	{
+//		MessageBox( hWnd, TEXT("ファイルを開けなかったかしらー！？"), NULL, MB_OK | MB_ICONERROR );
+//	}
+//	else
+//	{
+//		MultiFileTabAppend( dNumber, atFileName );	//	Ｄ＆Ｄで開く
+//#ifdef OPEN_HISTORY
+//		OpenHistoryLogging( hWnd , atFileName );	//	ファイルオーポン記録を追加
+//#endif
+//	}
 
 
 	return;
@@ -1683,66 +1700,6 @@ UINT AppClientAreaCalc( LPRECT pstRect )
 	return 1;
 }
 //-------------------------------------------------------------------------------------------------
-
-#ifndef MAA_PROFILE
-
-/*!
-	MAA複数ファイルのセーブロード
-	@param[in]	dMode	非０ロード　０セーブ
-	@param[in]	dCount	データの個数[NULL==ptFile]／通し番号
-	@param[out]	ptFile	フルパス・MAX_PATHであること
-	@param[out]	ptBase	基点ディレクトリー名・MAX_PATHであること
-	@return		INT	ロード：データの個数　セーブ：０
-*/
-INT InitMultipleFile( UINT dMode, UINT dCount, LPTSTR ptFile, LPTSTR ptBase )
-{
-	TCHAR	atKeyName[MIN_STRING], atBuff[MIN_STRING];
-	INT	iBuff = 0;
-
-	if( ptFile )
-	{
-		if( dMode  )	//	ロード
-		{
-			StringCchPrintf( atKeyName, MIN_STRING, TEXT("Item%d"), dCount );
-			GetPrivateProfileString( TEXT("MaaSubOpen"), atKeyName, TEXT(""), ptFile, MAX_PATH, gatIniPath );
-
-			StringCchPrintf( atKeyName, MIN_STRING, TEXT("Base%d"), dCount );
-			GetPrivateProfileString( TEXT("MaaSubOpen"), atKeyName, TEXT(""), ptBase, MAX_PATH, gatIniPath );
-		}
-		else	//	セーブ
-		{
-			StringCchPrintf( atKeyName, MIN_STRING, TEXT("Item%d"), dCount );
-			WritePrivateProfileString( TEXT("MaaSubOpen"), atKeyName, ptFile, gatIniPath );
-
-			StringCchPrintf( atKeyName, MIN_STRING, TEXT("Base%d"), dCount );
-			WritePrivateProfileString( TEXT("MaaSubOpen"), atKeyName, ptBase, gatIniPath );
-		}
-	}
-	else	//	個数
-	{
-		if( dMode  )	//	ロード
-		{
-			GetPrivateProfileString( TEXT("MaaSubOpen"), TEXT("Count"), TEXT("0"), atBuff, MIN_STRING, gatIniPath );
-			iBuff = StrToInt( atBuff );
-		}
-		else	//	セーブ
-		{
-			//	一旦セクションを空にする
-			ZeroMemory( atBuff, sizeof(atBuff) );
-			WritePrivateProfileSection( TEXT("MaaSubOpen"), atBuff, gatIniPath );
-
-			StringCchPrintf( atBuff, MIN_STRING, TEXT("%d"), dCount );
-			WritePrivateProfileString( TEXT("MaaSubOpen"), TEXT("Count"), atBuff, gatIniPath );
-		}
-
-		return iBuff;
-	}
-
-
-	return 0;
-}
-//-------------------------------------------------------------------------------------------------
-#endif
 
 /*!
 	トレスの各モードの数値
@@ -2008,28 +1965,6 @@ HRESULT InitParamString( UINT dMode, UINT dStyle, LPTSTR ptFile )
 }
 //-------------------------------------------------------------------------------------------------
 
-
-#ifndef MAA_PROFILE
-/*!
-	MLTディレクトリのセーブロード
-	@param[in]	dMode	非０ロード　０セーブ
-	@param[out]	ptFile	フルパス・MAX_PATHであること
-	@return		HRESULT	終了状態コード
-*/
-HRESULT InitMaaFldrOpen( UINT dMode, LPTSTR ptFile )
-{
-
-	if(  !(ptFile) )	return 0;
-
-	if( dMode ){	GetPrivateProfileString( TEXT("General"), TEXT("MultiLinePath"), TEXT(""), ptFile, MAX_PATH, gatIniPath );	}
-	else{			WritePrivateProfileString( TEXT("General"), TEXT("MultiLinePath"), ptFile, gatIniPath );	}
-
-	return S_OK;
-}
-//-------------------------------------------------------------------------------------------------
-#endif
-
-
 /*!
 	最前面状態のセーブロード
 	@param[in]	dMode	非０ロード　０セーブ
@@ -2118,32 +2053,12 @@ HRESULT InitWindowPos( UINT dMode, UINT dStyle, LPRECT pstRect )
 }
 //-------------------------------------------------------------------------------------------------
 
-#ifdef OPEN_HISTORY
-HRESULT InitOpenHistory( UINT dMode, LPTSTR ptFile, INT iNumber )
-{
-	TCHAR	atKeyName[SUB_STRING];
-
-	if(  !(ptFile) )	return E_INVALIDARG;
-
-	if( dMode )
-	{
-
-	}
-	else
-	{
-
-	}
-
-	return S_OK;
-}
-//-------------------------------------------------------------------------------------------------
-#endif
-
+#if 0
 /*!
 	最終使用ファイルのセーブロード
 	@param[in]	dMode	非０ロード　０セーブ
 	@param[out]	ptFile	フルパス・MAX_PATHであること
-	@return		HRESULT	終了状態コード
+	@return	HRESULT	終了状態コード
 */
 HRESULT InitLastOpen( UINT dMode, LPTSTR ptFile )
 {
@@ -2154,12 +2069,13 @@ HRESULT InitLastOpen( UINT dMode, LPTSTR ptFile )
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
+#endif
 
 /*!
 	枠情報のセーブロード
 	@param[in]	nowWnd	今の窓番号
 	@param[in]	iDir	ジャンプ方向・＋１か－１で・０は不可
-	@return		HRESULT	終了状態コード
+	@return	HRESULT	終了状態コード
 */
 HRESULT WindowFocusChange( INT nowWnd, INT iDir )
 {
@@ -2191,6 +2107,222 @@ HRESULT WindowFocusChange( INT nowWnd, INT iDir )
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
+
+#ifdef OPEN_PROFILE
+/*!
+	プロフ履歴をINIから読んだり書いたり
+	@param[in]		dMode	非０ロード　０セーブ
+	@param[in]		dNumber	ロードセーブ番号
+	@param[in,out]	ptFile	ロード：中身を入れる　セーブ：保存する文字列　MAX_PATHであること・NULLなら内容消去
+	@return			HRESULT	終了状態コード
+*/
+HRESULT InitProfHistory( UINT dMode, UINT dNumber, LPTSTR ptFile )
+{
+	TCHAR	atKeyName[MIN_STRING], atDefault[MAX_PATH];
+
+	if( dMode  )	//	ロード
+	{
+		ZeroMemory( ptFile, sizeof(TCHAR) * MAX_PATH );
+
+		StringCchPrintf( atKeyName, MIN_STRING, TEXT("Hist%X"), dNumber );
+		GetPrivateProfileString( TEXT("ProfHistory"), atKeyName, TEXT(""), atDefault, MAX_PATH, gatIniPath );
+
+		if( NULL == atDefault[0] )	return E_NOTIMPL;	//	記録無し
+
+		StringCchCopy( ptFile, MAX_PATH, atDefault );
+	}
+	else	//	セーブ
+	{
+		if( ptFile )
+		{
+			StringCchPrintf( atKeyName, MIN_STRING, TEXT("Hist%X"), dNumber );
+			WritePrivateProfileString( TEXT("ProfHistory"), atKeyName, ptFile, gatIniPath );
+		}
+		else	//	一旦全削除
+		{
+			WritePrivateProfileSection( TEXT("ProfHistory"), NULL, gatIniPath );
+		}
+	}
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+
+#endif
+
+#ifdef OPEN_HISTORY
+
+/*!
+	ファイルから履歴取り込んだり書き込んだり
+	@param[in]	hWnd	ウインドウハンドル・NULLならデストロイ
+	@return	HRESULT	終了状態コード
+*/
+HRESULT OpenHistoryInitialise( HWND hWnd )
+{
+	HMENU	hSubMenu;
+	TCHAR	atKeyName[MIN_STRING], atString[MAX_PATH+10];
+	UINT	d;
+	UINT_PTR	dItems;
+	OPENHIST	stOpenHist;
+	OPHIS_ITR	itHist;
+
+	if( hWnd )
+	{
+		gltOpenHist.clear( );	//	とりあえず全削除
+
+		for( d = 0; OPENHIST_MAX > d; d++ )
+		{
+			ZeroMemory( &stOpenHist, sizeof(OPENHIST) );
+			StringCchPrintf( atKeyName, MIN_STRING, TEXT("Hist%X"), d );
+			GetPrivateProfileString( TEXT("OpenHistory"), atKeyName, TEXT(""), stOpenHist.atFile, MAX_PATH, gatIniPath );
+			if( NULL == stOpenHist.atFile[0] )	break;	//	記録無くなったらそこで終了だよ
+
+			gltOpenHist.push_back( stOpenHist );
+		}
+
+		if( ghHistyMenu )	DestroyMenu( ghHistyMenu );
+		//	メニュー作成
+		ghHistyMenu = CreatePopupMenu(  );
+		AppendMenu( ghHistyMenu, MF_SEPARATOR, 0, NULL );	//	セッパレター
+		AppendMenu( ghHistyMenu, MF_STRING, IDM_OPEN_HIS_CLEAR, TEXT("履歴クリヤ") );
+		//文字列固定はあまりイクナイ
+
+		dItems = gltOpenHist.size( );
+		if( 0 == dItems )
+		{
+			//	オーポン履歴が無い場合
+			InsertMenu( ghHistyMenu, 0, MF_STRING | MF_BYPOSITION | MF_GRAYED, IDM_OPEN_HIS_FIRST, TEXT("(无)") );
+		}
+		else
+		{
+			//	オーポン履歴を並べる
+			for( itHist = gltOpenHist.begin(), d = dItems-1; gltOpenHist.end() != itHist; itHist++, d-- )
+			{
+				StringCchPrintf( atString, MAX_PATH+10, TEXT("(&%X) %s"), d, itHist->atFile );
+				InsertMenu( ghHistyMenu, 0, MF_STRING | MF_BYPOSITION, (IDM_OPEN_HIS_FIRST + d), atString );
+				itHist->dMenuNumber = (IDM_OPEN_HIS_FIRST + d);
+			}
+		}
+
+#pragma message ("ファイルオーポン履歴の基点メニュー、位置に注意")
+		//	メニュー情報の書換
+		hSubMenu = GetSubMenu( ghMenu, 0 );
+		ModifyMenu( hSubMenu, 2, MF_BYPOSITION | MF_POPUP, (UINT_PTR)ghHistyMenu, TEXT("ファイル使用履歴(&H)") );
+		//文字列固定はあまりイクナイ
+
+		DrawMenuBar( hWnd );	//	要らないかも？
+	}
+	else	//	APPZ終了時
+	{
+		if( ghHistyMenu )	DestroyMenu( ghHistyMenu );
+
+		WritePrivateProfileSection( TEXT("OpenHistory"), NULL, gatIniPath );	//	一旦全削除
+
+		//	中身を保存
+		for( itHist = gltOpenHist.begin(), d = 0; gltOpenHist.end() != itHist; itHist++, d++ )
+		{
+			StringCchPrintf( atKeyName, MIN_STRING, TEXT("Hist%X"), d );
+			WritePrivateProfileString( TEXT("OpenHistory"), atKeyName, itHist->atFile, gatIniPath );
+		}
+
+	}
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+
+/*!
+	開いた履歴を番号指定して読み込む
+	@param[in]	hWnd	ウインドウハンドル
+	@param[in]	id		履歴指定メッセージ・メニューＩＤである
+	@return	HRESULT	終了状態コード
+*/
+HRESULT OpenHistoryLoad( HWND hWnd, INT id )
+{
+	UINT_PTR	dNumber, dItems;
+	LPARAM		lUnique;
+	INT			iTabNum;
+	OPHIS_ITR	itHist;
+
+	dNumber = id - IDM_OPEN_HIS_FIRST;
+
+	TRACE( TEXT("履歴 -> %d"), dNumber );
+	if( OPENHIST_MAX <= dNumber ){	return E_OUTOFMEMORY;	}
+
+	dItems = gltOpenHist.size();
+	dNumber = (dItems-1) - dNumber;
+
+	itHist = gltOpenHist.begin();
+	advance( itHist , dNumber );	//	個数分進める
+
+	lUnique = DocOpendFileCheck( itHist->atFile );
+	if( 1 <= lUnique )	//	既存のファイルヒット・そっちに移動する
+	{
+		iTabNum = MultiFileTabSearch( lUnique );	//	該当するタブを探す
+		if( 0 <= iTabNum )	//	タブの番号
+		{
+			TabCtrl_SetCurSel( ghFileTabWnd , iTabNum );	//	該当のタブにフォーカス移して
+			DocMultiFileSelect( lUnique );	//	そのタブのファイルを表示
+		}
+	}
+	else
+	{
+		DocDoOpenFile( hWnd, itHist->atFile );	//	履歴から選択したファイルを開く
+	}
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+
+/*!
+	開いたファイルを記録する
+	@param[in]	hWnd	ウインドウハンドル
+	@param[out]	ptFile	開いたファイルのれるバッファ・MAX_PATHであること・NULLなら履歴クルヤー
+	@return	HRESULT	終了状態コード
+*/
+HRESULT OpenHistoryLogging( HWND hWnd, LPTSTR ptFile )
+{
+	UINT_PTR	dItems;
+	OPENHIST	stOpenHist;
+	OPHIS_ITR	itHist;
+
+	if( ptFile )
+	{
+		ZeroMemory( &stOpenHist, sizeof(OPENHIST) );
+
+		StringCchCopy( stOpenHist.atFile, MAX_PATH, ptFile );
+		//既存の内容なら最新に入れ替えるので、検索しておく
+		for( itHist = gltOpenHist.begin(); gltOpenHist.end() != itHist; itHist++ )
+		{
+			if( !StrCmp( itHist->atFile, stOpenHist.atFile ) )	//	同じものがあったら削除する
+			{
+				gltOpenHist.erase( itHist );
+				break;
+			}
+		}
+
+		gltOpenHist.push_back( stOpenHist );	//	リスト末尾ほど新しい
+
+		//	もしはみ出すようなら古いのを削除する
+		dItems = gltOpenHist.size( );
+		if( OPENHIST_MAX <  dItems )
+		{
+			gltOpenHist.pop_front(  );
+		}
+	}
+	else	//	文字列指定無い場合は全クリ
+	{
+		gltOpenHist.clear();
+	}
+
+	OpenHistoryInitialise( NULL );	//	古いの破壊して
+	OpenHistoryInitialise( hWnd );	//	最新の内容で作り直し
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+
+#endif
 
 /*!
 	おぷしょんダイヤログ開く
@@ -2280,15 +2412,10 @@ INT_PTR CALLBACK OptionDlgProc( HWND hDlg, UINT message, WPARAM wParam, LPARAM l
 			//	スライダ初期値・小さいほど薄くなる
 			SendDlgItemMessage( hDlg, IDSL_LAYERBOX_TRANCED, TBM_SETRANGE, TRUE, MAKELPARAM( 0, 0xE0 ) );	//	0xE0
 
-#ifdef MAA_PROFILE
 			Edit_SetText( GetDlgItem(hDlg,IDE_AA_DIRECTORY), TEXT("ＡＡディレクトリはプロファイルから設定してね") );
 			EnableWindow( GetDlgItem(hDlg,IDE_AA_DIRECTORY), FALSE );
 			ShowWindow( GetDlgItem(hDlg,IDB_AADIR_SEARCH), SW_HIDE );
-#else
-			//	MAA一覧
-			InitMaaFldrOpen( INIT_LOAD, atPath );
-			Edit_SetText( GetDlgItem(hDlg,IDE_AA_DIRECTORY), atPath );
-#endif
+
 			//	MAAポップアップについて
 			dValue = InitParamValue( INIT_LOAD, VL_MAATIP_SIZE, 16 );	//	サイズ確認
 			if( FONTSZ_REDUCE == dValue )	CheckRadioButton( hDlg, IDRB_POPUP_NOMAL, IDRB_POPUP_REDUCE, IDRB_POPUP_REDUCE );
@@ -2406,14 +2533,6 @@ INT_PTR CALLBACK OptionDlgProc( HWND hDlg, UINT message, WPARAM wParam, LPARAM l
 			id = LOWORD(wParam);
 			switch( id )
 			{
-	#ifndef MAA_PROFILE
-				case IDB_AADIR_SEARCH:	//	MAAディレクトリ探す
-					if( SelectDirectoryDlg( hDlg, atPath, MAX_PATH ) )
-					{
-						Edit_SetText( GetDlgItem(hDlg,IDE_AA_DIRECTORY), atPath );
-					}
-					return (INT_PTR)TRUE;
-	#endif
 				case IDB_CHOOSEFONT:	//	フォント変更のアレ
 					ViewingFontGet( &stLogFont );
 					ZeroMemory( &stChooseFont, sizeof(CHOOSEFONT) );
@@ -2429,11 +2548,6 @@ INT_PTR CALLBACK OptionDlgProc( HWND hDlg, UINT message, WPARAM wParam, LPARAM l
 
 				case IDB_APPLY://適用
 				case IDOK:
-	#ifndef MAA_PROFILE
-					//	MAAのディレクトリー
-					Edit_GetText( GetDlgItem(hDlg,IDE_AA_DIRECTORY), atPath, MAX_PATH );
-					InitMaaFldrOpen( INIT_SAVE, atPath );
-	#endif
 					//	MAAポップアップについて
 					dValue = FONTSZ_NORMAL;
 					if( IsDlgButtonChecked( hDlg, IDRB_POPUP_REDUCE ) ){	dValue =  FONTSZ_REDUCE;	}
@@ -2668,6 +2782,8 @@ HRESULT MultiFileTabAppend( LPARAM dNumber, LPTSTR ptName )
 
 	TabCtrl_SetCurSel( ghFileTabWnd, iCount );
 
+//	ここでファイルオーポンを記録すると、関係無いのまで無差別に記録してまう
+
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
@@ -2767,7 +2883,7 @@ HRESULT MultiFileTabSlide( INT xDir )
 
 /*!
 	指定の通し番号をもったタブの名称を変更
-	@param[in]	dNumber	通し番号
+	@param[in]	dNumber	ファイルのUNIQUE番号
 	@param[in]	ptName	ファイル名
 	@return		HRESULT	終了状態コード
 */
