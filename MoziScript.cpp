@@ -145,6 +145,8 @@ static DWORD		gcchMzBuf;		//!<	確保枠の文字数・バイトじゃないぞ
 
 static BOOLEAN		gbQuickClose;	//!<	貼り付けたらすぐ閉じる
 
+static WNDPROC		gpfOrigMoziEditProc;	//!<	
+
 static sqlite3		*gpMoziTable;	//!<	文字一覧のオンメモリデタベ
 
 static vector<MOZIITEM>	gvcMoziItem;
@@ -152,6 +154,7 @@ static vector<MOZIITEM>	gvcMoziItem;
 typedef vector<MOZIITEM>::iterator	MZTM_ITR;
 //-------------------------------------------------------------------------------------------------
 
+static LRESULT	CALLBACK gpfMoziEditProc( HWND , UINT, WPARAM, LPARAM );	//!<	
 
 
 LRESULT	CALLBACK MoziProc( HWND, UINT, WPARAM, LPARAM );
@@ -406,6 +409,9 @@ HWND MoziScripterCreate( HINSTANCE hInst, HWND hPrWnd )
 		0, height, rect.right, rect.bottom - height, ghMoziWnd, (HMENU)IDE_MZSCR_TEXT, hInst, NULL );
 	SetWindowFont( ghTextWnd, ghAaFont, TRUE );
 
+	//	サブクラス
+	gpfOrigMoziEditProc = SubclassWindow( ghTextWnd, gpfMoziEditProc );
+
 	//設定枠
 	ghSettiLvWnd = CreateWindowEx( 0, WC_LISTVIEW, TEXT("mozisetting"),
 		WS_CHILD | WS_BORDER | WS_VSCROLL | LVS_REPORT | LVS_SINGLESEL | LVS_NOSORTHEADER,
@@ -577,6 +583,53 @@ HRESULT MoziEditAssemble( HWND hWnd )
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
+
+
+/*!
+	エディットボックスサブクラス
+	@param[in]	hWnd	ウインドウのハンドル
+	@param[in]	msg		ウインドウメッセージの識別番号
+	@param[in]	wParam	追加の情報１
+	@param[in]	lParam	追加の情報２
+	@return	処理した結果とか
+*/
+LRESULT CALLBACK gpfMoziEditProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
+{
+	INT		len;
+	INT		id;
+	HWND	hWndCtl;
+	UINT	codeNotify;
+
+	switch( msg )
+	{
+		default:	break;
+
+		case WM_COMMAND:
+			id         = LOWORD(wParam);	//	発生したコマンドの識別子
+			hWndCtl    = (HWND)lParam;		//	コマンドを発生させた子ウインドウのハンドル
+			codeNotify = HIWORD(wParam);	//	追加の通知メッセージ
+			TRACE( TEXT("[%X]MoziEdit COMMAND %d"), hWnd, id );
+			
+			switch( id )	//	キーボードショートカットをブッとばす
+			{
+				case IDM_PASTE:	SendMessage( hWnd, WM_PASTE, 0, 0 );	return 0;
+				case IDM_COPY:	SendMessage( hWnd, WM_COPY,  0, 0 );	return 0;
+				case IDM_CUT:	SendMessage( hWnd, WM_CUT,   0, 0 );	return 0;
+				case IDM_UNDO:	SendMessage( hWnd, WM_UNDO,  0, 0 );	return 0;
+				case IDM_ALLSEL:
+					len = GetWindowTextLength( hWnd );
+					SendMessage( hWnd, EM_SETSEL, 0, len );
+					break;
+				default:	break;
+			}
+
+			break;
+	}
+
+	return CallWindowProc( gpfOrigMoziEditProc, hWnd, msg, wParam, lParam );
+}
+//-------------------------------------------------------------------------------------------------
+
 
 /*!
 	スクリプトビューのウインドウプロシージャ

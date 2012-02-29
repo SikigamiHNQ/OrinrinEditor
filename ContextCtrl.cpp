@@ -630,7 +630,7 @@ VOID CntxDlgItemAdd( HWND hDlg )
 	else
 	{
 		itMnItm = gltCntxEdit.begin();
-		advance( itMnItm, iIns+1 );
+		std::advance( itMnItm, iIns+1 );
 		//	イテレータの直前に入る
 		gltCntxEdit.insert( itMnItm, gstContextItem[iSel] );
 	}
@@ -660,7 +660,7 @@ VOID CntxDlgItemDel( HWND hDlg )
 	if( 0 > iSel )	return;	//	選択してなかったら終わり
 
 	itMnItm = gltCntxEdit.begin();
-	advance( itMnItm, iSel );
+	std::advance( itMnItm, iSel );
 
 	gltCntxEdit.erase( itMnItm );
 
@@ -687,7 +687,7 @@ VOID CntxDlgItemSpinUp( HWND hDlg )
 	if( 0 >= iSel ){	 return;	}	//	選択してないか一番上なら終わり
 
 	itTgtItm = gltCntxEdit.begin();
-	advance( itTgtItm, iSel );
+	std::advance( itTgtItm, iSel );
 	itSwpItm = itTgtItm;
 	itSwpItm--;	//	入れる先は一つ前
 
@@ -727,7 +727,7 @@ VOID CntxDlgItemSpinDown( HWND hDlg )
 
 	//	処理の位置関係に注意
 	itSwpItm = gltCntxEdit.begin();
-	advance( itSwpItm, iSel );
+	std::advance( itSwpItm, iSel );
 	itTgtItm = itSwpItm;
 	itTgtItm++;	//	入れる先は一つ次
 

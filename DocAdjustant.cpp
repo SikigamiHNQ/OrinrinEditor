@@ -415,7 +415,7 @@ INT DocLineStateCheckWithDot( INT dDot, INT rdLine, PINT pLeft, PINT pRight, PIN
 	LINE_ITR	itLine;
 
 	itLine = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.begin();
-	advance( itLine, rdLine );
+	std::advance( itLine, rdLine );
 #endif
 
 	if( !(pLeft) || !(pRight) || !(pIsSp) ){	return 0;	}
@@ -520,7 +520,7 @@ UINT DocSpaceDifference( UINT vk, PINT pXdot, INT dLine )
 	LINE_ITR	itLine;
 
 	itLine = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.begin();
-	advance( itLine, dLine );
+	std::advance( itLine, dLine );
 #endif
 
 	dNowDot = *pXdot;
@@ -781,7 +781,7 @@ INT DocDiffAdjExec( PINT pxDot, INT yLine )
 	LINE_ITR	itLine;
 
 	itLine = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.begin();
-	advance( itLine, yLine );
+	std::advance( itLine, yLine );
 #endif
 
 	//	調整値の状況を確認
@@ -1042,7 +1042,7 @@ HRESULT DocTopSpaceErase( PINT pXdot, INT dLine )
 
 #ifdef LINE_VEC_LIST
 	itLine = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.begin();
-	advance( itLine, iTop );	//	位置合わせ
+	std::advance( itLine, iTop );	//	位置合わせ
 
 	for( i = iTop; iBottom >= i; i++, itLine++ )	//	範囲内の各行について
 	{
@@ -1126,7 +1126,7 @@ HRESULT DocLastLetterErase( PINT pXdot, INT dLine )
 	//	選択してる場合は、操作行を全選択状態にする
 #ifdef LINE_VEC_LIST
 	itLine = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.begin();
-	advance( itLine, iTop );	//	位置合わせ
+	std::advance( itLine, iTop );	//	位置合わせ
 
 	for( i = iTop; iBottom >= i; i++, itLine++ )	//	範囲内の各行について
 	{
@@ -1223,7 +1223,7 @@ HRESULT DocLastSpaceErase( PINT pXdot, INT dLine )
 
 #ifdef LINE_VEC_LIST
 	itLine = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.begin();
-	advance( itLine, iTop );	//	位置合わせ
+	std::advance( itLine, iTop );	//	位置合わせ
 
 	for( i = iTop; iBottom >= i; i++, itLine++ )
 	{
@@ -1334,7 +1334,7 @@ UINT DocRangeDeleteByMozi( INT xDot, INT yLine, INT dBgnMozi, INT dEndMozi, PBOO
 	LINE_ITR	itLine;
 
 	itLine = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.begin();
-	advance( itLine, yLine );
+	std::advance( itLine, yLine );
 
 	vcLtrBgn  = itLine->vcLine.begin( );
 	vcLtrEnd  = itLine->vcLine.begin( );
@@ -1413,7 +1413,7 @@ HRESULT DocRightSlide( PINT pXdot, INT dLine )
 
 #ifdef LINE_VEC_LIST
 	itLine = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.begin();
-	advance( itLine, iTop );	//	位置合わせ
+	std::advance( itLine, iTop );	//	位置合わせ
 
 	for( i = iTop; iBottom >= i; i++, itLine++ )
 	{
@@ -1543,7 +1543,7 @@ HRESULT DocPositionShift( UINT vk, PINT pXdot, INT dLine )
 	//	壱行ずつ面倒見ていく
 #ifdef LINE_VEC_LIST
 	itLine = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.begin();
-	advance( itLine, iTop );	//	位置合わせ
+	std::advance( itLine, iTop );	//	位置合わせ
 
 	for( i = iTop; iBottom >= i; i++, itLine++ )
 	{

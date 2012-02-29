@@ -870,7 +870,7 @@ HRESULT PageListSpinning( HWND hWnd, INT iPage, INT bDir )
 
 	//	街頭位置までイテレータをもっていく
 	itPage = (*gitFileIt).vcCont.begin(  );
-	advance( itPage, iPage );
+	std::advance( itPage, iPage );
 
 	//	スワップ対象
 	if( 0 <  bDir ){	itSwap = itPage - 1;	i = iPage - 1;	}	//	↑に移動なら直前のやつと交換

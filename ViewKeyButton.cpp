@@ -147,7 +147,7 @@ VOID Evw_OnKey( HWND hWnd, UINT vk, BOOL fDown, INT cRepeat, UINT flags )
 				break;
 
 
-			case VK_DELETE:
+			case VK_DELETE:	//	DELキー入力
 				bSelect = IsSelecting( &bSqSel );
 				iLines = DocPageParamGet( NULL, NULL );
 				if( bSelect )	//	選択状態なら、そこだけ削除する

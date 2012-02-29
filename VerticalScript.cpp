@@ -120,10 +120,15 @@ static DWORD		gcchVtBuf;		//!<	確保枠の文字数・バイトじゃないぞ
 
 static BOOLEAN		gbQuickClose;	//!<	貼り付けたら直ぐ閉じる
 
+static WNDPROC		gpfOrigVertEditProc;	//!<	
+
+
 static  vector<VERTITEM>	gvcVertItem;
 typedef vector<VERTITEM>::iterator	VTIM_ITR;
 typedef vector<VERTITEM>::reverse_iterator	VTIM_RITR;
 //-------------------------------------------------------------------------------------------------
+
+static LRESULT	CALLBACK gpfVertEditProc( HWND , UINT, WPARAM, LPARAM );	//!<	
 
 LRESULT	CALLBACK VertProc( HWND, UINT, WPARAM, LPARAM );	//!<	
 VOID	Vrt_OnCommand( HWND , INT, HWND, UINT );	//!<	
@@ -326,6 +331,10 @@ HWND VertScripterCreate( HINSTANCE hInst, HWND hPrWnd )
 		0, height, rect.right, rect.bottom - height, ghVertWnd, (HMENU)IDE_VLINE_TEXT, hInst, NULL );
 	SetWindowFont( ghTextWnd, ghAaFont, TRUE );
 
+	//	サブクラス
+	gpfOrigVertEditProc = SubclassWindow( ghTextWnd, gpfVertEditProc );
+
+
 	ShowWindow( ghVertWnd, SW_SHOW );
 	UpdateWindow( ghVertWnd );
 
@@ -360,6 +369,53 @@ HWND VertScripterCreate( HINSTANCE hInst, HWND hPrWnd )
 	return ghVertWnd;
 }
 //-------------------------------------------------------------------------------------------------
+
+
+/*!
+	エディットボックスサブクラス
+	@param[in]	hWnd	ウインドウのハンドル
+	@param[in]	msg		ウインドウメッセージの識別番号
+	@param[in]	wParam	追加の情報１
+	@param[in]	lParam	追加の情報２
+	@return	処理した結果とか
+*/
+LRESULT CALLBACK gpfVertEditProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
+{
+	INT		len;
+	INT		id;
+	HWND	hWndCtl;
+	UINT	codeNotify;
+
+	switch( msg )
+	{
+		default:	break;
+
+		case WM_COMMAND:
+			id         = LOWORD(wParam);	//	発生したコマンドの識別子
+			hWndCtl    = (HWND)lParam;		//	コマンドを発生させた子ウインドウのハンドル
+			codeNotify = HIWORD(wParam);	//	追加の通知メッセージ
+			TRACE( TEXT("[%X]VertEdit COMMAND %d"), hWnd, id );
+			
+			switch( id )	//	キーボードショートカットをブッとばす
+			{
+				case IDM_PASTE:	SendMessage( hWnd, WM_PASTE, 0, 0 );	return 0;
+				case IDM_COPY:	SendMessage( hWnd, WM_COPY,  0, 0 );	return 0;
+				case IDM_CUT:	SendMessage( hWnd, WM_CUT,   0, 0 );	return 0;
+				case IDM_UNDO:	SendMessage( hWnd, WM_UNDO,  0, 0 );	return 0;
+				case IDM_ALLSEL:
+					len = GetWindowTextLength( hWnd );
+					SendMessage( hWnd, EM_SETSEL, 0, len );
+					break;
+				default:	break;
+			}
+
+			break;
+	}
+
+	return CallWindowProc( gpfOrigVertEditProc, hWnd, msg, wParam, lParam );
+}
+//-------------------------------------------------------------------------------------------------
+
 
 /*!
 	ウインドウプロシージャ

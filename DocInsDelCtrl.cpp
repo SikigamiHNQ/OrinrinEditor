@@ -167,7 +167,7 @@ HRESULT DocInputReturn( INT nowDot, INT rdLine )
 	//	文字数確認
 #ifdef LINE_VEC_LIST
 	itLine = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.begin();
-	advance( itLine, rdLine );
+	std::advance( itLine, rdLine );
 
 	iCount = itLine->vcLine.size( );
 #else
@@ -179,7 +179,7 @@ HRESULT DocInputReturn( INT nowDot, INT rdLine )
 
 #ifdef LINE_VEC_LIST
 		ltLineItr = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.begin( );
-		advance( ltLineItr, (rdLine+1) );
+		std::advance( ltLineItr, (rdLine+1) );
 
 		//	今の行の次の場所に行のデータを挿入
 		(*gitFileIt).vcCont.at( gixFocusPage ).ltPage.insert( ltLineItr, stLine );

@@ -155,6 +155,12 @@ LPTSTR FindStringProc( LPTSTR ptText, LPTSTR ptPattern, LPINT pdCch )
 }
 //-------------------------------------------------------------------------------------------------
 
+/*!
+	検索ダイヤログを開く
+	@param[in]	hInst	アポリケーションの実存
+	@param[in]	hWnd	ウインドウハンドル
+	@retval HRESULT	終了状態コード
+*/
 HRESULT FindDialogueOpen( HINSTANCE hInst, HWND hWnd )
 {
 	if( ghFindDlg )
@@ -196,7 +202,7 @@ INT_PTR CALLBACK FindStrDlgProc( HWND hDlg, UINT message, WPARAM wParam, LPARAM 
 			hWorkWnd = GetDlgItem( hDlg, IDCB_FIND_TARGET );
 			ComboBox_InsertString( hWorkWnd, 0, TEXT("現在の頁") );
 			ComboBox_InsertString( hWorkWnd, 1, TEXT("現在のファイル") );
-	//		ComboBox_InsertString( hWorkWnd, 2, TEXT("開いている全てのファイル") );難しい
+	//		ComboBox_InsertString( hWorkWnd, 2, TEXT("開いている全てのファイル") );無しでいいかも
 			ComboBox_SetCurSel( hWorkWnd, 0 );
 			ComboBox_Enable( hWorkWnd , FALSE );	//	機能出来るまで凍結
 			hWorkWnd = GetDlgItem( hDlg, IDE_FIND_TEXT );

@@ -33,6 +33,7 @@ If not, see <http://www.gnu.org/licenses/>.
 
 #pragma comment(linker, "/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='x86' publicKeyToken='6595b64144ccf1df' language='*'\"")
 
+
 //#define WIN32_LEAN_AND_MEAN		//	Windows ヘッダーから使用されていない部分を除外します。
 // Windows ヘッダー ファイル:
 #include <windows.h>
@@ -71,6 +72,8 @@ If not, see <http://www.gnu.org/licenses/>.
 
 // C ランタイム ヘッダー ファイル
 #include <assert.h>
+
+#define _CRTDBG_MAP_ALLOC	//	メモリリークチェク用
 #include <stdlib.h>
 #include <malloc.h>
 #ifdef _DEBUG
@@ -112,7 +115,7 @@ static CONST GUID gcstGUID = { 0x66D3E881, 0x972B, 0x458B, { 0x93, 0x5E, 0x9E, 0
 #define USE_NOTIFYICON	//	タスクトレイアイコンを有効
 
 //	作成中の機能
-//#define FIND_STRINGS	//	文字列検索機能
+#define FIND_STRINGS	//	文字列検索機能
 //#define FRAME_MLINE	//	枠パーツ複数行
 
 #define DO_TRY_CATCH	//	例外対策してみる

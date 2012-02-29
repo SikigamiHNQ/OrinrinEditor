@@ -452,6 +452,10 @@ INT DocSelectedDelete( PINT pdDot, PINT pdLine, UINT bSqSel )
 	LINE_ITR	itLine;
 #endif
 
+#ifdef DO_TRY_CATCH
+	try{
+#endif
+
 	bSqSel &= D_SQUARE;	//	矩形ビットだけ残す
 
 	//	ページ全体の行数
@@ -481,8 +485,10 @@ INT DocSelectedDelete( PINT pdDot, PINT pdLine, UINT bSqSel )
 	itLine = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.begin();
 	std::advance( itLine, j );
 
-	for( ; i <= j; j--, k--, itLine-- )
+	for( ; i <= j; j--, k--, itLine-- )//beginを超えたらアウツ！
 	{
+		//	continueは使えない・
+
 		iMozis = itLine->vcLine.size( );
 		if( 0 < iMozis )
 		{
@@ -551,11 +557,14 @@ INT DocSelectedDelete( PINT pdDot, PINT pdLine, UINT bSqSel )
 
 		//	改行サクるとこれによりatが無効になる？
 
-		//	ページ全体の行数再設定？
+	
 #ifdef LINE_VEC_LIST
-	//	iLines = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.size( );
+	//	iLines = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.size(  );	//	ページ全体の行数再設定？
+
+		if( (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.begin() == itLine )	break;
+		//	位置的に末端だったらループせずに終わる
 #else
-	//	iLines = (*gitFileIt).vcCont.at( gixFocusPage ).vcPage.size( );
+	//	iLines = (*gitFileIt).vcCont.at( gixFocusPage ).vcPage.size(  );	//	ページ全体の行数再設定？
 #endif
 	}
 
@@ -570,6 +579,12 @@ INT DocSelectedDelete( PINT pdDot, PINT pdLine, UINT bSqSel )
 	FREE( ptText );
 
 	FREE( pstPt );
+
+#ifdef DO_TRY_CATCH
+	}
+	catch( exception &err ){	return (INT)ETC_MSG( err.what(), 0 );	}
+	catch( ... ){	return (INT)ETC_MSG( ("etc error"), 0 );	}
+#endif
 
 	return bCrLf;
 }

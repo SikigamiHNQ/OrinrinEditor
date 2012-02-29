@@ -1636,7 +1636,7 @@ HRESULT OpenProfileLoad( HWND hWnd, INT id )
 	dNumber = (dItems-1) - dNumber;
 
 	itHist = gltProfHist.begin();
-	advance( itHist , dNumber );	//	個数分進める
+	std::advance( itHist , dNumber );	//	個数分進める
 
 	//	選択したプロフを開く
 	StringCchCopy( atFilePath, MAX_PATH, itHist->atFile );

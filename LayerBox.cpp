@@ -32,10 +32,12 @@ typedef struct tagLAYERBOXSTRUCT
 	POINT	stOffset;			//!<	ビュー左上からの、ボックスの相対位置
 
 	HWND	hBoxWnd;			//!<	ボックスのウインドウハンドル
+
 	HWND	hTextWnd;			//!<	テキストエリアのウインドウハンドル
+//	WNDPROC	pfOrgTextProc;		//!<	サブクラス元プロシージャ・いらない？
 
 	HWND	hToolWnd;			//!<	ツールバーのウインドウハンドル
-	WNDPROC	pfOrgToolProc;		//!<	
+//	WNDPROC	pfOrgToolProc;		//!<	サブクラス元プロシージャ・いらない？
 
 	vector<ONELINE>	vcLyrImg;	//!<	表示するデータの保持・AA用
 
@@ -90,6 +92,8 @@ EXTERNED BYTE	gbAlpha;		//!<	透明度
 static BOOLEAN	gbQuickClose;	//!<	貼り付けたら直ぐ閉じる
 
 static WNDPROC	gpfOrigLyrTBProc;	//!<	
+static WNDPROC	gpfOrigLyrEditProc;	//!<	
+//	元プロシージャは共通で問題無い？
 
 static HIMAGELIST	ghLayerImgLst;	//!<	
 
@@ -97,6 +101,7 @@ static  list<LAYERBOXSTRUCT>	gltLayer;	//!<	複数のレイヤボックスを開いたとき
 //-------------------------------------------------------------------------------------------------
 
 static LRESULT	CALLBACK gpfLayerTBProc( HWND, UINT, WPARAM, LPARAM );	//!<	
+static LRESULT	CALLBACK gpfLyrEditProc( HWND, UINT, WPARAM, LPARAM );	//!<	
 
 LRESULT	CALLBACK LayerBoxProc( HWND, UINT, WPARAM, LPARAM );	//!<	
 
@@ -226,7 +231,8 @@ HWND LayerBoxVisibalise( HINSTANCE hInst, LPCTSTR ptStr, UINT bNormal )
 	LAYER_ITR	itLyr;
 
 
-	stLayer.pfOrgToolProc = NULL;	//	あとで
+//	stLayer.pfOrgTextProc = NULL;	//	あとで
+//	stLayer.pfOrgToolProc = NULL;	//	あとで
 	stLayer.id = gdBoxID;	//	ボックスの認識番号
 
 	bSelect = IsSelecting( &bSqSel );
@@ -272,11 +278,15 @@ HWND LayerBoxVisibalise( HINSTANCE hInst, LPCTSTR ptStr, UINT bNormal )
 
 	GetClientRect( stLayer.hBoxWnd, &rect );
 
+	//	編集用エディット
 	stLayer.hTextWnd = CreateWindowEx( 0, WC_EDIT, TEXT(""), 
 		WS_CHILD | WS_VSCROLL | WS_HSCROLL | ES_MULTILINE | ES_AUTOHSCROLL | ES_AUTOVSCROLL,
 		0, gdToolBarHei, rect.right, rect.bottom - gdToolBarHei,
 		stLayer.hBoxWnd, (HMENU)IDE_LYB_TEXTEDIT, hInst, NULL );
 	SetWindowFont( stLayer.hTextWnd, ghAaFont, TRUE );
+
+	//	サブクラス
+	gpfOrigLyrEditProc = SubclassWindow( stLayer.hTextWnd, gpfLyrEditProc );
 
 	//	レイヤリストに記録
 	gltLayer.push_back( stLayer );
@@ -343,7 +353,7 @@ HRESULT LayerBoxPositionChange( HWND hWnd, LONG x, LONG y )
 	ツールバーサブクラス
 	WindowsXPで、ツールバーのボタン上でマウスの左ボタンを押したまま右ボタンを押すと、
 	それ以降のマウス操作を正常に受け付けなくなる。それの対策
-	@param[in]	hWnd	親ウインドウのハンドル
+	@param[in]	hWnd	ツールバーハンドル
 	@param[in]	msg		ウインドウメッセージの識別番号
 	@param[in]	wParam	追加の情報１
 	@param[in]	lParam	追加の情報２
@@ -381,6 +391,51 @@ LRESULT CALLBACK gpfLayerTBProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 }
 //-------------------------------------------------------------------------------------------------
 
+/*!
+	エディットボックスサブクラス
+	@param[in]	hWnd	ウインドウのハンドル
+	@param[in]	msg		ウインドウメッセージの識別番号
+	@param[in]	wParam	追加の情報１
+	@param[in]	lParam	追加の情報２
+	@return	処理した結果とか
+*/
+LRESULT CALLBACK gpfLyrEditProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
+{
+	INT		len;
+	INT		id;
+	HWND	hWndCtl;
+	UINT	codeNotify;
+
+	switch( msg )
+	{
+		default:	break;
+
+		case WM_COMMAND:
+			id         = LOWORD(wParam);	//	発生したコマンドの識別子
+			hWndCtl    = (HWND)lParam;		//	コマンドを発生させた子ウインドウのハンドル
+			codeNotify = HIWORD(wParam);	//	追加の通知メッセージ
+			TRACE( TEXT("[%X]LyrEdit COMMAND %d"), hWnd, id );
+			
+			switch( id )	//	キーボードショートカットをブッとばす
+			{
+				case IDM_PASTE:	SendMessage( hWnd, WM_PASTE, 0, 0 );	return 0;
+				case IDM_COPY:	SendMessage( hWnd, WM_COPY,  0, 0 );	return 0;
+				case IDM_CUT:	SendMessage( hWnd, WM_CUT,   0, 0 );	return 0;
+				case IDM_UNDO:	SendMessage( hWnd, WM_UNDO,  0, 0 );	return 0;
+				case IDM_ALLSEL:
+					len = GetWindowTextLength( hWnd );
+					SendMessage( hWnd, EM_SETSEL, 0, len );
+					break;
+				default:	break;
+			}
+
+			break;
+	}
+
+	return CallWindowProc( gpfOrigLyrEditProc, hWnd, msg, wParam, lParam );
+}
+//-------------------------------------------------------------------------------------------------
+
 
 /*!
 	ウインドウプロシージャ
@@ -397,11 +452,11 @@ LRESULT CALLBACK LayerBoxProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lP
 	{
 //		HANDLE_MSG( hWnd, WM_SIZE,    Lyb_OnSize );	
 //WM_WINDOWPOSCHANGEDを使った場合、WM_SIZEは発生しないようだ
-		HANDLE_MSG( hWnd, WM_KEYDOWN, Lyb_OnKey );
 		HANDLE_MSG( hWnd, WM_CREATE,  Lyb_OnCreate );	
 		HANDLE_MSG( hWnd, WM_COMMAND, Lyb_OnCommand );	
 		HANDLE_MSG( hWnd, WM_PAINT,   Lyb_OnPaint );	
 		HANDLE_MSG( hWnd, WM_DESTROY, Lyb_OnDestroy );
+		HANDLE_MSG( hWnd, WM_KEYDOWN, Lyb_OnKey );
 		HANDLE_MSG( hWnd, WM_LBUTTONDBLCLK, Lyb_OnLButtonDown );
 		HANDLE_MSG( hWnd, WM_CONTEXTMENU,   Lyb_OnContextMenu );
 		HANDLE_MSG( hWnd, WM_WINDOWPOSCHANGING, Lyb_OnWindowPosChanging );
@@ -539,7 +594,7 @@ VOID Lyb_OnCommand( HWND hWnd, INT id, HWND hWndCtl, UINT codeNotify )
 			InvalidateRect( hWnd, NULL, TRUE );
 			break;
 
-		default:	break;
+		default:	TRACE( TEXT("Layer未知のコマンド %d"), id );	break;
 	}
 
 	return;
@@ -720,9 +775,13 @@ VOID Lyb_OnDestroy( HWND hWnd )
 			StatusBarSetText( SB_LAYER, TEXT("") );
 
 			gltLayer.erase( itLyr );
+
+			//SubclassWindow( itLyr->hTextWnd, gpfOrigLyrEditProc );	//	サブクラスを元に戻す
+
 			break;
 		}
 	}
+
 
 	return;
 }
