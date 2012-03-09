@@ -464,8 +464,6 @@
 #define IDM_TMPLT_GROUP_NEXT            32823
 #define IDM_PAGENUM_DLG_OPEN            32824
 #define IDM_MENUEDIT_DLG_OPEN           32825
-#define IDM_FIND_DLG_OPEN               32826
-#define IDM_FIND_HIGHLIGHT_OFF          32827
 #define IDM_FINDMAA_DLG_OPEN            32828
 #define IDM_DRAUGHT_OPEN                32831
 #define IDM_DRAUGHT_CLOSE               32832
@@ -485,6 +483,13 @@
 #define IDM_TMPLT_RELOAD                32846
 #define IDM_VERT_SCRIPT_OPEN            32847
 #define IDM_REBER_DORESET				32851
+
+#define IDM_FIND_DLG_OPEN				32861
+#define IDM_FIND_HIGHLIGHT_OFF			32862
+#define IDM_FIND_JUMP_NEXT				32863
+#define IDM_FIND_JUMP_PREV				32864
+#define IDM_FIND_TARGET_SET				32865
+
 #define IDM_PAGEL_DETAIL                32900
 #define IDM_PAGEL_ADD                   32901
 #define IDM_PAGEL_INSERT                32902

@@ -269,6 +269,11 @@ VOID Evw_OnChar( HWND hWnd, TCHAR ch, INT cRepeat )
 			}
 			else
 			{
+				if( bSelect )	//	選択状態で有る場合・削除
+				{
+					bCrLf = DocSelectedDelete( &gdDocXdot , &gdDocLine, bSqSel );
+				}
+
 				DocCrLfAdd( gdDocXdot , gdDocLine, TRUE );
 				ViewRedrawSetLine( gdDocLine );
 
@@ -406,16 +411,18 @@ VOID Evw_OnLButtonDown( HWND hWnd, BOOL fDoubleClick, INT x, INT y, UINT keyFlag
 	gdDocMozi = DocLetterPosGetAdjust( &dDot, dLine, 0 );
 	gdDocXdot = dDot;
 	gdDocLine = dLine;
+	//	この時点で移動は確定
 
+	//	Upのほうに移動？
 	if( !(gbExtract) )	ViewBrushFilling(  );	//	ブラシする
 	//	抽出モード中は処理しない
 
 	gdXmemory = gdDocXdot;
 	ViewDrawCaret( gdDocXdot, gdDocLine, 1 );	//	位置移動
 
-	ViewSelMoveCheck( FALSE );
+	ViewSelMoveCheck( FALSE );	//	選択状態で、クルッコだけすると、選択解除
 
-	ViewSelPositionSet( NULL );	//	移動した位置を記録
+	ViewSelPositionSet( NULL );	//	移動した位置を記録と再描画
 
 	return;
 }
@@ -656,6 +663,8 @@ HRESULT ViewScriptedLineFeed( VOID )
 //次の行をそこまで空白パディングして、カーソル移動・行を増やすのとは違う処理
 //めり込んでたらカーソル移動だけ・次の行が無かったら、増やしてパディングする
 
+//空白が出っ張ってる行でやったら、そこを基準点とする処理する
+
 	INT		dLines, iTgtDot, iLastDot, iLineDot, iPadDot;
 	BOOLEAN	bIsSp, bFirst = TRUE;
 	UINT	dStyle = 0;
@@ -663,6 +672,8 @@ HRESULT ViewScriptedLineFeed( VOID )
 
 	//	文字列の開始地点を探す。iTgtDotがその位置のはず
 	DocLineStateCheckWithDot( gdDocXdot, gdDocLine, &iTgtDot, &iLastDot, NULL, NULL, &bIsSp );
+	//	該当箇所が最初からスペースだったら、キャレット位置を基準点にする
+	if( bIsSp ){	iTgtDot = gdDocXdot;	}
 	TRACE( TEXT("TEXT START D[%d] L[%d]"), iTgtDot, gdDocLine );
 
 	dLines = DocPageParamGet( NULL , NULL );	//	頁の行数確認

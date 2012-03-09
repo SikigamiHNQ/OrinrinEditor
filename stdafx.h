@@ -115,8 +115,9 @@ static CONST GUID gcstGUID = { 0x66D3E881, 0x972B, 0x458B, { 0x93, 0x5E, 0x9E, 0
 #define USE_NOTIFYICON	//	タスクトレイアイコンを有効
 
 //	作成中の機能
-#define FIND_STRINGS	//	文字列検索機能
+//#define FIND_STRINGS	//	文字列検索機能
 //#define FRAME_MLINE	//	枠パーツ複数行
+#define PAGE_MULTISELECT//	頁一覧の複数選択
 
 #define DO_TRY_CATCH	//	例外対策してみる
 //-------------------------------------------------------------------------------------------------

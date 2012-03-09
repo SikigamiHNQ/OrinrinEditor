@@ -190,10 +190,11 @@ HWND PageListInitialise( HINSTANCE hInstance, HWND hParentWnd, LPRECT pstFrame )
 	}
 	ghPageWnd = CreateWindowEx( dwExStyle, PAGELIST_CLASS, TEXT("Page List"), dwStyle,
 		rect.left, rect.top, rect.right, rect.bottom, hPrWnd, NULL, hInstance, NULL);
-
+	//	ウインドウを作成
 
 	GetClientRect( ghPageWnd, &clRect );
 
+	//	ツールバー・縦のやつ
 	ghToolWnd = CreateWindowEx( 0, TOOLBARCLASSNAME, TEXT("pagetoolbar"),
 		WS_CHILD | WS_VISIBLE | CCS_NORESIZE | CCS_LEFT | CCS_NODIVIDER | TBSTYLE_FLAT | TBSTYLE_LIST | TBSTYLE_TOOLTIPS,// | TBSTYLE_WRAPABLE,
 		0, 0, 0, 0, ghPageWnd, (HMENU)IDTB_PAGE_TOOLBAR, hInstance, NULL);
@@ -243,7 +244,12 @@ HWND PageListInitialise( HINSTANCE hInstance, HWND hParentWnd, LPRECT pstFrame )
 
 //リストビュー
 	ghPageListWnd = CreateWindowEx( 0, WC_LISTVIEW, TEXT("pagelist"),
-		WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | LVS_REPORT | LVS_NOSORTHEADER | LVS_SHOWSELALWAYS | LVS_SINGLESEL,
+		WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | 
+#ifdef PAGE_MULTISELECT
+		LVS_REPORT | LVS_NOSORTHEADER | LVS_SHOWSELALWAYS,
+#else
+		LVS_REPORT | LVS_NOSORTHEADER | LVS_SHOWSELALWAYS | LVS_SINGLESEL,
+#endif
 		tbRect.right, clRect.top, clRect.right - tbRect.right, clRect.bottom, ghPageWnd,
 		(HMENU)IDLV_PAGELISTVIEW, hInstance, NULL );
 	ListView_SetExtendedListViewStyle( ghPageListWnd, LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES );
@@ -362,6 +368,9 @@ VOID Plt_OnCommand( HWND hWnd, INT id, HWND hWndCtl, UINT codeNotify )
 {
 	INT	iPage, iItem, mRslt, iDiff;
 	LONG_PTR	rdExStyle;
+#ifdef PAGE_MULTISELECT
+	INT	iNxItem, iCount, i;
+#endif
 
 	switch( id )
 	{
@@ -401,10 +410,19 @@ VOID Plt_OnCommand( HWND hWnd, INT id, HWND hWndCtl, UINT codeNotify )
 
 	//	選択されてる項目を確保
 	iItem = ListView_GetNextItem( ghPageListWnd, -1, LVNI_ALL | LVNI_SELECTED );
+#ifdef PAGE_MULTISELECT
+	iCount = ListView_GetItemCount( ghPageListWnd );
+
+	if( 0 <= iItem )	//	複数選択されてるかどうか確認
+	{
+		iNxItem = ListView_GetNextItem( ghPageListWnd, iItem, LVNI_ALL | LVNI_SELECTED );
+	}
+#endif
 
 	//	選択されてるモノがないと無意味
 	if( 0 >  iItem ){	iItem = gixFocusPage;	}
 	//	未選択なら、現在頁が選択されているモノと見なす
+
 
 	switch( id )
 	{
@@ -419,7 +437,11 @@ VOID Plt_OnCommand( HWND hWnd, INT id, HWND hWndCtl, UINT codeNotify )
 			return;
 		//	20120110	頁移動したら変更有りになっちゃうの修正
 
+
 		case IDM_PAGEL_INSERT:	//	任意位置新規作成
+#ifdef PAGE_MULTISELECT
+			if( 0 <= iNxItem ){	return;	}	//	複数選択してたら処理しない
+#endif
 			iPage = DocPageCreate( iItem );
 			PageListInsert( iPage );	//	ページリストビューに追加
 			DocPageChange( iPage );
@@ -427,33 +449,67 @@ VOID Plt_OnCommand( HWND hWnd, INT id, HWND hWndCtl, UINT codeNotify )
 			break;
 
 		case IDM_PAGEL_RENAME:	//	頁名称変更
+#ifdef PAGE_MULTISELECT
+			if( 0 <= iNxItem ){	return;	}	//	複数選択してたら処理しない
+#endif
 			if( FAILED( PageListNameChange( iItem ) ) ){	 return;	}
 			break;
 
 		case IDM_PAGEL_DELETE:	//	この頁を削除
-			//	確認入れて
-			mRslt = MessageBoxCheckBox( hWnd, ghInst, 2 );
-			if( IDYES == mRslt ){	DocPageDelete( iItem  );	}
+#ifdef PAGE_MULTISELECT
+			if( 0 <= iNxItem )	//	複数選択してるのなら、いつでも確認入れる
+			{
+				mRslt = MessageBox( hWnd, TEXT("複数の頁を削除しようとしてるのです。\r\n本当に削除していいのですか？"), TEXT("操作確認"), MB_YESNO | MB_DEFBUTTON2 );
+				if( IDYES == mRslt )
+				{
+					for( i = 0; iCount > i; i++ )	//	一応リミット
+					{
+						iItem = ListView_GetNextItem( ghPageListWnd, -1, LVNI_ALL | LVNI_SELECTED );
+						if( 0 > iItem ){	break;	}
+						DocPageDelete( iItem  );
+					}
+				}
+			}
+			else
+			{
+#endif
+				mRslt = MessageBoxCheckBox( hWnd, ghInst, 2 );	//	確認入れて
+				if( IDYES == mRslt ){	DocPageDelete( iItem  );	}
+#ifdef PAGE_MULTISELECT
+			}
+#endif
 			break;
 
-		case IDM_PAGEL_DIVIDE:	//	分割はビューのメニューだろう
+		case IDM_PAGEL_DIVIDE:	//	分割はビューのメニュー
 			break;
 
 		case IDM_PAGEL_COMBINE:	//	統合
+#ifdef PAGE_MULTISELECT
+			if( 0 <= iNxItem ){	return;	}	//	複数選択してたら処理しない
+#endif
 			//	確認入れて
 			mRslt = MessageBoxCheckBox( hWnd, ghInst, 0 );
 			if( IDYES == mRslt ){	PageListCombine( hWnd , iItem );	}
 			break;
 
-		case IDM_PAGEL_UPFLOW:	//	↑移動
+		case IDM_PAGEL_UPFLOW:		//	↑移動
+#ifdef PAGE_MULTISELECT
+			if( 0 <= iNxItem ){	return;	}	//	複数選択してたら処理しない
+#endif
 			PageListSpinning( hWnd, iItem, 1 );
 			break;
 
 		case IDM_PAGEL_DOWNSINK:	//	↓移動
+#ifdef PAGE_MULTISELECT
+			if( 0 <= iNxItem ){	return;	}	//	複数選択してたら処理しない
+#endif
 			PageListSpinning( hWnd, iItem, -1 );
 			break;
 
 		case IDM_PAGEL_DUPLICATE:	//	頁複製
+#ifdef PAGE_MULTISELECT
+			if( 0 <= iNxItem ){	return;	}	//	複数選択してたら処理しない
+#endif
 			PageListDuplicate( hWnd, iItem );
 			break;
 

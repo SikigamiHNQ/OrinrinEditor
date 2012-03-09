@@ -18,7 +18,6 @@ If not, see <http://www.gnu.org/licenses/>.
 //-------------------------------------------------------------------------------------------------
 
 
-
 #include "stdafx.h"
 #include "OrinrinEditor.h"
 #include "MaaTemplate.h"
@@ -449,6 +448,11 @@ VOID Maa_OnContextMenu( HWND hWnd, HWND hWndContext, UINT xPos, UINT yPos )
 #ifdef OPEN_PROFILE
 				if( IDM_OPEN_HIS_FIRST <= dRslt && dRslt <= IDM_OPEN_HIS_LAST )
 				{
+					OpenProfileLoad( hWnd, dRslt );
+				}
+				else if( IDM_OPEN_HIS_CLEAR == dRslt )	//	ファイルオーポン履歴クルヤー
+				{
+					OpenProfileLogging( hWnd, NULL );
 				}
 #endif
 				break;

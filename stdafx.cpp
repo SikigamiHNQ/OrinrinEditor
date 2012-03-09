@@ -219,6 +219,8 @@ LPSTR SjisEntityExchange( LPCSTR pcMoto )
 			acChk[0] = acSrp[1];	acChk[1] = 0x00;
 			CharLowerA( acChk );
 			check = acChk[0] - 'a';	//	位置を確認
+			//	20120301	０～２５の範囲外であるのなら、&xxxx;ではない
+			if( 26 <= check ){	pcOutput[dt++] = pcMoto[sc];	continue;	}
 
 			pstEty = gpstEntitys[check];
 

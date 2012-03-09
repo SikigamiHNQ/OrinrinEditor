@@ -81,10 +81,10 @@ VOID	Maa_OnMeasureItem( HWND, MEASUREITEMSTRUCT * );	//!<
 
 INT_PTR	CALLBACK TreeProfileDlgProc( HWND, UINT, WPARAM, LPARAM );	//!<	
 HRESULT	TreeProfListUp( HWND, HWND, LPTSTR, HTREEITEM, UINT, INT );	//!<	
-UINT	TreeLoadNodeProc( HWND, HWND, HTREEITEM, UINT );					//!<	
+UINT	TreeLoadNodeProc( HWND, HWND, HTREEITEM, UINT );			//!<	
 VOID	TreeProfCheckState( HWND, HTREEITEM, UINT );				//!<	
 #ifdef TREEPROF_AUTOCHECK
-UINT	TreeProfCheckExistent( HWND, LPTSTR, HWND, HTREEITEM, UINT );		//!<	
+UINT	TreeProfCheckExistent( HWND, LPTSTR, HWND, HTREEITEM, UINT );	//!<	
 #endif
 //-------------------------------------------------------------------------------------------------
 
@@ -388,6 +388,12 @@ VOID Maa_OnCommand( HWND hWnd, INT id, HWND hwndCtl, UINT codeNotify )
 		//	Ｅコンテキスト・アクセロリータ　Ｖメニュー・アクセロリータ
 		case IDM_FINDMAA_DLG_OPEN:	TreeMaaFileFind( hWnd );	break;
 		//全文検索できるか？
+
+		case IDM_TMPLT_GROUP_NEXT:
+		case IDM_TMPLT_GROUP_PREV:
+			TRACE( TEXT("Ctrl＋↑↓") );
+			break;
+
 		default:	break;
 	}
 

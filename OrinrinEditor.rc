@@ -250,10 +250,10 @@ IDM_AATABS_POPUP MENU
 BEGIN
     POPUP "複数行テンプレタブのアレ"
     BEGIN
-        MENUITEM "このタブを閉じる(&Q)",                IDM_AATABS_DELETE
-        MENUITEM "全ての副タブを閉じる(&A)",              IDM_AATABS_ALLDELETE
+        MENUITEM "このタブを閉じる(&Q)",	IDM_AATABS_DELETE
+        MENUITEM "全ての副タブを閉じる(&A)",	IDM_AATABS_ALLDELETE
         MENUITEM SEPARATOR
-        MENUITEM "編集ビューに開く(&E)",                IDM_AATREE_GOEDIT
+        MENUITEM "編集ビューに開く(&E)",	IDM_AATREE_GOEDIT
     END
 END
 
@@ -261,10 +261,10 @@ IDM_LAYERBOX_POPUP MENU
 BEGIN
     POPUP "レイヤボックスのアレ"
     BEGIN
-        MENUITEM "コピー(&C)",                     IDM_LYB_COPY
+        MENUITEM "コピー(&C)",	IDM_LYB_COPY
         MENUITEM SEPARATOR
-        MENUITEM "透過領域設定をリセット(&R)",             IDM_LYB_TRANCE_RELEASE
-        MENUITEM "全ての空白を透過領域に設定(&T)",           IDM_LYB_TRANCE_ALL
+        MENUITEM "透過領域設定をリセット(&R)",	IDM_LYB_TRANCE_RELEASE
+        MENUITEM "全ての空白を透過領域に設定(&T)",	IDM_LYB_TRANCE_ALL
     END
 END
 
@@ -272,10 +272,10 @@ IDM_MULTIFILE_POPUP MENU
 BEGIN
     POPUP "複数ファイルタブのアレ"
     BEGIN
-        MENUITEM "保存(&S)",                      IDM_OVERWRITESAVE
-        MENUITEM "名前を付けて保存(&M)",                IDM_RENAMESAVE
+        MENUITEM "保存(&S)",	IDM_OVERWRITESAVE
+        MENUITEM "名前を付けて保存(&M)",	IDM_RENAMESAVE
         MENUITEM SEPARATOR
-        MENUITEM "タブを閉じる(&Q)",                  IDM_FILE_CLOSE
+        MENUITEM "タブを閉じる(&Q)",	IDM_FILE_CLOSE
     END
 END
 
@@ -283,8 +283,8 @@ IDM_TEMPLATE_POPUP MENU
 BEGIN
     POPUP "テンプレウインドウのアレ"
     BEGIN
-        MENUITEM "常に手前に表示(&Z)",                 IDM_TOPMOST_TOGGLE
-        MENUITEM "テンプレート再読込(&R)",               IDM_TMPLT_RELOAD
+        MENUITEM "常に手前に表示(&Z)",		IDM_TOPMOST_TOGGLE
+        MENUITEM "テンプレート再読込(&R)",	IDM_TMPLT_RELOAD
     END
 END
 
@@ -292,18 +292,18 @@ IDM_DRAUGHT_POPUP MENU
 BEGIN
     POPUP "ドラフトボードのアレ"
     BEGIN
-        MENUITEM "編集ビューに通常挿入(&I)",              IDM_DRAUGHT_INSERTEDIT
-        MENUITEM "編集ビューに矩形挿入(&R)",              IDM_DRAUGHT_INTERRUPTEDIT
-        MENUITEM "レイヤで開く(&L)",                  IDM_DRAUGHT_LAYERBOX
-        MENUITEM "コピー(UNI&CODE)",               IDM_DRAUGHT_UNICLIP
-        MENUITEM "コピー(Shift&JIS)",              IDM_DRAUGHT_SJISCLIP
+        MENUITEM "編集ビューに通常挿入(&I)",	IDM_DRAUGHT_INSERTEDIT
+        MENUITEM "編集ビューに矩形挿入(&R)",	IDM_DRAUGHT_INTERRUPTEDIT
+        MENUITEM "レイヤで開く(&L)",			IDM_DRAUGHT_LAYERBOX
+        MENUITEM "コピー(UNI&CODE)",			IDM_DRAUGHT_UNICLIP
+        MENUITEM "コピー(Shift&JIS)",			IDM_DRAUGHT_SJISCLIP
         MENUITEM SEPARATOR
-        MENUITEM "アイテムを削除(&D)",                 IDM_DRAUGHT_DELETE
+        MENUITEM "アイテムを削除(&D)",			IDM_DRAUGHT_DELETE
         MENUITEM SEPARATOR
-        MENUITEM "全内容をエクスポート(&E)",              IDM_DRAUGHT_EXPORT
+        MENUITEM "全内容をエクスポート(&E)",	IDM_DRAUGHT_EXPORT
         MENUITEM SEPARATOR
-        MENUITEM "全内容を削除(&K)",                  IDM_DRAUGHT_ALLDELETE
-        MENUITEM "ドラフトボードを閉じる(&Q)",             IDM_DRAUGHT_CLOSE
+        MENUITEM "全内容を削除(&K)",			IDM_DRAUGHT_ALLDELETE
+        MENUITEM "ドラフトボードを閉じる(&Q)",	IDM_DRAUGHT_CLOSE
     END
 END
 
@@ -366,8 +366,11 @@ BEGIN
     VK_TAB,         IDM_WINDOW_CHG_RVRS,    VIRTKEY, SHIFT, CONTROL, NOINVERT
     VK_PRIOR,       IDM_FILE_PREV,          VIRTKEY, CONTROL, NOINVERT
     VK_NEXT,        IDM_FILE_NEXT,          VIRTKEY, CONTROL, NOINVERT
-    VK_F4,          IDM_FILE_CLOSE,         VIRTKEY, CONTROL, NOINVERT
-    VK_F5,          IDM_NOW_PAGE_REFRESH,   VIRTKEY, NOINVERT
+	VK_F3,			IDM_FIND_JUMP_NEXT,		VIRTKEY, NOINVERT
+	VK_F3,			IDM_FIND_JUMP_PREV,		VIRTKEY, SHIFT, NOINVERT
+	VK_F3,			IDM_FIND_TARGET_SET,	VIRTKEY, CONTROL, NOINVERT
+	VK_F4,          IDM_FILE_CLOSE,			VIRTKEY, CONTROL, NOINVERT
+    VK_F5,          IDM_NOW_PAGE_REFRESH,	VIRTKEY, NOINVERT
 END
 
 

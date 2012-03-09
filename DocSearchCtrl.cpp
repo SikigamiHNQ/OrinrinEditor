@@ -23,20 +23,37 @@ If not, see <http://www.gnu.org/licenses/>.
 
 /*
 検索したら、ファイル名・頁番号・位置を全部覚えておく必要がある
-Ｆ３でジャンプのために
+Ctrl+Fで検索窓オーポン
+Ctrl+F3で、選択範囲を検索範囲に・範囲なかったら無視
+Ｆ３でジャンプ、Shift+F3で逆送り
+
+検索状態なら、文字列に変更があったら検索し直し。その行だけでいいか？
+F3用ジャンプテーブルも修正・編集はいったら、該当行のデータ全部けして、その行だけ再検索
+
+イテレータ、eraseの返り値は、削除したやつの次の位置
 */
 
 #ifdef FIND_STRINGS
 
 
 //	文字列検索は簡易Boyer-Moore法
-
 typedef struct tagFINDPATTERN
 {
 	TCHAR	cchMozi;
 	INT		iDistance;
 
 } FINDPATTERN, *LPFINDPATTERN;
+//--------------------------------
+
+//	ヒット位置を記録・リストのほうがいい？
+typedef struct tagFINDPOSITION
+{
+	INT	iPage;	//!<	属してる頁
+	INT	iLine;	//!<	該当行
+	INT	iCaret;	//!<	該当の開始位置
+
+} FINDPOSITION, *LPFINDPOSITION;
+
 //-------------------------------------------------------------------------------------------------
 
 extern list<ONEFILE>	gltMultiFiles;	//!<	複数ファイル保持
@@ -49,8 +66,8 @@ extern INT		gixFocusPage;	//	注目中のページ・とりあえず０・０インデックス
 
 EXTERNED HWND	ghFindDlg;	//!<	検索ダイヤログのハンドル
 
-
-static TCHAR	gatNowPtn[MAX_PATH];	//!<	最新の検索文字列
+static TCHAR	gatNowPtn[MAX_PATH];			//!<	最新の検索文字列
+static list<FINDPOSITION>	gltFindPosition;	//!<	検索結果保持
 //-------------------------------------------------------------------------------------------------
 
 
@@ -156,7 +173,7 @@ LPTSTR FindStringProc( LPTSTR ptText, LPTSTR ptPattern, LPINT pdCch )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	検索ダイヤログを開く
+	検索ダイヤログを開く・モーダレスで
 	@param[in]	hInst	アポリケーションの実存
 	@param[in]	hWnd	ウインドウハンドル
 	@retval HRESULT	終了状態コード
@@ -264,6 +281,7 @@ HRESULT FindExecute( HWND hDlg )
 
 	//	検索範囲
 	dRange = ComboBox_GetCurSel( GetDlgItem(hDlg,IDCB_FIND_TARGET) );
+	//	０頁　１ファイル
 
 	//検索パヤーン
 	Edit_GetText( GetDlgItem(hDlg,IDE_FIND_TEXT), atBuf, MAX_PATH );
@@ -334,6 +352,7 @@ HRESULT FindPageSearch( LPTSTR ptPattern, INT iTgtPage, FILES_ITR itFile )
 		dLeng += dCch;	//	文字位置・０インデックス
 		ttBuf = ptPage[dLeng];
 
+		//	ヒットした部分に色を付ける
 		FindPageHitHighlight( dLeng, cchSzPtn, iTgtPage, itFile );
 
 		ptCaret = ptFind;
