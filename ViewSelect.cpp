@@ -109,17 +109,26 @@ HRESULT ViewSelPositionSet( LPVOID pVoid )
 
 /*!
 	矩形選択モードのON/OFFトグル
+	@param[in]	bMode	非０メニューから　０範囲選択処理の中から
 	@param[in]	pVoid	なにか
 	@return	UINT	非０矩形モードＯＮ　０矩形モードＯＦＦ
 */
-UINT ViewSqSelModeToggle( LPVOID pVoid )
+UINT ViewSqSelModeToggle( UINT bMode, LPVOID pVoid )
 {
 	TRACE( TEXT("矩形選択ON/OFF") );
 
 	//	選択動作中はモード変更しない
 	if( gbSelecting )	gbSqSelect;
 
-	gbSqSelect ^= D_SQUARE;
+	if( bMode )	//	20120313
+	{
+		gbSqSelect ^= D_SQUARE;
+	}
+	else
+	{
+		gbSqSelect &= ~D_SQUARE;	//	一旦解除して
+		if( gbAltOn ){	gbSqSelect |=  D_SQUARE;	}
+	}
 
 	//	開始しても終了しても初期化するのは変わらない
 	gstSqSelBegin.x = -1;
@@ -220,7 +229,8 @@ HRESULT ViewSelMoveCheck( UINT dMode )
 		if( gbShiftOn || dMode )
 		{
 			//	ALT押しながら選択開始したら、矩形選択をToggleする
-			if( gbAltOn )	ViewSqSelModeToggle( NULL );
+		//	if( gbAltOn )	//	20120313
+				ViewSqSelModeToggle( 0, NULL );
 
 			TRACE( TEXT("STATE[%d %d %d]"), gbShiftOn, gbAltOn, dMode );
 

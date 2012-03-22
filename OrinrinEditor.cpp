@@ -22,12 +22,19 @@ If not, see <http://www.gnu.org/licenses/>.
 //考え中
 //	頁削除メッセージの確認無しは、起動中だけにしたほうがいい？
 
+//	キーバインド・メニューに入ってない機能に注意
+
 //バグ
-//	TODO:	Editor側で、プロファイル使用履歴が動かない
+//	TODO:	選択範囲がある状態でCtrlU＞アンドゥ＞選択範囲がおかしくなる。さらに切り取りとかすると落ちる
+//アンドゥリドゥしたら、選択範囲解除する・DocInsDelCtrl.cpp:559あたりでおかしい？
+//	TODO:	MLTに右クリからアイテム追加して、そのAAを連続で貼り付けると落ちる
+//	TODO:	追加したAAの最後にステルス空白がある？
+//	TODO:	複数の空白を、まとめてドラッグでけしてもバッド空白チェキが外れない
 //	TODO:	「矩形選択」と「部分抽出」の両方にチェックを入れた状態でドラッグすると範囲がおかしい
 //	TODO:	ページ分割処理、容量表示、改行の数とかおかしい？
 //	TODO:	枠編集のサンプルがおかしいときがある・描画ルーチン治すか＜複数行対応にする
 //	TODO:	イケない空白の行番号表示の赤が、解消しても消えない時がある・多分Drawかチェック忘れ
+//	TODO:	選択範囲ある時にエンターだと選択範囲がキャンセルされない？
 
 //	TODO:	使用のアレ、別MLTに同じAAが有ったらハッシュが同じってことでラリってまう。どうしよう
 //ベースネーム書換で対処はできる
@@ -35,6 +42,8 @@ If not, see <http://www.gnu.org/licenses/>.
 //確認：Viewer側、↑↓PageUpDownつかえてるか
 
 //変更・修正
+//	TODO:	サムネ表示、ポップアップで落ちやすい？メモリの扱いを考える必要がある・NULLチェキとか
+
 //	TODO:	頁の複数選択して移動、Ｄ＆Ｄも
 //	TODO:	CtrlF4で、Viewer側なら副タブ閉じる
 //	TODO:	Viewer側、Ctrl↑↓で、MLTのセクション間移動する
@@ -64,14 +73,13 @@ If not, see <http://www.gnu.org/licenses/>.
 //	TODO:	テンプレの「常に最前面に表示」Orinrinediterを表示している時だけ最前面に来るように//もしくは、メイン窓に統合とか
 
 //機能追加
-//	TODO:	ツリーのアイテムをダブルクリックしたら副タブに開く。Ctrl＋右クリとか、とにかくショートカット欲しい
-
-//	TODO:	Ctrl+Alt+Oで上書きペースト？
+//	TODO:	MAA窓を非使用するオプショッ
 //	TODO:	MAAのアイテム追加、カーソル位置のAAの手前に入るように
 //	TODO:	選択範囲をマウスドラッグで移動
 //	TODO:	viewerの主タブをマウスとスクロールバーだけでなく、ホウィール、キーボードの矢印やPageUp,PageDnキーで操作出来る様にならない？
 //	TODO:	Viewer側、ポップアップで、容量も出せないか
 //	TODO:	枠機能で、複数行パーツを使いたい
+//	TODO:	右揃え線消し
 
 //	TODO:	使用をファイル出力できるように
 //	TODO:	MLTのブックマーク機能・タブ増やすか、ツリーに増やすか・副タブじゃいけない？
@@ -79,8 +87,6 @@ If not, see <http://www.gnu.org/licenses/>.
 //	TODO:	Viewの右クリメニューも編集出来るように
 //	TODO:	スペース文字が二個以上連続しているところをAAと台詞の区切りだと認識するようなロジックは？
 //	TODO:	フリーカーソルモード
-//	TODO:	ユニコード調整有効なら、右そろえ線の調整をドットではなくユニコード空白で
-//	TODO:	行頭が5dot空白の場合、半角スペースではなくユニコード空白に変換
 //	TODO:	View部分をサムネ表示できるように
 //	TODO:	頁一覧を、複数選択して一発削除できるように
 //	TODO:	レイヤボックス自体の操作、上書き実行とかもキボドショトカトで出来るように
@@ -91,14 +97,12 @@ If not, see <http://www.gnu.org/licenses/>.
 //	TODO:	バックアップ機能の強化・上書き保存したらバックアップとか・頁新規作成したら保存
 //	TODO:	保存するとき、同名ファイルがあったら、日時くっつけてバックアップとか
 //	TODO:	カーソルのところに上書き挿入、的な機能・レイヤボックス介さずに直で。
-//	TODO:	MAA窓を非使用するオプショッ
 //	TODO:	頁リスト、直前に選択していた頁を灰色にしておく機能
 //	TODO:	ファイル内容統計機能が欲しい。全バイト数、頁数とか
 //	TODO:	Ctrl+Kの統計機能・PageListの項目増やして対処・Ctrl+Kでリフレッシュとか
 //			連続半角とか、行末空白とか・いろんな情報をだす・リヤルタイムだと重いので操作でリフレッシュ
 //	TODO:	ツールチップ付けたい
 //	TODO:	文字の検索・痴漢機能	ユニコード空白一括検索とか
-//	TODO:	右揃え線消し
 //	TODO:	切り抜きリファレンスAAを使って、文字のとこだけ切り抜き、ないところだけ切り抜き、とかできるようにしたい
 //	TODO:	バックアップメッセージ、ステータスバーに出せないか
 //	TODO:	全部保存作る
@@ -117,6 +121,12 @@ If not, see <http://www.gnu.org/licenses/>.
 
 
 
+//	CopyAcceleratorTable
+//	CreateAcceleratorTable
+//	DestroyAcceleratorTable
+//	ACCEL構造体
+//	Ctrl Shift Alt の順番
+
 
 
 
@@ -128,7 +138,6 @@ If not, see <http://www.gnu.org/licenses/>.
 //        MENUITEM SEPARATOR
 //        MENUITEM "塗り潰し（ブラシ）モード(&M)\tCtrl + T",  IDM_BRUSH_STYLE
 //    "T",            IDM_BRUSH_STYLE,        VIRTKEY, CONTROL, NOINVERT
-
 
 
 //	スクロールが発生した場合、画面全体書換必要か
@@ -144,11 +153,19 @@ If not, see <http://www.gnu.org/licenses/>.
 
 
 //OK?
-//	TODO:	台詞Enter、空白だけ出っ張ってるときとかにキャレット位置がおかしくなる
+//	TODO:	Editor側で、プロファイル使用履歴が動かない
 
+//	TODO:	頁削除のAlt+D付ける。注意ダイヤログ出す。
+//	TODO:	UTF8でもセーブ出来るように・エクスポートでいいか
+//	TODO:	フォント変更出来るように
 //	TODO:	ViewerEXEの場合、最前面に表示になってたらドラフトボード・サムネが裏になってまう
+//	TODO:	MAAのリストアップは、テキストも対象に入れる
+//	TODO:	サムネからだと使用履歴に反映されない
 //	TODO:	IEプレビュー、CSSでフォント表示を正規化する http://b4t.jp/823
 //	TODO:	文字ＡＡの入力とか、レイヤボックスの編集とかで、キーボードショートカット使えるように
+
+//	TODO:	未保存で閉じようとしたときのメッセージのYes/Noを逆にしてほしい。
+//			未保存のまま閉じようとした場合の確認は『セーブしますか? Yes（Save)/No/Cancel』だが、Orinrinは『終了していいですか? Yes/No』なのでYesとNoの動作が逆になっていて紛らわしいため。
 
 //コピーモード入れ替え、起動時の処理と、Ctrl+Cの表記
 //レイヤボックスで、SJISコピーしたら中身が内のを修正
@@ -164,6 +181,7 @@ ASDファイル　　壱行が壱コンテンツ
 内容と説明の区切り　0x02,0x02
 
 */
+//	v ^ (v >> 1)	グレイコード
 
 /*
 2011/06/30	0.10	初リリース、プレアルファ版
@@ -346,17 +364,19 @@ ASDファイル　　壱行が壱コンテンツ
 					終了時の確認メッセージ変更
 					IEプレビューのCSSを少し変更・行間について
 					バグ修正いろいろ
-2012/03/06	0.29	台詞改行、空白行で実行した場合は、キャレット位置で次の行を確保するようにした
-					Editor側のプロファイル履歴がおかしかったのを修正
-
+2012/03/22	0.29	台詞改行、空白行で実行した場合は、キャレット位置で次の行を確保するようにした
+					Editorで効いてなかったプロファイル履歴を修正
+					右揃え線、ユニコードに対応
+					行頭半角空白をユニコード空白に置き換える機能搭載
+					Ctrl+Bでプレビュー開くようにした
+					壱行、ブラシテンプレの表示/非表示ができる
+					アクセラキー編集機能を搭載
+					アンドゥリドゥをするときは選択範囲解除するようにした
+					已に開いているファイルを開こうとしたら、そのタブに移るようにした
 
 更新日時注意
 
 ページリストは、クリックしてもフォーカス移らないようにした
-
-
-	リバーの変更の復元
-
 */
 
 /*
@@ -407,40 +427,44 @@ static  HINSTANCE	ghInst;						//!<	現在のインターフェイス
 static  TCHAR		gszTitle[MAX_STRING];		//!<	タイトルバーのテキスト
 static  TCHAR		gszWindowClass[MAX_STRING];	//!<	メインウィンドウクラス名
 
-static  HMENU	ghMenu;			//!<	メニュー
+static  HMENU		ghMenu;			//!<	メニュー
 
-static   HWND	ghFileTabWnd;	//!<	複数ファイルタブ
-static  HWND	ghFileTabTip;	//!<	複数ファイルタブツールチップ
+static	HACCEL		ghAccelTable;	//!<	キーボードアクセラレータハンドル
 
-static   HWND	ghMainWnd;		
-static   HWND	ghStsBarWnd;	//!<	ステータスバー
+static  HWND		ghFileTabWnd;	//!<	複数ファイルタブ
+static  HWND		ghFileTabTip;	//!<	複数ファイルタブツールチップ
 
-static HANDLE	ghMutex;		//!<	多重起動防止用Mutex
+static  HWND		ghMainWnd;		
+static  HWND		ghStsBarWnd;	//!<	ステータスバー
 
-EXTERNED HFONT	ghNameFont;		//!<	ファイルタブ用フォント
+static HANDLE		ghMutex;		//!<	多重起動防止用Mutex
 
-EXTERNED HWND	ghMaaWnd;		//!<	複数行ＡＡテンプレ
-EXTERNED HWND	ghPgVwWnd;		//!<	ページリスト
-EXTERNED HWND	ghLnTmplWnd;	//!<	壱行テンプレ
-EXTERNED HWND	ghBrTmplWnd;	//!<	ブラシテンプレ
+EXTERNED HFONT		ghNameFont;		//!<	ファイルタブ用フォント
 
-EXTERNED HWND	ghMainSplitWnd;	//!<	メインのスプリットバーハンドル
-EXTERNED LONG	grdSplitPos;	//!<	スプリットバーの、左側の、画面右からのオフセット
+EXTERNED HWND		ghMaaWnd;		//!<	複数行ＡＡテンプレ
+EXTERNED HWND		ghPgVwWnd;		//!<	ページリスト
+EXTERNED HWND		ghLnTmplWnd;	//!<	壱行テンプレ
+EXTERNED HWND		ghBrTmplWnd;	//!<	ブラシテンプレ
+EXTERNED BOOLEAN	gbDockTmplView;	//!<	くっついてるテンプレは見えているか
 
-EXTERNED UINT	gbUniPad;		//!<	パディングにユニコードをつかって、ドットを見せないようにする
-EXTERNED UINT	gbUniRadixHex;	//!<	ユニコード数値参照が１６進数であるか
+EXTERNED HWND		ghMainSplitWnd;	//!<	メインのスプリットバーハンドル
+EXTERNED LONG		grdSplitPos;	//!<	スプリットバーの、左側の、画面右からのオフセット
 
-static   UINT	gdBUInterval;	//!<	バックアップ感覚・デフォ３分くらい？
-EXTERNED UINT	gbAutoBUmsg;	//!<	自動バックアップメッセージ出すか？
-EXTERNED UINT	gbCrLfCode;		//!<	改行コード：０したらば・非０ＹＹ 
+EXTERNED UINT		gbUniPad;		//!<	パディングにユニコードをつかって、ドットを見せないようにする
+EXTERNED UINT		gbUniRadixHex;	//!<	ユニコード数値参照が１６進数であるか
+
+static   UINT		gdBUInterval;	//!<	バックアップ感覚・デフォ３分くらい？
+EXTERNED UINT		gbAutoBUmsg;	//!<	自動バックアップメッセージ出すか？
+EXTERNED UINT		gbCrLfCode;		//!<	改行コード：０したらば・非０ＹＹ 
 
 //@@コピー処理
-EXTERNED UINT	gbCpModSwap;	//!<	SJISとユニコードコピーを入れ替える
+#ifdef COPY_SWAP
+EXTERNED UINT		gbCpModSwap;	//!<	SJISとユニコードコピーを入れ替える
+#endif
+static TCHAR		gatExePath[MAX_PATH];	//!<	実行ファイルの位置
+static TCHAR		gatIniPath[MAX_PATH];	//!<	ＩＮＩファイルの位置
 
-static TCHAR	gatExePath[MAX_PATH];	//!<	実行ファイルの位置
-static TCHAR	gatIniPath[MAX_PATH];	//!<	ＩＮＩファイルの位置
-
-EXTERNED INT	gbTmpltDock;	//!<	テンプレのドッキング
+EXTERNED INT		gbTmpltDock;	//!<	テンプレのドッキング
 
 #ifdef OPEN_HISTORY
 static list<OPENHIST>	gltOpenHist;	//!<	ファイル開いた履歴・
@@ -485,6 +509,10 @@ VOID	Cls_OnHotKey(HWND, INT, UINT, UINT );		//!<
 INT_PTR	CALLBACK OptionDlgProc( HWND, UINT, WPARAM, LPARAM );	//!<	
 
 HRESULT	ViewingFontNameLoad( VOID );
+
+#ifdef USE_NOTIFYICON
+VOID	TaskTrayIconEvent( HWND, UINT, UINT );
+#endif
 //-------------------------------------------------------------------------------------------------
 
 
@@ -501,7 +529,6 @@ INT APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 	UNREFERENCED_PARAMETER(hPrevInstance);
 	UNREFERENCED_PARAMETER(lpCmdLine);
 
-	HACCEL	hAccelTable;
 	INT		msRslt;
 	MSG		msg;
 
@@ -510,6 +537,10 @@ INT APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 	LPTSTR	*pptArgs;
 
 	INT		iCode;
+
+	LPACCEL	pstAccel;
+	INT	iEntry;
+
 
 #ifdef _DEBUG
 	//_CRTDBG_ALLOC_MEM_DF;		//	指定が必要なフラグ
@@ -567,6 +598,8 @@ INT APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 
 	gbUniPad = 0;
 
+	gbDockTmplView = TRUE;
+
 	iCode = InitParamValue( INIT_LOAD, VL_CLASHCOVER, 0 );
 	if( iCode )
 	{
@@ -587,7 +620,11 @@ INT APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 
 	RegisterHotKey( ghMainWnd, IDHK_THREAD_DROP, MOD_CONTROL | MOD_SHIFT, VK_D );
 
-	hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_ORINRINEDITOR));
+	//	読み込むテーブルに注意
+	//ghAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_ORINRINEDITOR));
+	pstAccel = AccelKeyTableLoadAlloc( &iEntry );
+	AccelKeyTableCreate( pstAccel, iEntry );
+	FREE( pstAccel );
 
 	//	メインメッセージループ
 	for(;;)
@@ -600,7 +637,7 @@ INT APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 		{	//トップに来てるかどうか判断する
 			if( ghFindDlg == GetForegroundWindow(  ) )
 			{
-				if( TranslateAccelerator( ghFindDlg, hAccelTable, &msg ) )	continue;
+				if( TranslateAccelerator( ghFindDlg, ghAccelTable, &msg ) )	continue;
 				if( IsDialogMessage( ghFindDlg, &msg ) )	continue;
 			}
 		}
@@ -610,12 +647,12 @@ INT APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 		{	//トップに来てるかどうか判断する
 			if( ghMaaFindDlg == GetForegroundWindow(  ) )
 			{
-				if( TranslateAccelerator( ghMaaFindDlg, hAccelTable, &msg ) )	continue;
+				if( TranslateAccelerator( ghMaaFindDlg, ghAccelTable, &msg ) )	continue;
 				if( IsDialogMessage( ghMaaFindDlg, &msg ) )	continue;
 			}
 		}
 
-		if( !TranslateAccelerator( msg.hwnd, hAccelTable, &msg ) )
+		if( !TranslateAccelerator( msg.hwnd, ghAccelTable, &msg ) )
 		{
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
@@ -719,8 +756,9 @@ BOOL InitInstance( HINSTANCE hInstance, INT nCmdShow, LPTSTR ptArgv )
 
 	gbTmpltDock   = InitParamValue( INIT_LOAD, VL_PLS_LN_DOCK,  1 );	//	０独立　１くっつける
 
+#ifdef COPY_SWAP
 	gbCpModSwap   = InitParamValue( INIT_LOAD, VL_SWAP_COPY, 0 );		//	０ユニコード　１SJIS
-
+#endif
 
 	ghMainWnd = hWnd;
 
@@ -732,31 +770,35 @@ BOOL InitInstance( HINSTANCE hInstance, INT nCmdShow, LPTSTR ptArgv )
 	ghMenu = GetMenu( hWnd );
 
 	//	メニューにツリー構築はいらないのでカット
-	hSubMenu = GetSubMenu( ghMenu, 0 );
+	hSubMenu = GetSubMenu( ghMenu , 0 );	//	ファイル
 	DeleteMenu( hSubMenu, IDM_TREE_RECONSTRUCT, MF_BYCOMMAND );
+#ifndef ACCELERATOR_EDIT
+	DeleteMenu( hSubMenu, IDM_ACCELKEY_EDIT_DLG_OPEN, MF_BYCOMMAND );
+#endif
 
-	hSubMenu = GetSubMenu( ghMenu, 1 );	//	編集
+	hSubMenu = GetSubMenu( ghMenu , 1 );	//	編集
+#ifdef COPY_SWAP
 	if( gbCpModSwap )
 	{
 		ModifyMenu( hSubMenu, IDM_COPY,     MF_BYCOMMAND | MFT_STRING, IDM_COPY,     TEXT("SJISコピ－(&C)\tCtrl + C") );
 		ModifyMenu( hSubMenu, IDM_SJISCOPY, MF_BYCOMMAND | MFT_STRING, IDM_SJISCOPY, TEXT("Unicodeコピ－(&J)") );
 	}
+#endif
 #ifndef FIND_STRINGS
 	DeleteMenu( hSubMenu, IDM_FIND_DLG_OPEN, MF_BYCOMMAND );
 	DeleteMenu( hSubMenu, IDM_FIND_HIGHLIGHT_OFF, MF_BYCOMMAND );
 	DeleteMenu( hSubMenu, 19, MF_BYPOSITION );	//	削除順番注意
 #endif
 
-//	hSubMenu = GetSubMenu( ghMenu, 2 );	//	挿入
+//	hSubMenu = GetSubMenu( ghMenu , 2 );	//	挿入
 
-	hSubMenu = GetSubMenu( ghMenu, 4 );	//	表示
+	hSubMenu = GetSubMenu( ghMenu , 4 );	//	表示
 	if( gbTmpltDock )
 	{
 		DeleteMenu( hSubMenu, IDM_PAGELIST_VIEW, MF_BYCOMMAND );
 		DeleteMenu( hSubMenu, IDM_LINE_TEMPLATE, MF_BYCOMMAND );
 		DeleteMenu( hSubMenu, IDM_BRUSH_PALETTE, MF_BYCOMMAND );
 	}
-
 
 
 	AaFontCreate( 1 );
@@ -812,6 +854,10 @@ BOOL InitInstance( HINSTANCE hInstance, INT nCmdShow, LPTSTR ptArgv )
 
 	ghMaaWnd = MaaTmpltInitialise( hInstance, hWnd, &wnRect );
 
+	//	複数行テンプレ窓の表示・非表示のチェキ
+	MenuItemCheckOnOff( IDM_MAATMPLE_VIEW, MaaViewToggle( 0 ) );
+
+
 	DraughtInitialise( hInstance, hWnd );
 
 	if( isMaxim )
@@ -829,6 +875,64 @@ BOOL InitInstance( HINSTANCE hInstance, INT nCmdShow, LPTSTR ptArgv )
 	return TRUE;
 }
 //-------------------------------------------------------------------------------------------------
+
+#ifdef ACCELERATOR_EDIT
+
+/*!
+	アクセラテーブルをダイナミックに確保
+	@param[out]	piEntry	確保したエントリ数を戻す
+	@return		確保したテーブル構造体のポインター・freeに注意
+*/
+LPACCEL AccelKeyTableGetAlloc( LPINT piEntry )
+{
+	INT	iItems;
+	LPACCEL	pstAccel = NULL;
+
+	if( !(piEntry) )	return NULL;
+	*piEntry = 0;
+
+	//	まず個数確保
+	iItems = CopyAcceleratorTable( ghAccelTable, NULL, 0 );
+	if( 0 >= iItems )	return NULL;
+
+	pstAccel = (LPACCEL)malloc( iItems * sizeof(ACCEL) );
+	if( !(pstAccel) )	return NULL;
+
+	iItems = CopyAcceleratorTable( ghAccelTable, pstAccel, iItems );
+
+	*piEntry = iItems;
+
+	return pstAccel;
+}
+//-------------------------------------------------------------------------------------------------
+
+/*!
+	構造体テーブルを受け取って、それをアクセラハンドルにする・NULLならResourceから
+	@param[in]	pstAccel	内容テーブル・無い時はNULL
+	@param[in]	iEntry		テーブルのエントリ数
+	@return	アクセラハンドル
+*/
+HACCEL AccelKeyTableCreate( LPACCEL pstAccel, INT iEntry )
+{
+	HACCEL	hAccel;
+	
+	if( pstAccel )
+	{
+		DestroyAcceleratorTable( ghAccelTable );	//	前のヤツぶっ壊して
+
+		hAccel = CreateAcceleratorTable( pstAccel, iEntry );
+	}
+	else
+	{
+		hAccel = LoadAccelerators( ghInst, MAKEINTRESOURCE(IDC_ORINRINEDITOR) );
+	}
+
+	ghAccelTable = hAccel;	//	大域変数にいれる・本当はこういうやり方は良くないと思われ
+
+	return hAccel;
+}
+//-------------------------------------------------------------------------------------------------
+#endif
 
 /*!
 	タイトルバーを変更する
@@ -954,11 +1058,14 @@ LRESULT CALLBACK WndProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam 
 			if( !(iRslt)  ){	return FALSE;	}
 			break;
 #endif
+
+#ifdef USE_NOTIFYICON
 		//	タスクトレイのアイコンでエベンツ発生
 		case WMP_TRAYNOTIFYICON:
-	//		if( WM_LBUTTONUP == lParam ||  WM_RBUTTONUP == lParam ){	SetActiveWindow( hWnd );	}
+			TaskTrayIconEvent( hWnd, (UINT)wParam, (UINT)lParam );
 			return 0;
-			
+#endif
+
 		case WMP_BRUSH_TOGGLE:
 			hSubMenu = GetSubMenu( ghMenu, 1 );
 			CheckMenuItem( hSubMenu, IDM_BRUSH_STYLE, wParam ? MF_CHECKED : MF_UNCHECKED );
@@ -1416,8 +1523,10 @@ VOID Cls_OnContextMenu( HWND hWnd, HWND hWndContext, UINT xPos, UINT yPos )
 	//リバーの、バー名称と左の取っ手のところは発生する・
 	if( ToolBarOnContextMenu( hWnd, hWndContext, stPost.x, stPost.y ) ){	 return;	}
 
+	if( SUCCEEDED( DockingTabContextMenu( hWnd, hWndContext, stPost.x, stPost.y ) ) ){	 return;	}
+
 	//	複数タブ以外にはない
-	if( ghFileTabWnd != hWndContext )	return;
+	if( ghFileTabWnd != hWndContext ){	 return;	}
 
 	iCount = TabCtrl_GetItemCount( ghFileTabWnd );
 
@@ -1491,12 +1600,16 @@ LRESULT Cls_OnNotify( HWND hWnd, INT idFrom, LPNMHDR pstNmhdr )
 
 			TRACE( TEXT("TMPL TAB sel [%d]"), curSel );
 
-			//	フォーカス入れ替え
-			switch( curSel )
+			//	非表示時は何もしない
+			if( gbDockTmplView )
 			{
-				case  0:	ShowWindow( ghLnTmplWnd , SW_SHOW );	ShowWindow( ghBrTmplWnd , SW_HIDE );	break;
-				case  1:	ShowWindow( ghLnTmplWnd , SW_HIDE );	ShowWindow( ghBrTmplWnd , SW_SHOW );	break;
-				default:	break;
+				//	フォーカス入れ替え
+				switch( curSel )
+				{
+					case  0:	ShowWindow( ghLnTmplWnd , SW_SHOW );	ShowWindow( ghBrTmplWnd , SW_HIDE );	break;
+					case  1:	ShowWindow( ghLnTmplWnd , SW_HIDE );	ShowWindow( ghBrTmplWnd , SW_SHOW );	break;
+					default:	break;
+				}
 			}
 		}
 	}
@@ -1566,19 +1679,6 @@ VOID Cls_OnDropFiles( HWND hWnd, HDROP hDrop )
 	TRACE( TEXT("DROP[%s]"), atFileName );
 
 	DocDoOpenFile( hWnd, atFileName );	//	Ｄ＆Ｄで開く
-//	dNumber = DocFileInflate( atFileName );	//	開いて中身展開
-//	if( !(dNumber) )
-//	{
-//		MessageBox( hWnd, TEXT("ファイルを開けなかったかしらー！？"), NULL, MB_OK | MB_ICONERROR );
-//	}
-//	else
-//	{
-//		MultiFileTabAppend( dNumber, atFileName );	//	Ｄ＆Ｄで開く
-//#ifdef OPEN_HISTORY
-//		OpenHistoryLogging( hWnd , atFileName );	//	ファイルオーポン記録を追加
-//#endif
-//	}
-
 
 	return;
 }
@@ -1901,6 +2001,7 @@ INT InitParamValue( UINT dMode, UINT dStyle, INT nValue )
 		case  VL_GRID_X_POS:	StringCchCopy( atKeyName, SUB_STRING, TEXT("GridXpos") );		break;
 		case  VL_GRID_Y_POS:	StringCchCopy( atKeyName, SUB_STRING, TEXT("GridYpos") );		break;
 		case  VL_GRID_VIEW:		StringCchCopy( atKeyName, SUB_STRING, TEXT("GridView") );		break;
+		case  VL_MAA_TOPMOST:	StringCchCopy( atKeyName, SUB_STRING, TEXT("MaaViewOn") );		break;
 		case  VL_R_RULER_POS:	StringCchCopy( atKeyName, SUB_STRING, TEXT("RightRuler")  );	break;
 		case  VL_R_RULER_VIEW:	StringCchCopy( atKeyName, SUB_STRING, TEXT("RitRulerView") );	break;
 		case  VL_PAGETIP_VIEW:	StringCchCopy( atKeyName, SUB_STRING, TEXT("PageToolTip") );	break;
@@ -2248,7 +2349,6 @@ HRESULT OpenHistoryLoad( HWND hWnd, INT id )
 {
 	UINT_PTR	dNumber, dItems;
 	LPARAM		lUnique;
-	INT			iTabNum;
 	OPHIS_ITR	itHist;
 
 	dNumber = id - IDM_OPEN_HIS_FIRST;
@@ -2265,10 +2365,8 @@ HRESULT OpenHistoryLoad( HWND hWnd, INT id )
 	lUnique = DocOpendFileCheck( itHist->atFile );
 	if( 1 <= lUnique )	//	既存のファイルヒット・そっちに移動する
 	{
-		iTabNum = MultiFileTabSearch( lUnique );	//	該当するタブを探す
-		if( 0 <= iTabNum )	//	タブの番号
+		if( SUCCEEDED( MultiFileTabSelect( dNumber ) ) )
 		{
-			TabCtrl_SetCurSel( ghFileTabWnd , iTabNum );	//	該当のタブにフォーカス移して
 			DocMultiFileSelect( lUnique );	//	そのタブのファイルを表示
 		}
 	}
@@ -2336,9 +2434,11 @@ HRESULT OpenHistoryLogging( HWND hWnd, LPTSTR ptFile )
 */
 HRESULT OptionDialogueOpen( VOID )
 {
+	UINT	bURHbuff, bABUIbuff;
+#ifdef COPY_SWAP
 	HMENU	hSubMenu;
-	UINT	bURHbuff, bABUIbuff, bCpNodBuf;
-
+	UINT	bCpNodBuf;
+#endif
 	TCHAR	atFontName[LF_FACESIZE];	//	フォント名変更に備える
 	//	項目増えたら、構造体にしちゃう
 
@@ -2346,8 +2446,9 @@ HRESULT OptionDialogueOpen( VOID )
 
 	bURHbuff  = gbUniRadixHex;
 	bABUIbuff = gdBUInterval;
+#ifdef COPY_SWAP
 	bCpNodBuf = gbCpModSwap;
-
+#endif
 	//	改行コード変更ならバイト数再計算が必要か
 	DialogBoxParam( ghInst, MAKEINTRESOURCE(IDD_GENERAL_OPTION_DLG), ghMainWnd, OptionDlgProc, (LPARAM)atFontName );
 
@@ -2368,6 +2469,7 @@ HRESULT OptionDialogueOpen( VOID )
 	}
 
 //@@コピー処理
+#ifdef COPY_SWAP
 	if( bCpNodBuf != gbCpModSwap )	//	コピーモード入替
 	{
 		hSubMenu = GetSubMenu( ghMenu, 1 );
@@ -2384,7 +2486,7 @@ HRESULT OptionDialogueOpen( VOID )
 
 		CntxMenuCopySwap(  );
 	}
-
+#endif
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
@@ -2470,9 +2572,12 @@ INT_PTR CALLBACK OptionDlgProc( HWND hDlg, UINT message, WPARAM wParam, LPARAM l
 			dValue = InitParamValue( INIT_LOAD, VL_GROUP_UNDO, 1 );
 			CheckDlgButton( hDlg, IDCB_GROUPUNDO_SET, dValue ? BST_CHECKED : BST_UNCHECKED );
 
+#ifdef COPY_SWAP
 			//	コピー標準スタイル	//	０ユニコード　１SJIS
 			CheckDlgButton( hDlg, IDCB_COPY_STYLE_SWAP, gbCpModSwap ? BST_CHECKED : BST_UNCHECKED );
-
+#else
+			EnableWindow( GetDlgItem(hDlg,IDCB_COPY_STYLE_SWAP), FALSE );
+#endif
 			//	ドッキングスタイル
 			dValue = InitParamValue( INIT_LOAD, VL_PLS_LN_DOCK, 1 );
 			CheckDlgButton( hDlg, IDCB_DOCKING_STYLE, dValue ? BST_CHECKED : BST_UNCHECKED );
@@ -2613,11 +2718,12 @@ INT_PTR CALLBACK OptionDlgProc( HWND hDlg, UINT message, WPARAM wParam, LPARAM l
 					dValue = IsDlgButtonChecked( hDlg, IDCB_GROUPUNDO_SET );
 					InitParamValue( INIT_SAVE, VL_GROUP_UNDO, dValue ? 1 : 0 );
 
+#ifdef COPY_SWAP
 					//	コピー標準スタイル
 					dValue = IsDlgButtonChecked( hDlg, IDCB_COPY_STYLE_SWAP );
 					gbCpModSwap = dValue ? 1 : 0;
 					InitParamValue( INIT_SAVE, VL_SWAP_COPY, gbCpModSwap );
-
+#endif
 					//	ドッキングスタイル・変更しても、再起動するまでは無効
 					dValue = IsDlgButtonChecked( hDlg, IDCB_DOCKING_STYLE );
 					InitParamValue( INIT_SAVE, VL_PLS_LN_DOCK, dValue ? 1 : 0 );
@@ -2834,10 +2940,11 @@ HRESULT MultiFileTabSelect( LPARAM dNumber )
 
 	if( 0 <= iRslt )
 	{
-		TabCtrl_SetCurSel( ghFileTabWnd, iRslt );
+		TabCtrl_SetCurSel( ghFileTabWnd, iRslt );	//	該当のタブにフォーカス移して
+		return S_OK;
 	}
 
-	return S_OK;
+	return E_OUTOFMEMORY;
 }
 //-------------------------------------------------------------------------------------------------
 
@@ -3002,6 +3109,23 @@ HRESULT ViewingFontGet( LPLOGFONT pstLogFont )
 
 
 #ifdef USE_NOTIFYICON
+
+/*!
+	タスクトレイアイコンでイベントが発生したら
+	@param[in]	hWnd	ウインドウハンドル
+	@param[in]	uID		イベントが発生したトレイアイコンのＩＤ
+	@param[in]	message	マウス、キーボードの操作のWMmessage
+	@return 特になし
+*/
+VOID TaskTrayIconEvent( HWND hWnd, UINT uID, UINT message )
+{
+
+
+	return;
+}
+//-------------------------------------------------------------------------------------------------
+#endif
+
 /*!
 	タスクトレイアイコンにばりゅ～んめせーじを載せる
 	@param[in]	ptInfo	バルーンの本文
@@ -3011,6 +3135,7 @@ HRESULT ViewingFontGet( LPLOGFONT pstLogFont )
 */
 HRESULT NotifyBalloonExist( LPTSTR ptInfo, LPTSTR ptTitle, DWORD dIconTy )
 {
+#ifdef USE_NOTIFYICON
 	NOTIFYICONDATA	nid;
 
 	ZeroMemory( &nid, sizeof(NOTIFYICONDATA) );
@@ -3026,14 +3151,69 @@ HRESULT NotifyBalloonExist( LPTSTR ptInfo, LPTSTR ptTitle, DWORD dIconTy )
 //	NIIF_INFO       0x00000001
 //	NIIF_WARNING    0x00000002
 //	NIIF_ERROR      0x00000003
+#endif
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+
+/*!
+	ドッキングしてる壱行ブラシテンプレを表示/非表示
+*/
+HRESULT DockingTmplViewToggle( UINT bMode )
+{
+	HWND	hDockWnd;
+	RECT	clntRect, tabRect, pageRect, sbRect;
+	RECT	rect;
+	INT		iHeight, curSel;
+
+	hDockWnd = DockingTabGet( );
+	//	分離状態ならタブは無い
+	if( !(hDockWnd) )	return E_ABORT;
+
+	GetClientRect( ghMainWnd, &clntRect );
+	GetClientRect( hDockWnd,  &tabRect );
+	GetClientRect( ghPgVwWnd, &pageRect );
+
+	GetClientRect( ghStsBarWnd, &sbRect );	//	ステータスバーのサイズ確認
+
+	AppClientAreaCalc( &rect );
+
+	if( gbDockTmplView )	//	見えてるなら閉じればいい
+	{
+		gbDockTmplView = FALSE;
+		ShowWindow( ghLnTmplWnd, SW_HIDE );
+		ShowWindow( ghBrTmplWnd, SW_HIDE );
+
+		//	場所を変えないといかん
+		iHeight = clntRect.bottom - tabRect.bottom - sbRect.bottom;
+
+		//	壱行ブラシタブは下へ
+		SetWindowPos( hDockWnd, HWND_TOP, rect.right - tabRect.right, iHeight, 0, 0, SWP_NOSIZE | SWP_NOZORDER );
+
+		//	Pageリストは広げる
+		SetWindowPos( ghPgVwWnd, HWND_TOP, 0, 0, pageRect.right, iHeight - rect.top, SWP_NOMOVE | SWP_NOZORDER );
+	}
+	else
+	{
+		gbDockTmplView = TRUE;
+
+		//	位置合わせ
+		ViewSizeMove( ghMainWnd, &rect );
+
+		//	今の状態に合わせて復帰
+		curSel = TabCtrl_GetCurSel( hDockWnd );
+		switch( curSel )
+		{
+			case  0:	ShowWindow( ghLnTmplWnd , SW_SHOW );	break;
+			case  1:	ShowWindow( ghBrTmplWnd , SW_SHOW );	break;
+			default:	break;
+		}
+
+	}
 
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-#endif
-
-
-
 
 #ifdef _DEBUG
 VOID OutputDebugStringPlus( DWORD rixError, LPSTR pcFile, INT rdLine, LPSTR pcFunc, LPTSTR ptFormat, ... )

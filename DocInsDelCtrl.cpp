@@ -555,7 +555,10 @@ HRESULT DocLineCombine( INT dBsLine )
 
 	itLineNx = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.begin();
 	std::advance( itLineNx, dBsLine+1 );
+	
+	if( itLineNx == (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.end() )	return E_ACCESSDENIED;
 
+	//	選択範囲ある時にアンドゥして、選択範囲が死んでる状態で切り取りするとここで落ちる
 	vcLtrNxItr = itLineNx->vcLine.begin(  );	//	次の行の先頭
 	vcLtrNxEnd = itLineNx->vcLine.end(  );	//	次の行の尻尾
 

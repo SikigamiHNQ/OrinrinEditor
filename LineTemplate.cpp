@@ -32,6 +32,7 @@ extern HFONT	ghAaFont;		//	AA用フォント
 extern HFONT	ghNameFont;		//	ファイルタブ用フォント
 
 extern INT		gbTmpltDock;	//	頁・壱行テンプレのドッキング
+extern BOOLEAN	gbDockTmplView;	//	くっついてるテンプレは見えているか
 
 extern  HWND	ghMainSplitWnd;	//	メインのスプリットバーハンドル
 extern  LONG	grdSplitPos;	//	スプリットバーの、左側の、画面右からのオフセット
@@ -44,7 +45,8 @@ static  HWND	ghCtgryBxWnd;	//!<
 static  HWND	ghLvItemWnd;	//!<	
 static  HWND	ghLnLvTipWnd;	//!<	壱行リストツールチップ
 
-static  HWND	ghDockTabWnd;	//!<	ドッキングしたときの選択肢用
+static  HWND	ghDockTabWnd;	//!<	ドッキングしたときの選択肢タブ
+
 
 static  UINT	gNowGroup;		//!<	今みてるグループ番号
 
@@ -270,37 +272,6 @@ HWND DockingTabCreate( HINSTANCE hInst, HWND hPrWnd, LPRECT pstRect )
 }
 //-------------------------------------------------------------------------------------------------
 
-/*!
-	ドッキング状態で発生・くっついてるウインドウがリサイズされたら
-	@param[in]	hPrntWnd	くっついてるウインドウハンドル
-	@param[in]	pstFrame	使えるサイズ
-*/
-VOID LineTmpleResize( HWND hPrntWnd, LPRECT pstFrame )
-{
-	RECT	rect, tbRect;
-
-	rect = *pstFrame;	//	クライヤントに使える領域
-	rect.left    = rect.right - (grdSplitPos - SPLITBAR_WIDTH);
-	rect.right   = (grdSplitPos - SPLITBAR_WIDTH);
-	rect.bottom >>= 1;
-	rect.top    += rect.bottom;
-
-	GetWindowRect( ghDockTabWnd, &tbRect );
-	tbRect.left    = rect.left;
-	tbRect.right   = (grdSplitPos - SPLITBAR_WIDTH);
-	tbRect.bottom -= tbRect.top;
-	tbRect.top     = rect.top;
-	MoveWindow( ghDockTabWnd, tbRect.left, tbRect.top, tbRect.right, tbRect.bottom, TRUE );
-
-	rect.top    += tbRect.bottom;
-	rect.bottom -= tbRect.bottom;
-
-	SetWindowPos( ghTmpleWnd, HWND_TOP, rect.left, rect.top, rect.right, rect.bottom, SWP_NOZORDER );
-
-	return;
-}
-//-------------------------------------------------------------------------------------------------
-
 VOID DockingTabSizeGet( LPRECT pstRect )
 {
 	ZeroMemory( pstRect, sizeof(RECT) );
@@ -311,6 +282,95 @@ VOID DockingTabSizeGet( LPRECT pstRect )
 		pstRect->right -= pstRect->left;
 		pstRect->bottom -= pstRect->top;
 	}
+
+	return;
+}
+//-------------------------------------------------------------------------------------------------
+
+/*!
+	壱行ブラシタブのコンテキストメニューか？
+	@param[in]	hWnd		ウインドウハンドル
+	@param[in]	hWndContext	コンテキストが発生したウインドウのハンドル
+	@param[in]	xPos		スクリーンＸ座標
+	@param[in]	yPos		スクリーンＹ座業
+	@return	HRESULT	S_OK処理した　E_ABORT関係なかった
+*/
+HRESULT DockingTabContextMenu( HWND hWnd, HWND hWndContext, LONG xPos, LONG yPos )
+{
+	HMENU	hPopupMenu = NULL;
+
+	//	関係ないなら何もしない
+	if( hWndContext != ghDockTabWnd ){	return  E_ABORT;	}
+
+	hPopupMenu = CreatePopupMenu(  );
+
+	if( gbDockTmplView )	AppendMenu( hPopupMenu, MF_STRING, IDM_LINE_BRUSH_TMPL_VIEW, TEXT("テンプレ非表示") );
+	else					AppendMenu( hPopupMenu, MF_STRING, IDM_LINE_BRUSH_TMPL_VIEW, TEXT("テンプレ表示") );
+
+	TrackPopupMenu( hPopupMenu, 0, xPos, yPos, 0, hWnd, NULL );
+	DestroyMenu( hPopupMenu );
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+
+/*!
+	DOCKINGテンプレ選択タブのハンドル確保
+	@return	ハンドル、分離状態ならNULLが返る
+*/
+HWND DockingTabGet( VOID )
+{
+	if( gbTmpltDock )	return ghDockTabWnd;
+
+	return NULL;
+}
+//-------------------------------------------------------------------------------------------------
+
+
+/*!
+	ドッキング状態で発生・くっついてるウインドウがリサイズされたら
+	@param[in]	hPrntWnd	くっついてるウインドウハンドル
+	@param[in]	pstFrame	使えるサイズ
+*/
+VOID LineTmpleResize( HWND hPrntWnd, LPRECT pstFrame )
+{
+	RECT	rect, tbRect;
+
+
+	rect = *pstFrame;	//	クライヤントに使える領域
+	rect.left    = rect.right - (grdSplitPos - SPLITBAR_WIDTH);
+	rect.right   = (grdSplitPos - SPLITBAR_WIDTH);
+
+	if( gbDockTmplView )	//	壱行ブラシテンプレ見えてる
+	{
+		rect.bottom >>= 1;	//半分のところに配置
+		rect.top    += rect.bottom;	//	オフセット
+
+		GetWindowRect( ghDockTabWnd, &tbRect );
+
+		tbRect.left    = rect.left;
+		tbRect.right   = (grdSplitPos - SPLITBAR_WIDTH);	//	幅
+		tbRect.bottom -= tbRect.top;	//	高さ
+		tbRect.top     = rect.top;
+		MoveWindow( ghDockTabWnd, tbRect.left, tbRect.top, tbRect.right, tbRect.bottom, TRUE );
+	}
+	else
+	{
+		DockingTabSizeGet( &tbRect );
+
+		tbRect.left    = rect.left;	//	左位置
+		tbRect.right   = (grdSplitPos - SPLITBAR_WIDTH);	//	幅
+	//	tbRect.bottom -= tbRect.top;	//	高さ
+		tbRect.top     = rect.top + (rect.bottom - tbRect.bottom);
+
+		MoveWindow( ghDockTabWnd, tbRect.left, tbRect.top, tbRect.right, tbRect.bottom, TRUE );
+		return;
+
+	}
+
+	rect.top    += tbRect.bottom;
+	rect.bottom -= tbRect.bottom;
+	SetWindowPos( ghTmpleWnd, HWND_TOP, rect.left, rect.top, rect.right, rect.bottom, SWP_NOZORDER );
 
 	return;
 }

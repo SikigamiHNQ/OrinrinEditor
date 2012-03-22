@@ -45,24 +45,25 @@ IDC_ORINRINEDITOR MENU
 BEGIN
     POPUP "ファイル(&F)"
     BEGIN
-        MENUITEM "新規作成(&N)\tCtrl + N",		IDM_NEWFILE
-        MENUITEM "ファイル開く(&O)\tCtrl + O",	IDM_OPEN
-		MENUITEM "ファイル使用履歴(&H)",		IDM_OPEN_HISTORY
+        MENUITEM "新規作成(&N)\tCtrl + N",          IDM_NEWFILE
+        MENUITEM "ファイル開く(&O)\tCtrl + O",        IDM_OPEN
+        MENUITEM "ファイル使用履歴(&H)",                IDM_OPEN_HISTORY
         MENUITEM SEPARATOR
-        MENUITEM "上書き保存(&S)\tCtrl + S",				IDM_OVERWRITESAVE
-        MENUITEM "名前を付けて保存(&M)\tCtrl + Alt + S",	IDM_RENAMESAVE
-        MENUITEM "現在頁を画像にして保存(&I)",				IDM_IMAGE_SAVE
+        MENUITEM "上書き保存(&S)\tCtrl + S",         IDM_OVERWRITESAVE
+        MENUITEM "名前を付けて保存(&M)\tCtrl + Alt + S", IDM_RENAMESAVE
+        MENUITEM "現在頁を画像にして保存(&I)",             IDM_IMAGE_SAVE
         MENUITEM SEPARATOR
-        MENUITEM "ファイルを閉じる(&C)\tCtrl + F4",	IDM_FILE_CLOSE
+        MENUITEM "ファイルを閉じる(&C)\tCtrl + F4",     IDM_FILE_CLOSE
         MENUITEM SEPARATOR
-        MENUITEM "一般設定(&G)",				IDM_GENERAL_OPTION
-        MENUITEM "右クリックメニュー編集",		IDM_MENUEDIT_DLG_OPEN
-        MENUITEM "AA一覧ツリーを再構築(&T)",	IDM_TREE_RECONSTRUCT
-        MENUITEM "編集エリアの配色編集",		IDM_COLOUR_EDIT_OPEN
+        MENUITEM "一般設定(&G)",                    IDM_GENERAL_OPTION
+        MENUITEM "右クリックメニュー編集",                 IDM_MENUEDIT_DLG_OPEN
+        MENUITEM "編集エリアの配色編集",                  IDM_COLOUR_EDIT_OPEN
+        MENUITEM "アクセルキー設定の編集",                 IDM_ACCELKEY_EDIT_DLG_OPEN
+        MENUITEM "AA一覧ツリーを再構築(&T)",             IDM_TREE_RECONSTRUCT
         MENUITEM SEPARATOR
-        MENUITEM "バージョン情報(&A)",			IDM_ABOUT
+        MENUITEM "バージョン情報(&A)",                 IDM_ABOUT
         MENUITEM SEPARATOR
-        MENUITEM "終了(&Q)",					IDM_EXIT
+        MENUITEM "終了(&Q)",                      IDM_EXIT
     END
     POPUP "編集(&E)"
     BEGIN
@@ -149,6 +150,8 @@ BEGIN
         MENUITEM "選択範囲を空白にする(&F)\tCtrl + Alt + G", IDM_FILL_SPACE
         MENUITEM "頁全体を空白で埋める(&B)",              IDM_FILL_ZENSP
         MENUITEM SEPARATOR
+        MENUITEM "行頭半角空白をユニコードに変換(&L)",         IDM_HEADHALF_EXCHANGE
+        MENUITEM SEPARATOR
         MENUITEM "右に寄せる(&H)",                   IDM_RIGHT_SLIDE
         MENUITEM "１ドット増やす(&D)\tAlt + →",        IDM_INCREMENT_DOT
         MENUITEM "１ドット減らす(&O)\tAlt + ←",        IDM_DECREMENT_DOT
@@ -164,11 +167,11 @@ BEGIN
     END
     POPUP "表示(&N)"
     BEGIN
-        MENUITEM "空白を表示(&W)",                   IDM_SPACE_VIEW_TOGGLE
+        MENUITEM "空白を表示(&W)\tCtrl + Shift + W", IDM_SPACE_VIEW_TOGGLE
         MENUITEM "グリッド線を表示(&H)",                IDM_GRID_VIEW_TOGGLE
         MENUITEM "右ガイド線を表示(&M)",                IDM_RIGHT_RULER_TOGGLE
         MENUITEM SEPARATOR
-        MENUITEM "複数行テンプレート(&A)",               IDM_MAATMPLE_VIEW
+        MENUITEM "複数行テンプレート表示(&A)",             IDM_MAATMPLE_VIEW
         MENUITEM "複数行サムネイル(&B)\tCtrl + T",      IDM_MAA_THUMBNAIL_OPEN
         MENUITEM "頁一覧(&L)",                     IDM_PAGELIST_VIEW
         MENUITEM "壱行テンプレート(&T)",                IDM_LINE_TEMPLATE
@@ -177,7 +180,7 @@ BEGIN
         MENUITEM "トレスモード(&R)",                  IDM_TRACE_MODE_ON
         MENUITEM "ドラフトボード(&D)\tCtrl + Space",   IDM_DRAUGHT_OPEN
         MENUITEM SEPARATOR
-        MENUITEM "プレビュー(&P)",                   IDM_ON_PREVIEW
+        MENUITEM "プレビュー(&P)\tCtrl + B",         IDM_ON_PREVIEW
     END
 END
 
@@ -231,18 +234,18 @@ IDM_AATREE_POPUP MENU
 BEGIN
     POPUP "複数行テンプレツリーのアレ"
     BEGIN
-        MENUITEM "プロファイル作成／開く(&N)",	IDM_MAA_PROFILE_MAKE
-        MENUITEM "AA一覧ツリーを再構築(&T)",	IDM_TREE_RECONSTRUCT
-		MENUITEM "プロファイル使用履歴(&H)",	IDM_OPEN_HISTORY
+        MENUITEM "プロファイル作成／開く(&N)",             IDM_MAA_PROFILE_MAKE
+        MENUITEM "AA一覧ツリーを再構築(&T)",             IDM_TREE_RECONSTRUCT
+        MENUITEM "プロファイル使用履歴(&H)",              IDM_OPEN_HISTORY
         MENUITEM SEPARATOR
-        MENUITEM "ファイル名で検索(&F)",		IDM_FINDMAA_DLG_OPEN
+        MENUITEM "ファイル名で検索(&F)",                IDM_FINDMAA_DLG_OPEN
         MENUITEM SEPARATOR
-        MENUITEM "（名称未設定）",			IDM_DUMMY, GRAYED
-        MENUITEM "主タブで開く(&M)",		IDM_AATREE_MAINOPEN
-        MENUITEM "副タブを追加(&S)",		IDM_AATREE_SUBADD
-        MENUITEM "編集ビューに開く(&E)",	IDM_AATREE_GOEDIT
+        MENUITEM "（名称未設定）",                     IDM_DUMMY, GRAYED
+        MENUITEM "主タブで開く(&M)",                  IDM_AATREE_MAINOPEN
+        MENUITEM "副タブを追加(&S)",                  IDM_AATREE_SUBADD
+        MENUITEM "編集ビューに開く(&E)",                IDM_AATREE_GOEDIT
         MENUITEM SEPARATOR
-        MENUITEM "アイテム追加(&A)",		IDM_MAA_IADD_OPEN
+        MENUITEM "アイテム追加(&A)",                  IDM_MAA_IADD_OPEN
     END
 END
 
@@ -250,10 +253,10 @@ IDM_AATABS_POPUP MENU
 BEGIN
     POPUP "複数行テンプレタブのアレ"
     BEGIN
-        MENUITEM "このタブを閉じる(&Q)",	IDM_AATABS_DELETE
-        MENUITEM "全ての副タブを閉じる(&A)",	IDM_AATABS_ALLDELETE
+        MENUITEM "このタブを閉じる(&Q)",                IDM_AATABS_DELETE
+        MENUITEM "全ての副タブを閉じる(&A)",              IDM_AATABS_ALLDELETE
         MENUITEM SEPARATOR
-        MENUITEM "編集ビューに開く(&E)",	IDM_AATREE_GOEDIT
+        MENUITEM "編集ビューに開く(&E)",                IDM_AATREE_GOEDIT
     END
 END
 
@@ -261,10 +264,10 @@ IDM_LAYERBOX_POPUP MENU
 BEGIN
     POPUP "レイヤボックスのアレ"
     BEGIN
-        MENUITEM "コピー(&C)",	IDM_LYB_COPY
+        MENUITEM "コピー(&C)",                     IDM_LYB_COPY
         MENUITEM SEPARATOR
-        MENUITEM "透過領域設定をリセット(&R)",	IDM_LYB_TRANCE_RELEASE
-        MENUITEM "全ての空白を透過領域に設定(&T)",	IDM_LYB_TRANCE_ALL
+        MENUITEM "透過領域設定をリセット(&R)",             IDM_LYB_TRANCE_RELEASE
+        MENUITEM "全ての空白を透過領域に設定(&T)",           IDM_LYB_TRANCE_ALL
     END
 END
 
@@ -272,10 +275,10 @@ IDM_MULTIFILE_POPUP MENU
 BEGIN
     POPUP "複数ファイルタブのアレ"
     BEGIN
-        MENUITEM "保存(&S)",	IDM_OVERWRITESAVE
-        MENUITEM "名前を付けて保存(&M)",	IDM_RENAMESAVE
+        MENUITEM "保存(&S)",                      IDM_OVERWRITESAVE
+        MENUITEM "名前を付けて保存(&M)",                IDM_RENAMESAVE
         MENUITEM SEPARATOR
-        MENUITEM "タブを閉じる(&Q)",	IDM_FILE_CLOSE
+        MENUITEM "タブを閉じる(&Q)",                  IDM_FILE_CLOSE
     END
 END
 
@@ -283,8 +286,8 @@ IDM_TEMPLATE_POPUP MENU
 BEGIN
     POPUP "テンプレウインドウのアレ"
     BEGIN
-        MENUITEM "常に手前に表示(&Z)",		IDM_TOPMOST_TOGGLE
-        MENUITEM "テンプレート再読込(&R)",	IDM_TMPLT_RELOAD
+        MENUITEM "常に手前に表示(&Z)",                 IDM_TOPMOST_TOGGLE
+        MENUITEM "テンプレート再読込(&R)",               IDM_TMPLT_RELOAD
     END
 END
 
@@ -292,18 +295,18 @@ IDM_DRAUGHT_POPUP MENU
 BEGIN
     POPUP "ドラフトボードのアレ"
     BEGIN
-        MENUITEM "編集ビューに通常挿入(&I)",	IDM_DRAUGHT_INSERTEDIT
-        MENUITEM "編集ビューに矩形挿入(&R)",	IDM_DRAUGHT_INTERRUPTEDIT
-        MENUITEM "レイヤで開く(&L)",			IDM_DRAUGHT_LAYERBOX
-        MENUITEM "コピー(UNI&CODE)",			IDM_DRAUGHT_UNICLIP
-        MENUITEM "コピー(Shift&JIS)",			IDM_DRAUGHT_SJISCLIP
+        MENUITEM "編集ビューに通常挿入(&I)",              IDM_DRAUGHT_INSERTEDIT
+        MENUITEM "編集ビューに矩形挿入(&R)",              IDM_DRAUGHT_INTERRUPTEDIT
+        MENUITEM "レイヤで開く(&L)",                  IDM_DRAUGHT_LAYERBOX
+        MENUITEM "コピー(UNI&CODE)",               IDM_DRAUGHT_UNICLIP
+        MENUITEM "コピー(Shift&JIS)",              IDM_DRAUGHT_SJISCLIP
         MENUITEM SEPARATOR
-        MENUITEM "アイテムを削除(&D)",			IDM_DRAUGHT_DELETE
+        MENUITEM "アイテムを削除(&D)",                 IDM_DRAUGHT_DELETE
         MENUITEM SEPARATOR
-        MENUITEM "全内容をエクスポート(&E)",	IDM_DRAUGHT_EXPORT
+        MENUITEM "全内容をエクスポート(&E)",              IDM_DRAUGHT_EXPORT
         MENUITEM SEPARATOR
-        MENUITEM "全内容を削除(&K)",			IDM_DRAUGHT_ALLDELETE
-        MENUITEM "ドラフトボードを閉じる(&Q)",	IDM_DRAUGHT_CLOSE
+        MENUITEM "全内容を削除(&K)",                  IDM_DRAUGHT_ALLDELETE
+        MENUITEM "ドラフトボードを閉じる(&Q)",             IDM_DRAUGHT_CLOSE
     END
 END
 
@@ -315,15 +318,16 @@ END
 
 IDC_ORINRINEDITOR ACCELERATORS 
 BEGIN
-    "A",            IDM_ALLSEL,				VIRTKEY, CONTROL, NOINVERT
-    "B",            IDM_SQSELECT,			VIRTKEY, CONTROL, ALT, NOINVERT
-    "C",            IDM_COPY,				VIRTKEY, CONTROL, NOINVERT
-    "C",            IDM_PAGEL_DUPLICATE,	VIRTKEY, ALT, NOINVERT
-    "C",            IDM_SJISCOPY_ALL,		VIRTKEY, SHIFT, CONTROL, NOINVERT
-	"D",			IDM_PAGEL_DELETE,		VIRTKEY, ALT, NOINVERT
-    "E",            IDM_DOTDIFF_ADJT,		VIRTKEY, CONTROL, ALT, NOINVERT
-    "F",            IDM_FIND_DLG_OPEN,		VIRTKEY, CONTROL, NOINVERT
-    "F",            IDM_FIND_HIGHLIGHT_OFF,	VIRTKEY, SHIFT, CONTROL, NOINVERT
+    "A",            IDM_ALLSEL,             VIRTKEY, CONTROL, NOINVERT
+    "B",            IDM_ON_PREVIEW,         VIRTKEY, CONTROL, NOINVERT
+    "B",            IDM_SQSELECT,           VIRTKEY, CONTROL, ALT, NOINVERT
+    "C",            IDM_COPY,               VIRTKEY, CONTROL, NOINVERT
+    "C",            IDM_PAGEL_DUPLICATE,    VIRTKEY, ALT, NOINVERT
+    "C",            IDM_SJISCOPY_ALL,       VIRTKEY, SHIFT, CONTROL, NOINVERT
+    "D",            IDM_PAGEL_DELETE,       VIRTKEY, ALT, NOINVERT
+    "E",            IDM_DOTDIFF_ADJT,       VIRTKEY, CONTROL, ALT, NOINVERT
+    "F",            IDM_FIND_DLG_OPEN,      VIRTKEY, CONTROL, NOINVERT
+    "F",            IDM_FIND_HIGHLIGHT_OFF, VIRTKEY, SHIFT, CONTROL, NOINVERT
     "G",            IDM_DEL_LASTLETTER,     VIRTKEY, SHIFT, CONTROL, NOINVERT
     "G",            IDM_DEL_LASTSPACE,      VIRTKEY, CONTROL, NOINVERT
     "G",            IDM_FILL_SPACE,         VIRTKEY, CONTROL, ALT, NOINVERT
@@ -356,21 +360,21 @@ BEGIN
     VK_LEFT,        IDM_TMPL_GRID_DECREASE, VIRTKEY, CONTROL, NOINVERT
     VK_LEFT,        IDM_DECREMENT_DOT,      VIRTKEY, ALT, NOINVERT
     VK_LEFT,        IDM_DECR_DOT_LINES,     VIRTKEY, SHIFT, ALT, NOINVERT
+    VK_SPACE,       IDM_LAYERBOX,           VIRTKEY, ALT, NOINVERT
+    VK_SPACE,       IDM_DRAUGHT_OPEN,       VIRTKEY, CONTROL, NOINVERT
     VK_UP,          IDM_PAGE_PREV,          VIRTKEY, ALT, NOINVERT
     VK_UP,          IDM_TMPLT_GROUP_PREV,   VIRTKEY, CONTROL, NOINVERT
     VK_DOWN,        IDM_PAGE_NEXT,          VIRTKEY, ALT, NOINVERT
     VK_DOWN,        IDM_TMPLT_GROUP_NEXT,   VIRTKEY, CONTROL, NOINVERT
-    VK_SPACE,       IDM_LAYERBOX,           VIRTKEY, ALT, NOINVERT
-    VK_SPACE,       IDM_DRAUGHT_OPEN,       VIRTKEY, CONTROL, NOINVERT
     VK_TAB,         IDM_WINDOW_CHANGE,      VIRTKEY, CONTROL, NOINVERT
     VK_TAB,         IDM_WINDOW_CHG_RVRS,    VIRTKEY, SHIFT, CONTROL, NOINVERT
     VK_PRIOR,       IDM_FILE_PREV,          VIRTKEY, CONTROL, NOINVERT
     VK_NEXT,        IDM_FILE_NEXT,          VIRTKEY, CONTROL, NOINVERT
-	VK_F3,			IDM_FIND_JUMP_NEXT,		VIRTKEY, NOINVERT
-	VK_F3,			IDM_FIND_JUMP_PREV,		VIRTKEY, SHIFT, NOINVERT
-	VK_F3,			IDM_FIND_TARGET_SET,	VIRTKEY, CONTROL, NOINVERT
-	VK_F4,          IDM_FILE_CLOSE,			VIRTKEY, CONTROL, NOINVERT
-    VK_F5,          IDM_NOW_PAGE_REFRESH,	VIRTKEY, NOINVERT
+    VK_F3,          IDM_FIND_JUMP_NEXT,     VIRTKEY, NOINVERT
+    VK_F3,          IDM_FIND_JUMP_PREV,     VIRTKEY, SHIFT, NOINVERT
+    VK_F3,          IDM_FIND_TARGET_SET,    VIRTKEY, CONTROL, NOINVERT
+    VK_F4,          IDM_FILE_CLOSE,         VIRTKEY, CONTROL, NOINVERT
+    VK_F5,          IDM_NOW_PAGE_REFRESH,   VIRTKEY, NOINVERT
 END
 
 
@@ -386,7 +390,7 @@ CAPTION "バージョン情報 - Orinrin Editor"
 FONT 9, "MS UI Gothic"
 BEGIN
     ICON            IDI_ORINRINEDITOR,IDC_MYICON,6,6,20,20
-    LTEXT           "Orinrin Editor, Version 0.28 Aurora (2012.227.2200.920)",IDC_STATIC,36,6,168,8,SS_NOPREFIX
+    LTEXT           "Orinrin Editor, Version 0.29 Aurora (2012.322.2200.920)",IDC_STATIC,36,6,168,8,SS_NOPREFIX
     LTEXT           "Copyright (C) 2011 - 2012 SikigamiHNQ",IDC_STATIC,36,18,168,8
     LTEXT           "Site ： お燐ちゃんは俺の嫁．ｃｏｍ",IDC_STATIC,36,30,168,8
     DEFPUSHBUTTON   "OK",IDOK,84,180,48,12,WS_GROUP
@@ -504,7 +508,7 @@ BEGIN
     EDITTEXT        IDE_PAGENAME,6,18,156,12,ES_AUTOHSCROLL
 END
 
-IDD_GENERAL_OPTION_DLG DIALOG 0, 0, 342, 322
+IDD_GENERAL_OPTION_DLG DIALOG  0, 0, 342, 322
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_TOOLWINDOW
 CAPTION "設定いろいろ"
@@ -794,6 +798,25 @@ BEGIN
     PUSHBUTTON      "キャンセル",IDCANCEL,114,102,42,12
 END
 
+IDD_ACCEL_KEY_DLG DIALOG 0, 0, 294, 144
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_TOOLWINDOW
+CAPTION "キーボードアクセラレータの編集"
+FONT 10, "MS UI Gothic"
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,186,126,48,12
+    PUSHBUTTON      "キャンセル",IDCANCEL,240,126,48,12
+    CONTROL         "",IDLV_FUNCKEY_LIST,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_ALIGNLEFT | LVS_NOSORTHEADER | WS_BORDER | WS_VSCROLL | WS_TABSTOP,0,0,180,144
+    LTEXT           "キーバインド",IDC_STATIC,186,24,102,8
+    CONTROL         "",IDHKC_FUNCKEY_INPUT,"msctls_hotkey32",WS_BORDER | WS_TABSTOP,186,36,102,12
+    PUSHBUTTON      "セット",IDB_FUNCKEY_SET,186,54,54,12
+    PUSHBUTTON      "クリア",IDB_FUNCKEY_CLEAR,258,54,30,12
+    CONTROL         "Spaceに置き換える",IDCB_FUNCKEY_SPACE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,186,72,102,8
+    LTEXT           "この入力枠、スペースが使えないので、使いたい時は、このチェックをONにしてね。入力するキーはなんでもいいよ。",IDC_STATIC,186,84,102,36
+    PUSHBUTTON      "リストを出力",IDB_FUNCKEY_FILEOUT,186,6,54,12
+    PUSHBUTTON      "初期化",IDB_FUNCKEY_INIT,258,6,30,12
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -801,8 +824,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 2012,227,2200,920
- PRODUCTVERSION 0,28,0,920
+ FILEVERSION 2012,322,2200,920
+ PRODUCTVERSION 0,29,0,920
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -827,8 +850,8 @@ BEGIN
             VALUE "LegalTrademarks", "License : GPLv3"
             VALUE "PrivateBuild", "Build by Visual C++ 2008 Express"
             VALUE "SpecialBuild", "Not Speciality"
-            VALUE "FileVersion", "2012.227.2200.920"
-            VALUE "ProductVersion", "0.28.0.920"
+            VALUE "FileVersion", "2012.322.2200.920"
+            VALUE "ProductVersion", "0.29.0.920"
             VALUE "FileDescription", "AsciiArt Story Editor by Orinrin!"
             VALUE "OriginalFilename", "OrinrinEditor.exe"
             VALUE "InternalName", "Orinrin Editor"
@@ -998,23 +1021,6 @@ IDBMP_VERT_LEFT         BITMAP                  "resource\\VertLeft.bmp"
 IDBMQ_VERT_LEFT         BITMAP                  "resource\\VertLeft_q.bmp"
 IDBMP_VERT_TRANS        BITMAP                  "resource\\VertTrans.bmp"
 IDBMQ_VERT_TRANS        BITMAP                  "resource\\VertTrans_q.bmp"
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// DESIGNINFO
-//
-
-#ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO 
-BEGIN
-    IDD_FRAME_EDIT_DLG_2, DIALOG
-    BEGIN
-        RIGHTMARGIN, 186
-        BOTTOMMARGIN, 182
-    END
-END
-#endif    // APSTUDIO_INVOKED
-
 
 /////////////////////////////////////////////////////////////////////////////
 //

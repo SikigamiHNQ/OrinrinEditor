@@ -103,18 +103,6 @@ HRESULT DocFileOpen( HWND hWnd )
 	if( !(bOpened) ){	return  E_ABORT;	}	//	キャンセルしてたら何もしない
 
 	DocDoOpenFile( hWnd, atFilePath );	//	開いて中身展開
-//	dNumber = DocFileInflate( atFilePath );	//	開いて中身展開
-//	if( !(dNumber) )
-//	{
-//		MessageBox( hWnd, TEXT("ファイルを開けなかったかしらー！？"), NULL, MB_OK | MB_ICONERROR );
-//	}
-//	else
-//	{
-//		MultiFileTabAppend( dNumber, atFilePath );	//	ダイヤログからファイルオーポン
-//#ifdef OPEN_HISTORY
-//		OpenHistoryLogging( hWnd , atFilePath );	//	ファイルオーポン記録を追加
-//#endif
-//	}
 
 	return S_OK;
 }
@@ -128,6 +116,17 @@ HRESULT DocFileOpen( HWND hWnd )
 HRESULT DocDoOpenFile( HWND hWnd, LPTSTR ptFile )
 {
 	LPARAM	dNumber;
+
+	//	既存のファイルを開こうとしたらそっちをフォーカスするだけにするのが良いはず
+	dNumber = DocOpendFileCheck( ptFile );
+	if( 1 <= dNumber )	//	既存のファイルヒット・そっちに移動する
+	{
+		if( SUCCEEDED( MultiFileTabSelect( dNumber ) ) )	//	該当のタブにフォーカス移して
+		{
+			DocMultiFileSelect( dNumber );	//	そのタブのファイルを表示
+			return S_OK;
+		}
+	}
 
 	dNumber = DocFileInflate( ptFile );	//	開いて中身展開
 	if( !(dNumber) )

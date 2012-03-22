@@ -119,6 +119,9 @@ static CONST GUID gcstGUID = { 0x66D3E881, 0x972B, 0x458B, { 0x93, 0x5E, 0x9E, 0
 //#define FRAME_MLINE	//	枠パーツ複数行
 #define PAGE_MULTISELECT//	頁一覧の複数選択
 
+#define ACCELERATOR_EDIT//	キーのアレ編集
+//#define COPY_SWAP
+
 #define DO_TRY_CATCH	//	例外対策してみる
 //-------------------------------------------------------------------------------------------------
 
@@ -167,7 +170,9 @@ LRESULT	ExceptionMessage( LPCSTR, LPCSTR, UINT, LPARAM );
 #define TMPL_DOCK	150
 //-------------------------------------------------------------------------------------------------
 
+#ifdef USE_NOTIFYICON
 #define WMP_TRAYNOTIFYICON	(WM_APP+1)
+#endif
 #define WMP_BRUSH_TOGGLE	(WM_APP+2)
 #define WMP_PREVIEW_CLOSE	(WM_APP+3)
 //-------------------------------------------------------------------------------------------------
@@ -233,7 +238,7 @@ LRESULT	ExceptionMessage( LPCSTR, LPCSTR, UINT, LPARAM );
 #define VL_BACKUP_MSGON	14	//	バックアップしたときのメッセージを表示するか？
 #define VL_GRID_X_POS	15	//	グリッド線のＸドット数
 #define VL_GRID_Y_POS	16	//	グリッド線のＹドット数
-#define VL_MAA_TOPMOST	17	//	ＭＡＡを最前面・ビューワ専用
+#define VL_MAA_TOPMOST	17	//	VIEWERＭＡＡを最前面・EDITORＭＡＡ窓ON/OFF
 #define VL_R_RULER_POS	18	//	右ルーラの位置
 #define VL_CRLF_CODE	19	//	改行コード：０したらば・非０ＹＹ
 //#define VL_SPACE_VIEW	20	//	空白を表示するか　非０表示

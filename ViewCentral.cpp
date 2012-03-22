@@ -72,10 +72,12 @@ static HINSTANCE	ghInst;		//!<	現在のインターフェイス
 EXTERNED HWND	ghPrntWnd;		//!<	メインウインドウハンドル
 EXTERNED HWND	ghViewWnd;		//!<	このウインドウのハンドル
 
-extern  HWND	ghPgVwWnd;		//		ページリスト
-extern  HWND	ghMaaWnd;		//!<	複数行ＡＡテンプレ
-extern  HWND	ghLnTmplWnd;	//!<	壱行テンプレ
-extern  HWND	ghBrTmplWnd;	//!<	ブラシテンプレ
+extern  HWND	ghPgVwWnd;		//	ページリスト
+extern  HWND	ghMaaWnd;		//	複数行ＡＡテンプレ
+extern  HWND	ghLnTmplWnd;	//	壱行テンプレ
+extern  HWND	ghBrTmplWnd;	//	ブラシテンプレ
+extern BOOLEAN	gbDockTmplView;	//	くっついてるテンプレは見えているか
+
 
 EXTERNED INT	gdXmemory;		//!<	直前のＸ位置を覚えておく
 EXTERNED INT	gdDocXdot;		//!<	キャレットのＸドット・ドキュメント位置
@@ -124,8 +126,9 @@ extern INT		gixFocusPage;	//	注目中のページ・とりあえず０・０インデックス
 extern INT		gbTmpltDock;	//	ページ窓のドッキング
 
 //@@コピー処理
+#ifdef COPY_SWAP
 extern  UINT	gbCpModSwap;	//	SJISとユニコードコピーを入れ替える
-
+#endif
 extern  HWND	ghMainSplitWnd;	//	メインのスプリットバーハンドル
 extern  LONG	grdSplitPos;	//	スプリットバーの、左側の、画面右からのオフセット
 //-------------------------------------------------------------------------------------------------
@@ -2034,7 +2037,9 @@ HRESULT OperationOnStatusBar( VOID )
 VOID OperationUndoRedo( INT id, PINT pxDot, PINT pyLine )
 {
 	INT		dCrLf;
-	
+
+	DocPageSelStateToggle( -1 );	//	操作前には選択範囲解除すべき
+
 	if( IDM_UNDO == id ){		dCrLf = DocUndoExecute( pxDot, pyLine );	}
 	else if( IDM_REDO == id ){	dCrLf = DocRedoExecute( pxDot, pyLine );	}
 	else{	 return;	}	//	無関係ならナニもしない
@@ -2096,9 +2101,6 @@ VOID OperationOnCommand( HWND hWnd, INT id, HWND hWndCtl, UINT codeNotify )
 
 		//	プレビューオーポン
 		case  IDM_ON_PREVIEW:		PreviewVisibalise( gixFocusPage );	break;
-
-		//	複数行テンプレを前面に
-		case  IDM_MAATMPLE_VIEW:	SetForegroundWindow( ghMaaWnd );	break;
 
 		//	頁一覧を前面に
 		case  IDM_PAGELIST_VIEW:	SetForegroundWindow( ghPgVwWnd );	break;
@@ -2178,6 +2180,11 @@ VOID OperationOnCommand( HWND hWnd, INT id, HWND hWndCtl, UINT codeNotify )
 		//	コンテキストメニュー編集
 		case IDM_MENUEDIT_DLG_OPEN:	CntxEditDlgOpen( hWnd );	break;
 
+#ifdef ACCELERATOR_EDIT
+		//	アクセラレートキー編集
+		case IDM_ACCELKEY_EDIT_DLG_OPEN:	AccelKeyDlgOpen( hWnd );	break;
+#endif
+
 #ifdef FIND_STRINGS
 		//	文字列検索
 		case  IDM_FIND_DLG_OPEN:		FindDialogueOpen( ghInst, hWnd );	break;
@@ -2187,31 +2194,27 @@ VOID OperationOnCommand( HWND hWnd, INT id, HWND hWndCtl, UINT codeNotify )
 
 		//	アンドゥする
 		case IDM_UNDO:	OperationUndoRedo( IDM_UNDO, &gdDocXdot, &gdDocLine );
-			//iRslt = DocUndoExecute( &gdDocXdot, &gdDocLine );
-			//if( iRslt ){	ViewRedrawSetLine( -1 );	}
-			//else{		ViewRedrawSetLine( gdDocLine );	}
-			//ViewDrawCaret( gdDocXdot, gdDocLine, TRUE );
 			break;
 
 		//	リドゥする
 		case IDM_REDO:	OperationUndoRedo( IDM_REDO, &gdDocXdot, &gdDocLine );
-			//iRslt = DocRedoExecute( &gdDocXdot, &gdDocLine );
-			//if( iRslt ){	ViewRedrawSetLine( -1 );	}
-			//else{		ViewRedrawSetLine( gdDocLine );	}
-			//ViewDrawCaret( gdDocXdot, gdDocLine, TRUE );
 			break;
 
 		//	切り取り
 		case IDM_CUT:
 //@@コピー処理
+#ifdef COPY_SWAP
 			bMode = gbCpModSwap ? D_SJIS : D_UNI;
 			DocExClipSelect( bMode | gbSqSelect );	//	コピーして削除すればおｋ
+#else
+			DocExClipSelect( D_UNI | gbSqSelect );	//	コピーして削除すればおｋ
+#endif
 			if( IsSelecting( NULL ) ){	Evw_OnKey( hWnd, VK_DELETE, TRUE, 0, 0 );	}
 			break;
 
 		//	コピー
 		case IDM_COPY:
-			if( gbExtract )
+			if( gbExtract )	//	SJISでも出来るように？
 			{
 				DocExtractExecute( NULL );
 				gbExtract = FALSE;		//	取り出したらモード終了
@@ -2223,16 +2226,24 @@ VOID OperationOnCommand( HWND hWnd, INT id, HWND hWndCtl, UINT codeNotify )
 			else
 			{
 //@@コピー処理
+#ifdef COPY_SWAP
 				bMode = gbCpModSwap ? D_SJIS : D_UNI;
 				DocExClipSelect( bMode | gbSqSelect );
+#else
+				DocExClipSelect( D_UNI | gbSqSelect );
+#endif
 			}
 			break;
 
 		//	SJISコピー
 //@@コピー処理
 		case IDM_SJISCOPY:
+#ifdef COPY_SWAP
 			bMode = gbCpModSwap ? D_UNI : D_SJIS;	//	ここは逆にする必要が有る
 			DocExClipSelect( bMode | gbSqSelect  );
+#else
+			DocExClipSelect( D_SJIS | gbSqSelect  );
+#endif
 			break;
 
 		//	全SJISコピー
@@ -2251,7 +2262,7 @@ VOID OperationOnCommand( HWND hWnd, INT id, HWND hWndCtl, UINT codeNotify )
 		case IDM_ALLSEL:		ViewSelPageAll( 1 );	break;
 
 		//	矩形選択トグル
-		case IDM_SQSELECT:		ViewSqSelModeToggle( NULL );	break;
+		case IDM_SQSELECT:		ViewSqSelModeToggle( 1 , NULL );	break;
 
 		//	選択範囲を空白にする
 		case IDM_FILL_SPACE:
@@ -2314,7 +2325,7 @@ VOID OperationOnCommand( HWND hWnd, INT id, HWND hWndCtl, UINT codeNotify )
 		case IDM_INSTAG_GREEN:		ViewInsertColourTag( id );	break;
 
 		//	右揃え線
-		case IDM_RIGHT_GUIDE_SET:	DocLeftGuideline( NULL );	break;
+		case IDM_RIGHT_GUIDE_SET:	DocRightGuideline( NULL );	break;
 
 		//	右に寄せる
 		case IDM_RIGHT_SLIDE:		DocRightSlide( &gdDocXdot , gdDocLine );	break;
@@ -2355,6 +2366,16 @@ VOID OperationOnCommand( HWND hWnd, INT id, HWND hWndCtl, UINT codeNotify )
 
 		//	自動調整する
 		case IDM_DOTDIFF_ADJT:	DocDiffAdjExec( &gdDocXdot, gdDocLine );	break;
+
+		//	行頭半角空白をユニコードに変換
+		case IDM_HEADHALF_EXCHANGE:	DocHeadHalfSpaceExchange( hWnd );	break;
+
+		//	複数行テンプレを見せたり消したり
+		case  IDM_MAATMPLE_VIEW:
+			bMode = MaaViewToggle( TRUE );
+			InitParamValue( INIT_SAVE, VL_MAA_TOPMOST, bMode );
+			MenuItemCheckOnOff( IDM_MAATMPLE_VIEW, bMode );
+			break;
 
 		//	空白の表示非表示切換
 		case IDM_SPACE_VIEW_TOGGLE:
@@ -2418,6 +2439,9 @@ VOID OperationOnCommand( HWND hWnd, INT id, HWND hWndCtl, UINT codeNotify )
 
 		//	Ctrl+Tでサムネイル
 		case IDM_MAA_THUMBNAIL_OPEN:	DraughtWindowCreate( GetModuleHandle(NULL), hWnd, 1 );	break;
+
+		//	DOCKING時の、壱行・BRUSHテンプレを表示/非表示
+		case IDM_LINE_BRUSH_TMPL_VIEW:	DockingTmplViewToggle(  0 );	break;
 
 		case IDM_TESTCODE:
 			TRACE( TEXT("機能テスト") );

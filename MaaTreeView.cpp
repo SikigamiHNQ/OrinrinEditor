@@ -1070,15 +1070,6 @@ INT TreeSelItemProc( HWND hWnd, HTREEITEM hSelItem, UINT dMode )
 #ifndef _ORRVW
 		case  2:	//	編集ビューで開く場合
 			DocDoOpenFile( hWnd , atPath );	//	開いて中身展開
-//			dNumber = DocFileInflate( atPath  );	//	開いて中身展開
-//			if( dNumber )
-//			{
-//				MultiFileTabAppend( dNumber, atPath );	//	MAAをツリーから編集エリアで開く
-//#ifdef OPEN_HISTORY
-//				OpenHistoryLogging( hWnd , atPath );	//	ファイルオーポン記録を追加
-//#endif
-//			}
-
 			break;
 
 		//	アイテム追加
@@ -1290,15 +1281,6 @@ INT TabMultipleSelect( HWND hWnd, INT tabSel, UINT dMode )
 			else	//	ファイル名を確保して、さらに編集ビュー側で開く処理をする
 			{
 				DocDoOpenFile( hWnd, itNulti->atFilePath );
-//				dNumber = DocFileInflate( itNulti->atFilePath );	//	開いて中身展開
-//
-//				if( dNumber )
-//				{
-//					MultiFileTabAppend( dNumber , itNulti->atFilePath );	//	MAAを副タブから編集エリアに開く
-//#ifdef OPEN_HISTORY
-//					OpenHistoryLogging( hWnd, itNulti->atFilePath );	//	ファイルオーポン記録を追加
-//#endif
-//				}
 			}
 #endif
 			return 1;

@@ -538,7 +538,7 @@ LRESULT Drt_OnNotify( HWND hWnd, INT idFrom, LPNMHDR pstNmhdr )
 			pcConts = AacAsciiArtGet( iTarget );	//	該当するインデックスAAを引っ張ってくる
 
 			gptTipBuffer = SjisDecodeAlloc( pcConts );
-			free( pcConts );
+			FREE( pcConts );
 		}
 		else
 		{

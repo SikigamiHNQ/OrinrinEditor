@@ -60,6 +60,7 @@ static WNDPROC	gpfOrigPageToolProc;
 static HIMAGELIST	ghPgLstImgLst;
 
 extern INT	gbTmpltDock;		//	頁・壱行テンプレのドッキング
+extern BOOLEAN	gbDockTmplView;	//	くっついてるテンプレは見えているか
 
 
 extern  HWND	ghMainSplitWnd;	//!<	メインのスプリットバーハンドル
@@ -369,7 +370,7 @@ VOID Plt_OnCommand( HWND hWnd, INT id, HWND hWndCtl, UINT codeNotify )
 	INT	iPage, iItem, mRslt, iDiff;
 	LONG_PTR	rdExStyle;
 #ifdef PAGE_MULTISELECT
-	INT	iNxItem, iCount, i;
+	INT	iNxItem = 0, iCount, i;
 #endif
 
 	switch( id )
@@ -652,13 +653,21 @@ VOID Plt_OnContextMenu( HWND hWnd, HWND hWndContext, UINT xPos, UINT yPos )
 */
 VOID PageListResize( HWND hPrntWnd, LPRECT pstFrame )
 {
-	RECT	rect;
+	RECT	rect, tbRect;
 //gbTmpltDock
 
 	rect = *pstFrame;	//	クライヤントに使える領域
-	rect.left  = rect.right - (grdSplitPos - SPLITBAR_WIDTH);
-	rect.right = (grdSplitPos - SPLITBAR_WIDTH);
-	rect.bottom >>= 1;
+	rect.left  = rect.right - (grdSplitPos - SPLITBAR_WIDTH);	//	左位置
+	rect.right = (grdSplitPos - SPLITBAR_WIDTH);	//	幅
+	if( gbDockTmplView )
+	{
+		rect.bottom >>= 1;
+	}
+	else
+	{
+		DockingTabSizeGet( &tbRect );	//	タブの高さが要る
+		rect.bottom -= tbRect.bottom;
+	}
 
 	SetWindowPos( ghPageWnd, HWND_TOP, rect.left, rect.top, rect.right, rect.bottom, SWP_SHOWWINDOW );
 

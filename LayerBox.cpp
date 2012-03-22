@@ -76,8 +76,9 @@ extern HFONT	ghAaFont;		//!<	AA用フォント
 extern  HWND	ghViewWnd;		//!<	ビューウインドウハンドル
 
 //@@コピー処理
+#ifdef COPY_SWAP
 extern  UINT	gbCpModSwap;	//	SJISとユニコードコピーを入れ替える
-
+#endif
 static POINT	gstViewOrigin;	//!<	ビューの左上ウインドウ位置・
 
 static  ATOM	gLyrBoxAtom;	//!<	
@@ -569,7 +570,11 @@ VOID Lyb_OnCommand( HWND hWnd, INT id, HWND hWndCtl, UINT codeNotify )
 			break;
 
 		case IDM_LYB_COPY:	//	クルップボードへ
+#ifdef COPY_SWAP
 			LayerForClipboard( hWnd, gbCpModSwap ? D_SJIS : D_UNI );	//@@コピー処理
+#else
+			LayerForClipboard( hWnd, D_UNI );
+#endif
 			break;
 
 		case IDM_LYB_DO_EDIT:	//	文字列を編集

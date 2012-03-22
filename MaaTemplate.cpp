@@ -165,7 +165,7 @@ HWND MaaTmpltInitialise( HINSTANCE hInstance, HWND hParentWnd, LPRECT pstFrame )
 		WS_OVERLAPPEDWINDOW,
 #else
 		WS_EX_TOOLWINDOW, MAATMPLT_CLASS_NAME, TEXT("Multi Line AA Template"),
-		WS_POPUP | WS_THICKFRAME | WS_BORDER | WS_CAPTION | WS_VISIBLE,
+		WS_POPUP | WS_THICKFRAME | WS_BORDER | WS_CAPTION,
 #endif
 		rect.left, rect.top, rect.right, rect.bottom,
 		NULL, NULL, hInstance, NULL);
@@ -180,15 +180,21 @@ HWND MaaTmpltInitialise( HINSTANCE hInstance, HWND hParentWnd, LPRECT pstFrame )
 		SetWindowPos( ghMaaWnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE );
 		CheckMenuItem( GetMenu(ghMaaWnd), IDM_TOPMOST_TOGGLE, MF_CHECKED );
 	}
-#else
-	if( InitWindowTopMost( INIT_LOAD, WDP_MAATPL , 0 ) )
-	{	SetWindowPos( ghMaaWnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE );	}
-#endif
-
-	OpenProfileInitialise( ghMaaWnd );
 
 	ShowWindow( ghMaaWnd, SW_SHOW );
 	UpdateWindow( ghMaaWnd );
+#else
+	if( InitParamValue( INIT_LOAD, VL_MAA_TOPMOST, 1 ) )	//	非表示ならONしない
+	{
+		if( InitWindowTopMost( INIT_LOAD, WDP_MAATPL , 0 ) )
+		{	SetWindowPos( ghMaaWnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE );	}
+
+		ShowWindow( ghMaaWnd, SW_SHOW );
+		UpdateWindow( ghMaaWnd );
+	}
+#endif
+
+	OpenProfileInitialise( ghMaaWnd );
 
 	ZeroMemory( gatTemplatePath, sizeof(gatTemplatePath) );
 
@@ -222,6 +228,34 @@ HWND MaaTmpltInitialise( HINSTANCE hInstance, HWND hParentWnd, LPRECT pstFrame )
 	return ghMaaWnd;
 }
 //-------------------------------------------------------------------------------------------------
+
+#ifndef _ORRVW
+/*!
+	ＭＡＡ窓のＶＩＥＷをtoggleする
+	@param[in]	bSet	非０Toggle処理　０状態確認
+	@return	非０見えてる　０消えてる
+*/
+BOOLEAN MaaViewToggle( UINT bSet )
+{
+	BOOL	bStyle;
+
+	if( !(ghMaaWnd) )	return FALSE;
+
+	bStyle = IsWindowVisible( ghMaaWnd );	//	今の状態確認
+
+	if( bSet )	//	そして入れ替える
+	{
+		if( bStyle )	ShowWindow( ghMaaWnd, SW_HIDE );
+		else			ShowWindow( ghMaaWnd, SW_SHOW );
+
+		bStyle = !(bStyle);
+	}
+
+	return bStyle;
+}
+//-------------------------------------------------------------------------------------------------
+
+#endif
 
 /*!
 	ウインドウプロシージャ

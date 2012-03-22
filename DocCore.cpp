@@ -453,6 +453,7 @@ HRESULT DocMultiFileStore( LPTSTR ptIniPath )
 /*!
 	対象ファイルの名前をゲッツ！する
 	@param[in]	tabNum	名前を知りたいヤツのタブ番号
+	@param[out]	pIsDmy	名無しであるかどうかを返す・名無しなら非０
 	@return		LPTSTR	名前バッファのポインター・無効ならNULLを返す
 */
 LPTSTR DocMultiFileNameGet( INT tabNum )

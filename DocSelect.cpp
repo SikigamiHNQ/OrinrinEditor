@@ -29,8 +29,9 @@ extern  UINT	gbUniPad;		//	ƒpƒfƒBƒ“ƒO‚Éƒ†ƒjƒR[ƒh‚ð‚Â‚©‚Á‚ÄAƒhƒbƒg‚ðŒ©‚¹‚È‚¢‚æ‚
 
 extern  UINT	gbCrLfCode;		//	‰üsƒR[ƒhF‚O‚µ‚½‚ç‚ÎE”ñ‚O‚x‚x 
 
+#ifdef COPY_SWAP
 extern  UINT	gbCpModSwap;	//	SJIS‚Æƒ†ƒjƒR[ƒhƒRƒs[‚ð“ü‚ê‘Ö‚¦‚é	//@@ƒRƒs[ˆ—
-
+#endif
 static INT		gdSelByte;		//!<	‘I‘ð”ÍˆÍ‚ÌƒoƒCƒg”
 //-------------------------------------------------------------------------------------------------
 
@@ -1034,7 +1035,11 @@ HRESULT DocExtractExecute( HINSTANCE hInst )
 	else	//	‚È‚¢‚È‚çƒNƒ‹ƒbƒyƒ{[ƒh
 	{
 //@@ƒRƒs[ˆ—
+#ifdef COPY_SWAP
 		DocClipboardDataSet( ptString, cch * sizeof(TCHAR), gbCpModSwap ? D_SJIS : D_UNI );
+#else
+		DocClipboardDataSet( ptString, cch * sizeof(TCHAR), D_UNI );
+#endif
 	}
 
 

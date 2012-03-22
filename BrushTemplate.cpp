@@ -37,6 +37,7 @@ static  TBBUTTON	gstBrTBInfo[] = {
 extern HFONT	ghAaFont;		//	AA用フォント
 
 extern INT		gbTmpltDock;	//	テンプレのドッキング
+extern BOOLEAN	gbDockTmplView;	//	くっついてるテンプレは見えているか
 
 extern  HWND	ghMainSplitWnd;	//	メインのスプリットバーハンドル
 extern  LONG	grdSplitPos;	//	スプリットバーの、左側の、画面右からのオフセット
@@ -303,8 +304,11 @@ VOID BrushTmpleResize( HWND hPrntWnd, LPRECT pstFrame )
 	RECT	rect, tbRect;
 	//INT	iHei, iTak;
 
-//gbTmpltDock
+	//gbTmpltDock
 	if( !(ghBrTmplWnd) )	return;
+
+	//	非表示なら何もしないでおｋ
+	if( !(gbDockTmplView) )	return;
 
 	rect = *pstFrame;	//	クライヤントに使える領域
 	rect.left    = rect.right - (grdSplitPos - SPLITBAR_WIDTH);

@@ -64,7 +64,7 @@ static INT		gdDiffLock;		//!<	ずれ調整の基準ドット値
 //-------------------------------------------------------------------------------------------------
 
 //	右揃え用空白パヤーン
-CONST  TCHAR	gaatDotPattern[11][9] = {
+CONST  TCHAR	gaatDotPtrnPeriod[11][9] = {
 	{ TEXT("　　") },		//	22	0
 	{ TEXT("　....") },		//	23	1
 	{ TEXT(" 　 .") },		//	24	2
@@ -78,6 +78,22 @@ CONST  TCHAR	gaatDotPattern[11][9] = {
 	{ TEXT("　 　 ") }		//	32	10
 };
 #define RIGHT_WALL	TEXT('|')
+
+//	右揃え用空白パヤーンユニコード	20120315
+CONST  TCHAR	gaatDotPtrnUnic[11][6] = {
+	{ TEXT("　　") },				//	22	0	全SP　全SP
+	{ 0x3000,0x3000,0x200A },		//	23	1	全SP　全SP　1dot
+	{ 0x3000,0x3000,0x2009 },		//	24	2	全SP　全SP　2dot
+	{ 0x3000,0x3000,0x2006 },		//	25	3	全SP　全SP　3dot
+	{ 0x3000,0x3000,0x2005 },		//	26	4	全SP　全SP　4dot
+	{ TEXT("　　 ") },				//	27	5	全SP　全SP　半SP
+	{ 0x3000,0x0020,0x3000,0x200A },//	28	6	全SP　半SP　全SP　1dot
+	{ 0x3000,0x0020,0x3000,0x2009 },//	29	7	全SP　半SP　全SP　2dot
+	{ 0x3000,0x0020,0x3000,0x2006 },//	30	8	全SP　半SP　全SP　3dot
+	{ 0x3000,0x0020,0x3000,0x2005 },//	31	9	全SP　半SP　全SP　4dot
+	{ TEXT("　 　 ") }				//	32	10	全SP　半SP　全SP　半SP
+};
+
 
 
 //	パディング用空白パヤーン・非ユニコード
@@ -632,7 +648,7 @@ INT DocSpaceShiftProc( UINT vk, PINT pXdot, INT dLine )
 	@param[in]	pVoid	なにか
 	@return		HRESULT	終了状態コード
 */
-HRESULT	DocLeftGuideline( LPVOID pVoid )
+HRESULT	DocRightGuideline( LPVOID pVoid )
 {
 	INT	iTop, iBottom, i;
 
@@ -705,11 +721,15 @@ HRESULT DocRightGuideSet( INT dTop, INT dBottom )
 			nDot += lDot;
 		}
 
-		iMz = lstrlen( gaatDotPattern[sDot] );
+		//	20120315	ユニコードモードならゆにゆにっとする
+		if( gbUniPad  ){	iMz = lstrlen( gaatDotPtrnUnic[sDot]  );	}
+		else{				iMz = lstrlen( gaatDotPtrnPeriod[sDot] );	}
 
 		for( j = 0; iMz > j; j++ )
 		{
-			ch = gaatDotPattern[sDot][j];
+			if( gbUniPad  ){	ch = gaatDotPtrnUnic[sDot][j];	}	//	20120315
+			else{			ch = gaatDotPtrnPeriod[sDot][j];	}
+
 			wsBuffer += ch;
 			lDot  = DocInputLetter( nDot, i, ch );
 			nDot += lDot;
@@ -1637,6 +1657,75 @@ HRESULT DocPositionShift( UINT vk, PINT pXdot, INT dLine )
 	iDot = 0;
 	DocLetterPosGetAdjust( &iDot, dLine, 0 );
 	ViewDrawCaret( iDot, dLine, 1 );
+
+	DocPageInfoRenew( -1, 1 );
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+
+/*!
+	行頭半角空白をユニコードに変換
+*/
+HRESULT DocHeadHalfSpaceExchange( HWND hWnd )
+{
+	UINT_PTR	iLines;
+	INT			iTop, iBottom, i;
+	INT			xDot;
+	BOOLEAN		bFirst = TRUE, bSeled = FALSE;
+	TCHAR		ch;
+
+	LETR_ITR	vcLtrItr;
+
+//	LINE_VEC_LIST専用
+	LINE_ITR	itLine;
+
+	iLines  = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.size( );
+
+	//	範囲確認
+	iTop    = (*gitFileIt).vcCont.at( gixFocusPage ).dSelLineTop;
+	iBottom = (*gitFileIt).vcCont.at( gixFocusPage ).dSelLineBottom;
+	if( 0 <= iTop &&  0 <= iBottom )	bSeled = TRUE;
+
+	if( 0 > iTop )		iTop = 0;
+	if( 0 > iBottom )	iBottom = iLines - 1;
+
+	TRACE( TEXT("行頭半角をユニコードに") );
+
+	ViewSelPageAll( -1 );	//	選択範囲無くなる
+
+	//	容量計算、バッド空白の確認と再描画必要
+
+	itLine = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.begin();
+	std::advance( itLine, iTop );	//	行の位置合わせ
+
+	for( i = iTop; iBottom >= i; i++, itLine++ )	//	範囲内の各行について
+	{
+		//	文字があるなら操作する
+		if( 0 != itLine->vcLine.size(  ) )
+		{
+			vcLtrItr = itLine->vcLine.begin( );
+			ch = vcLtrItr->cchMozi;
+
+			if( TEXT(' ') == ch )	//	半角なら
+			{
+				//	一旦削除して
+				SqnAppendLetter( &((*gitFileIt).vcCont.at( gixFocusPage ).stUndoLog), DO_DELETE, ch, 0, i, bFirst );
+				bFirst = FALSE;
+				DocIterateDelete( vcLtrItr, i );
+
+				//	先頭位置に5dotユニコード空白をアッー！。
+				ch  = (TCHAR)0x2004;
+				xDot = DocInputLetter( 0, i, ch );
+				SqnAppendLetter( &((*gitFileIt).vcCont.at( gixFocusPage ).stUndoLog), DO_INSERT, ch, 0, i, bFirst );
+			}
+
+			DocBadSpaceCheck( i );	//	状態をリセット
+			ViewRedrawSetLine( i );
+		}
+	}
+
+	//	キャレット位置はずれない
 
 	DocPageInfoRenew( -1, 1 );
 

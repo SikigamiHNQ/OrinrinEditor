@@ -406,6 +406,7 @@ HRESULT		AaItemsTipSizeChange( INT, UINT );
 HRESULT		ViewingFontGet( LPLOGFONT );	//!<	
 
 #ifndef _ORRVW
+BOOLEAN		MaaViewToggle( UINT );
 
 LPSTR		SjisEncodeAlloc( LPCTSTR );
 
@@ -430,6 +431,15 @@ INT			InitTraceValue( UINT, LPTRACEPARAM );
 //HRESULT	InitLastOpen( UINT, LPTSTR );
 INT			InitWindowTopMost( UINT, UINT, INT );
 HRESULT		InitToolBarLayout( UINT, INT, LPREBARLAYOUTINFO );
+
+#ifdef ACCELERATOR_EDIT
+LPACCEL		AccelKeyTableGetAlloc( LPINT );
+LPACCEL		AccelKeyTableLoadAlloc( LPINT );
+HRESULT		AccelKeyDlgOpen( HWND );
+HACCEL		AccelKeyHandleGet( HINSTANCE );
+
+HACCEL		AccelKeyTableCreate( LPACCEL, INT );
+#endif
 
 #ifdef OPEN_HISTORY
 HRESULT		OpenHistoryInitialise( HWND );
@@ -467,8 +477,9 @@ HRESULT		FrameMoveFromView( HWND, UINT );
 HRESULT		CntxEditInitialise( LPTSTR, HINSTANCE );
 HRESULT		CntxEditDlgOpen( HWND );
 HMENU		CntxMenuGet( VOID );
+#ifdef COPY_SWAP
 HRESULT		CntxMenuCopySwap( VOID );
-
+#endif
 
 HRESULT		MultiFileTabFirst( LPTSTR );
 HRESULT		MultiFileTabAppend( LPARAM, LPTSTR );
@@ -520,7 +531,7 @@ HRESULT		ViewSelMoveCheck( UINT );		//!<
 HRESULT		ViewSelRangeCheck( UINT );		//!<	
 UINT		ViewSelBackCheck( INT );		//!<	
 INT			ViewSelPageAll( INT );			//!<	
-UINT		ViewSqSelModeToggle( LPVOID );	//!<	
+UINT		ViewSqSelModeToggle( UINT, LPVOID );	//!<	
 
 INT			ViewInsertUniSpace( UINT );
 INT			ViewInsertColourTag( UINT );
@@ -563,6 +574,9 @@ HWND		LineTmpleInitialise( HINSTANCE, HWND, LPRECT );
 VOID		LineTmpleResize( HWND, LPRECT );
 
 VOID		DockingTabSizeGet( LPRECT );
+HRESULT		DockingTabContextMenu( HWND, HWND, LONG, LONG );
+HWND		DockingTabGet( VOID );
+HRESULT		DockingTmplViewToggle( UINT );	//	”Ÿ”‚ÌêŠˆá‚¤‚©‚ç’ˆÓ
 
 HWND		BrushTmpleInitialise( HINSTANCE, HWND, LPRECT, HWND );
 LPTSTR		BrushStringMake( INT, LPTSTR );
@@ -701,7 +715,7 @@ UINT		DocStringSplitAST( LPTSTR, INT, PAGELOAD );
 UINT		DocImportSplitASD( LPSTR, INT, PAGELOAD );
 
 INT			DocLineStateCheckWithDot( INT, INT, PINT, PINT, PINT, PINT, PBOOLEAN );
-HRESULT		DocLeftGuideline( LPVOID );
+HRESULT		DocRightGuideline( LPVOID );
 INT			DocSpaceShiftProc( UINT, PINT, INT );
 LPTSTR		DocPaddingSpaceMake( INT );
 LPTSTR		DocPaddingSpaceUni( INT, PINT, PINT, PINT );
@@ -714,6 +728,8 @@ HRESULT		DocTopSpaceErase( PINT, INT );
 HRESULT		DocRightSlide( PINT, INT );
 
 HRESULT		DocPositionShift( UINT, PINT, INT );
+
+HRESULT		DocHeadHalfSpaceExchange( HWND );
 
 LPTSTR		DocLastSpDel( vector<LETTER> * );
 

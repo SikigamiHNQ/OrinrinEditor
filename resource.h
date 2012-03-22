@@ -53,6 +53,7 @@
 #define IDD_CONTEXT_ITEM_DLG            232
 #define IDM_AAFAVS_POPUP                233
 #define IDD_COLOUR_DLG                  234
+#define IDD_ACCEL_KEY_DLG               235
 #define IDBMPQ_MAIN_TB_FIRST            301
 #define IDBMP_FILE_NEW                  301
 #define IDBMQ_FILE_NEW                  302
@@ -370,6 +371,14 @@
 #define IDRB_LASTOPEN_NON               1238
 #define IDRB_LASTOPEN_ASK               1239
 #define IDB_CHOOSEFONT                  1240
+#define IDLV_FUNCKEY_LIST               1241
+#define IDHKC_FUNCKEY_INPUT             1242
+#define IDB_FUNCKEY_CLEAR               1243
+#define IDB_FUNCKEY_SET                 1244
+#define IDB_FUNCKEY_EDIT                1245
+#define IDCB_FUNCKEY_SPACE              1246
+#define IDB_FUNCKEY_FILEOUT             1247
+#define IDB_FUNCKEY_INIT                1248
 #define IDTV_ITEMTREE                   2000
 #define IDTB_TREESEL                    2001
 #define IDSO_AAITEMS                    2002
@@ -388,17 +397,18 @@
 #define IDB_CLIPSTEAL_FILEDEL           3006
 #define IDLV_CLIPSTEAL_FILELISTVW       3007
 #define IDHK_CLIPSTEAL_FILECHANGE       3008
-#define IDM_OPEN_HISTORY				32680
-#define IDM_OPEN_HIS_FIRST				32681
-#define IDM_OPEN_HIS_RESERVE			32691
-#define IDM_OPEN_HIS_LAST				32692
-#define IDM_OPEN_HIS_CLEAR				32693
+#define IDM_OPEN_HISTORY                32680
+#define IDM_OPEN_HIS_FIRST              32681
+#define IDM_OPEN_HIS_RESERVE            32691
+#define IDM_OPEN_HIS_LAST               32692
+#define IDM_OPEN_HIS_CLEAR              32693
 #define IDM_CLIPSTEAL_OPTION            32694
 #define IDM_TRACE_MODE_ON               32695
 #define IDM_TRC_VIEWTOGGLE              32696
 #define IDM_TMPL_GRID_INCREASE          32697
 #define IDM_TMPL_GRID_DECREASE          32698
 #define IDM_CLIPSTEAL_SELECT            32700
+#define IDM_HEADHALF_EXCHANGE           32720
 #define IDM_PATH_SETTING                32721
 #define IDM_TREE_RECONSTRUCT            32722
 #define IDM_MAA_INSERT_EDIT             32723
@@ -464,6 +474,7 @@
 #define IDM_TMPLT_GROUP_NEXT            32823
 #define IDM_PAGENUM_DLG_OPEN            32824
 #define IDM_MENUEDIT_DLG_OPEN           32825
+#define IDM_ACCELKEY_EDIT_DLG_OPEN      32826
 #define IDM_FINDMAA_DLG_OPEN            32828
 #define IDM_DRAUGHT_OPEN                32831
 #define IDM_DRAUGHT_CLOSE               32832
@@ -482,14 +493,12 @@
 #define IDM_THUMB_DRAUGHT_ADD           32845
 #define IDM_TMPLT_RELOAD                32846
 #define IDM_VERT_SCRIPT_OPEN            32847
-#define IDM_REBER_DORESET				32851
-
-#define IDM_FIND_DLG_OPEN				32861
-#define IDM_FIND_HIGHLIGHT_OFF			32862
-#define IDM_FIND_JUMP_NEXT				32863
-#define IDM_FIND_JUMP_PREV				32864
-#define IDM_FIND_TARGET_SET				32865
-
+#define IDM_REBER_DORESET               32851
+#define IDM_FIND_DLG_OPEN               32861
+#define IDM_FIND_HIGHLIGHT_OFF          32862
+#define IDM_FIND_JUMP_NEXT              32863
+#define IDM_FIND_JUMP_PREV              32864
+#define IDM_FIND_TARGET_SET             32865
 #define IDM_PAGEL_DETAIL                32900
 #define IDM_PAGEL_ADD                   32901
 #define IDM_PAGEL_INSERT                32902
@@ -549,6 +558,7 @@
 #define IDM_FRMINSBOX_QCLOSE            32964
 #define IDM_FRAME_INS_DECIDE            32965
 #define IDM_FRMINSBOX_OPEN              32966
+#define IDM_LINE_BRUSH_TMPL_VIEW        32967
 #define IDM_USERINS_NA                  32970
 #define IDM_USERINS_ITEM_FIRST          32971
 #define IDM_USERINS_ITEM_LAST           32986
@@ -573,9 +583,9 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NO_MFC                     1
-#define _APS_NEXT_RESOURCE_VALUE        235
+#define _APS_NEXT_RESOURCE_VALUE        236
 #define _APS_NEXT_COMMAND_VALUE         33014
-#define _APS_NEXT_CONTROL_VALUE         1241
+#define _APS_NEXT_CONTROL_VALUE         1249
 #define _APS_NEXT_SYMED_VALUE           120
 #endif
 #endif
