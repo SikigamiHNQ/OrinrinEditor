@@ -126,8 +126,9 @@ UINT ViewSqSelModeToggle( UINT bMode, LPVOID pVoid )
 	}
 	else
 	{
-		gbSqSelect &= ~D_SQUARE;	//	一旦解除して
+		//gbSqSelect &= ~D_SQUARE;	//	一旦解除して
 		if( gbAltOn ){	gbSqSelect |=  D_SQUARE;	}
+		//	20120323	Alt押されてたらON、違うなら素通り
 	}
 
 	//	開始しても終了しても初期化するのは変わらない

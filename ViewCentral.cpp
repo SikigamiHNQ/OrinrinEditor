@@ -2409,13 +2409,14 @@ VOID OperationOnCommand( HWND hWnd, INT id, HWND hWndCtl, UINT codeNotify )
 		//	PageCtrl‚Ö”ò‚Î‚·
 		case IDM_PAGEL_ADD:
 		case IDM_PAGEL_INSERT:
+		case IDM_PAGEL_DELETE:
 		case IDM_PAGEL_DUPLICATE:
 		case IDM_PAGEL_COMBINE:
 		case IDM_PAGEL_UPFLOW:
 		case IDM_PAGEL_DOWNSINK:
+		case IDM_PAGEL_RENAME:
 		case IDM_PAGE_PREV:
 		case IDM_PAGE_NEXT:
-		case IDM_PAGEL_RENAME:
 			FORWARD_WM_COMMAND( ghPgVwWnd, id, hWndCtl, codeNotify, SendMessage );
 			break;
 
