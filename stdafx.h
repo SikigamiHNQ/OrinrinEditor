@@ -117,7 +117,7 @@ static CONST GUID gcstGUID = { 0x66D3E881, 0x972B, 0x458B, { 0x93, 0x5E, 0x9E, 0
 //	作成中の機能
 //#define FIND_STRINGS	//	文字列検索機能
 //#define FRAME_MLINE	//	枠パーツ複数行
-#define PAGE_MULTISELECT//	頁一覧の複数選択
+//#define PAGE_MULTISELECT//	頁一覧の複数選択
 
 #define ACCELERATOR_EDIT//	キーのアレ編集
 //#define COPY_SWAP
