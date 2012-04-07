@@ -792,7 +792,7 @@ INT DocDiffAdjExec( PINT pxDot, INT yLine )
 	INT			dBgnDot, dEndDot, dBgnCnt, dRngCnt, iSabun, dTgtDot, nDot;
 	UINT_PTR	cchSize, cchPlus;
 	BOOLEAN		bIsSpace;
-	LPTSTR		PtPlus, ptBuffer;
+	LPTSTR		ptPlus, ptBuffer;
 
 	wstring		wsDelBuf, wsAddBuf;
 	LETR_ITR	vcLtrBgn, vcLtrEnd, vcItr;
@@ -829,16 +829,17 @@ INT DocDiffAdjExec( PINT pxDot, INT yLine )
 	}
 
 	//埋め文字列作成
-	PtPlus = DocPaddingSpaceWithPeriod( dTgtDot, NULL, NULL, NULL, FALSE );
+//	ptPlus = DocPaddingSpaceWithPeriod( dTgtDot, NULL, NULL, NULL, FALSE );
+	ptPlus = DocPaddingSpaceMake( dTgtDot );
 
 
-	if( !(PtPlus) )
+	if( !(ptPlus) )
 	{
 		NotifyBalloonExist( TEXT("調整出来なかったですぅ"), TEXT("自動調整失敗"), NIIF_ERROR );
 		return 0;
 	}
 
-	StringCchLength( PtPlus, STRSAFE_MAX_CCH, &cchPlus );
+	StringCchLength( ptPlus, STRSAFE_MAX_CCH, &cchPlus );
 
 
 #ifdef LINE_VEC_LIST
@@ -868,9 +869,9 @@ INT DocDiffAdjExec( PINT pxDot, INT yLine )
 	FREE( ptBuffer );
 
 //ここで文字列追加
-	DocStringAdd( &nDot, &yLine, PtPlus, cchPlus );
-	SqnAppendString( &((*gitFileIt).vcCont.at( gixFocusPage ).stUndoLog), DO_INSERT, PtPlus, dBgnDot, yLine, FALSE );
-	FREE(PtPlus);
+	DocStringAdd( &nDot, &yLine, ptPlus, cchPlus );
+	SqnAppendString( &((*gitFileIt).vcCont.at( gixFocusPage ).stUndoLog), DO_INSERT, ptPlus, dBgnDot, yLine, FALSE );
+	FREE(ptPlus);
 
 //もろもろの位置合わせしておｋ
 	*pxDot = nDot;
@@ -885,6 +886,7 @@ INT DocDiffAdjExec( PINT pxDot, INT yLine )
 }
 //-------------------------------------------------------------------------------------------------
 
+#if 0
 /*!
 	指定されたドット幅を、ピリオドも使って綺麗に確保する・１９幅までなら調整できる
 	@param[in]	dTgtDot	作成するドット数
@@ -967,6 +969,7 @@ LPTSTR DocPaddingSpaceWithPeriod( INT dTgtDot, PINT pdZen, PINT pdHan, PINT pdPr
 	return ptPlus;
 }
 //-------------------------------------------------------------------------------------------------
+#endif
 
 /*!
 	行頭に、文字(主に空白)を追加
@@ -1456,7 +1459,7 @@ HRESULT DocRightSlide( PINT pXdot, INT dLine )
 
 		//	先頭からうめちゃう
 		dInBgn = 0;
-		ptBuffer = DocPaddingSpaceWithPeriod( dAdDot, NULL, NULL, NULL, TRUE );
+		ptBuffer = DocPaddingSpaceMake( dAdDot );//	DocPaddingSpaceWithPeriod( dAdDot, NULL, NULL, NULL, TRUE );
 		DocInsertString( &dInBgn, &i, NULL, ptBuffer, 0, bFirst );	bFirst = FALSE;
 		FREE(ptBuffer);
 

@@ -50,6 +50,8 @@ static  HWND	ghPageTipWnd;	//!<	ツールチップハンドル
 static HFONT	ghPgTipFont;	//!<	ツールチップ用
 static LPTSTR	gptPgTipBuf;	//!<	
 
+static INT		gixPreviSel;	//!<	直前まで選択してた頁
+
 static INT		gixMouseSel;	//!<	マウスカーソル下のアレ
 
 static BOOLEAN	gbPgTipView;	//!<	頁ツールティップ表示ON/OFF
@@ -70,15 +72,15 @@ extern  LONG	grdSplitPos;	//!<	スプリットバーの、左側の、画面右からのオフセット
 //	ツールバー・新規作成とか
 #define PGTB_ITEMS	9
 static TBBUTTON gstPgTlBarInfo[] = {
-/*新規*/{  0,	IDM_PAGEL_ADD,		TBSTATE_ENABLED | TBSTATE_WRAP,	BTNS_BUTTON | BTNS_AUTOSIZE,	0,	0 },	//	
-/*挿入*/{  1,	IDM_PAGEL_INSERT,	TBSTATE_ENABLED | TBSTATE_WRAP,	BTNS_BUTTON | BTNS_AUTOSIZE,	0,	0 },	//	
-/*複製*/{  2,	IDM_PAGEL_DUPLICATE,TBSTATE_ENABLED | TBSTATE_WRAP,	BTNS_BUTTON | BTNS_AUTOSIZE,	0,	0 },	//	
-/*削除*/{  3,	IDM_PAGEL_DELETE,	TBSTATE_ENABLED | TBSTATE_WRAP,	BTNS_BUTTON | BTNS_AUTOSIZE,	0,	0 },	//	
-/*統合*/{  4,	IDM_PAGEL_COMBINE,	TBSTATE_ENABLED | TBSTATE_WRAP,	BTNS_BUTTON | BTNS_AUTOSIZE,	0,	0 },	//	
-/*上移*/{  5,	IDM_PAGEL_UPFLOW,	TBSTATE_ENABLED | TBSTATE_WRAP,	BTNS_BUTTON | BTNS_AUTOSIZE,	0,	0 },	//	
-/*下移*/{  6,	IDM_PAGEL_DOWNSINK,	TBSTATE_ENABLED | TBSTATE_WRAP,	BTNS_BUTTON | BTNS_AUTOSIZE,	0,	0 },	//	
-/*名称*/{  7,	IDM_PAGEL_RENAME,	TBSTATE_ENABLED | TBSTATE_WRAP,	BTNS_BUTTON | BTNS_AUTOSIZE,	0,	0 },	//	
-/*更新*/{  8,	IDM_PAGEL_DETAIL,	TBSTATE_WRAP,					BTNS_BUTTON | BTNS_AUTOSIZE,	0,	0 } 	//	
+/*新規*/{  0,	IDM_PAGEL_ADD,		TBSTATE_ENABLED | TBSTATE_WRAP,	BTNS_BUTTON | BTNS_AUTOSIZE,	{0, 0}, 0, 0  },	//	
+/*挿入*/{  1,	IDM_PAGEL_INSERT,	TBSTATE_ENABLED | TBSTATE_WRAP,	BTNS_BUTTON | BTNS_AUTOSIZE,	{0, 0}, 0, 0  },	//	
+/*複製*/{  2,	IDM_PAGEL_DUPLICATE,TBSTATE_ENABLED | TBSTATE_WRAP,	BTNS_BUTTON | BTNS_AUTOSIZE,	{0, 0}, 0, 0  },	//	
+/*削除*/{  3,	IDM_PAGEL_DELETE,	TBSTATE_ENABLED | TBSTATE_WRAP,	BTNS_BUTTON | BTNS_AUTOSIZE,	{0, 0}, 0, 0  },	//	
+/*統合*/{  4,	IDM_PAGEL_COMBINE,	TBSTATE_ENABLED | TBSTATE_WRAP,	BTNS_BUTTON | BTNS_AUTOSIZE,	{0, 0}, 0, 0  },	//	
+/*上移*/{  5,	IDM_PAGEL_UPFLOW,	TBSTATE_ENABLED | TBSTATE_WRAP,	BTNS_BUTTON | BTNS_AUTOSIZE,	{0, 0}, 0, 0  },	//	
+/*下移*/{  6,	IDM_PAGEL_DOWNSINK,	TBSTATE_ENABLED | TBSTATE_WRAP,	BTNS_BUTTON | BTNS_AUTOSIZE,	{0, 0}, 0, 0  },	//	
+/*名称*/{  7,	IDM_PAGEL_RENAME,	TBSTATE_ENABLED | TBSTATE_WRAP,	BTNS_BUTTON | BTNS_AUTOSIZE,	{0, 0}, 0, 0  },	//	
+/*更新*/{  8,	IDM_PAGEL_DETAIL,	TBSTATE_WRAP,					BTNS_BUTTON | BTNS_AUTOSIZE,	{0, 0}, 0, 0  } 	//	
 };	//	内容変更したら、ツールバー文字列の設定とかも変更セヨ
 
 //-------------------------------------------------------------------------------------------------
@@ -156,6 +158,8 @@ HWND PageListInitialise( HINSTANCE hInstance, HWND hParentWnd, LPRECT pstFrame )
 	ghInst = hInstance;
 
 	gixMouseSel = -1;
+
+	gixPreviSel = -1;
 
 	gbPgTipView = InitParamValue( INIT_LOAD, VL_PAGETIP_VIEW, 1 );
 
@@ -409,6 +413,9 @@ VOID Plt_OnCommand( HWND hWnd, INT id, HWND hWndCtl, UINT codeNotify )
 		default:	break;
 	}
 
+	//	選択されてる個数を確保・なんかヘンになってる
+//	ListView_GetSelectedCount
+
 	//	選択されてる項目を確保
 	iItem = ListView_GetNextItem( ghPageListWnd, -1, LVNI_ALL | LVNI_SELECTED );
 #ifdef PAGE_MULTISELECT
@@ -424,6 +431,7 @@ VOID Plt_OnCommand( HWND hWnd, INT id, HWND hWndCtl, UINT codeNotify )
 	if( 0 >  iItem ){	iItem = gixFocusPage;	}
 	//	未選択なら、現在頁が選択されているモノと見なす
 
+	//	複数選択なら、今のPageをCurrentにするか
 
 	switch( id )
 	{
@@ -686,6 +694,8 @@ LRESULT PageListNotify( HWND hWnd, LPNMLISTVIEW pstLv )
 	HWND	hLvWnd;
 	INT		iCount, iItem, nmCode;//, iPage;
 
+	INT		iSel;
+
 	DWORD	lvClmn;
 	INT		lvLine;
 	LPNMLVCUSTOMDRAW	pstDraw;
@@ -718,6 +728,17 @@ LRESULT PageListNotify( HWND hWnd, LPNMLISTVIEW pstLv )
 		}
 	}
 
+	if( NM_RETURN == nmCode )
+	{
+//#ifdef PAGE_MULTISELECT
+
+		iSel = ListView_GetNextItem( hLvWnd, -1, LVNI_ALL | LVNI_SELECTED );
+		if( 0 > iSel )	return 0;	//	選択してなかったら終わり
+
+		TRACE( TEXT("NM_RETURN[%d]"), iSel );
+	}
+//	NM_KEYDOWN	NM_CHAR	関知できず
+
 
 //カスタムドロー・サブクラスの中だと上手くいかない・Why?
 	if( NM_CUSTOMDRAW == nmCode )
@@ -733,18 +754,31 @@ LRESULT PageListNotify( HWND hWnd, LPNMLISTVIEW pstLv )
 			lvLine = pstDraw->nmcd.dwItemSpec;	//	行
 			lvClmn = pstDraw->iSubItem;			//	カラム
 
-			//	再描画せずともリヤルに変わる
+			if( gixFocusPage == lvLine )	//	今の行・とりあえず青
+			{
+				pstDraw->clrTextBk = 0x00FF8080;
+			}
+			else if( gixPreviSel == lvLine )	//	前の行・とりやえず灰
+			{
+				pstDraw->clrTextBk = 0x00CCCCDD;
+			}
+			else
+			{
+				pstDraw->clrTextBk = 0xFF000000;	//	これでデフォ色指定・多分
+			}
+
+			//	再描画せずともリヤルに変わる・バイト数計算のところで再描画してる？
 			if( 2 == lvClmn )
 			{
 				if( PAGE_BYTE_MAX < (*gitFileIt).vcCont.at( lvLine ).dByteSz )
 					pstDraw->clrTextBk = 0x000000FF;
-				else
-					pstDraw->clrTextBk = 0xFF000000;
+				//else
+				//	pstDraw->clrTextBk = 0xFF000000;
 			}
-			else
-			{
-				pstDraw->clrTextBk = 0xFF000000;	//	これでデフォ色指定
-			}
+			//else
+			//{
+			//	pstDraw->clrTextBk = 0xFF000000;	//	これでデフォ色指定
+			//}
 
 			return CDRF_NEWFONT;
 		}
@@ -768,28 +802,34 @@ HRESULT PageListClear( VOID )
 
 /*!
 	開いている頁内容を変更
-	@param[in]	dPage	開く頁０インデックス・表示は１インデックスなので注意
+	@param[in]	iPage		開く頁０インデックス・表示は１インデックスなので注意
+	@param[in]	iPrePage	直前まで選択してた頁・切り替えた場合は－１
 	@return		HRESULT	終了状態コード
 */
-HRESULT PageListViewChange( INT dPage )
+HRESULT PageListViewChange( INT iPage, INT iPrePage )
 {
 	//	フォーカスページは、ここに来る前に変更しておくこと
 
 	LONG	iItem;
 
+	gixPreviSel = iPrePage;	//	直前の選択頁を記録しておく
+
+	InvalidateRect( ghPageListWnd, NULL, TRUE );
+
 	iItem = ListView_GetItemCount( ghPageListWnd );
-	if( iItem <= dPage )	return E_OUTOFMEMORY;
+	if( iItem <= iPage || 0 > iPage )	return E_OUTOFMEMORY;
 
 	//	選択状態を変更
-	ListView_SetItemState( ghPageListWnd, dPage, LVIS_SELECTED, LVIS_SELECTED );
+	ListView_SetItemState( ghPageListWnd, iPage, LVIS_SELECTED, LVIS_SELECTED );
 
 	//	ビューを書き直し
 	ViewEditReset(  );
 
 	//	ここで開いた頁を投下ホットキー番号にセット
-	gixDropPage = dPage;
+	gixDropPage = iPage;
 
 //	ViewFocusSet(  );	//	ここではフォーカスしないほうが良いか
+
 
 	return S_OK;
 }
@@ -983,24 +1023,24 @@ HRESULT PageListDelete( INT iPage )
 
 /*!
 	各頁の状況・引数はそのうち構造体にしたほうがいいかも
-	@param[in]	dPage	頁番号
+	@param[in]	iPage	頁番号
 	@param[in]	dByte	バイト数
 	@param[in]	dLine	行数
 	@return		HRESULT	終了状態コード
 */
-HRESULT PageListInfoSet( INT dPage, INT dByte, INT dLine )
+HRESULT PageListInfoSet( INT iPage, INT dByte, INT dLine )
 {
-	INT		iPage;
+	INT		iPageCnt;
 	TCHAR	atBuffer[MIN_STRING];
 
-	iPage = ListView_GetItemCount( ghPageListWnd );
-	if( iPage <= dPage )	return E_OUTOFMEMORY;
+	iPageCnt = ListView_GetItemCount( ghPageListWnd );
+	if( iPageCnt <= iPage ){	return E_OUTOFMEMORY;	}
 
 	StringCchPrintf( atBuffer, MIN_STRING, TEXT("%d"), dByte );	//	byte
-	ListView_SetItemText( ghPageListWnd, dPage, 2, atBuffer );
+	ListView_SetItemText( ghPageListWnd, iPage, 2, atBuffer );
 
 	StringCchPrintf( atBuffer, MIN_STRING, TEXT("%d"), dLine );	//	line
-	ListView_SetItemText( ghPageListWnd, dPage, 3, atBuffer );
+	ListView_SetItemText( ghPageListWnd, iPage, 3, atBuffer );
 
 	return S_OK;
 }
@@ -1015,11 +1055,11 @@ HRESULT PageListViewRewrite( INT dPage )
 {
 	UINT_PTR	dLines;
 	UINT		dBytes;
-	INT			iPage;
+	INT			iPageCount;
 	TCHAR	atBuffer[MIN_STRING];
 
-	iPage = ListView_GetItemCount( ghPageListWnd );
-	if( iPage <= dPage )	return E_OUTOFMEMORY;
+	iPageCount = ListView_GetItemCount( ghPageListWnd );
+	if( iPageCount <= dPage )	return E_OUTOFMEMORY;
 
 	StringCchPrintf( atBuffer, MIN_STRING, TEXT("%d"), dPage + 1 );
 	ListView_SetItemText( ghPageListWnd, dPage, 0, atBuffer );
@@ -1138,11 +1178,11 @@ HRESULT PageListNameChange( INT dPage )
 */
 HRESULT PageListNameSet( INT dPage, LPTSTR ptName )
 {
-	INT		iPage;
+	INT		iPageCount;
 	LVITEM	stLvi;
 
-	iPage = ListView_GetItemCount( ghPageListWnd );
-	if( iPage <= dPage )	return E_OUTOFMEMORY;
+	iPageCount = ListView_GetItemCount( ghPageListWnd );
+	if( iPageCount <= dPage )	return E_OUTOFMEMORY;
 
 	ZeroMemory( &stLvi, sizeof(stLvi) );
 	stLvi.mask     = LVIF_TEXT;
@@ -1161,10 +1201,10 @@ HRESULT PageListNameSet( INT dPage, LPTSTR ptName )
 */
 INT PageListIsNamed( FILES_ITR itFile )
 {
-	UINT_PTR	iPage, i;
+	UINT_PTR	iPageCount, i;
 
-	iPage = itFile->vcCont.size(  );
-	for( i = 0; iPage > i; i++ )
+	iPageCount = itFile->vcCont.size(  );
+	for( i = 0; iPageCount > i; i++ )
 	{
 		if( 0 != itFile->vcCont.at( i ).atPageName[0] ){	return TRUE;	}
 	}
@@ -1336,7 +1376,7 @@ LRESULT Plv_OnNotify( HWND hWnd, INT idFrom, LPNMHDR pstNmhdr )
 		{
 			pstDispInfo = (LPNMTTDISPINFO)pstNmhdr;
 
-			ZeroMemory( &(pstDispInfo->szText), sizeof(pstDispInfo->szText) );
+			ZeroMemory( pstDispInfo->szText, sizeof(pstDispInfo->szText) );
 			pstDispInfo->lpszText = NULL;
 
 			FREE( gptPgTipBuf );
@@ -1348,16 +1388,19 @@ LRESULT Plv_OnNotify( HWND hWnd, INT idFrom, LPNMHDR pstNmhdr )
 			//	該当ページから引っ張る
 			dBytes = DocAllTextGetAlloc( gixMouseSel, D_UNI, (LPVOID *)(&gptPgTipBuf), gitFileIt );
 
-			StringCchLength( gptPgTipBuf, STRSAFE_MAX_CCH, &rdLength );
-			if( 2 <= rdLength )
+			if( gptPgTipBuf )
 			{
-				//	末端に余計な改行があるので消しておく
-				gptPgTipBuf[rdLength-1] = NULL;
-				gptPgTipBuf[rdLength-2] = NULL;
-				rdLength -= 2;
-			}
+				StringCchLength( gptPgTipBuf, STRSAFE_MAX_CCH, &rdLength );
+				if( 2 <= rdLength )
+				{
+					//	末端に余計な改行があるので消しておく
+					gptPgTipBuf[rdLength-1] = NULL;
+					gptPgTipBuf[rdLength-2] = NULL;
+					rdLength -= 2;
+				}
 
-			pstDispInfo->lpszText = gptPgTipBuf;
+				pstDispInfo->lpszText = gptPgTipBuf;
+			}
 
 			return 0;
 		}

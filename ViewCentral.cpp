@@ -2100,7 +2100,7 @@ VOID OperationOnCommand( HWND hWnd, INT id, HWND hWndCtl, UINT codeNotify )
 		case  IDM_UNI_PALETTE:		UniDialogueEntry( ghInst, hWnd );	break;
 
 		//	プレビューオーポン
-		case  IDM_ON_PREVIEW:		PreviewVisibalise( gixFocusPage );	break;
+		case  IDM_ON_PREVIEW:		PreviewVisibalise( gixFocusPage, TRUE );	break;
 
 		//	頁一覧を前面に
 		case  IDM_PAGELIST_VIEW:	SetForegroundWindow( ghPgVwWnd );	break;
@@ -2154,10 +2154,10 @@ VOID OperationOnCommand( HWND hWnd, INT id, HWND hWndCtl, UINT codeNotify )
 		case IDM_OPEN:				DocFileOpen( hWnd );	break;
 
 		//	上書き保存
-		case IDM_OVERWRITESAVE:		DocFileSave( hWnd, D_SJIS );	break;
+		case IDM_OVERWRITESAVE:		DocFileSave( hWnd, D_SJIS );	PreviewVisibalise( gixFocusPage, FALSE );	break;
 
 		//	名前を付けて保存
-		case IDM_RENAMESAVE:		DocFileSave( hWnd, (D_SJIS|D_RENAME) );	break;
+		case IDM_RENAMESAVE:		DocFileSave( hWnd , (D_SJIS|D_RENAME) );	PreviewVisibalise( gixFocusPage, FALSE );	break;
 
 		//	画像として保存
 		case IDM_IMAGE_SAVE:		DocImageSave( hWnd, 0, ghAaFont );	break;
@@ -2173,6 +2173,17 @@ VOID OperationOnCommand( HWND hWnd, INT id, HWND hWndCtl, UINT codeNotify )
 		case IDM_INSFRAME_HOTEL:	ViewFrameInsert( 7 );	break;
 		case IDM_INSFRAME_INDIA:	ViewFrameInsert( 8 );	break;
 		case IDM_INSFRAME_JULIETTE:	ViewFrameInsert( 9 );	break;
+
+		case IDM_INSFRAME_KILO:		ViewFrameInsert( 10 );	break;
+		case IDM_INSFRAME_LIMA:		ViewFrameInsert( 11 );	break;
+		case IDM_INSFRAME_MIKE:		ViewFrameInsert( 12 );	break;
+		case IDM_INSFRAME_NOVEMBER:	ViewFrameInsert( 13 );	break;
+		case IDM_INSFRAME_OSCAR:	ViewFrameInsert( 14 );	break;
+		case IDM_INSFRAME_POPPA:	ViewFrameInsert( 15 );	break;
+		case IDM_INSFRAME_QUEBEC:	ViewFrameInsert( 16 );	break;
+		case IDM_INSFRAME_ROMEO:	ViewFrameInsert( 17 );	break;
+		case IDM_INSFRAME_SIERRA:	ViewFrameInsert( 18 );	break;
+		case IDM_INSFRAME_TANGO:	ViewFrameInsert( 19 );	break;
 
 		//	枠挿入窓オーポン
 		case IDM_FRMINSBOX_OPEN:	FrameInsBoxCreate( ghInst, hWnd );	break;
@@ -2193,12 +2204,10 @@ VOID OperationOnCommand( HWND hWnd, INT id, HWND hWndCtl, UINT codeNotify )
 #endif
 
 		//	アンドゥする
-		case IDM_UNDO:	OperationUndoRedo( IDM_UNDO, &gdDocXdot, &gdDocLine );
-			break;
+		case IDM_UNDO:	OperationUndoRedo( IDM_UNDO, &gdDocXdot, &gdDocLine );	break;
 
 		//	リドゥする
-		case IDM_REDO:	OperationUndoRedo( IDM_REDO, &gdDocXdot, &gdDocLine );
-			break;
+		case IDM_REDO:	OperationUndoRedo( IDM_REDO, &gdDocXdot, &gdDocLine );	break;
 
 		//	切り取り
 		case IDM_CUT:
@@ -2272,7 +2281,7 @@ VOID OperationOnCommand( HWND hWnd, INT id, HWND hWndCtl, UINT codeNotify )
 			break;
 
 		//	画面の再描画
-		case IDM_NOW_PAGE_REFRESH:	ViewRedrawSetLine( -1 );	break;
+		case IDM_NOW_PAGE_REFRESH:	ViewRedrawSetLine( -1 );	PreviewVisibalise( gixFocusPage, FALSE );	break;
 
 		//	800Dｘ40Lくらいまでを全角スペースで埋めちゃう
 		case IDM_FILL_ZENSP:	DocScreenFill( TEXT("　") );	break;
@@ -2400,6 +2409,9 @@ VOID OperationOnCommand( HWND hWnd, INT id, HWND hWndCtl, UINT codeNotify )
 			MenuItemCheckOnOff( IDM_RIGHT_RULER_TOGGLE, gbRitRlrView );
 			ViewRedrawSetLine( -1 );	//	画面表示更新
 			break;
+
+		//	ユニコードON/OFFトグル
+		case IDM_UNICODE_TOGGLE:	UnicodeUseToggle( NULL );	break;
 
 		//	頁分割
 		case IDM_PAGEL_DIVIDE:	DocPageDivide( hWnd, ghInst, gdDocLine );	break;

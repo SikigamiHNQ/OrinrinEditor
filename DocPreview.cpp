@@ -115,7 +115,7 @@ extern INT		gixFocusPage;	//!<	注目中のページ・とりあえず０・０インデックス
 
 #define TB_ITEMS	1
 static  TBBUTTON	gstTBInfo[] = {
-	{ 0,	IDM_PVW_ALLVW,	TBSTATE_ENABLED,	TBSTYLE_BUTTON | TBSTYLE_AUTOSIZE | TBSTYLE_CHECK,	0,	0  }
+	{ 0, IDM_PVW_ALLVW, TBSTATE_ENABLED, TBSTYLE_BUTTON | TBSTYLE_AUTOSIZE | TBSTYLE_CHECK, {0, 0}, 0, 0 }
 };	//	
 
 
@@ -258,10 +258,11 @@ HRESULT PreviewHeaderGet( VOID )
 
 /*！
 	ウインドウを作成
-	いまの頁をうけとる？
-	@return		HRESULT	終了状態コード
+	@param[in]	iNowPage	プレビュりたい頁番号
+	@param[in]	bForeg		非０なら再プレビューのときにフォアグランドにする・０ならしない・プレビュー開いてないなら何もしない
+	@return	HRESULT	終了状態コード
 */
-HRESULT PreviewVisibalise( INT iNowPage )
+HRESULT PreviewVisibalise( INT iNowPage, BOOLEAN bForeg )
 {
 	HWND	hWnd;
 	TCHAR	atBuffer[MAX_STRING];
@@ -284,9 +285,13 @@ HRESULT PreviewVisibalise( INT iNowPage )
 		PreviewPageWrite( iNowPage );	//	内容書き換え
 		InvalidateRect( ghPrevWnd, NULL, TRUE );
 
-		SetForegroundWindow( ghPrevWnd );
+		if( bForeg )	SetForegroundWindow( ghPrevWnd );
+
 		return S_FALSE;
 	}
+
+	//	プレビュー開いてないときに、非フォアグランドなら何もしない
+	if( !(bForeg) ){	return  E_ABORT;	}
 
 
 	InitWindowPos( INIT_LOAD, WDP_PREVIEW, &rect );

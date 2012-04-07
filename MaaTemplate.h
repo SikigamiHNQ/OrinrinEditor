@@ -90,6 +90,7 @@ UINT		AaItemsIsUnderCursor( HWND, HWND, INT );	//!<
 VOID		AaTitleClear( VOID );
 INT			AaTitleAddString( UINT, LPSTR );
 VOID		AaTitleSelect( HWND, UINT );
+UINT		AaItemsDoSelect( HWND, UINT, UINT );		//!<	
 
 VOID		Aai_OnKey( HWND, UINT, BOOL, INT, UINT );
 VOID		Aai_OnVScroll( HWND , HWND, UINT, INT );	//!<	

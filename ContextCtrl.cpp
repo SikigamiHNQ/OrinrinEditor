@@ -35,7 +35,6 @@ typedef struct tagCONTEXTITEM
 
 
 
-
 CONST static CONTEXTITEM	gstContextItem[] =
 {
 /* 0*/	{  TEXT("新規作成"),	/*ファイル*/		IDM_NEWFILE				},
@@ -85,74 +84,84 @@ CONST static CONTEXTITEM	gstContextItem[] =
 		{  TEXT("枠（８）"),						IDM_INSFRAME_HOTEL		},
 /*45*/	{  TEXT("枠（９）"),						IDM_INSFRAME_INDIA		},
 		{  TEXT("枠（１０）"),						IDM_INSFRAME_JULIETTE	},
+		{  TEXT("枠（１１）"),						IDM_INSFRAME_KILO		},
+		{  TEXT("枠（１２）"),						IDM_INSFRAME_LIMA		},
+		{  TEXT("枠（１３）"),						IDM_INSFRAME_MIKE		},
+/*50*/	{  TEXT("枠（１４）"),						IDM_INSFRAME_NOVEMBER	},
+		{  TEXT("枠（１５）"),						IDM_INSFRAME_OSCAR		},
+		{  TEXT("枠（１６）"),						IDM_INSFRAME_POPPA		},
+		{  TEXT("枠（１７）"),						IDM_INSFRAME_QUEBEC		},
+		{  TEXT("枠（１８）"),						IDM_INSFRAME_ROMEO		},
+/*55*/	{  TEXT("枠（１９）"),						IDM_INSFRAME_SIERRA		},
+		{  TEXT("枠（２０）"),						IDM_INSFRAME_TANGO		},
 		{  TEXT("枠編集"),							IDM_INSFRAME_EDIT		},
 		{  TEXT("枠挿入ボックス"),					IDM_FRMINSBOX_OPEN		},
 		{  TEXT("文字ＡＡ変換ボックス"),			IDM_MOZI_SCR_OPEN		},
-/*50*/	{  TEXT("縦書き変換ボックス"),				IDM_VERT_SCRIPT_OPEN	},
+/*60*/	{  TEXT("縦書き変換ボックス"),				IDM_VERT_SCRIPT_OPEN	},
 		{  TEXT("ユーザ定義"),						IDM_MN_USER_REFS		},//サブメニューダミー
 		{  TEXT("各頁に通し番号を入れる"),			IDM_PAGENUM_DLG_OPEN	},
 		{  TEXT("（セパレータ）"),					0						},
 		{  TEXT("右揃え線"),	/*整形*/			IDM_RIGHT_GUIDE_SET		},
-/*55*/	{  TEXT("行頭に全角空白追加"),				IDM_INS_TOPSPACE		},
+/*65*/	{  TEXT("行頭に全角空白追加"),				IDM_INS_TOPSPACE		},
 		{  TEXT("行頭空白削除"),					IDM_DEL_TOPSPACE		},
 		{  TEXT("行末空白削除"),					IDM_DEL_LASTSPACE		},
 		{  TEXT("行末文字削除"),					IDM_DEL_LASTLETTER		},
 		{  TEXT("選択範囲を空白にする"),			IDM_FILL_SPACE			},
-/*60*/	{  TEXT("頁全体を空白で埋める"),			IDM_FILL_ZENSP			},
+/*70*/	{  TEXT("頁全体を空白で埋める"),			IDM_FILL_ZENSP			},
 		{  TEXT("行頭半角空白をユニコードに変換"),	IDM_HEADHALF_EXCHANGE	},
 		{  TEXT("右に寄せる"),						IDM_RIGHT_SLIDE			},
 		{  TEXT("１ドット増やす"),					IDM_INCREMENT_DOT		},
 		{  TEXT("１ドット減らす"),					IDM_DECREMENT_DOT		},
-/*65*/	{  TEXT("全体を１ドット右へ"),				IDM_INCR_DOT_LINES		},
+/*75*/	{  TEXT("全体を１ドット右へ"),				IDM_INCR_DOT_LINES		},
 		{  TEXT("全体を１ドット左へ"),				IDM_DECR_DOT_LINES		},
 		{  TEXT("調整基準ロック"),					IDM_DOTDIFF_LOCK		},
 		{  TEXT("カーソル位置で調整"),				IDM_DOTDIFF_ADJT		},
 		{  TEXT("（セパレータ）"),					0						},
-/*70*/	{  TEXT("空白を表示"),	/*表示*/			IDM_SPACE_VIEW_TOGGLE	},
+/*80*/	{  TEXT("空白を表示"),	/*表示*/			IDM_SPACE_VIEW_TOGGLE	},
 		{  TEXT("グリッド線を表示"),				IDM_GRID_VIEW_TOGGLE	},
 		{  TEXT("右ガイド線を表示"),				IDM_RIGHT_RULER_TOGGLE	},
 		{  TEXT("複数行テンプレート"),				IDM_MAATMPLE_VIEW		},
-		{  TEXT("頁一覧"),							IDM_PAGELIST_VIEW		},
-/*75*/	{  TEXT("壱行テンプレート"),				IDM_LINE_TEMPLATE		},
+/*84*/	{  TEXT("頁一覧"),							IDM_PAGELIST_VIEW		},
+/*85*/	{  TEXT("壱行テンプレート"),				IDM_LINE_TEMPLATE		},
 		{  TEXT("塗り潰しブラシ"),					IDM_BRUSH_PALETTE		},
 		{  TEXT("ユニコード表"),					IDM_UNI_PALETTE			},
 		{  TEXT("トレスモード"),					IDM_TRACE_MODE_ON		},
 		{  TEXT("プレビュー"),						IDM_ON_PREVIEW			},
-/*80*/	{  TEXT("ドラフトボードを開く"),			IDM_DRAUGHT_OPEN		},
+/*90*/	{  TEXT("ドラフトボードを開く"),			IDM_DRAUGHT_OPEN		},
 		{  TEXT("サムネイルを表示"),				IDM_MAA_THUMBNAIL_OPEN	},
 		{  TEXT("（セパレータ）"),					0						},
 		{  TEXT("選択範囲をドラフトボードへ"),		IDM_COPY_TO_DRAUGHT		},
-/*84*/	{  TEXT("（セパレータ）"),	0	/*以下、内容固定？の特殊コマンド*/	},
-/*85*/	{  TEXT("選択頁を複製"),					IDM_PAGEL_DUPLICATE		},
+		{  TEXT("（セパレータ）"),	0	/*以下、内容固定？の特殊コマンド*/	},
+/*95*/	{  TEXT("選択頁を複製"),					IDM_PAGEL_DUPLICATE		},
 		{  TEXT("選択頁を削除"),					IDM_PAGEL_DELETE		},
 		{  TEXT("次の頁と統合"),					IDM_PAGEL_COMBINE		},
 		{  TEXT("選択頁の次に新規作成"),			IDM_PAGEL_INSERT		},
 		{  TEXT("末尾に頁を新規作成"),				IDM_PAGEL_ADD			},
-/*90*/	{  TEXT("頁を下へ移動"),					IDM_PAGEL_DOWNSINK		},
+/*100*/	{  TEXT("頁を下へ移動"),					IDM_PAGEL_DOWNSINK		},
 		{  TEXT("頁を上へ移動"),					IDM_PAGEL_UPFLOW		},
 		{  TEXT("頁名称の変更"),					IDM_PAGEL_RENAME		},
 		{  TEXT("トレス画像表示/非表示"),			IDM_TRC_VIEWTOGGLE		},
 		{  TEXT("テンプレグループ切替↑"),			IDM_TMPLT_GROUP_PREV	},
-/*95*/	{  TEXT("テンプレグループ切替↓"),			IDM_TMPLT_GROUP_NEXT	},
+/*105*/	{  TEXT("テンプレグループ切替↓"),			IDM_TMPLT_GROUP_NEXT	},
 		{  TEXT("窓フォーカス切替↑"),				IDM_WINDOW_CHANGE		},
 		{  TEXT("窓フォーカス切替↓"),				IDM_WINDOW_CHG_RVRS		},
 		{  TEXT("ファイルを閉じる"),				IDM_FILE_CLOSE			},
 		{  TEXT("ファイル切替↑"),					IDM_FILE_PREV			},
-/*100*/	{  TEXT("ファイル切替↓"),					IDM_FILE_NEXT			},
+/*110*/	{  TEXT("ファイル切替↓"),					IDM_FILE_NEXT			},
 		{  TEXT("前の頁へ移動"),					IDM_PAGE_PREV			},
 		{  TEXT("次の頁へ移動"),					IDM_PAGE_NEXT			},
 		{  TEXT("テンプレグリッド増加"),			IDM_TMPL_GRID_INCREASE	},
 		{  TEXT("テンプレグリッド減少"),			IDM_TMPL_GRID_DECREASE	},
-/*105*/	{  TEXT("表示画面再描画"),					IDM_NOW_PAGE_REFRESH	},
+/*115*/	{  TEXT("表示画面再描画"),					IDM_NOW_PAGE_REFRESH	},
 		{  TEXT("（未実装）文字列検索"),			IDM_FIND_DLG_OPEN		},
 		{  TEXT("（未実装）検索ハイライト解除"),	IDM_FIND_HIGHLIGHT_OFF	},
 		{  TEXT("（未実装）次の検索位置"),			IDM_FIND_JUMP_NEXT		},
 		{  TEXT("（未実装）前の検索位置"),			IDM_FIND_JUMP_PREV		},
-/*110*/	{  TEXT("（未実装）新しい文字列を検索"),	IDM_FIND_TARGET_SET		},
+/*120*/	{  TEXT("（未実装）新しい文字列を検索"),	IDM_FIND_TARGET_SET		},
 		{  TEXT("（セパレータ）"),					0						}
 };
-#define ALL_ITEMS	84	//	右クリ用　０インデックス
-#define FULL_ITEMS	112	//	全アイテム
+#define ALL_ITEMS	94	//	右クリ用　０インデックス
+#define FULL_ITEMS	122	//	全アイテム
 
 //	サブ展開するアイテムに注意セヨ・コンテキストメニューとアクセルキー
 
@@ -1048,7 +1057,7 @@ LPACCEL AccelKeyTableLoadAlloc( LPINT piEntry )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	アクセルキー編集のリストビュー初期化
+	キーバインドを参照して、文字列を作る
 	@param[in]	pstAccel	アクセラキーテーブル
 	@param[in]	ptBuffer	文字列入れるバッファのポインター
 	@param[in]	cchSize		バッファの文字数
@@ -1598,5 +1607,71 @@ HRESULT AccelKeyBindListMod( HWND hDlg, INT iItem, LPACCEL pstAccel, list<ACCEL>
 }
 //-------------------------------------------------------------------------------------------------
 
+/*!
+	メニュー文字列に、アクセラーキー名称を割り当てていく
+	@param[in]	hWnd		メニューのあるウインドウハンドル
+	@param[in]	pstAccel	内容テーブル・無い時はNULL
+	@param[in]	iEntry		テーブルのエントリ数
+	@return		HRESULT		終了状態コード
+*/
+HRESULT AccelKeyMenuRewrite( HWND hWnd, LPACCEL pstAccel, CONST INT iEntry )
+{
+	HMENU		hMenu;
+	WORD		dCmd;
+	INT			i, j, iRslt;
+	UINT_PTR	d, cchSz;
+	BOOLEAN		bModify;
+	TCHAR		atBuffer[MAX_STRING], atBind[SUB_STRING];
+
+	hMenu = GetMenu( hWnd );
+
+	for( i = 0; FULL_ITEMS > i; i++ )
+	{
+		//	関係無いやつは飛ばす
+		if( 0 == gstContextItem[i].dCommandoID )	continue;
+
+		dCmd = gstContextItem[i].dCommandoID;	//	基本的にこれでヒットするはず
+		ZeroMemory( atBuffer, sizeof(atBuffer) );
+		iRslt = GetMenuString( hMenu, dCmd, atBuffer, MAX_STRING, MF_BYCOMMAND );
+		if( !(iRslt) )	continue;
+
+		bModify = FALSE;
+
+		//	先の内容を破壊する
+		StringCchLength( atBuffer, MAX_STRING, &cchSz );
+		for( d = 0; cchSz > d; d++ )
+		{
+			if( TEXT('\t') == atBuffer[d] )
+			{
+				atBuffer[d] = 0;
+				bModify = TRUE;
+				break;
+			}
+		}
+
+		//	このコマンドのエントリーはあるか
+		for( j = 0; iEntry > j; j++ )
+		{
+			if( dCmd == pstAccel[j].cmd )	//	あったら作成
+			{
+				ZeroMemory( atBind, sizeof(atBind) );
+				AccelKeyBindString( &(pstAccel[j]), atBind, SUB_STRING );
+
+				StringCchCat( atBuffer, MAX_STRING, TEXT("\t") );
+				StringCchCat( atBuffer, MAX_STRING, atBind );
+
+				bModify = TRUE;
+				break;
+			}
+		}
+
+		if( bModify ){	ModifyMenu( hMenu, dCmd, MF_BYCOMMAND | MFT_STRING, dCmd, atBuffer );	}
+	}
+
+	DrawMenuBar( hWnd );
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
 
 #endif

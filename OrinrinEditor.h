@@ -152,13 +152,18 @@ typedef list<OPENHIST>::iterator	OPHIS_ITR;
 #ifndef _ORRVW
 
 //	枠パーツデータ	20120105	複数行に向けて調整
+#ifdef FRAME_MLINE
+#define PARTS_CCH	130
+#else
 #define PARTS_CCH	32
+#endif
 typedef struct tagFRAMEITEM
 {
 	TCHAR	atParts[PARTS_CCH];	//!<	パーツ文字列・９字まで
 	INT		dDot;	//!<	横幅ドット数
 #ifdef FRAME_MLINE
 	INT		iLine;	//!<	使用行数
+	INT		iNowLn;	//!<	使用行番号・配置時に使う
 #endif
 } FRAMEITEM, *LPFRAMEITEM;
 //----------------
@@ -178,6 +183,8 @@ typedef struct tagFRAMEINFO
 
 	INT		dLeftOffset;	//!<	左壁の配置オフセット・０は左上の始点
 	INT		dRightOffset;	//!<	右壁の配置オフセット・０は右上の始点
+
+	UINT	dRestPadd;		//!<	あまりを埋めるかどうか・
 
 } FRAMEINFO, *LPFRAMEINFO;
 //-----------------------------
@@ -408,6 +415,8 @@ HRESULT		ViewingFontGet( LPLOGFONT );	//!<
 #ifndef _ORRVW
 BOOLEAN		MaaViewToggle( UINT );
 
+UINT		UnicodeUseToggle( LPVOID );
+
 LPSTR		SjisEncodeAlloc( LPCTSTR );
 
 ATOM		InitWndwClass( HINSTANCE );
@@ -439,6 +448,7 @@ HRESULT		AccelKeyDlgOpen( HWND );
 HACCEL		AccelKeyHandleGet( HINSTANCE );
 
 HACCEL		AccelKeyTableCreate( LPACCEL, INT );
+HRESULT		AccelKeyMenuRewrite( HWND, LPACCEL, CONST INT );
 #endif
 
 #ifdef OPEN_HISTORY
@@ -528,10 +538,11 @@ INT			ViewAreaSizeGet( PINT );
 
 HRESULT		ViewSelPositionSet( LPVOID );	//!<	
 HRESULT		ViewSelMoveCheck( UINT );		//!<	
-HRESULT		ViewSelRangeCheck( UINT );		//!<	
+UINT		ViewSelRangeCheck( UINT );		//!<	
 UINT		ViewSelBackCheck( INT );		//!<	
 INT			ViewSelPageAll( INT );			//!<	
 UINT		ViewSqSelModeToggle( UINT, LPVOID );	//!<	
+HRESULT		ViewSelAreaSelect( LPVOID );	//!<	
 
 INT			ViewInsertUniSpace( UINT );
 INT			ViewInsertColourTag( UINT );
@@ -559,7 +570,7 @@ VOID		PageListResize( HWND, LPRECT );
 HRESULT		PageListClear( VOID );
 HRESULT		PageListInsert( INT );
 HRESULT		PageListDelete( INT );
-HRESULT		PageListViewChange( INT );
+HRESULT		PageListViewChange( INT, INT );
 HRESULT		PageListInfoSet( INT, INT, INT );
 HRESULT		PageListNameSet( INT, LPTSTR );
 INT			PageListIsNamed( FILES_ITR );
@@ -590,7 +601,7 @@ HRESULT		UserDefSetString( vector<ONELINE> *, LPTSTR, UINT );	//!<
 HRESULT		FrameNameModifyMenu( HWND );
 
 VOID		PreviewInitialise( HINSTANCE, HWND );
-HRESULT		PreviewVisibalise( INT );
+HRESULT		PreviewVisibalise( INT, BOOLEAN );
 
 INT			TraceInitialise( HWND, UINT );
 HRESULT		TraceDialogueOpen( HINSTANCE, HWND );
@@ -681,6 +692,7 @@ INT			DocLetterPosGetAdjust( PINT, INT, INT );
 
 HRESULT		DocReturnSelStateToggle( INT, INT );
 INT			DocRangeSelStateToggle( INT, INT, INT, INT );
+UINT		DocLetterSelStateGet( INT, INT );
 INT			DocPageSelStateToggle( INT );
 HRESULT		DocSelRangeSet( INT, INT );
 HRESULT		DocSelRangeGet( PINT, PINT );
@@ -696,7 +708,7 @@ LPSTR		DocPageTextPreviewAlloc( INT, PINT );
 
 HRESULT		DocThreadDropCopy( VOID );
 
-INT			DocSelectedDelete( PINT, PINT, UINT );
+INT			DocSelectedDelete( PINT, PINT, UINT, BOOLEAN );
 INT			DocSelectedBrushFilling( LPTSTR, PINT, PINT );
 INT			DocSelectTextGetAlloc( UINT, LPVOID *, LPPOINT * );
 
@@ -720,7 +732,7 @@ INT			DocSpaceShiftProc( UINT, PINT, INT );
 LPTSTR		DocPaddingSpaceMake( INT );
 LPTSTR		DocPaddingSpaceUni( INT, PINT, PINT, PINT );
 LPTSTR		DocPaddingSpaceWithGap( INT, PINT, PINT );
-LPTSTR		DocPaddingSpaceWithPeriod( INT, PINT, PINT, PINT, BOOLEAN );
+//LPTSTR		DocPaddingSpaceWithPeriod( INT, PINT, PINT, PINT, BOOLEAN );
 HRESULT		DocLastSpaceErase( PINT, INT );
 HRESULT		DocTopLetterInsert( TCHAR, PINT, INT );
 HRESULT		DocLastLetterErase( PINT, INT );

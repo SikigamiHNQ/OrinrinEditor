@@ -54,12 +54,12 @@ typedef list<LAYERBOXSTRUCT>::iterator	LAYER_ITR;
 
 #define TB_ITEMS	6
 static  TBBUTTON	gstTBInfo[] = {
-	{ 0,	IDM_LYB_INSERT,		TBSTATE_ENABLED,	TBSTYLE_BUTTON | TBSTYLE_AUTOSIZE,	0,	0  },	//	挿入
-	{ 1,	IDM_LYB_OVERRIDE,	TBSTATE_ENABLED,	TBSTYLE_BUTTON | TBSTYLE_AUTOSIZE,	0,	0  },	//	上書
-	{ 0,	0,					TBSTATE_ENABLED,	TBSTYLE_SEP,						0,	0  },
-	{ 2,	IDM_LYB_COPY,		TBSTATE_ENABLED,	TBSTYLE_BUTTON | TBSTYLE_AUTOSIZE,	0,	0  },	//	コピー
-	{ 0,	0,					TBSTATE_ENABLED,	TBSTYLE_SEP,						0,	0  },
-	{ 3,	IDM_LYB_DO_EDIT,	TBSTATE_ENABLED,	TBSTYLE_BUTTON | TBSTYLE_CHECK | TBSTYLE_AUTOSIZE,	0,	0  }	//	編集ボックスON/OFF
+	{ 0,	IDM_LYB_INSERT,		TBSTATE_ENABLED,	TBSTYLE_BUTTON | TBSTYLE_AUTOSIZE,	{0, 0}, 0, 0  },	//	挿入
+	{ 1,	IDM_LYB_OVERRIDE,	TBSTATE_ENABLED,	TBSTYLE_BUTTON | TBSTYLE_AUTOSIZE,	{0, 0}, 0, 0  },	//	上書
+	{ 0,	0,					TBSTATE_ENABLED,	TBSTYLE_SEP,						{0, 0}, 0, 0  },
+	{ 2,	IDM_LYB_COPY,		TBSTATE_ENABLED,	TBSTYLE_BUTTON | TBSTYLE_AUTOSIZE,	{0, 0}, 0, 0  },	//	コピー
+	{ 0,	0,					TBSTATE_ENABLED,	TBSTYLE_SEP,						{0, 0}, 0, 0  },
+	{ 3,	IDM_LYB_DO_EDIT,	TBSTATE_ENABLED,	TBSTYLE_BUTTON | TBSTYLE_CHECK | TBSTYLE_AUTOSIZE,	{0, 0}, 0, 0  } 	//	編集ボックスON/OFF
 
 };	//	
 //-------------------------------------------------------------------------------------------------
@@ -1796,10 +1796,13 @@ HRESULT LayerContentsImportable( HWND hWnd, UINT cmdID, LPINT pXdot, LPINT pYlin
 				if( 0 < iDivid )	//	行末端より後にきてる
 				{
 					xDot = iSrcDot;
-					ptBuffer = DocPaddingSpaceWithPeriod( iDivid, NULL, NULL, NULL, TRUE );
+					ptBuffer = DocPaddingSpaceMake( iDivid );// DocPaddingSpaceWithPeriod( iDivid, NULL, NULL, NULL, TRUE );
 					//	行末端からレイヤ内オブジェクトまでを埋める空白
-					DocInsertString( &xDot, &dWkLine, NULL, ptBuffer, dStyle, bFirst );	bFirst = FALSE;
-					FREE(ptBuffer);
+					if( ptBuffer )
+					{
+						DocInsertString( &xDot, &dWkLine, NULL, ptBuffer, dStyle, bFirst );	bFirst = FALSE;
+						FREE(ptBuffer);
+					}
 				}
 				else if( 0 > iDivid )	//	既存の文字列のほうが長い場合
 				{
@@ -1844,9 +1847,12 @@ HRESULT LayerContentsImportable( HWND hWnd, UINT cmdID, LPINT pXdot, LPINT pYlin
 						{
 							dInBgn  = xDot;
 							//	レイヤ内オブジェクト末端から元絵の開始位置までを埋める数ドットの空白
-							ptBuffer = DocPaddingSpaceWithPeriod( dGap, NULL, NULL, NULL, TRUE );
-							DocInsertString( &dInBgn, &dWkLine, NULL, ptBuffer, dStyle, bFirst );	bFirst = FALSE;
-							FREE(ptBuffer);
+							ptBuffer = DocPaddingSpaceMake( dGap );//DocPaddingSpaceWithPeriod( dGap, NULL, NULL, NULL, TRUE );
+							if( ptBuffer )
+							{
+								DocInsertString( &dInBgn, &dWkLine, NULL, ptBuffer, dStyle, bFirst );	bFirst = FALSE;
+								FREE(ptBuffer);
+							}
 						}
 					}
 
@@ -1864,10 +1870,13 @@ HRESULT LayerContentsImportable( HWND hWnd, UINT cmdID, LPINT pXdot, LPINT pYlin
 						dLeft = xDot;
 					}
 
-					ptBuffer = DocPaddingSpaceWithPeriod( dGap, NULL, NULL, NULL, TRUE );
-					//	行末端からレイヤ内オブジェクトまでを埋める空白
-					DocInsertString( &dLeft, &dWkLine, NULL, ptBuffer, dStyle, bFirst );	bFirst = FALSE;
-					FREE(ptBuffer);
+					ptBuffer = DocPaddingSpaceMake( dGap );//DocPaddingSpaceWithPeriod( dGap, NULL, NULL, NULL, TRUE );
+					if( ptBuffer )
+					{
+						//	行末端からレイヤ内オブジェクトまでを埋める空白
+						DocInsertString( &dLeft, &dWkLine, NULL, ptBuffer, dStyle, bFirst );	bFirst = FALSE;
+						FREE(ptBuffer);
+					}
 
 					xDot = dLeft;	//	挿入位置であるように
 				}

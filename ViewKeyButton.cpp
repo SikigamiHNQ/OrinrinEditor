@@ -60,6 +60,11 @@ EXTERNED UINT	gbBrushMode;	//!<	非零ブラシモード
 static TCHAR	gatBrushPtn[SUB_STRING];	//!<	ブラシパヤーン
 
 static  UINT	gdSqFillCnt;	//!<	矩形選択を、IME文字列で塗りつぶした時の文字数
+
+static  UINT	gbLDoubleClick;	//!<	ダブルクルックした
+
+static POINT	gstLClicken;	//!<	左クルックした位置
+static  UINT	gbDragMoved;	//!<	選択範囲をドラッグで移動しようとしている
 //-------------------------------------------------------------------------------------------------
 
 HRESULT	ViewBrushFilling( VOID );
@@ -152,7 +157,7 @@ VOID Evw_OnKey( HWND hWnd, UINT vk, BOOL fDown, INT cRepeat, UINT flags )
 				iLines = DocPageParamGet( NULL, NULL );
 				if( bSelect )	//	選択状態なら、そこだけ削除する
 				{
-					bCrLf = DocSelectedDelete( &gdDocXdot , &gdDocLine, bSqSel );
+					bCrLf = DocSelectedDelete( &gdDocXdot , &gdDocLine, bSqSel, TRUE );
 				}
 				else
 				{
@@ -271,7 +276,7 @@ VOID Evw_OnChar( HWND hWnd, TCHAR ch, INT cRepeat )
 			{
 				if( bSelect )	//	選択状態で有る場合・削除
 				{
-					bCrLf = DocSelectedDelete( &gdDocXdot , &gdDocLine, bSqSel );
+					bCrLf = DocSelectedDelete( &gdDocXdot , &gdDocLine, bSqSel, TRUE );
 				}
 
 				DocCrLfAdd( gdDocXdot , gdDocLine, TRUE );
@@ -292,7 +297,7 @@ VOID Evw_OnChar( HWND hWnd, TCHAR ch, INT cRepeat )
 			iLines = DocPageParamGet( NULL, NULL );
 			if( bSelect )	//	選択状態なら、そこだけ削除する
 			{
-				bCrLf = DocSelectedDelete( &gdDocXdot , &gdDocLine, bSqSel );
+				bCrLf = DocSelectedDelete( &gdDocXdot , &gdDocLine, bSqSel, TRUE );
 			}
 			else
 			{
@@ -332,7 +337,7 @@ VOID Evw_OnChar( HWND hWnd, TCHAR ch, INT cRepeat )
 			DocPageInfoRenew( -1, 1 );
 			return;
 		}
-		else{	bCrLf = DocSelectedDelete( &gdDocXdot , &gdDocLine, 0 );	}
+		else{	bCrLf = DocSelectedDelete( &gdDocXdot , &gdDocLine, 0, TRUE );	}
 		//	通常選択中なら、一旦その範囲を削除する
 	}
 
@@ -368,6 +373,7 @@ VOID Evw_OnLButtonDown( HWND hWnd, BOOL fDoubleClick, INT x, INT y, UINT keyFlag
 {
 	INT		dX, dY;	//	
 	INT		dDot, dMaxDot, dLine, iMaxLine;	//	
+	UINT	dRslt;
 
 	SetFocus( hWnd );	//	マウスインでフォーカス
 
@@ -389,7 +395,11 @@ VOID Evw_OnLButtonDown( HWND hWnd, BOOL fDoubleClick, INT x, INT y, UINT keyFlag
 	{
 		TRACE( TEXT("マウス左ダブルクルック[%d / %d]%d:%d:%d"), dDot, dLine, gbShiftOn, gbCtrlOn, gbAltOn );
 
+		ViewSelAreaSelect( NULL );
 
+		ViewDrawCaret( gdDocXdot, gdDocLine, 1 );	//	位置移動
+
+		gbLDoubleClick = TRUE;
 		return;	//	これ以降は処理しなくて良いはず
 	}
 
@@ -413,14 +423,22 @@ VOID Evw_OnLButtonDown( HWND hWnd, BOOL fDoubleClick, INT x, INT y, UINT keyFlag
 	gdDocLine = dLine;
 	//	この時点で移動は確定
 
-	//	Upのほうに移動？
-	if( !(gbExtract) )	ViewBrushFilling(  );	//	ブラシする
+	gstLClicken.x = gdDocXdot;
+	gstLClicken.y = gdDocLine;
+
+	//	Upのほうに移動してみる	20120328
+//	if( !(gbExtract) )	ViewBrushFilling(  );	//	ブラシする
 	//	抽出モード中は処理しない
 
 	gdXmemory = gdDocXdot;
 	ViewDrawCaret( gdDocXdot, gdDocLine, 1 );	//	位置移動
 
-	ViewSelMoveCheck( FALSE );	//	選択状態で、クルッコだけすると、選択解除
+
+	dRslt = DocLetterSelStateGet( gdDocXdot, gdDocLine );
+	//	TRACE(	TEXT("Sel %d[%u]"), dRslt, gdDocXdot );
+	if( dRslt ){	gbDragMoved = TRUE;	}	//	選択範囲のドラッグ移動の可能性
+	else{	ViewSelMoveCheck( FALSE );	}	//	選択状態で、クルッコだけすると、選択解除
+	//クルックした箇所が選択状態であれば解除しない・非選択エリアならここで解除する
 
 	ViewSelPositionSet( NULL );	//	移動した位置を記録と再描画
 
@@ -486,7 +504,8 @@ VOID Evw_OnMouseMove( HWND hWnd, INT x, INT y, UINT keyFlags )
 
 		ViewDrawCaret( gdDocXdot, gdDocLine, 1 );	//	位置移動
 
-		ViewSelMoveCheck( TRUE );	//	ドラッグ移動は選択モード突入
+		//	ドラッグ移動は選択モード突入・移動に考慮
+		if( !(gbDragMoved) ){	ViewSelMoveCheck( TRUE );	}
 
 		ViewSelPositionSet( NULL );	//	移動した位置を記録
 	}
@@ -507,9 +526,53 @@ VOID Evw_OnMouseMove( HWND hWnd, INT x, INT y, UINT keyFlags )
 */
 VOID Evw_OnLButtonUp( HWND hWnd, INT x, INT y, UINT keyFlags )
 {
+	UINT	dRslt, bSqSel;
+
+	INT		iCrLf;
+	LPTSTR	ptString = NULL;
+	UINT	cbSize;
+
+	TRACE( TEXT("マウス左アップ[%d / %d]"), x, y );
+
+	//	ダブルクルック操作後はすることはない
+	if( gbLDoubleClick ){	gbLDoubleClick =  FALSE;	 return;	}
+
 	ViewSelRangeCheck( FALSE  );	//	とりあえず選択範囲の様子確認
 
-	ReleaseCapture(   );	//	マウスキャプチャ
+	ReleaseCapture(   );	//	マウスキャプチャ解除
+
+	//	Downのほうから	20120328
+	if( !(gbExtract) )	//	抽出モード中は処理しない
+	{
+		ViewBrushFilling(  );	//	ブラシする
+
+		//	最終的にここで解除
+		if( (gstLClicken.x == gdDocXdot) && (gstLClicken.y == gdDocLine) )
+		{
+			ViewSelMoveCheck( FALSE );
+			gbDragMoved = FALSE;
+		}
+
+		if( gbDragMoved )	//	ドラッグ移動完了・ここに移動させる
+		{
+			//	キャレットが選択範囲中なら何もしない
+			dRslt = DocLetterSelStateGet( gdDocXdot, gdDocLine );
+			if( !(dRslt)  )
+			{
+				IsSelecting( &bSqSel );	//	矩形であるか
+				//選択範囲をコピペしてから。内部処理なのでユニコードでよろし
+				cbSize = DocSelectTextGetAlloc( D_UNI | bSqSel, (LPVOID *)(&ptString), NULL );
+				iCrLf = DocInsertString( &gdDocXdot, &gdDocLine, NULL, ptString, bSqSel, TRUE );
+				FREE( ptString );
+				//	選択範囲を削除する
+				iCrLf = DocSelectedDelete( &gdDocXdot, &gdDocLine, bSqSel, FALSE );
+				//REDRAW指示
+				ViewRedrawSetLine( -1 );	//	範囲不明なので全画面書換
+			}
+			gbDragMoved = FALSE;
+		}
+	}
+	
 
 	return;
 }
@@ -690,6 +753,7 @@ HRESULT ViewScriptedLineFeed( VOID )
 	{
 		gdDocXdot = iTgtDot;	//	とりやえず合わせる
 		DocLetterPosGetAdjust( &gdDocXdot, gdDocLine, 0 );	//	Caret位置調整
+		ViewDrawCaret( gdDocXdot, gdDocLine, 1 );	//	位置移動
 	}
 	else
 	{

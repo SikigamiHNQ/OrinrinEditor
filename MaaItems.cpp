@@ -105,7 +105,6 @@ VOID	Aai_OnContextMenu( HWND, HWND, UINT, UINT );		//!<
 VOID	Aai_OnDropFiles( HWND , HDROP );					//!<	
 
 HRESULT	AaItemsFavDelete( LPSTR, UINT );	//!<	
-UINT	AaItemsDoSelect( HWND, UINT );		//!<	
 
 LRESULT	CALLBACK gpfAaItemsProc( HWND, UINT, WPARAM, LPARAM );		//!<	
 LRESULT	CALLBACK gpfAaTitleCbxProc( HWND, UINT, WPARAM, LPARAM );	//!<	
@@ -599,7 +598,7 @@ VOID Aai_OnMouseMove( HWND hWnd, INT x, INT y, UINT keyFlags )
 */
 VOID Aai_OnLButtonUp( HWND hWnd, INT x, INT y, UINT keyFlags )
 {
-	AaItemsDoSelect( hWnd, MAA_DEFAULT );
+	AaItemsDoSelect( hWnd, MAA_DEFAULT, TRUE );
 
 	return;
 }
@@ -615,7 +614,7 @@ VOID Aai_OnLButtonUp( HWND hWnd, INT x, INT y, UINT keyFlags )
 */
 VOID Aai_OnMButtonUp( HWND hWnd, INT x, INT y, UINT keyFlags )
 {
-	AaItemsDoSelect( hWnd, MAA_SUBDEFAULT );
+	AaItemsDoSelect( hWnd, MAA_SUBDEFAULT, TRUE );
 
 	return;
 }
@@ -790,14 +789,14 @@ VOID Aai_OnContextMenu( HWND hWnd, HWND hWndContext, UINT xPos, UINT yPos )
 			break;
 
 #ifndef _ORRVW
-		case IDM_MAA_INSERT_EDIT:		AaItemsDoSelect( hWnd, MAA_INSERT );	break;
-		case IDM_MAA_INTERRUPT_EDIT:	AaItemsDoSelect( hWnd, MAA_INTERRUPT );	break;
-		case IDM_MAA_SET_LAYERBOX:		AaItemsDoSelect( hWnd, MAA_LAYERED );	break;
+		case IDM_MAA_INSERT_EDIT:		AaItemsDoSelect( hWnd, MAA_INSERT,   TRUE );	break;
+		case IDM_MAA_INTERRUPT_EDIT:	AaItemsDoSelect( hWnd, MAA_INTERRUPT, TRUE );	break;
+		case IDM_MAA_SET_LAYERBOX:		AaItemsDoSelect( hWnd, MAA_LAYERED,  TRUE );	break;
 #endif
-		case IDM_MAA_CLIP_UNICODE:		AaItemsDoSelect( hWnd, MAA_UNICLIP );	break;
-		case IDM_MAA_CLIP_SHIFTJIS:		AaItemsDoSelect( hWnd, MAA_SJISCLIP );	break;
+		case IDM_MAA_CLIP_UNICODE:		AaItemsDoSelect( hWnd, MAA_UNICLIP,  TRUE );	break;
+		case IDM_MAA_CLIP_SHIFTJIS:		AaItemsDoSelect( hWnd, MAA_SJISCLIP, TRUE );	break;
 
-		case IDM_DRAUGHT_ADDING:		AaItemsDoSelect( hWnd, MAA_DRAUGHT );	break;
+		case IDM_DRAUGHT_ADDING:		AaItemsDoSelect( hWnd, MAA_DRAUGHT,  TRUE );	break;
 #ifdef _ORRVW
 		case IDM_DRAUGHT_OPEN:			Maa_OnCommand( hWnd, IDM_DRAUGHT_OPEN, NULL, 0 );	break;
 #endif
@@ -964,20 +963,23 @@ UINT AaItemsIsUnderCursor( HWND hWnd, HWND hChdWnd, INT zDelta )
 }
 //-------------------------------------------------------------------------------------------------
 
-
 /*!
-	現在カーソル下にあるAAを使う処理
+	ターゲットしているAAを使う処理
 	@param[in]	hWnd	多分AA一覧のウインドウハンドル
 	@param[in]	dMode	使用モードもしくはデフォで
+	@param[in]	dDirct	非０マウス直下ので　０表示トップので
 	@return		UINT	非０ＡＡとった　０ＡＡ無かった
 */
-UINT AaItemsDoSelect( HWND hWnd, UINT dMode )
+UINT AaItemsDoSelect( HWND hWnd, UINT dMode, UINT dDirct )
 {
 	LPSTR		pcConts = NULL;
 	UINT		uRslt;
 	UINT_PTR	rdLength;
 
-	pcConts = AacAsciiArtGet( gixNowSel );	//	該当するインデックスAAを引っ張ってくる
+	//	該当するインデックスAAを引っ張ってくる
+	if( dDirct ){	pcConts = AacAsciiArtGet( gixNowSel );	}
+	else{			pcConts = AacAsciiArtGet( gixTopItem );	}
+
 	if( !pcConts  ){	return 0;	}
 
 	rdLength = strlen( pcConts );	//	文字列の長さ取得

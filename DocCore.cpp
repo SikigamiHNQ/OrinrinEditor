@@ -243,7 +243,7 @@ HRESULT DocMultiFileSelect( LPARAM uqNumber )
 
 	DocCaretPosMemory( INIT_LOAD, &stCaret );	//	先に読み出さないと次でクルヤーされる
 
-	PageListViewChange( gixFocusPage );	//	全部読み込んだのでラストページを表示する
+	PageListViewChange( gixFocusPage,  -1 );	//	全部読み込んだのでラストページを表示する
 
 	ViewPosResetCaret( stCaret.x, stCaret.y );	//	Caret位置再設定
 
@@ -686,6 +686,7 @@ LPARAM DocFileInflate( LPTSTR ptFileName )
 	FREE( pBuffer );	//	＝ptString
 
 	DocPageChange( 0  );	//	全部読み込んだので最初のページを表示する
+	PageListViewChange( -1, -1 );	//	直前頁リセット
 
 	AppTitleChange( ptFileName );
 
@@ -1119,6 +1120,8 @@ HRESULT DocPageDelete( INT iPage )
 */
 HRESULT DocPageChange( INT dPageNum )
 {
+	INT	iPrePage;
+
 	//	今の表示内容破棄とかいろいろある
 #ifdef DO_TRY_CATCH
 	try{
@@ -1126,11 +1129,12 @@ HRESULT DocPageChange( INT dPageNum )
 
 	ViewSelPageAll( -1 );	//	範囲選択を破棄
 
+	iPrePage = gixFocusPage;
 	gixFocusPage = dPageNum;	//	先に変更して
 
 	(*gitFileIt).dNowPage = dPageNum;	//	記録
 
-	PageListViewChange( dPageNum );
+	PageListViewChange( dPageNum, iPrePage );
 
 #ifdef DO_TRY_CATCH
 	}

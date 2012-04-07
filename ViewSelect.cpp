@@ -24,17 +24,17 @@ If not, see <http://www.gnu.org/licenses/>.
 //	TODO:	ALT押しながらカーソル、マウス動かしたらそのときだけ矩形選択になるようにする
 
 
-extern  HWND	ghPrntWnd;		//!<	親ウインドウハンドル
-extern  HWND	ghViewWnd;		//!<	このウインドウのハンドル
+extern  HWND	ghPrntWnd;		//	親ウインドウハンドル
+extern  HWND	ghViewWnd;		//	このウインドウのハンドル
 
-extern INT		gdDocXdot;		//!<	キャレットのＸドット・ドキュメント位置
-extern INT		gdDocLine;		//!<	キャレットのＹ行数・ドキュメント位置
+extern INT		gdDocXdot;		//	キャレットのＸドット・ドキュメント位置
+extern INT		gdDocLine;		//	キャレットのＹ行数・ドキュメント位置
 
 //	画面サイズを確認して、移動によるスクロールの面倒みる
-extern INT		gdHideXdot;		//!<	左の隠れ部分
-extern INT		gdViewTopLine;	//!<	表示中の最上部行番号
-extern SIZE		gstViewArea;	//!<	表示領域のサイズ・ルーラー等の領域は無し
-extern INT		gdDispingLine;	//!<	見えてる行数・中途半端に見えてる末端は含まない
+extern INT		gdHideXdot;		//	左の隠れ部分
+extern INT		gdViewTopLine;	//	表示中の最上部行番号
+extern SIZE		gstViewArea;	//	表示領域のサイズ・ルーラー等の領域は無し
+extern INT		gdDispingLine;	//	見えてる行数・中途半端に見えてる末端は含まない
 
 //	これらのキーの具合は、GetKeyStateもしくはGetKeyboardStateを使えばいい
 extern BOOLEAN	gbShiftOn;		//	シフトが押されている
@@ -65,6 +65,7 @@ HRESULT	ViewSqSelAdjust( INT );
 
 /*!
 	選択操作中であるかどうかの問い合わせ
+	@param[out]	pSqSel	矩形選択中であるかどうか
 	@return	BOOLEAN	非０選択中である　０選択してない
 */
 BOOLEAN IsSelecting( PUINT pSqSel )
@@ -151,9 +152,9 @@ UINT ViewSqSelModeToggle( UINT bMode, LPVOID pVoid )
 /*!
 	選択範囲確認して、始点終点同じだったら解除する
 	@param[in]	dMode	零：特に考慮なし　非零：選択開始強制モード・でも使ってない
-	@return	HRESULT		終了状態コード
+	@return	非０始点終点が異なる　０同じ
 */
-HRESULT ViewSelRangeCheck( UINT dMode )
+UINT ViewSelRangeCheck( UINT dMode )
 {
 
 	//	始点終点が同じ位置＝何も選択していない
@@ -176,9 +177,11 @@ HRESULT ViewSelRangeCheck( UINT dMode )
 		gstSelBgnOrig.y = -1;
 		gstSelEndOrig.x = -1;
 		gstSelEndOrig.y = -1;
+
+		return 0;
 	}
 
-	return S_OK;
+	return 1;
 }
 //-------------------------------------------------------------------------------------------------
 
@@ -484,6 +487,31 @@ HRESULT ViewSqSelAdjust( INT dBaseLine )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	対象行を選択
+	カーソルのある、空白列もしくは文字列を選択状態にする
+	@param[in]	pVoid	なにか
+	@return		HRESULT	終了状態コード
 */
+HRESULT ViewSelAreaSelect( LPVOID pVoid )
+{
+	INT		iBeginDot, iEndDot, iStCnt, iCount;
+	INT		iRangeDot;
+	BOOLEAN	bIsSpase;
+
+	DocPageSelStateToggle(  FALSE );	//	一旦選択状態は解除
+
+	iRangeDot = DocLineStateCheckWithDot( gdDocXdot, gdDocLine, &iBeginDot, &iEndDot, &iStCnt, &iCount, &bIsSpase );
+															//	始点ドット・終点ドット・開始地点の文字数・間の文字数・該当はスペースであるか
+	gdDocXdot = iBeginDot;	//	選択範囲として移動する
+	ViewSelMoveCheck( FALSE );
+	ViewSelPositionSet( NULL );
+
+	//	ドラッグ移動を模擬的に行う
+
+	gdDocXdot = iEndDot;	//	選択範囲として移動する
+	ViewSelMoveCheck( TRUE );
+	ViewSelPositionSet( NULL );	//	移動した位置を記録
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
 

@@ -559,6 +559,14 @@
 					>
 				</File>
 				<File
+					RelativePath=".\resource\FramePadding.bmp"
+					>
+				</File>
+				<File
+					RelativePath=".\resource\FramePadding_q.bmp"
+					>
+				</File>
+				<File
 					RelativePath=".\resource\HeadSpaceAdd.bmp"
 					>
 				</File>
@@ -840,6 +848,14 @@
 				</File>
 				<File
 					RelativePath=".\resource\Undo_q.bmp"
+					>
+				</File>
+				<File
+					RelativePath=".\resource\unicode_use.bmp"
+					>
+				</File>
+				<File
+					RelativePath=".\resource\unicode_use_q.bmp"
 					>
 				</File>
 				<File

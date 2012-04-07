@@ -24,11 +24,21 @@ If not, see <http://www.gnu.org/licenses/>.
 
 //	キーバインド・メニューに入ってない機能に注意
 
-//#error ALTによる矩形選択の改造してると、メニューからONにした時の挙動がおかしい
 
-//バグ
+//	複数行枠、編集DIALOGUEのサイズ可変になるようにする・最小サイズだけ注意して、プレビュー連動で
+
+//	枠編集DIALOGUE、オフセットでENTERとか直書換に対応セヨ
+
+//	ユニコードモードの切替、ツールバーにボタン増やす
+
+//	ドッキングテンプレ、左に置けないか
+
+
+//バグ＜影響ないようにした
 //選択範囲がある状態でCtrlU＞アンドゥ＞選択範囲がおかしくなる。さらに切り取りとかすると落ちる
 //アンドゥリドゥしたら、選択範囲解除する・DocInsDelCtrl.cpp:559あたりでおかしい？
+
+
 
 //	TODO:	MLTに右クリからアイテム追加して、そのAAを連続で貼り付けると落ちる
 //	TODO:	追加したAAの最後にステルス空白がある？
@@ -50,7 +60,6 @@ If not, see <http://www.gnu.org/licenses/>.
 //	TODO:	頁の複数選択して移動、Ｄ＆Ｄも
 //	TODO:	CtrlF4で、Viewer側なら副タブ閉じる
 //	TODO:	Viewer側、Ctrl↑↓で、MLTのセクション間移動する
-//	TODO:	Enterでコピー・表示の一番上でいいか
 //	TODO:	履歴から開こうとしたファイル・プロフが無かったらリストから消すべき
 
 //	TODO:	複数行テンプレ窓の主タブでホイールスクロールが効かない？
@@ -61,7 +70,6 @@ If not, see <http://www.gnu.org/licenses/>.
 //	TODO:	デカいファイル開いたら時間かかる（1000コマとか）
 //			逐次読み込みにするとか、先読みしたらvector確保してからいれるとかvectorじゃなくlistにするとか？
 //			壱行毎のサイズ確認して、確保してからブチ込むとか
-//	TODO:	枠挿入したら、右が妙に空く。ユニコ使うときは、調整開けは不要か
 //	TODO:	Viewer、右クリメニューからのドラフトボードが開かない？・追加されない？
 //	TODO:	最大化して終わる＞起動して、最大化解除すると、メインスプリットバーが見えなくなる//右にイッちゃってるまま
 //	TODO:	メインスプリットバーの位置情報リセットが居るかも
@@ -76,12 +84,10 @@ If not, see <http://www.gnu.org/licenses/>.
 //	TODO:	テンプレの「常に最前面に表示」Orinrinediterを表示している時だけ最前面に来るように//もしくは、メイン窓に統合とか
 
 //機能追加
-//	TODO:	MAA窓を非使用するオプショッ
 //	TODO:	MAAのアイテム追加、カーソル位置のAAの手前に入るように
 //	TODO:	選択範囲をマウスドラッグで移動
 //	TODO:	viewerの主タブをマウスとスクロールバーだけでなく、ホウィール、キーボードの矢印やPageUp,PageDnキーで操作出来る様にならない？
 //	TODO:	Viewer側、ポップアップで、容量も出せないか
-//	TODO:	枠機能で、複数行パーツを使いたい
 //	TODO:	右揃え線消し
 
 //	TODO:	使用をファイル出力できるように
@@ -110,7 +116,6 @@ If not, see <http://www.gnu.org/licenses/>.
 //	TODO:	バックアップメッセージ、ステータスバーに出せないか
 //	TODO:	全部保存作る
 //	TODO:	ALT+Nを、頁名称一括編集にする？
-//	TODO:	ダブルクルックでSpaceエリアとかの部分選択
 //	TODO:	ファイルを開き直す機能
 //	TODO:	よく使うユニコードを纏めておけないか、ユーザ定義でいいんじゃね
 //	TODO:	テンプレのコンボックスを、リストボックス型と切り替えられるとか
@@ -156,7 +161,8 @@ If not, see <http://www.gnu.org/licenses/>.
 
 
 //OK?
-//	TODO:	Editor側で、プロファイル使用履歴が動かない
+//	TODO:	Enterでコピー・表示の一番上でいいか
+//	TODO:	Editorのプロファイル使用履歴が動かない
 
 //	TODO:	頁削除のAlt+D付ける。注意ダイヤログ出す。
 //	TODO:	UTF8でもセーブ出来るように・エクスポートでいいか
@@ -166,6 +172,7 @@ If not, see <http://www.gnu.org/licenses/>.
 //	TODO:	サムネからだと使用履歴に反映されない
 //	TODO:	IEプレビュー、CSSでフォント表示を正規化する http://b4t.jp/823
 //	TODO:	文字ＡＡの入力とか、レイヤボックスの編集とかで、キーボードショートカット使えるように
+//	TODO:	枠機能で、複数行パーツを使いたい
 
 //	TODO:	未保存で閉じようとしたときのメッセージのYes/Noを逆にしてほしい。
 //			未保存のまま閉じようとした場合の確認は『セーブしますか? Yes（Save)/No/Cancel』だが、Orinrinは『終了していいですか? Yes/No』なのでYesとNoの動作が逆になっていて紛らわしいため。
@@ -376,6 +383,13 @@ ASDファイル　　壱行が壱コンテンツ
 					アクセラキー編集機能を搭載
 					アンドゥリドゥをするときは選択範囲解除するようにした
 					已に開いているファイルを開こうとしたら、そのタブに移るようにした
+2012/04/05	0.30	MAA窓でENTER押したら、そのときトップに見えてるAAを左クリック動作するようにした
+					文字列若しくは空白列でダブルクルックすると、その範囲を選択状態にする
+					選択範囲をドラッグ移動出来るようにした
+					プレビュー開いてたら、保存したときに再描画するようにした
+					枠作成に、複数行使えるようにした
+					枠の個数を２０個保持できるようにした
+					ツールバーに、ユニコード空白の使用／不使用トグルボタンつけた
 
 更新日時注意
 
@@ -437,7 +451,7 @@ static	HACCEL		ghAccelTable;	//!<	キーボードアクセラレータハンドル
 static  HWND		ghFileTabWnd;	//!<	複数ファイルタブ
 static  HWND		ghFileTabTip;	//!<	複数ファイルタブツールチップ
 
-static  HWND		ghMainWnd;		
+static  HWND		ghMainWnd;		//!<	メインウインドウハンドル
 static  HWND		ghStsBarWnd;	//!<	ステータスバー
 
 static HANDLE		ghMutex;		//!<	多重起動防止用Mutex
@@ -857,9 +871,9 @@ BOOL InitInstance( HINSTANCE hInstance, INT nCmdShow, LPTSTR ptArgv )
 
 	ghMaaWnd = MaaTmpltInitialise( hInstance, hWnd, &wnRect );
 
-	//	複数行テンプレ窓の表示・非表示のチェキ
-	MenuItemCheckOnOff( IDM_MAATMPLE_VIEW, MaaViewToggle( 0 ) );
+	MenuItemCheckOnOff( IDM_MAATMPLE_VIEW, MaaViewToggle( 0 ) );	//	複数行テンプレ窓の表示・非表示のチェキ
 
+	MenuItemCheckOnOff( IDM_UNICODE_TOGGLE , gbUniPad );	 //	ユニコードON/OFFのチェキ
 
 	DraughtInitialise( hInstance, hWnd );
 
@@ -931,6 +945,8 @@ HACCEL AccelKeyTableCreate( LPACCEL pstAccel, INT iEntry )
 	}
 
 	ghAccelTable = hAccel;	//	大域変数にいれる・本当はこういうやり方は良くないと思われ
+
+	AccelKeyMenuRewrite( ghMainWnd, pstAccel, iEntry );
 
 	return hAccel;
 }
@@ -2463,6 +2479,8 @@ HRESULT OptionDialogueOpen( VOID )
 		if( 1 <= gdBUInterval )	SetTimer(  ghMainWnd, IDT_BACKUP_TIMER, (gdBUInterval * 60000), NULL );
 	}
 
+	MenuItemCheckOnOff( IDM_UNICODE_TOGGLE , gbUniPad );	 //	ユニコードON/OFFのチェキ
+
 	SqnSetting(   );	//	グループアンドゥのアレ
 
 	if( NULL != atFontName[ 0] )	//	フォント名、なんか入ってたら変更されたと見なす
@@ -2795,6 +2813,19 @@ INT_PTR CALLBACK OptionDlgProc( HWND hDlg, UINT message, WPARAM wParam, LPARAM l
 	}
 
 	return (INT_PTR)FALSE;
+}
+//-------------------------------------------------------------------------------------------------
+
+/*!
+	ユニコード空白の使用・不使用
+*/
+UINT UnicodeUseToggle( LPVOID pVoid )
+{
+	gbUniPad =  !(gbUniPad);	//	トグル
+	InitParamValue( INIT_SAVE, VL_USE_UNICODE, gbUniPad );
+	MenuItemCheckOnOff( IDM_UNICODE_TOGGLE, gbUniPad );
+
+	return gbUniPad;
 }
 //-------------------------------------------------------------------------------------------------
 

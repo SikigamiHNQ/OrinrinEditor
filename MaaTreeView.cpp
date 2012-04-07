@@ -283,7 +283,13 @@ VOID Maa_OnChar( HWND hWnd, TCHAR ch, INT cRepeat )
 
 	TRACE( TEXT("CHAR[%04X][%d]"), ch, bShift );
 
-	if( VK_TAB != ch )	return;
+	if( VK_RETURN == ch )	//	エンター押されたら
+	{
+		AaItemsDoSelect( hWnd, MAA_DEFAULT, FALSE );
+		return;
+	}
+
+	if( VK_TAB != ch ){	return;	}	//	タブ以外は何も無い
 
 	iTabs = TabCtrl_GetItemCount( ghTabWnd );
 
@@ -417,7 +423,9 @@ VOID Maa_OnContextMenu( HWND hWnd, HWND hWndContext, UINT xPos, UINT yPos )
 
 #ifdef OPEN_PROFILE
 		//	プロフ履歴入替
-		ModifyMenu( hSubMenu, IDM_OPEN_HISTORY, MF_BYCOMMAND | MF_POPUP, (UINT_PTR)ghProfHisMenu, TEXT("ファイル使用履歴(&H)") );
+	//	ModifyMenu( hSubMenu, IDM_OPEN_HISTORY, MF_BYCOMMAND | MF_POPUP, (UINT_PTR)ghProfHisMenu, TEXT("ファイル使用履歴(&H)") );
+		ModifyMenu( hSubMenu, 2, MF_BYPOSITION | MF_POPUP, (UINT_PTR)ghProfHisMenu, TEXT("ファイル使用履歴(&H)") );
+		//	ポップアップへの変更は、Position指定でないと出来ない？
 #endif
 
 		//	右クリではノード選択されないようだ

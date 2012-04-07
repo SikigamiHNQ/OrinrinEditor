@@ -83,6 +83,52 @@ VOID DocSelByteSet( INT iBytes )
 //-------------------------------------------------------------------------------------------------
 
 /*!
+	示されたドット位置の直後の文字の選択状態の確認
+	@param[in]	nowDot	対象のドット位置
+	@param[in]	rdLine	対象の行番号・ドキュメントの０インデックス
+	@return		非０選択状態　０選択してない
+*/
+UINT DocLetterSelStateGet( INT nowDot, INT rdLine )
+{
+	UINT	dStyle;
+	INT		iLetter;
+	INT_PTR	iLines, iLength;
+
+#ifdef LINE_VEC_LIST
+	LINE_ITR	itLine;
+
+	iLines = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.size( );
+#else
+	iLines = (*gitFileIt).vcCont.at( gixFocusPage ).vcPage.size( );
+#endif
+	if( iLines <= rdLine )	return 0;
+
+	iLetter = DocLetterPosGetAdjust( &nowDot, rdLine, 0 );
+
+	//	直後の文字を確認
+#ifdef LINE_VEC_LIST
+	itLine = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.begin();
+	std::advance( itLine, rdLine );
+	if( (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.end() == itLine ){	return 0;	}
+
+	iLength = itLine->vcLine.size();
+	if( iLength <= iLetter )	return 0;
+
+	//	フラグ操作
+	dStyle  = itLine->vcLine.at( iLetter ).mzStyle;
+#else
+	//	フラグ操作
+	dStyle  = (*gitFileIt).vcCont.at( gixFocusPage ).vcPage.at( rdLine ).vcLine.at( iLetter ).mzStyle;
+#endif
+
+	if( dStyle & CT_SELECT )	return 1;
+
+	return 0;
+}
+//-------------------------------------------------------------------------------------------------
+
+
+/*!
 	示されたドット位置の直後の文字の選択状態をON/OFFして、該当文字の幅を返す・単独では呼ばれない？
 	@param[in]	nowDot	対象のドット位置
 	@param[in]	rdLine	対象の行番号・ドキュメントの０インデックス
@@ -93,7 +139,7 @@ INT DocLetterSelStateToggle( INT nowDot, INT rdLine, INT dForce )
 {
 	UINT	dStyle, maeSty;
 	INT		dLtrDot = 0, iLetter, dByte;
-	INT_PTR	iLines;
+	INT_PTR	iLines, iLength;
 
 #ifdef LINE_VEC_LIST
 	LINE_ITR	itLine;
@@ -110,6 +156,10 @@ INT DocLetterSelStateToggle( INT nowDot, INT rdLine, INT dForce )
 #ifdef LINE_VEC_LIST
 	itLine = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.begin();
 	std::advance( itLine, rdLine );
+	if( (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.end() == itLine ){	return 0;	}
+
+	iLength = itLine->vcLine.size();
+	if( iLength <= iLetter )	return 0;
 
 	dLtrDot = itLine->vcLine.at( iLetter ).rdWidth;
 	dByte   = itLine->vcLine.at( iLetter ).mzByte;
@@ -436,9 +486,10 @@ VOID DocSelectedByteStatus( VOID )
 	@param[in]	pdDot	キャレットドット位置・書き換える必要がある
 	@param[in]	pdLine	行番号・書き換える必要がある
 	@param[in]	bSqSel	矩形選択してるのかどうか・D_SQUARE
+	@param[in]	bFirst	アンドゥ用・これが最初のアクションか
 	@return	非０改行あった　０壱行のみ
 */
-INT DocSelectedDelete( PINT pdDot, PINT pdLine, UINT bSqSel )
+INT DocSelectedDelete( PINT pdDot, PINT pdLine, UINT bSqSel, BOOLEAN bFirst )
 {
 //	UINT_PTR	iLines;
 	UINT_PTR	iMozis;
@@ -574,8 +625,8 @@ INT DocSelectedDelete( PINT pdDot, PINT pdLine, UINT bSqSel )
 	//	カーソル位置移動せないかん
 	*pdDot = dBeginX;	*pdLine = dBeginY;
 
-	if( bSqSel ){	SqnAppendSquare( &((*gitFileIt).vcCont.at( gixFocusPage ).stUndoLog), DO_DELETE, ptText, pstPt, iLct, TRUE );	}
-	else{		SqnAppendString( &((*gitFileIt).vcCont.at( gixFocusPage ).stUndoLog), DO_DELETE, ptText, dBeginX, dBeginY, TRUE );	}
+	if( bSqSel ){	SqnAppendSquare( &((*gitFileIt).vcCont.at( gixFocusPage ).stUndoLog), DO_DELETE, ptText, pstPt, iLct , bFirst );	}
+	else{		SqnAppendString( &((*gitFileIt).vcCont.at( gixFocusPage ).stUndoLog), DO_DELETE, ptText, dBeginX, dBeginY, bFirst );	}
 
 	FREE( ptText );
 

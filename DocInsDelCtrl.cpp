@@ -950,9 +950,9 @@ INT DocSquareAddPreMod( INT xDot, INT yLine, INT dNeedLine, BOOLEAN bFirst )
 		if( gbUniPad  ){	if( 0 >= iMinus )	continue;	}
 		else{	if( 3 >= iMinus )	continue;	}	//	—]‚é‚©‚RˆÈ‰º‚È‚ç‹C‚É‚·‚é•K—v‚Í–³‚¢
 
-		ptBuffer = DocPaddingSpaceWithPeriod( iMinus, NULL, NULL, NULL, FALSE );
-		if( !ptBuffer )	//	‚Ü‚¸‚ÍãY—í‚É”[‚ß‚é‚Ì‚ðŽŽ‚Ý‚ÄAƒ_ƒ‚È‚çƒYƒŒ‚ ‚è‚ÅÄŒvŽZ
-		{	ptBuffer = DocPaddingSpaceWithGap( iMinus, NULL, NULL );	}
+		ptBuffer = DocPaddingSpaceMake( iMinus );//DocPaddingSpaceWithPeriod( iMinus, NULL, NULL, NULL, FALSE );
+		//if( !ptBuffer )	//	‚Ü‚¸‚ÍãY—í‚É”[‚ß‚é‚Ì‚ðŽŽ‚Ý‚ÄAƒ_ƒ‚È‚çƒYƒŒ‚ ‚è‚ÅÄŒvŽZ
+		//{	ptBuffer = DocPaddingSpaceWithGap( iMinus, NULL, NULL );	}
 		if( !ptBuffer ){	continue;	}
 		StringCchLength( ptBuffer, STRSAFE_MAX_CCH, &cchBuf );
 
@@ -988,6 +988,8 @@ INT DocInsertString( PINT pNowDot, PINT pdLine, PINT pdMozi, LPTSTR ptText, UINT
 	dBaseDot  = *pNowDot;
 	dBaseLine = *pdLine;
 	dLastLine = *pdLine;
+
+	if( !(ptText)  )	return 0;
 
 	StringCchLength( ptText, STRSAFE_MAX_CCH, &cchSize );
 
@@ -1086,7 +1088,7 @@ INT DocInputFromClipboard( PINT pNowDot, PINT pdLine, PINT pdMozi )
 	{
 		iLines = DocPageParamGet( NULL, NULL );
 		DocSelRangeGet( &dTop, &dBtm );
-		dCrLf = DocSelectedDelete( pNowDot, pdLine, dSqSel );
+		dCrLf = DocSelectedDelete( pNowDot, pdLine, dSqSel, TRUE );
 		if( dCrLf  )	//	ˆ—‚µ‚½sˆÈ~‘SŽæ‚Á‘Ö‚¦
 		{
 			for( i = *pdLine; iLines > i; i++ ){	ViewRedrawSetLine(  i );	}

@@ -30,7 +30,7 @@ If not, see <http://www.gnu.org/licenses/>.
 
 #define TB_ITEMS	1
 static  TBBUTTON	gstBrTBInfo[] = {
-	{ 0,	IDM_BRUSH_ON_OFF,	TBSTATE_ENABLED,	TBSTYLE_CHECK | TBSTYLE_AUTOSIZE,	0,	0  }	//	On/Off
+	{ 0,	IDM_BRUSH_ON_OFF,	TBSTATE_ENABLED,	TBSTYLE_CHECK | TBSTYLE_AUTOSIZE,	{0, 0}, 0, 0 }	//	On/Off
 };	//	
 //-------------------------------------------------------------------------------------------------
 

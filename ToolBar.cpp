@@ -50,84 +50,86 @@ static LRESULT	CALLBACK gpfToolbarProc( HWND, UINT, WPARAM, LPARAM );
 //	ファイル
 #define TB_MAIN_ITEMS	5
 static TBBUTTON gstMainTBInfo[] = {
-	{  0,	IDM_NEWFILE,		TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,	0,	0 },	//	
-	{  1,	IDM_OPEN,			TBSTATE_ENABLED,	TBSTYLE_DROPDOWN | TBSTYLE_AUTOSIZE,	0,	0 },	//	
-	{  2,	IDM_OVERWRITESAVE,	TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,	0,	0 },	//	
-	{  0,	0,					TBSTATE_ENABLED,	TBSTYLE_SEP,		0,	0 },
-	{  3,	IDM_GENERAL_OPTION,	TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,	0,	0 } 	//	
+	{  0,	IDM_NEWFILE,		TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,						{0, 0}, 0, 0  },	//	
+	{  1,	IDM_OPEN,			TBSTATE_ENABLED,	TBSTYLE_DROPDOWN | TBSTYLE_AUTOSIZE,	{0, 0}, 0, 0  },	//	
+	{  2,	IDM_OVERWRITESAVE,	TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,						{0, 0}, 0, 0  },	//	
+	{  0,	0,					TBSTATE_ENABLED,	TBSTYLE_SEP,							{0, 0}, 0, 0  },
+	{  3,	IDM_GENERAL_OPTION,	TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,						{0, 0}, 0, 0  } 	//	
 };	//	内容変更したら、ツールバー文字列の設定とかも変更セヨ
 
 //	編集
-#define TB_EDIT_ITEMS	19
+#define TB_EDIT_ITEMS	21
 static TBBUTTON gstEditTBInfo[] = {
-	{  0,	IDM_UNDO,			TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,	0,	0 },	//	アンドゥ
-	{  1,	IDM_REDO,			TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,	0,	0 },	//	リドゥ
-	{  0,	0,					TBSTATE_ENABLED,	TBSTYLE_SEP,		0,	0 },
-	{  2,	IDM_CUT,			TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,	0,	0 },	//	切り取り
-	{  3,	IDM_COPY,			TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,	0,	0 },	//	コピー
-	{  4,	IDM_PASTE,			TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,	0,	0 },	//	貼付
-	{  5,	IDM_DELETE,			TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,	0,	0 },	//	削除
-	{  0,	0,					TBSTATE_ENABLED,	TBSTYLE_SEP,		0,	0 },
-	{  6,	IDM_SJISCOPY,		TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,	0,	0 },	//	ＳＪＩＳコピー
-	{  7,	IDM_SJISCOPY_ALL,	TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,	0,	0 },	//	頁全体SJISコピー
-	{  0,	0,					TBSTATE_ENABLED,	TBSTYLE_SEP,		0,	0 },
-	{  8,	IDM_ALLSEL,			TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,	0,	0 },	//	全選択
-	{  9,	IDM_SQSELECT,		TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,	0,	0 },	//	矩形選択
-	{  0,	0,					TBSTATE_ENABLED,	TBSTYLE_SEP,		0,	0 },
-	{ 10,	IDM_LAYERBOX,		TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,	0,	0 },	//	レイヤボックス起動
-	{  0,	0,					TBSTATE_ENABLED,	TBSTYLE_SEP,		0,	0 },
-	{ 11,	IDM_PAGEL_DIVIDE,	TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,	0,	0 },	//	ページ分割
-	{  0,	0,					TBSTATE_ENABLED,	TBSTYLE_SEP,		0,	0 },
-	{ 12,	IDM_EXTRACTION_MODE,TBSTATE_ENABLED,	TBSTYLE_CHECK | TBSTYLE_AUTOSIZE,	0,	0 }	//	抽出モード
+	{  0,	IDM_UNDO,			TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,					{0, 0}, 0, 0  },	//	アンドゥ
+	{  1,	IDM_REDO,			TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,					{0, 0}, 0, 0  },	//	リドゥ
+	{  0,	0,					TBSTATE_ENABLED,	TBSTYLE_SEP,						{0, 0}, 0, 0  },
+	{  2,	IDM_CUT,			TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,					{0, 0}, 0, 0  },	//	切り取り
+	{  3,	IDM_COPY,			TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,					{0, 0}, 0, 0  },	//	コピー
+	{  4,	IDM_PASTE,			TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,					{0, 0}, 0, 0  },	//	貼付
+	{  5,	IDM_DELETE,			TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,					{0, 0}, 0, 0  },	//	削除
+	{  0,	0,					TBSTATE_ENABLED,	TBSTYLE_SEP,						{0, 0}, 0, 0  },
+	{  6,	IDM_SJISCOPY,		TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,					{0, 0}, 0, 0  },	//	ＳＪＩＳコピー
+	{  7,	IDM_SJISCOPY_ALL,	TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,					{0, 0}, 0, 0  },	//	頁全体SJISコピー
+	{  0,	0,					TBSTATE_ENABLED,	TBSTYLE_SEP,						{0, 0}, 0, 0  },
+	{  8,	IDM_ALLSEL,			TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,					{0, 0}, 0, 0  },	//	全選択
+	{  9,	IDM_SQSELECT,		TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,					{0, 0}, 0, 0  },	//	矩形選択
+	{  0,	0,					TBSTATE_ENABLED,	TBSTYLE_SEP,						{0, 0}, 0, 0  },
+	{ 10,	IDM_LAYERBOX,		TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,					{0, 0}, 0, 0  },	//	レイヤボックス起動
+	{  0,	0,					TBSTATE_ENABLED,	TBSTYLE_SEP,						{0, 0}, 0, 0  },
+	{ 11,	IDM_PAGEL_DIVIDE,	TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,					{0, 0}, 0, 0  },	//	ページ分割
+	{  0,	0,					TBSTATE_ENABLED,	TBSTYLE_SEP,						{0, 0}, 0, 0  },
+	{ 12,	IDM_EXTRACTION_MODE,TBSTATE_ENABLED,	TBSTYLE_CHECK | TBSTYLE_AUTOSIZE,	{0, 0}, 0, 0  },	//	抽出モード
+	{  0,	0,					TBSTATE_ENABLED,	TBSTYLE_SEP,						{0, 0}, 0, 0  },
+	{ 13,	IDM_UNICODE_TOGGLE,	TBSTATE_ENABLED,	TBSTYLE_CHECK | TBSTYLE_AUTOSIZE,	{0, 0}, 0, 0  },	//	ユニコード使用ON/OFF
 };
 
 //	挿入
 #define  TB_INSERT_ITEMS	6
 static TBBUTTON gstInsertTBInfo[] = {
-	{  0, IDM_IN_UNI_SPACE,		TBSTATE_ENABLED,	TBSTYLE_DROPDOWN | TBSTYLE_AUTOSIZE,	0,	0 },	//	
-	{  1, IDM_INSTAG_COLOUR,	TBSTATE_ENABLED,	TBSTYLE_DROPDOWN | TBSTYLE_AUTOSIZE,	0,	0 },	//	
-	{  2, IDM_FRMINSBOX_OPEN,	TBSTATE_ENABLED,	TBSTYLE_DROPDOWN | TBSTYLE_AUTOSIZE,	0,	0 },	//	
-	{  3, IDM_USERINS_NA,		TBSTATE_ENABLED,	TBSTYLE_DROPDOWN | TBSTYLE_AUTOSIZE,	0,	0 },	//	
-	{  0, 0,					TBSTATE_ENABLED,	TBSTYLE_SEP,							0,	0 },
-	{  4, IDM_MOZI_SCR_OPEN,	TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,						0,	0 } 	//	
+	{  0, IDM_IN_UNI_SPACE,		TBSTATE_ENABLED,	TBSTYLE_DROPDOWN | TBSTYLE_AUTOSIZE,	{0, 0}, 0, 0  },	//	
+	{  1, IDM_INSTAG_COLOUR,	TBSTATE_ENABLED,	TBSTYLE_DROPDOWN | TBSTYLE_AUTOSIZE,	{0, 0}, 0, 0  },	//	
+	{  2, IDM_FRMINSBOX_OPEN,	TBSTATE_ENABLED,	TBSTYLE_DROPDOWN | TBSTYLE_AUTOSIZE,	{0, 0}, 0, 0  },	//	
+	{  3, IDM_USERINS_NA,		TBSTATE_ENABLED,	TBSTYLE_DROPDOWN | TBSTYLE_AUTOSIZE,	{0, 0}, 0, 0  },	//	
+	{  0, 0,					TBSTATE_ENABLED,	TBSTYLE_SEP,							{0, 0}, 0, 0  },
+	{  4, IDM_MOZI_SCR_OPEN,	TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,						{0, 0}, 0, 0  } 	//	
 };
 
 //	整形
 #define TB_LAYOUT_ITEMS	13
 static TBBUTTON gstLayoutTBInfo[] = {
-	{  0, IDM_RIGHT_GUIDE_SET,	TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,	0,	0 },	//	
-	{  1, IDM_INS_TOPSPACE,		TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,	0,	0 },	//	
-	{  0, 0,					TBSTATE_ENABLED,	TBSTYLE_SEP,		0,	0 },
-	{  2, IDM_DEL_TOPSPACE,		TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,	0,	0 },	//	
-	{  3, IDM_DEL_LASTSPACE,	TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,	0,	0 },	//	
-	{  4, IDM_DEL_LASTLETTER,	TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,	0,	0 },	//	
-	{  0, 0,					TBSTATE_ENABLED,	TBSTYLE_SEP,		0,	0 },
-	{  5, IDM_RIGHT_SLIDE,		TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,	0,	0 },	//	
-	{  6, IDM_INCREMENT_DOT,	TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,	0,	0 },	//	
-	{  7, IDM_DECREMENT_DOT,	TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,	0,	0 },	//	
-	{  0, 0,					TBSTATE_ENABLED,	TBSTYLE_SEP,		0,	0 },
-	{  8, IDM_INCR_DOT_LINES,	TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,	0,	0 },	//	
-	{  9, IDM_DECR_DOT_LINES,	TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,	0,	0 } 	//	
+	{  0, IDM_RIGHT_GUIDE_SET,	TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,	{0, 0}, 0, 0  },	//	
+	{  1, IDM_INS_TOPSPACE,		TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,	{0, 0}, 0, 0  },	//	
+	{  0, 0,					TBSTATE_ENABLED,	TBSTYLE_SEP,		{0, 0}, 0, 0  },
+	{  2, IDM_DEL_TOPSPACE,		TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,	{0, 0}, 0, 0  },	//	
+	{  3, IDM_DEL_LASTSPACE,	TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,	{0, 0}, 0, 0  },	//	
+	{  4, IDM_DEL_LASTLETTER,	TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,	{0, 0}, 0, 0  },	//	
+	{  0, 0,					TBSTATE_ENABLED,	TBSTYLE_SEP,		{0, 0}, 0, 0  },
+	{  5, IDM_RIGHT_SLIDE,		TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,	{0, 0}, 0, 0  },	//	
+	{  6, IDM_INCREMENT_DOT,	TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,	{0, 0}, 0, 0  },	//	
+	{  7, IDM_DECREMENT_DOT,	TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,	{0, 0}, 0, 0  },	//	
+	{  0, 0,					TBSTATE_ENABLED,	TBSTYLE_SEP,		{0, 0}, 0, 0  },
+	{  8, IDM_INCR_DOT_LINES,	TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,	{0, 0}, 0, 0  },	//	
+	{  9, IDM_DECR_DOT_LINES,	TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,	{0, 0}, 0, 0  } 	//	
 };
 
 //	表示
 #define TB_VIEW_ITEMS	5
 static TBBUTTON gstViewTBInfo[] = {
-	{  0, IDM_UNI_PALETTE,			TBSTATE_ENABLED,	TBSTYLE_CHECK | TBSTYLE_AUTOSIZE,	0,	0 },	//	
-	{  1, IDM_TRACE_MODE_ON,		TBSTATE_ENABLED,	TBSTYLE_CHECK | TBSTYLE_AUTOSIZE,	0,	0 },	//	
-	{  2, IDM_ON_PREVIEW,			TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,	0,	0 },	//	
-	{  3, IDM_DRAUGHT_OPEN,			TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,	0,	0 },	//	
-	{  4, IDM_MAA_THUMBNAIL_OPEN,	TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,	0,	0 } 	//	
+	{  0, IDM_UNI_PALETTE,			TBSTATE_ENABLED,	TBSTYLE_CHECK | TBSTYLE_AUTOSIZE,	{0, 0}, 0, 0  },	//	
+	{  1, IDM_TRACE_MODE_ON,		TBSTATE_ENABLED,	TBSTYLE_CHECK | TBSTYLE_AUTOSIZE,	{0, 0}, 0, 0  },	//	
+	{  2, IDM_ON_PREVIEW,			TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,					{0, 0}, 0, 0  },	//	
+	{  3, IDM_DRAUGHT_OPEN,			TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,					{0, 0}, 0, 0  },	//	
+	{  4, IDM_MAA_THUMBNAIL_OPEN,	TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,					{0, 0}, 0, 0  } 	//	
 };
 
 //全体
 #define TB_BAND_COUNT	5
 static CONST REBARLAYOUTINFO	gcstReBarDef[] = {
-	{ 1002,  180, 132 },	//	メイン
-	{ 1007,  450, 132 },	//	編集
-	{ 1008,  280, 133 },	//	挿入
-	{ 1005,  310, 132 },	//	整形
-	{ 1006,  140, 132 } 	//	表示
+	{ IDTB_MAIN_TOOLBAR,   180, RBBS_GRIPPERALWAYS | RBBS_CHILDEDGE               },	//	メイン
+	{ IDTB_EDIT_TOOLBAR,   450, RBBS_GRIPPERALWAYS | RBBS_CHILDEDGE               },	//	編集
+	{ IDTB_INSERT_TOOLBAR, 280, RBBS_GRIPPERALWAYS | RBBS_CHILDEDGE | RBBS_BREAK  },	//	挿入
+	{ IDTB_LAYOUT_TOOLBAR, 310, RBBS_GRIPPERALWAYS | RBBS_CHILDEDGE               },	//	整形
+	{ IDTB_VIEW_TOOLBAR,   140, RBBS_GRIPPERALWAYS | RBBS_CHILDEDGE               } 	//	表示
 };	//	初期構成
 //-------------------------------------------------------------------------------------------------
 
@@ -221,10 +223,10 @@ VOID ToolBarCreate( HWND hWnd, HINSTANCE lcInst )
 
 	SendMessage( ghMainTBWnd, TB_BUTTONSTRUCTSIZE, (WPARAM)sizeof(TBBUTTON), 0 );
 	//	ツールチップ文字列を設定・ボタンテキストがツールチップになる
-	StringCchCopy( atBuff, MAX_STRING, TEXT("新規作成\r\nCtrl + N") );		gstMainTBInfo[0].iString = SendMessage( ghMainTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-	StringCchCopy( atBuff, MAX_STRING, TEXT("ファイル開く\r\nCtrl + O") );	gstMainTBInfo[1].iString = SendMessage( ghMainTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-	StringCchCopy( atBuff, MAX_STRING, TEXT("上書き保存\r\nCtrl + S") );	gstMainTBInfo[2].iString = SendMessage( ghMainTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-	StringCchCopy( atBuff, MAX_STRING, TEXT("一般設定") );					gstMainTBInfo[4].iString = SendMessage( ghMainTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING, TEXT("新規作成") );		gstMainTBInfo[0].iString = SendMessage( ghMainTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING, TEXT("ファイル開く") );	gstMainTBInfo[1].iString = SendMessage( ghMainTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING, TEXT("上書き保存") );	gstMainTBInfo[2].iString = SendMessage( ghMainTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING, TEXT("一般設定") );		gstMainTBInfo[4].iString = SendMessage( ghMainTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
 
 	SendMessage( ghMainTBWnd, TB_ADDBUTTONS, (WPARAM)TB_MAIN_ITEMS, (LPARAM)&gstMainTBInfo );	//	ツールバーにボタンを挿入
 
@@ -246,9 +248,9 @@ VOID ToolBarCreate( HWND hWnd, HINSTANCE lcInst )
 	//stToolBmp.hInst = HINST_COMMCTRL;
 	//stToolBmp.nID   = IDB_STD_SMALL_COLOR;
 	//SendMessage( ghEditTBWnd, TB_ADDBITMAP, 0, (LPARAM)&stToolBmp );
-	ghEditImgLst = ImageList_Create( 16, 16, ILC_COLOR24 | ILC_MASK, 13, 1 );
+	ghEditImgLst = ImageList_Create( 16, 16, ILC_COLOR24 | ILC_MASK, 14, 1 );
 	resnum = IDBMPQ_EDIT_TB_FIRST;
-	for( ici = 0; 13 > ici; ici++ )
+	for( ici = 0; 14 > ici; ici++ )
 	{
 		hImg = LoadBitmap( lcInst, MAKEINTRESOURCE( (resnum++) ) );
 		hMsq = LoadBitmap( lcInst, MAKEINTRESOURCE( (resnum++) ) );
@@ -261,26 +263,28 @@ VOID ToolBarCreate( HWND hWnd, HINSTANCE lcInst )
 
 	SendMessage( ghEditTBWnd, TB_BUTTONSTRUCTSIZE, (WPARAM)sizeof(TBBUTTON), 0 );
 	//	ツールチップ文字列を設定・ボタンテキストがツールチップになる
-	StringCchCopy( atBuff, MAX_STRING, TEXT("元に戻す\r\nCtrl + Z") );						gstEditTBInfo[ 0].iString = SendMessage( ghEditTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-	StringCchCopy( atBuff, MAX_STRING, TEXT("やり直し\r\nCtrl + Y") );						gstEditTBInfo[ 1].iString = SendMessage( ghEditTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING, TEXT("元に戻す") );					gstEditTBInfo[ 0].iString = SendMessage( ghEditTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING, TEXT("やり直し") );					gstEditTBInfo[ 1].iString = SendMessage( ghEditTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
 													
-	StringCchCopy( atBuff, MAX_STRING, TEXT("切り取り\r\nCtrl + X") );						gstEditTBInfo[ 3].iString = SendMessage( ghEditTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-	StringCchCopy( atBuff, MAX_STRING, TEXT("コピー\r\nCtrl + C") );						gstEditTBInfo[ 4].iString = SendMessage( ghEditTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-	StringCchCopy( atBuff, MAX_STRING, TEXT("貼付\r\nCtrl + V") );							gstEditTBInfo[ 5].iString = SendMessage( ghEditTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-	StringCchCopy( atBuff, MAX_STRING, TEXT("削除\r\nDelete") );							gstEditTBInfo[ 6].iString = SendMessage( ghEditTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING, TEXT("切り取り") );					gstEditTBInfo[ 3].iString = SendMessage( ghEditTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING, TEXT("コピー") );					gstEditTBInfo[ 4].iString = SendMessage( ghEditTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING, TEXT("貼付") );						gstEditTBInfo[ 5].iString = SendMessage( ghEditTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING, TEXT("削除") );						gstEditTBInfo[ 6].iString = SendMessage( ghEditTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
 													
-	StringCchCopy( atBuff, MAX_STRING, TEXT("SJISコピー") );								gstEditTBInfo[ 8].iString = SendMessage( ghEditTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-	StringCchCopy( atBuff, MAX_STRING, TEXT("全体をSJISコピー\r\nCtrl + Shift + C") );		gstEditTBInfo[ 9].iString = SendMessage( ghEditTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING, TEXT("SJISコピー") );				gstEditTBInfo[ 8].iString = SendMessage( ghEditTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING, TEXT("全体をSJISコピー") );			gstEditTBInfo[ 9].iString = SendMessage( ghEditTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
 													
-	StringCchCopy( atBuff, MAX_STRING, TEXT("全選択\r\nCtrl + A") );						gstEditTBInfo[11].iString = SendMessage( ghEditTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-	StringCchCopy( atBuff, MAX_STRING, TEXT("矩形選択\r\nCtrl + Alt + B") );				gstEditTBInfo[12].iString = SendMessage( ghEditTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING, TEXT("全選択") );					gstEditTBInfo[11].iString = SendMessage( ghEditTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING, TEXT("矩形選択") );					gstEditTBInfo[12].iString = SendMessage( ghEditTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
 													
-	StringCchCopy( atBuff, MAX_STRING, TEXT("レイヤボックス\r\nAlt + Space") );				gstEditTBInfo[14].iString = SendMessage( ghEditTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING, TEXT("レイヤボックス") );			gstEditTBInfo[14].iString = SendMessage( ghEditTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
 													
-	StringCchCopy( atBuff, MAX_STRING, TEXT("次の行以降を新頁に分割") );					gstEditTBInfo[16].iString = SendMessage( ghEditTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING, TEXT("次の行以降を新頁に分割") );	gstEditTBInfo[16].iString = SendMessage( ghEditTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
 													
-	StringCchCopy( atBuff, MAX_STRING, TEXT("部分抽出モード") );							gstEditTBInfo[18].iString = SendMessage( ghEditTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-	StringCchCopy( atBuff, MAX_STRING, TEXT("抽出してレイヤボックスへ\r\nAlt + Space") );	gstEditTBInfo[19].iString = SendMessage( ghEditTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING, TEXT("部分抽出モード") );			gstEditTBInfo[18].iString = SendMessage( ghEditTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+//	StringCchCopy( atBuff, MAX_STRING, TEXT("抽出してレイヤボックスへ") );	gstEditTBInfo[19].iString = SendMessage( ghEditTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+
+	StringCchCopy( atBuff, MAX_STRING, TEXT("ユニコード空白を使う") );		gstEditTBInfo[20].iString = SendMessage( ghEditTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
 
 	SendMessage( ghEditTBWnd, TB_ADDBUTTONS, (WPARAM)TB_EDIT_ITEMS, (LPARAM)&gstEditTBInfo );	//	ツールバーにボタンを挿入
 	SendMessage( ghEditTBWnd, TB_AUTOSIZE, 0, 0 );	//	ボタンのサイズに合わせてツールバーをリサイズ
@@ -299,7 +303,7 @@ VOID ToolBarCreate( HWND hWnd, HINSTANCE lcInst )
 	//stToolBmp.hInst = HINST_COMMCTRL;
 	//stToolBmp.nID   = IDB_HIST_SMALL_COLOR;
 	//SendMessage( ghInsertTBWnd, TB_ADDBITMAP, 0, (LPARAM)&stToolBmp );
-	ghInsertImgLst = ImageList_Create( 16, 16, ILC_COLOR24 | ILC_MASK, 4, 1 );
+	ghInsertImgLst = ImageList_Create( 16, 16, ILC_COLOR24 | ILC_MASK, 5, 1 );
 	resnum = IDBMPQ_INSERT_TB_FIRST;
 	for( ici = 0; 4 > ici; ici++ )
 	{
@@ -356,16 +360,16 @@ VOID ToolBarCreate( HWND hWnd, HINSTANCE lcInst )
 
 	SendMessage( ghLayoutTBWnd, TB_BUTTONSTRUCTSIZE, (WPARAM)sizeof(TBBUTTON), 0 );
 	//	ツールチップ文字列を設定・ボタンテキストがツールチップになる
-	StringCchCopy( atBuff, MAX_STRING, TEXT("右揃え線\r\nCtrl + Alt + R") );			gstLayoutTBInfo[ 0].iString = SendMessage( ghLayoutTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-	StringCchCopy( atBuff, MAX_STRING, TEXT("行頭に全角空白追加\r\nCtrl + I") );		gstLayoutTBInfo[ 1].iString = SendMessage( ghLayoutTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-	StringCchCopy( atBuff, MAX_STRING, TEXT("行頭空白削除\r\nCtrl + U") );				gstLayoutTBInfo[ 3].iString = SendMessage( ghLayoutTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-	StringCchCopy( atBuff, MAX_STRING, TEXT("行末空白削除\r\nCtrl + G") );				gstLayoutTBInfo[ 4].iString = SendMessage( ghLayoutTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-	StringCchCopy( atBuff, MAX_STRING, TEXT("行末文字削除\r\nCtrl + Shift + G") );		gstLayoutTBInfo[ 5].iString = SendMessage( ghLayoutTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-	StringCchCopy( atBuff, MAX_STRING, TEXT("右に寄せる") );							gstLayoutTBInfo[ 7].iString = SendMessage( ghLayoutTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-	StringCchCopy( atBuff, MAX_STRING, TEXT("１ドット増やす\r\nAlt + →") );			gstLayoutTBInfo[ 8].iString = SendMessage( ghLayoutTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-	StringCchCopy( atBuff, MAX_STRING, TEXT("１ドット減らす\r\nAlt + ←") );			gstLayoutTBInfo[ 9].iString = SendMessage( ghLayoutTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-	StringCchCopy( atBuff, MAX_STRING, TEXT("全体を１ドット右へ\r\nAlt + Shift + →") );gstLayoutTBInfo[11].iString = SendMessage( ghLayoutTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-	StringCchCopy( atBuff, MAX_STRING, TEXT("全体を１ドット左へ\r\nAlt + Shift + ←") );gstLayoutTBInfo[12].iString = SendMessage( ghLayoutTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING, TEXT("右揃え線") );				gstLayoutTBInfo[ 0].iString = SendMessage( ghLayoutTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING, TEXT("行頭に全角空白追加") );	gstLayoutTBInfo[ 1].iString = SendMessage( ghLayoutTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING, TEXT("行頭空白削除") );			gstLayoutTBInfo[ 3].iString = SendMessage( ghLayoutTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING, TEXT("行末空白削除") );			gstLayoutTBInfo[ 4].iString = SendMessage( ghLayoutTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING, TEXT("行末文字削除") );			gstLayoutTBInfo[ 5].iString = SendMessage( ghLayoutTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING, TEXT("右に寄せる") );			gstLayoutTBInfo[ 7].iString = SendMessage( ghLayoutTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING, TEXT("１ドット増やす") );		gstLayoutTBInfo[ 8].iString = SendMessage( ghLayoutTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING, TEXT("１ドット減らす") );		gstLayoutTBInfo[ 9].iString = SendMessage( ghLayoutTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING, TEXT("全体を１ドット右へ") );	gstLayoutTBInfo[11].iString = SendMessage( ghLayoutTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING, TEXT("全体を１ドット左へ") );	gstLayoutTBInfo[12].iString = SendMessage( ghLayoutTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
 
 	SendMessage( ghLayoutTBWnd , TB_ADDBUTTONS, (WPARAM)TB_LAYOUT_ITEMS, (LPARAM)&gstLayoutTBInfo );	//	ツールバーにボタンを挿入
 
@@ -402,8 +406,8 @@ VOID ToolBarCreate( HWND hWnd, HINSTANCE lcInst )
 	StringCchCopy( atBuff, MAX_STRING, TEXT("ユニコード表") );		gstViewTBInfo[ 0].iString = SendMessage( ghViewTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
 	StringCchCopy( atBuff, MAX_STRING, TEXT("トレスモード") );		gstViewTBInfo[ 1].iString = SendMessage( ghViewTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
 	StringCchCopy( atBuff, MAX_STRING, TEXT("プレビュー") );		gstViewTBInfo[ 2].iString = SendMessage( ghViewTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-	StringCchCopy( atBuff, MAX_STRING, TEXT("ドラフトボード\r\nCtrl + Space") );	gstViewTBInfo[ 3].iString = SendMessage( ghViewTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-	StringCchCopy( atBuff, MAX_STRING, TEXT("複数行サムネイル\r\nCtrl + T") );		gstViewTBInfo[ 4].iString = SendMessage( ghViewTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING, TEXT("ドラフトボード") );	gstViewTBInfo[ 3].iString = SendMessage( ghViewTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING, TEXT("複数行サムネイル") );	gstViewTBInfo[ 4].iString = SendMessage( ghViewTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
 
 	SendMessage( ghViewTBWnd, TB_ADDBUTTONS, (WPARAM)TB_VIEW_ITEMS, (LPARAM)&gstViewTBInfo );	//	ツールバーにボタンを挿入
 	SendMessage( ghViewTBWnd, TB_AUTOSIZE, 0, 0 );	//	ボタンのサイズに合わせてツールバーをリサイズ
@@ -512,6 +516,8 @@ HRESULT ToolBarCheckOnOff( UINT itemID, UINT bCheck )
 
 		case IDM_EXTRACTION_MODE:	hTlBrWnd =  ghEditTBWnd;	break;
 		case IDM_SQSELECT:			hTlBrWnd =  ghEditTBWnd;	break;
+		case IDM_UNICODE_TOGGLE:	hTlBrWnd =  ghEditTBWnd;	break;
+
 		case IDM_UNI_PALETTE:		hTlBrWnd =  ghViewTBWnd;	break;
 		case IDM_TRACE_MODE_ON:		hTlBrWnd =  ghViewTBWnd;	break;
 	}
