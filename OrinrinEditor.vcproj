@@ -196,6 +196,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\DocInverseCtrl.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\DocMiscellaneous.cpp"
 				>
 			</File>

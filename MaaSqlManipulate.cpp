@@ -7,7 +7,7 @@
 
 /*
 Orinrin Editor : AsciiArt Story Editor for Japanese Only
-Copyright (C) 2011 Orinrin/SikigamiHNQ
+Copyright (C) 2011 - 2012 Orinrin/SikigamiHNQ
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
@@ -49,8 +49,8 @@ HRESULT	SqlFavUpdate( UINT );	//!<
 HRESULT	SqlFavInsert( LPTSTR, DWORD, LPSTR, UINT );	//!<	
 //-------------------------------------------------------------------------------------------------
 
-
-#ifdef _DEBUG
+//	WORK_LOG_OUT
+//#ifdef _DEBUG
 /*!
 	SQLiteのエラー情報を出刃愚兎淫怒兎に表示
 	@param[in]	*psqTarget	エラーチェキしたいデタベス
@@ -58,14 +58,14 @@ HRESULT	SqlFavInsert( LPTSTR, DWORD, LPSTR, UINT );	//!<
 */
 VOID SqlErrMsgView( sqlite3 *psqTarget, DWORD dline )
 {
-	TCHAR	atStr[MAX_PATH];	//	そんなバッファ容量で大丈夫か
-
-	StringCchPrintf( atStr, MAX_PATH, TEXT("%s[%u]\r\n"), sqlite3_errmsg16( psqTarget ), dline );
-	OutputDebugString( atStr );
+	//TCHAR	atStr[MAX_PATH];	//	そんなバッファ容量で大丈夫か
+	//StringCchPrintf( atStr, MAX_PATH, TEXT("%s[%u]\r\n"), sqlite3_errmsg16( psqTarget ), dline );
+	//OutputDebugString( atStr );
+	TRACE( TEXT("%s[%u]"), sqlite3_errmsg16( psqTarget ), dline );
 	return;
 }
 //-------------------------------------------------------------------------------------------------
-#endif
+//#endif
 
 /*!
 	SQLiteの使ったＡＡのデータベースを閉じたり開いたり

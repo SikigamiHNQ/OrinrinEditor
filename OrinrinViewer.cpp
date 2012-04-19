@@ -66,9 +66,7 @@ extern HFONT	ghAaFont;		//!<	表示用のフォント
 
 extern  UINT	gdClickDrt;	//
 
-#ifdef OPEN_PROFILE
 extern HMENU	ghProfHisMenu;	//	履歴表示する部分・動的に内容作成せないかん
-#endif
 //------------------------------------------------------------------------------------------------------------------------
 
 BOOLEAN	SelectFolderDlg( HWND, LPTSTR, UINT_PTR );
@@ -306,7 +304,6 @@ HRESULT InitWindowPos( UINT dMode, UINT dStyle, LPRECT pstRect )
 }
 //-------------------------------------------------------------------------------------------------
 
-#ifdef OPEN_PROFILE
 /*!
 	プロフ履歴をINIから読んだり書いたり
 	@param[in]		dMode	非０ロード　０セーブ
@@ -365,7 +362,6 @@ HRESULT OpenProfMenuModify( HWND hWnd )
 }
 //-------------------------------------------------------------------------------------------------
 
-#endif
 
 #pragma endregion	//	("設定内容読書")
 

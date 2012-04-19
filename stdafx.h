@@ -7,7 +7,7 @@
 
 /*
 Orinrin Editor : AsciiArt Story Editor for Japanese Only
-Copyright (C) 2011 Orinrin/SikigamiHNQ
+Copyright (C) 2011 - 2012 Orinrin/SikigamiHNQ
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
@@ -61,12 +61,6 @@ If not, see <http://www.gnu.org/licenses/>.
 #include "sqlite3.h"
 #pragma comment(lib, "sqlite3.lib")
 
-//	デバッグ用メッセージ
-#ifdef _DEBUG
-#define SQL_DEBUG(db)	SqlErrMsgView(db,__LINE__)
-#else
-#define SQL_DEBUG(db)
-#endif
 
 #endif
 
@@ -108,9 +102,10 @@ static CONST GUID gcstGUID = { 0x66D3E881, 0x972B, 0x458B, { 0x93, 0x5E, 0x9E, 0
 //-------------------------------------------------------------------------------------------------
 
 //機能ＯＫ
-#define LINE_VEC_LIST	//	行の保持をリストにしてみる
-#define OPEN_HISTORY	//	ファイル開いた履歴
-#define OPEN_PROFILE
+//	行の保持をリストにしてみる
+//	ファイル開いた履歴
+//	プロフ開いた履歴
+
 
 #define USE_NOTIFYICON	//	タスクトレイアイコンを有効
 
@@ -118,6 +113,9 @@ static CONST GUID gcstGUID = { 0x66D3E881, 0x972B, 0x458B, { 0x93, 0x5E, 0x9E, 0
 //#define FIND_STRINGS	//	文字列検索機能
 #define  FRAME_MLINE	//	枠パーツ複数行
 //#define PAGE_MULTISELECT//	頁一覧の複数選択
+#define AA_INVERSE		//	上下左右反転機能
+//#define PAGE_DELAY_LOAD		//	ファイル読み込んだ時は頁展開しない、ひつようになったら開く
+#define WORK_LOG_OUT	
 
 #define ACCELERATOR_EDIT//	キーのアレ編集
 //#define COPY_SWAP
@@ -129,16 +127,26 @@ static CONST GUID gcstGUID = { 0x66D3E881, 0x972B, 0x458B, { 0x93, 0x5E, 0x9E, 0
 #define EXTERNED
 //-------------------------------------------------------------------------------------------------
 
-#ifdef _DEBUG
+//	WORK_LOG_OUT
+
+//#ifdef _DEBUG
 
 #define TRACE(str,...)	OutputDebugStringPlus( GetLastError(), __FILE__, __LINE__, __FUNCTION__, str, __VA_ARGS__ )
+
+#ifndef _ORCOLL
+#define SQL_DEBUG(db)	SqlErrMsgView(db,__LINE__)
+#endif
 
 VOID	OutputDebugStringPlus( DWORD, LPSTR, INT, LPSTR, LPTSTR, ... );	//!<	
 VOID	SqlErrMsgView( sqlite3 *, DWORD );
 
-#else
-	#define TRACE(x,...)
-#endif
+//#else
+//	#define TRACE(x,...)
+//
+//  #ifndef _ORCOLL
+//	#define SQL_DEBUG(db)
+//  #endif
+//#endif
 
 #ifdef DO_TRY_CATCH
 #define ETC_MSG(str,ret)	ExceptionMessage( str, __FUNCTION__, __LINE__, ret )
@@ -185,6 +193,9 @@ LRESULT	ExceptionMessage( LPCSTR, LPCSTR, UINT, LPARAM );
 
 #define AA_BRUSH_FILE	TEXT("aabrush.txt")		//	塗りつぶし用
 #define AA_LIST_FILE	TEXT("aalist.txt")		//	壱行テンプレート
+
+#define AA_MIRROR_FILE	TEXT("hantenX.txt")		//	左右反転参照
+#define AA_UPSET_FILE	TEXT("hantenY.txt")		//	上下反転参照
 
 #define MAA_FAVDB_FILE	TEXT("Favorite.qmt")	//	AAリスト用
 #define MAA_TREE_CACHE	TEXT("TreeCache.qor")	//	ツリーの中身を取っておく・使わない
@@ -264,6 +275,7 @@ LRESULT	ExceptionMessage( LPCSTR, LPCSTR, UINT, LPARAM );
 #define VL_MAA_MCLICK	40	//	ＭＡＡ一覧でミドゥクルッコしたときの標準動作
 #define VL_DRT_MCLICK	41	//	ドラフトボードクリックのデフォ動作
 #define VS_FONT_NAME	42	//	メインのフォント名、ＭＳ Ｐゴシック
+#define VL_WORKLOG		43	//	動作ログを出力するか
 
 //増やしたら、函数内に取扱つくっておくこと
 

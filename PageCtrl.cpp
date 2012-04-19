@@ -7,7 +7,7 @@
 
 /*
 Orinrin Editor : AsciiArt Story Editor for Japanese Only
-Copyright (C) 2011 Orinrin/SikigamiHNQ
+Copyright (C) 2011 - 2012 Orinrin/SikigamiHNQ
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
@@ -934,11 +934,7 @@ HRESULT PageListBuild( LPVOID pVoid )
 		stLvi.iSubItem =  2;
 		ListView_SetItem( ghPageListWnd, &stLvi );
 
-#ifdef LINE_VEC_LIST
 		StringCchPrintf( atBuffer, MIN_STRING, TEXT("%u"), itPage->ltPage.size() );
-#else
-		StringCchPrintf( atBuffer, MIN_STRING, TEXT("%u"), itPage->vcPage.size() );
-#endif
 		stLvi.iSubItem =  3;
 		ListView_SetItem( ghPageListWnd, &stLvi );
 
@@ -1070,11 +1066,7 @@ HRESULT PageListViewRewrite( INT dPage )
 	StringCchPrintf( atBuffer, MIN_STRING, TEXT("%d"), dBytes );	//	byte
 	ListView_SetItemText( ghPageListWnd, dPage, 2, atBuffer );
 
-#ifdef LINE_VEC_LIST
 	dLines = (*gitFileIt).vcCont.at( dPage ).ltPage.size( );
-#else
-	dLines = (*gitFileIt).vcCont.at( dPage ).vcPage.size( );
-#endif
 	StringCchPrintf( atBuffer, MIN_STRING, TEXT("%d"), dLines );	//	line
 	ListView_SetItemText( ghPageListWnd, dPage, 3, atBuffer );
 
@@ -1235,19 +1227,11 @@ HRESULT PageListDuplicate( HWND hWnd, INT iNowPage )
 	PageListInsert( iNewPage  );	//	ページリストビューに追加
 
 	//	空の壱行が作られてるので、削除しておく
-#ifdef LINE_VEC_LIST
 	(*gitFileIt).vcCont.at( iNewPage ).ltPage.clear(  );
 
 	std::copy(	(*gitFileIt).vcCont.at( iNowPage ).ltPage.begin(),
 				(*gitFileIt).vcCont.at( iNowPage ).ltPage.end(),
 				back_inserter( (*gitFileIt).vcCont.at( iNewPage ).ltPage ) );
-#else
-	(*gitFileIt).vcCont.at( iNewPage ).vcPage.clear(  );
-
-	std::copy(	(*gitFileIt).vcCont.at( iNowPage ).vcPage.begin(),
-				(*gitFileIt).vcCont.at( iNowPage ).vcPage.end(),
-				back_inserter( (*gitFileIt).vcCont.at( iNewPage ).vcPage ) );
-#endif
 
 	return S_OK;
 }
@@ -1280,21 +1264,13 @@ HRESULT PageListCombine( HWND hWnd, INT iNowPage )
 	if( iTotal <= iNext ){	return E_OUTOFMEMORY;	}	//	末端頁なら何もしない
 
 	//	区切りとして改行入れて
-#ifdef LINE_VEC_LIST
 	(*gitFileIt).vcCont.at( iNowPage ).ltPage.push_back( stLine );
 
 	//	次の頁の全体をコピーしちゃう
 	std::copy(	(*gitFileIt).vcCont.at( iNext ).ltPage.begin(),
 				(*gitFileIt).vcCont.at( iNext ).ltPage.end(),
 				back_inserter( (*gitFileIt).vcCont.at( iNowPage ).ltPage ) );
-#else
-	(*gitFileIt).vcCont.at( iNowPage ).vcPage.push_back( stLine );
 
-	//	次の頁の全体をコピーしちゃう
-	std::copy(	(*gitFileIt).vcCont.at( iNext ).vcPage.begin(),
-				(*gitFileIt).vcCont.at( iNext ).vcPage.end(),
-				back_inserter( (*gitFileIt).vcCont.at( iNowPage ).vcPage ) );
-#endif
 	SqnFreeAll( &((*gitFileIt).vcCont.at( iNowPage ).stUndoLog) );	//	アンドゥログ削除
 
 	DocPageDelete( iNext  );	//	次の頁は削除しちゃう
@@ -1386,18 +1362,19 @@ LRESULT Plv_OnNotify( HWND hWnd, INT idFrom, LPNMHDR pstNmhdr )
 			if( 0 > gixMouseSel ){	return 0;	}
 
 			//	該当ページから引っ張る
-			dBytes = DocAllTextGetAlloc( gixMouseSel, D_UNI, (LPVOID *)(&gptPgTipBuf), gitFileIt );
+			dBytes = DocPageTextGetAlloc( gitFileIt, gixMouseSel, D_UNI, (LPVOID *)(&gptPgTipBuf), FALSE );
 
 			if( gptPgTipBuf )
 			{
 				StringCchLength( gptPgTipBuf, STRSAFE_MAX_CCH, &rdLength );
-				if( 2 <= rdLength )
-				{
-					//	末端に余計な改行があるので消しておく
-					gptPgTipBuf[rdLength-1] = NULL;
-					gptPgTipBuf[rdLength-2] = NULL;
-					rdLength -= 2;
-				}
+				//if( 2 <= rdLength )
+				//{
+				//	//	末端に余計な改行があるので消しておく
+				//	gptPgTipBuf[rdLength-1] = NULL;
+				//	gptPgTipBuf[rdLength-2] = NULL;
+				//	rdLength -= 2;
+				//}
+				//	余計な改行は無くなった
 
 				pstDispInfo->lpszText = gptPgTipBuf;
 			}

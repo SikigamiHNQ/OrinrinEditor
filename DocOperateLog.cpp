@@ -7,7 +7,7 @@
 
 /*
 Orinrin Editor : AsciiArt Story Editor for Japanese Only
-Copyright (C) 2011 Orinrin/SikigamiHNQ
+Copyright (C) 2011 - 2012 Orinrin/SikigamiHNQ
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
@@ -236,8 +236,8 @@ UINT SqnAppendSquare( LPUNDOBUFF pstBuff, UINT dCmd, LPTSTR ptStr, LPPOINT pstPt
 		//	末端がピタリ改行になるはず
 		cchMozi = ptSprt - ptCaret;	//	そこまでの文字数求めて
 
-		stOpe.cchSize = cchMozi;
 		cchMozi++;	//	ﾇﾙﾀｰﾐﾈｰﾀ分
+		stOpe.cchSize = cchMozi;
 		stOpe.ptText  = (LPTSTR)malloc( cchMozi * sizeof(TCHAR) );	//	必要分確保
 		StringCchCopy( stOpe.ptText, cchMozi, ptCaret );
 
@@ -288,8 +288,8 @@ UINT SqnAppendString( LPUNDOBUFF pstBuff, UINT dCmd, LPTSTR ptStr, INT xDot, INT
 
 	//	入力した文字・もしくは削除した文字
 	StringCchLength( ptStr, STRSAFE_MAX_CCH, &cchSize );
-	stOpe.cchSize   = cchSize;
 	cchSize++;	//	ﾇﾙﾀｰﾐﾈｰﾀ分
+	stOpe.cchSize   = cchSize;
 	stOpe.ptText    = (LPTSTR)malloc( cchSize * sizeof(TCHAR) );	//	必要分確保
 	StringCchCopy( stOpe.ptText, cchSize, ptStr );
 
@@ -317,6 +317,12 @@ INT SqnUndoExec( LPUNDOBUFF pstBuff, PINT pxDot, PINT pyLine )
 	UINT	dCmd, dGrp, dNow, cchSize;
 	UINT	dPreGroup = 0;
 	LPTSTR	ptStr;
+
+	if( !(pstBuff) )	return 0;	//	安全対策
+
+#ifdef DO_TRY_CATCH
+	try{
+#endif
 
 	do
 	{
@@ -375,6 +381,11 @@ INT SqnUndoExec( LPUNDOBUFF pstBuff, PINT pxDot, PINT pyLine )
 
 	}while( pstBuff->dNowSqn );
 
+#ifdef DO_TRY_CATCH
+	}
+	catch( exception &err ){	return ETC_MSG( err.what(), 0 );	}
+	catch( ... ){	return  ETC_MSG( ("etc error"), 0 );	}
+#endif
 
 	return dCrLf;
 }
@@ -395,6 +406,9 @@ INT SqnRedoExec( LPUNDOBUFF pstBuff, PINT pxDot, PINT pyLine )
 	UINT	dPreGroup = 0;
 	LPTSTR	ptStr;
 
+#ifdef DO_TRY_CATCH
+	try{
+#endif
 
 	do
 	{
@@ -451,6 +465,12 @@ INT SqnRedoExec( LPUNDOBUFF pstBuff, PINT pxDot, PINT pyLine )
 		if( !(gbGroupUndo) ){	break;	}	//	グループアンドゥしない
 
 	}while( pstBuff->dNowSqn != pstBuff->vcOpeSqn.size( ) );
+
+#ifdef DO_TRY_CATCH
+	}
+	catch( exception &err ){	return ETC_MSG( err.what(), 0 );	}
+	catch( ... ){	return  ETC_MSG( ("etc error"), 0 );	}
+#endif
 
 	return dCrLf;
 }

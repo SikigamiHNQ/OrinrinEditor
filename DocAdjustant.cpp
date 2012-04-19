@@ -7,7 +7,7 @@
 
 /*
 Orinrin Editor : AsciiArt Story Editor for Japanese Only
-Copyright (C) 2011 Orinrin/SikigamiHNQ
+Copyright (C) 2011 - 2012 Orinrin/SikigamiHNQ
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
@@ -427,22 +427,16 @@ INT DocLineStateCheckWithDot( INT dDot, INT rdLine, PINT pLeft, PINT pRight, PIN
 	INT		bSpace;
 	LETR_ITR	itMozi, itHead, itTail, itTemp;
 
-#ifdef LINE_VEC_LIST
 	LINE_ITR	itLine;
 
 	itLine = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.begin();
 	std::advance( itLine, rdLine );
-#endif
 
 	if( !(pLeft) || !(pRight) || !(pIsSp) ){	return 0;	}
 
-#ifdef LINE_VEC_LIST
 	itMozi = itLine->vcLine.begin( );
 	iCount = itLine->vcLine.size( );	//	この行の文字数確認
-#else
-	itMozi = (*gitFileIt).vcCont.at( gixFocusPage ).vcPage.at( rdLine ).vcLine.begin( );
-	iCount = (*gitFileIt).vcCont.at( gixFocusPage ).vcPage.at( rdLine ).vcLine.size( );	//	この行の文字数確認して
-#endif
+
 	//	中身が無いならエラー
 	if( 0 >= iCount ){	*pIsSp =  FALSE;	*pLeft =  0;	*pRight = 0;	return 0;	}
 
@@ -456,11 +450,7 @@ INT DocLineStateCheckWithDot( INT dDot, INT rdLine, PINT pLeft, PINT pRight, PIN
 
 
 	//	その場所から頭方向に辿って、途切れ目を探す
-#ifdef LINE_VEC_LIST
 	itHead = itLine->vcLine.begin( );
-#else
-	itHead = (*gitFileIt).vcCont.at( gixFocusPage ).vcPage.at( rdLine ).vcLine.begin( );
-#endif
 
 	for( ; itHead != itMozi; itMozi-- )
 	{
@@ -484,11 +474,8 @@ INT DocLineStateCheckWithDot( INT dDot, INT rdLine, PINT pLeft, PINT pRight, PIN
 		iBgnCnt++;	//	文字数も増やす
 	}//もし最初から先頭なら両方０のまま
 
-#ifdef LINE_VEC_LIST
 	itTail = itLine->vcLine.end( );
-#else
-	itTail = (*gitFileIt).vcCont.at( gixFocusPage ).vcPage.at( rdLine ).vcLine.end( );
-#endif
+
 	//	その場所から、同じグループの所まで確認
 	endDot = bgnDot;
 	iRngCnt = 0;
@@ -532,22 +519,16 @@ UINT DocSpaceDifference( UINT vk, PINT pXdot, INT dLine )
 	wstring		wsBuffer;
 	LETR_ITR	vcLtrBgn, vcLtrEnd, vcItr;
 
-#ifdef LINE_VEC_LIST
 	LINE_ITR	itLine;
 
 	itLine = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.begin();
 	std::advance( itLine, dLine );
-#endif
 
 	dNowDot = *pXdot;
 
 	if( 0 == dNowDot )	//	０の場合は強引に移動
 	{
-#ifdef LINE_VEC_LIST
 		dNowDot = itLine->vcLine.at( 0 ).rdWidth;
-#else
-		dNowDot = (*gitFileIt).vcCont.at( gixFocusPage ).vcPage.at( dLine ).vcLine.at( 0 ).rdWidth;
-#endif
 	}
 
 	dTgtDot = DocLineStateCheckWithDot( dNowDot, dLine, &dBgnDot, &dEndDot, &dBgnCnt, &dRngCnt, &bIsSpace );
@@ -574,11 +555,7 @@ UINT DocSpaceDifference( UINT vk, PINT pXdot, INT dLine )
 
 	StringCchLength( ptSpace, STRSAFE_MAX_CCH, &cchSize );
 
-#ifdef LINE_VEC_LIST
 	vcLtrBgn  = itLine->vcLine.begin( );
-#else
-	vcLtrBgn  = (*gitFileIt).vcCont.at( gixFocusPage ).vcPage.at( dLine ).vcLine.begin( );
-#endif
 	vcLtrBgn += dBgnCnt;	//	該当位置まで移動して
 	vcLtrEnd  = vcLtrBgn;
 	vcLtrEnd += dRngCnt;	//	そのエリアの終端も確認
@@ -590,11 +567,7 @@ UINT DocSpaceDifference( UINT vk, PINT pXdot, INT dLine )
 	}
 
 	//	該当部分を一旦削除・アンドゥリドゥするなら内容を記録する必要がある
-#ifdef LINE_VEC_LIST
 	itLine->vcLine.erase( vcLtrBgn, vcLtrEnd );
-#else
-	(*gitFileIt).vcCont.at( gixFocusPage ).vcPage.at( dLine ).vcLine.erase( vcLtrBgn, vcLtrEnd );
-#endif
 	//	Space文字列を追加
 	dNowDot = dBgnDot;
 	DocStringAdd( &dNowDot, &dLine, ptSpace, cchSize );
@@ -689,11 +662,7 @@ HRESULT DocRightGuideSet( INT dTop, INT dBottom )
 	wstring		wsBuffer;
 
 	//	範囲確認
-#ifdef LINE_VEC_LIST
 	iLines = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.size( );
-#else
-	iLines = (*gitFileIt).vcCont.at( gixFocusPage ).vcPage.size( );
-#endif
 	if( 0 > dTop )		dTop = 0;
 	if( 0 > dBottom )	dBottom = iLines - 1;
 
@@ -797,12 +766,10 @@ INT DocDiffAdjExec( PINT pxDot, INT yLine )
 	wstring		wsDelBuf, wsAddBuf;
 	LETR_ITR	vcLtrBgn, vcLtrEnd, vcItr;
 
-#ifdef LINE_VEC_LIST
 	LINE_ITR	itLine;
 
 	itLine = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.begin();
 	std::advance( itLine, yLine );
-#endif
 
 	//	調整値の状況を確認
 	dTgtDot = DocLineStateCheckWithDot( *pxDot, yLine, &dBgnDot, &dEndDot, &dBgnCnt, &dRngCnt, &bIsSpace );
@@ -829,9 +796,7 @@ INT DocDiffAdjExec( PINT pxDot, INT yLine )
 	}
 
 	//埋め文字列作成
-//	ptPlus = DocPaddingSpaceWithPeriod( dTgtDot, NULL, NULL, NULL, FALSE );
-	ptPlus = DocPaddingSpaceMake( dTgtDot );
-
+	ptPlus = DocPaddingSpaceWithPeriod( dTgtDot, NULL, NULL, NULL, FALSE );
 
 	if( !(ptPlus) )
 	{
@@ -842,11 +807,7 @@ INT DocDiffAdjExec( PINT pxDot, INT yLine )
 	StringCchLength( ptPlus, STRSAFE_MAX_CCH, &cchPlus );
 
 
-#ifdef LINE_VEC_LIST
 	vcLtrBgn  = itLine->vcLine.begin( );
-#else
-	vcLtrBgn  = (*gitFileIt).vcCont.at( gixFocusPage ).vcPage.at( yLine ).vcLine.begin( );
-#endif
 	vcLtrBgn += dBgnCnt;	//	該当位置まで移動して
 	vcLtrEnd  = vcLtrBgn;
 	vcLtrEnd += dRngCnt;	//	そのエリアの終端も確認
@@ -855,11 +816,7 @@ INT DocDiffAdjExec( PINT pxDot, INT yLine )
 	for( vcItr = vcLtrBgn; vcLtrEnd != vcItr; vcItr++ ){	wsDelBuf +=  vcItr->cchMozi;	}
 
 	//	該当部分を削除
-#ifdef LINE_VEC_LIST
 	itLine->vcLine.erase( vcLtrBgn, vcLtrEnd );
-#else
-	(*gitFileIt).vcCont.at( gixFocusPage ).vcPage.at( yLine ).vcLine.erase( vcLtrBgn, vcLtrEnd );
-#endif
 	nDot = dBgnDot;
 
 	cchSize = wsDelBuf.size( ) + 1;
@@ -886,9 +843,9 @@ INT DocDiffAdjExec( PINT pxDot, INT yLine )
 }
 //-------------------------------------------------------------------------------------------------
 
-#if 0
+
 /*!
-	指定されたドット幅を、ピリオドも使って綺麗に確保する・１９幅までなら調整できる
+	指定されたドット幅を、ピリオドも使って綺麗に確保する・１９幅までなら調整できる・これはこれで必要
 	@param[in]	dTgtDot	作成するドット数
 	@param[out]	pdZen	使用した全角スペースの個数入れる・NULLでもＯＫ
 	@param[out]	pdHan	使用した半角スペースの個数入れる・NULLでもＯＫ
@@ -969,7 +926,7 @@ LPTSTR DocPaddingSpaceWithPeriod( INT dTgtDot, PINT pdZen, PINT pdHan, PINT pdPr
 	return ptPlus;
 }
 //-------------------------------------------------------------------------------------------------
-#endif
+
 
 /*!
 	行頭に、文字(主に空白)を追加
@@ -987,11 +944,7 @@ HRESULT DocTopLetterInsert( TCHAR ch, PINT pXdot, INT dLine )
 	TRACE( TEXT("行頭空白を追加") );
 	
 	//	範囲確認
-#ifdef LINE_VEC_LIST
 	iLines = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.size( );
-#else
-	iLines = (*gitFileIt).vcCont.at( gixFocusPage ).vcPage.size( );
-#endif
 	iTop    = (*gitFileIt).vcCont.at( gixFocusPage ).dSelLineTop;
 	iBottom = (*gitFileIt).vcCont.at( gixFocusPage ).dSelLineBottom;
 	if( 0 <= iTop &&  0 <= iBottom )	bSeled = TRUE;
@@ -1045,14 +998,10 @@ HRESULT DocTopSpaceErase( PINT pXdot, INT dLine )
 
 	LETR_ITR	vcLtrItr;
 
-	//	範囲確認
-#ifdef LINE_VEC_LIST
 	LINE_ITR	itLine;
 
+	//	範囲確認
 	iLines = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.size( );
-#else
-	iLines = (*gitFileIt).vcCont.at( gixFocusPage ).vcPage.size( );
-#endif
 	iTop    = (*gitFileIt).vcCont.at( gixFocusPage ).dSelLineTop;
 	iBottom = (*gitFileIt).vcCont.at( gixFocusPage ).dSelLineBottom;
 	if( 0 <= iTop &&  0 <= iBottom )	bSeled = TRUE;
@@ -1063,7 +1012,6 @@ HRESULT DocTopSpaceErase( PINT pXdot, INT dLine )
 	TRACE( TEXT("行頭空白を削除") );
 	//	選択範囲は、操作した行全体を選択状態にする
 
-#ifdef LINE_VEC_LIST
 	itLine = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.begin();
 	std::advance( itLine, iTop );	//	位置合わせ
 
@@ -1073,14 +1021,6 @@ HRESULT DocTopSpaceErase( PINT pXdot, INT dLine )
 		if( 0 != itLine->vcLine.size(  ) )
 		{
 			vcLtrItr = itLine->vcLine.begin( );
-#else
-	for( i = iTop; iBottom >= i; i++ )	//	範囲内の各行について
-	{
-		//	文字があるなら操作する
-		if( 0 != (*gitFileIt).vcCont.at( gixFocusPage ).vcPage.at( i ).vcLine.size(  ) )
-		{
-			vcLtrItr = (*gitFileIt).vcCont.at( gixFocusPage ).vcPage.at( i ).vcLine.begin( );
-#endif
 			ch = vcLtrItr->cchMozi;
 
 			//	空白かつ半角ではない
@@ -1130,14 +1070,10 @@ HRESULT DocLastLetterErase( PINT pXdot, INT dLine )
 
 	LETR_ITR	vcLtrItr;
 
-	//	範囲確認
-#ifdef LINE_VEC_LIST
 	LINE_ITR	itLine;
 
+	//	範囲確認
 	iLines = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.size( );
-#else
-	iLines = (*gitFileIt).vcCont.at( gixFocusPage ).vcPage.size( );
-#endif
 	iTop    = (*gitFileIt).vcCont.at( gixFocusPage ).dSelLineTop;
 	iBottom = (*gitFileIt).vcCont.at( gixFocusPage ).dSelLineBottom;
 	if( 0 <= iTop &&  0 <= iBottom )	bSeled = TRUE;
@@ -1147,7 +1083,6 @@ HRESULT DocLastLetterErase( PINT pXdot, INT dLine )
 
 	TRACE( TEXT("行末文字削除") );
 	//	選択してる場合は、操作行を全選択状態にする
-#ifdef LINE_VEC_LIST
 	itLine = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.begin();
 	std::advance( itLine, iTop );	//	位置合わせ
 
@@ -1157,14 +1092,6 @@ HRESULT DocLastLetterErase( PINT pXdot, INT dLine )
 		if( 0 != itLine->vcLine.size( ) )
 		{
 			vcLtrItr = itLine->vcLine.end( );
-#else
-	for( i = iTop; iBottom >= i; i++ )	//	範囲内の各行について
-	{
-		//	文字があるなら操作する
-		if( 0 != (*gitFileIt).vcCont.at( gixFocusPage ).vcPage.at( i ).vcLine.size( ) )
-		{
-			vcLtrItr = (*gitFileIt).vcCont.at( gixFocusPage ).vcPage.at( i ).vcLine.end( );
-#endif
 			vcLtrItr--;	//	終端の一個前が末端文字
 			ch = vcLtrItr->cchMozi;
 
@@ -1223,9 +1150,7 @@ HRESULT DocLastSpaceErase( PINT pXdot, INT dLine )
 	LPTSTR		ptBuffer = NULL;
 	RECT		rect;
 
-#ifdef LINE_VEC_LIST
 	LINE_ITR	itLine;
-#endif
 
 	TRACE( TEXT("行末空白削除") );
 
@@ -1233,18 +1158,13 @@ HRESULT DocLastSpaceErase( PINT pXdot, INT dLine )
 	iBottom = (*gitFileIt).vcCont.at( gixFocusPage ).dSelLineBottom;
 
 	//	範囲確認
-#ifdef LINE_VEC_LIST
 	iLines = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.size( );
-#else
-	iLines = (*gitFileIt).vcCont.at( gixFocusPage ).vcPage.size( );
-#endif
 	if( 0 > iTop )		iTop = 0;
 	if( 0 > iBottom )	iBottom = iLines - 1;
 
 
 	ViewSelPageAll( -1 );	//	選択範囲無くなる
 
-#ifdef LINE_VEC_LIST
 	itLine = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.begin();
 	std::advance( itLine, iTop );	//	位置合わせ
 
@@ -1252,12 +1172,6 @@ HRESULT DocLastSpaceErase( PINT pXdot, INT dLine )
 	{
 		xMotoDot = itLine->iDotCnt;
 		ptBuffer = DocLastSpDel( &(itLine->vcLine) );
-#else
-	for( i = iTop; iBottom >= i; i++ )
-	{
-		xMotoDot = (*gitFileIt).vcCont.at( gixFocusPage ).vcPage.at( i ).iDotCnt;
-		ptBuffer = DocLastSpDel( &((*gitFileIt).vcCont.at( gixFocusPage ).vcPage.at( i ).vcLine) );
-#endif
 		xDelDot  = DocLineParamGet( i, NULL, NULL );	//	サクった後の行末端すなわち削除位置
 		
 		if( ptBuffer  )
@@ -1353,7 +1267,6 @@ UINT DocRangeDeleteByMozi( INT xDot, INT yLine, INT dBgnMozi, INT dEndMozi, PBOO
 	LETR_ITR	vcLtrBgn, vcLtrEnd, vcItr;
 	wstring		wsDelBuf;
 
-#ifdef LINE_VEC_LIST
 	LINE_ITR	itLine;
 
 	itLine = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.begin();
@@ -1361,10 +1274,6 @@ UINT DocRangeDeleteByMozi( INT xDot, INT yLine, INT dBgnMozi, INT dEndMozi, PBOO
 
 	vcLtrBgn  = itLine->vcLine.begin( );
 	vcLtrEnd  = itLine->vcLine.begin( );
-#else
-	vcLtrBgn  = (*gitFileIt).vcCont.at( gixFocusPage ).vcPage.at( yLine ).vcLine.begin( );
-	vcLtrEnd  = (*gitFileIt).vcCont.at( gixFocusPage ).vcPage.at( yLine ).vcLine.begin( );
-#endif
 	vcLtrBgn += dBgnMozi;	//	該当位置まで移動して
 	vcLtrEnd += dEndMozi;	//	そのエリアの終端も確認
 
@@ -1372,11 +1281,7 @@ UINT DocRangeDeleteByMozi( INT xDot, INT yLine, INT dBgnMozi, INT dEndMozi, PBOO
 	for( vcItr = vcLtrBgn; vcLtrEnd != vcItr; vcItr++ ){	wsDelBuf +=  vcItr->cchMozi;	}
 
 	//	該当部分を削除
-#ifdef LINE_VEC_LIST
 	itLine->vcLine.erase( vcLtrBgn, vcLtrEnd );
-#else
-	(*gitFileIt).vcCont.at( gixFocusPage ).vcPage.at( yLine ).vcLine.erase( vcLtrBgn, vcLtrEnd );
-#endif
 	cchSize = wsDelBuf.size( ) + 1;
 	ptBuffer = (LPTSTR)malloc( cchSize * sizeof(TCHAR) );
 	StringCchCopy( ptBuffer, cchSize, wsDelBuf.c_str( ) );
@@ -1402,9 +1307,8 @@ HRESULT DocRightSlide( PINT pXdot, INT dLine )
 	BOOLEAN		bFirst = TRUE;
 	LPTSTR		ptBuffer = NULL;
 
-#ifdef LINE_VEC_LIST
 	LINE_ITR	itLine;
-#endif
+
 	TRACE( TEXT("右寄せ") );
 
 	//	右寄せ限界確認
@@ -1414,11 +1318,7 @@ HRESULT DocRightSlide( PINT pXdot, INT dLine )
 	iBottom = (*gitFileIt).vcCont.at( gixFocusPage ).dSelLineBottom;
 
 	//	範囲確認
-#ifdef LINE_VEC_LIST
 	iLines = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.size( );
-#else
-	iLines = (*gitFileIt).vcCont.at( gixFocusPage ).vcPage.size( );
-#endif
 	if( 0 > iTop )		iTop = 0;
 	if( 0 > iBottom )	iBottom = iLines - 1;
 
@@ -1434,7 +1334,6 @@ HRESULT DocRightSlide( PINT pXdot, INT dLine )
 		return E_FAIL;
 	}
 
-#ifdef LINE_VEC_LIST
 	itLine = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.begin();
 	std::advance( itLine, iTop );	//	位置合わせ
 
@@ -1443,13 +1342,6 @@ HRESULT DocRightSlide( PINT pXdot, INT dLine )
 		dAdDot = dPaDot;
 		//	行頭の開き状態を確認
 		dLefDot = LayerHeadSpaceCheck( &(itLine->vcLine), &dMozi );
-#else
-	for( i = iTop; iBottom >= i; i++ )
-	{
-		dAdDot = dPaDot;
-		//	行頭の開き状態を確認
-		dLefDot = LayerHeadSpaceCheck( &((*gitFileIt).vcCont.at( gixFocusPage ).vcPage.at( i ).vcLine), &dMozi );
-#endif
 		if( 0 < dLefDot )
 		{
 			dAdDot += dLefDot;
@@ -1459,7 +1351,7 @@ HRESULT DocRightSlide( PINT pXdot, INT dLine )
 
 		//	先頭からうめちゃう
 		dInBgn = 0;
-		ptBuffer = DocPaddingSpaceMake( dAdDot );//	DocPaddingSpaceWithPeriod( dAdDot, NULL, NULL, NULL, TRUE );
+		ptBuffer = DocPaddingSpaceWithPeriod( dAdDot, NULL, NULL, NULL, TRUE );
 		DocInsertString( &dInBgn, &i, NULL, ptBuffer, 0, bFirst );	bFirst = FALSE;
 		FREE(ptBuffer);
 
@@ -1531,9 +1423,8 @@ HRESULT DocPositionShift( UINT vk, PINT pXdot, INT dLine )
 	LPUNDOBUFF	pstUndoBuff;	
 
 	LETR_ITR	vcLtrItr;
-#ifdef LINE_VEC_LIST
 	LINE_ITR	itLine;
-#endif
+
 
 
 	chOneSp = gaatPaddingSpDotW[1][0];
@@ -1547,11 +1438,7 @@ HRESULT DocPositionShift( UINT vk, PINT pXdot, INT dLine )
 	else if( VK_LEFT == vk )	bRight = FALSE;
 	else	return E_INVALIDARG;
 
-#ifdef LINE_VEC_LIST
 	iLines  = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.size( );
-#else
-	iLines  = (*gitFileIt).vcCont.at( gixFocusPage ).vcPage.size( );
-#endif
 	//	範囲確認
 	iTop    = (*gitFileIt).vcCont.at( gixFocusPage ).dSelLineTop;
 	iBottom = (*gitFileIt).vcCont.at( gixFocusPage ).dSelLineBottom;
@@ -1564,7 +1451,6 @@ HRESULT DocPositionShift( UINT vk, PINT pXdot, INT dLine )
 	if( bSeled ){	DocPageSelStateToggle( -1 );	}
 
 	//	壱行ずつ面倒見ていく
-#ifdef LINE_VEC_LIST
 	itLine = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.begin();
 	std::advance( itLine, iTop );	//	位置合わせ
 
@@ -1575,15 +1461,6 @@ HRESULT DocPositionShift( UINT vk, PINT pXdot, INT dLine )
 		{
 			//	先頭文字を確認
 			vcLtrItr = itLine->vcLine.begin( );
-#else
-	for( i = iTop; iBottom >= i; i++ )
-	{
-		//	文字があるなら操作する
-		if( 0 != (*gitFileIt).vcCont.at( gixFocusPage ).vcPage.at( i ).vcLine.size(  ) )
-		{
-			//	先頭文字を確認
-			vcLtrItr = (*gitFileIt).vcCont.at( gixFocusPage ).vcPage.at( i ).vcLine.begin( );
-#endif
 			ch  = vcLtrItr->cchMozi;
 			wid = vcLtrItr->rdWidth;	//	文字幅
 
@@ -1679,8 +1556,6 @@ HRESULT DocHeadHalfSpaceExchange( HWND hWnd )
 	TCHAR		ch;
 
 	LETR_ITR	vcLtrItr;
-
-//	LINE_VEC_LIST専用
 	LINE_ITR	itLine;
 
 	iLines  = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.size( );

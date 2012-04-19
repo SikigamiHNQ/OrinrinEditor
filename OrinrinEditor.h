@@ -7,7 +7,7 @@
 
 /*
 Orinrin Editor : AsciiArt Story Editor for Japanese Only
-Copyright (C) 2011 Orinrin/SikigamiHNQ
+Copyright (C) 2011 - 2012 Orinrin/SikigamiHNQ
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
@@ -135,7 +135,7 @@ CONST  TCHAR	gatEOF[] = TEXT("[EOF]");
 //-------------------------------------------------------------------------------------------------
 
 
-#if defined(OPEN_HISTORY) || defined(OPEN_PROFILE)
+
 //開いた履歴用・プロファイルにも使う
 #define OPENHIST_MAX	12
 typedef struct tagOPENHISTORY
@@ -145,7 +145,6 @@ typedef struct tagOPENHISTORY
 
 } OPENHIST, *LPOPENHIST;
 typedef list<OPENHIST>::iterator	OPHIS_ITR;
-#endif
 //----------------
 
 
@@ -268,11 +267,7 @@ typedef struct tagONELINE
 //	INT		dOffset;	//!<	矩形選択したときのズレ
 
 } ONELINE, *LPONELINE;
-#ifdef LINE_VEC_LIST
 typedef list<ONELINE>::iterator		LINE_ITR;
-#else
-typedef vector<ONELINE>::iterator	LINE_ITR;
-#endif
 //-----------------------------
 
 //	SPLITページ壱分
@@ -287,10 +282,10 @@ typedef struct tagONEPAGE
 	INT		dSelLineBottom;	//!<	一番下の選択がある行
 	UNDOBUFF	stUndoLog;	//!<	操作履歴・アンドゥに使う
 
-#ifdef LINE_VEC_LIST
 	list<ONELINE>	ltPage;	//!<	行全体
-#else
-	vector<ONELINE>	vcPage;	//!<	行全体
+
+#ifdef PAGE_DELAY_LOAD
+	LPTSTR	ptRawData;		//!<	頁の生データ
 #endif
 
 } ONEPAGE, *LPONEPAGE;
@@ -384,13 +379,11 @@ HRESULT		InitWindowPos( UINT, UINT, LPRECT );
 INT			InitParamValue( UINT, UINT, INT );
 HRESULT		InitParamString( UINT, UINT, LPTSTR );
 
-#ifdef OPEN_PROFILE
 HRESULT		OpenProfileInitialise( HWND );	//!<	
 HRESULT		InitProfHistory( UINT, UINT, LPTSTR );
   #ifdef _ORRVW
 HRESULT		OpenProfMenuModify( HWND );
   #endif
-#endif
 
 BOOLEAN		SelectDirectoryDlg( HWND, LPTSTR, UINT_PTR );
 
@@ -451,11 +444,9 @@ HACCEL		AccelKeyTableCreate( LPACCEL, INT );
 HRESULT		AccelKeyMenuRewrite( HWND, LPACCEL, CONST INT );
 #endif
 
-#ifdef OPEN_HISTORY
 HRESULT		OpenHistoryInitialise( HWND );
 HRESULT		OpenHistoryLogging( HWND, LPTSTR );
 HRESULT		OpenHistoryLoad( HWND, INT );
-#endif
 
 VOID		ToolBarCreate( HWND, HINSTANCE );
 VOID		ToolBarDestroy( VOID );
@@ -624,7 +615,7 @@ HRESULT		LayerStringReplace( HWND, LPTSTR );
 
 
 
-HRESULT		DocInitialise( LPVOID );
+HRESULT		DocInitialise( UINT );
 
 BOOLEAN		DocRangeIsError( INT, INT );
 
@@ -640,7 +631,7 @@ HRESULT		DocPageInfoRenew( INT, UINT );
 
 HRESULT		DocPageNameSet( LPTSTR );
 
-UINT		DocPageCreate( INT );
+INT			DocPageCreate( INT );
 HRESULT		DocPageDelete( INT );
 HRESULT		DocPageChange( INT );
 
@@ -665,7 +656,7 @@ INT			DocInputFromClipboard( PINT, PINT, PINT );
 
 INT			DocAdditionalLine( INT, BOOLEAN );
 
-INT			DocStringAdd( PINT, PINT, LPTSTR, INT );
+INT			DocStringAdd( PINT, PINT, LPCTSTR, INT );
 HRESULT		DocCrLfAdd( INT, INT, BOOLEAN );
 INT			DocSquareAdd( PINT, PINT, LPTSTR, INT, LPPOINT * );
 INT			DocStringErase( INT, INT, LPTSTR, INT );
@@ -703,10 +694,14 @@ LPTSTR		DocClipboardDataGet( PUINT );
 HRESULT		DocClipboardDataSet( LPVOID, INT, UINT );
 
 INT			DocLineDataGetAlloc( INT, INT, LPLETTER *, PINT, PUINT );
-INT			DocPageTextAllGetAlloc( UINT, LPVOID * );
 LPSTR		DocPageTextPreviewAlloc( INT, PINT );
 
 HRESULT		DocThreadDropCopy( VOID );
+
+INT			DocPageTextGetAlloc( FILES_ITR, INT, UINT, LPVOID *, BOOLEAN );
+INT			DocPageGetAlloc( UINT, LPVOID * );
+
+INT			DocLineTextGetAlloc( FILES_ITR, INT, UINT, UINT, LPVOID * );
 
 INT			DocSelectedDelete( PINT, PINT, UINT, BOOLEAN );
 INT			DocSelectedBrushFilling( LPTSTR, PINT, PINT );
@@ -718,7 +713,6 @@ LPARAM		DocOpendFileCheck( LPTSTR );
 HRESULT		DocFileSave( HWND, UINT );
 HRESULT		DocFileOpen( HWND );
 HRESULT		DocDoOpenFile( HWND, LPTSTR );
-INT			DocAllTextGetAlloc( INT, UINT, LPVOID *, FILES_ITR );
 HRESULT		DocImageSave( HWND, UINT, HFONT );
 
 UINT		DocStringSplitMLT( LPTSTR, INT, PAGELOAD );
@@ -732,7 +726,7 @@ INT			DocSpaceShiftProc( UINT, PINT, INT );
 LPTSTR		DocPaddingSpaceMake( INT );
 LPTSTR		DocPaddingSpaceUni( INT, PINT, PINT, PINT );
 LPTSTR		DocPaddingSpaceWithGap( INT, PINT, PINT );
-//LPTSTR		DocPaddingSpaceWithPeriod( INT, PINT, PINT, PINT, BOOLEAN );
+LPTSTR		DocPaddingSpaceWithPeriod( INT, PINT, PINT, PINT, BOOLEAN );
 HRESULT		DocLastSpaceErase( PINT, INT );
 HRESULT		DocTopLetterInsert( TCHAR, PINT, INT );
 HRESULT		DocLastLetterErase( PINT, INT );
@@ -749,7 +743,7 @@ INT			DocDiffAdjBaseSet( INT );
 INT			DocDiffAdjExec( PINT, INT );
 
 VOID		ZeroONELINE( LPONELINE );
-INT			DocStringInfoCount( LPTSTR, UINT_PTR, PINT, PINT );
+INT			DocStringInfoCount( LPCTSTR, UINT_PTR, PINT, PINT );
 
 UINT		DocRangeDeleteByMozi( INT, INT, INT, INT, PBOOLEAN );
 
@@ -769,6 +763,11 @@ HRESULT		DocMultiFileModify( UINT );
 HRESULT		DocMultiFileStore( LPTSTR );
 INT			DocMultiFileFetch( INT, LPTSTR, LPTSTR );
 LPTSTR		DocMultiFileNameGet( INT );
+
+#ifdef AA_INVERSE
+HRESULT		DocInverseInit( UINT );
+HRESULT		DocInverseTransform( UINT, UINT, PINT, INT );
+#endif
 
 HRESULT		SqnInitialise( LPUNDOBUFF );
 HRESULT		SqnFreeAll( LPUNDOBUFF );

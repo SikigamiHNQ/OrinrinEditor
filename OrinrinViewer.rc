@@ -33,8 +33,8 @@ LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
 
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
-IDI_ORINRINEDITOR	ICON	"OrinrinEditor.ico"
-IDI_SMALL			ICON	"OrinrinEditor.ico"
+IDI_ORINRINEDITOR	ICON	"OrinrinViewer.ico"
+IDI_SMALL			ICON	"OrinrinViewer.ico"
 
 /////////////////////////////////////////////////////////////////////////////
 //

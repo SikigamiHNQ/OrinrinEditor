@@ -7,7 +7,7 @@
 
 /*
 Orinrin Editor : AsciiArt Story Editor for Japanese Only
-Copyright (C) 2011 Orinrin/SikigamiHNQ
+Copyright (C) 2011 - 2012 Orinrin/SikigamiHNQ
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
@@ -389,7 +389,7 @@ HWND ViewInitialise( HINSTANCE hInstance, HWND hParentWnd, LPRECT pstFrame, LPTS
 
 	gdDispingLine = gstViewArea.cy / LINE_HEIGHT;
 
-	DocInitialise( NULL );
+	DocInitialise( TRUE );
 
 	ZeroMemory( atFile, sizeof(atFile) );
 
@@ -2073,8 +2073,6 @@ VOID OperationOnCommand( HWND hWnd, INT id, HWND hWndCtl, UINT codeNotify )
 	}
 
 	//	ファイルオーポン履歴
-#ifdef OPEN_HISTORY
-
 	if( IDM_OPEN_HIS_FIRST <= id && id <= IDM_OPEN_HIS_LAST )	//	開く
 	{
 		OpenHistoryLoad( hWnd, id );
@@ -2085,8 +2083,6 @@ VOID OperationOnCommand( HWND hWnd, INT id, HWND hWndCtl, UINT codeNotify )
 		OpenHistoryLogging( hWnd, NULL );
 		return;
 	}
-#endif
-
 
 
 	switch( id )
@@ -2455,6 +2451,11 @@ VOID OperationOnCommand( HWND hWnd, INT id, HWND hWndCtl, UINT codeNotify )
 
 		//	DOCKING時の、壱行・BRUSHテンプレを表示/非表示
 		case IDM_LINE_BRUSH_TMPL_VIEW:	DockingTmplViewToggle(  0 );	break;
+
+#ifdef AA_INVERSE
+		case IDM_MIRROR_INVERSE:	DocInverseTransform( gbSqSelect, 1, &gdDocXdot, gdDocLine );	break;
+		case IDM_UPSET_INVERSE:		DocInverseTransform( gbSqSelect, 0, &gdDocXdot, gdDocLine );	break;
+#endif
 
 		case IDM_TESTCODE:
 			TRACE( TEXT("機能テスト") );

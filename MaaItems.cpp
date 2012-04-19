@@ -7,7 +7,7 @@
 
 /*
 Orinrin Editor : AsciiArt Story Editor for Japanese Only
-Copyright (C) 2011 Orinrin/SikigamiHNQ
+Copyright (C) 2011 - 2012 Orinrin/SikigamiHNQ
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
@@ -1144,7 +1144,8 @@ INT_PTR CALLBACK AaItemAddDlgProc( HWND hDlg, UINT message, WPARAM wParam, LPARA
 
 			//	とりあえずクリップボードの中身をとる
 			ptBuffer = DocClipboardDataGet( NULL );
-			if( !(ptBuffer) ){	DocPageTextAllGetAlloc( D_UNI , (LPVOID *)(&ptBuffer) );	}
+		//	if( !(ptBuffer) ){	DocPageTextAllGetAlloc( D_UNI , (LPVOID *)(&ptBuffer) );	}
+			if( !(ptBuffer) ){	DocPageGetAlloc( D_UNI , (LPVOID *)(&ptBuffer) );	}
 			//	使えないシロモノなら、今の頁の内容を持ってきて表示
 			SetDlgItemText( hDlg, IDE_MAID_CONTENTS, ptBuffer );
 			return (INT_PTR)TRUE;
@@ -1184,7 +1185,8 @@ INT_PTR CALLBACK AaItemAddDlgProc( HWND hDlg, UINT message, WPARAM wParam, LPARA
 
 				case IDB_MAID_NOWPAGE:
 					FREE(ptBuffer);
-					DocPageTextAllGetAlloc( D_UNI , (LPVOID *)(&ptBuffer) );
+					//DocPageTextAllGetAlloc( D_UNI , (LPVOID *)(&ptBuffer) );
+					DocPageGetAlloc( D_UNI , (LPVOID *)(&ptBuffer) );
 					SetDlgItemText( hDlg, IDE_MAID_CONTENTS, ptBuffer );
 					return (INT_PTR)TRUE;
 

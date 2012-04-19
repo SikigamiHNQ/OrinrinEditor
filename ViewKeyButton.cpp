@@ -7,7 +7,7 @@
 
 /*
 Orinrin Editor : AsciiArt Story Editor for Japanese Only
-Copyright (C) 2011 Orinrin/SikigamiHNQ
+Copyright (C) 2011 - 2012 Orinrin/SikigamiHNQ
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
@@ -111,6 +111,10 @@ VOID Evw_OnKey( HWND hWnd, UINT vk, BOOL fDown, INT cRepeat, UINT flags )
 	ViewSelPositionSet( NULL );	//	操作直前の位置
 	//	中でルーラーのドローが発生してる。Ctrlとか押しっぱでちらつく
 
+#ifdef DO_TRY_CATCH
+	try{
+#endif
+
 	if( fDown )
 	{
 		switch( vk )
@@ -163,7 +167,8 @@ VOID Evw_OnKey( HWND hWnd, UINT vk, BOOL fDown, INT cRepeat, UINT flags )
 				{
 					bCrLf = DocInputDelete( gdDocXdot , gdDocLine );
 				}
-				if( bCrLf  )	//	処理した行以降全取っ替え
+				//	負で異常発生
+				if( 0 < bCrLf  )	//	処理した行以降全取っ替え
 				{
 					for( i = gdDocLine; iLines > i; i++ ){	ViewRedrawSetLine(  i );	}
 				}
@@ -215,7 +220,7 @@ VOID Evw_OnKey( HWND hWnd, UINT vk, BOOL fDown, INT cRepeat, UINT flags )
 
 				//	次の行が無かったら
 				dDot = DocLineParamGet( gdDocLine, NULL, NULL );
-				if( -1 == dDot ){	gdDocLine--;	}	//	戻しておく
+				if( 0 >  dDot ){	gdDocLine--;	}	//	戻しておく
 				else{	gdDocXdot = 0;	}	//	次の行へ移動して行頭へ
 			}
 		}
@@ -232,6 +237,12 @@ VOID Evw_OnKey( HWND hWnd, UINT vk, BOOL fDown, INT cRepeat, UINT flags )
 	{
 		//	ない？
 	}
+
+#ifdef DO_TRY_CATCH
+	}
+	catch( exception &err ){	ETC_MSG( err.what(), 0 );	 return;	}
+	catch( ... ){	ETC_MSG( ("etc error"), 0 );	 return;	}
+#endif
 
 	return;
 }

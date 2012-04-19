@@ -7,7 +7,7 @@
 
 /*
 Orinrin Editor : AsciiArt Story Editor for Japanese Only
-Copyright (C) 2011 Orinrin/SikigamiHNQ
+Copyright (C) 2011 - 2012 Orinrin/SikigamiHNQ
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
@@ -25,13 +25,30 @@ If not, see <http://www.gnu.org/licenses/>.
 //	キーバインド・メニューに入ってない機能に注意
 
 
-//	複数行枠、編集DIALOGUEのサイズ可変になるようにする・最小サイズだけ注意して、プレビュー連動で
 
 //	枠編集DIALOGUE、オフセットでENTERとか直書換に対応セヨ
 
-//	ユニコードモードの切替、ツールバーにボタン増やす
-
 //	ドッキングテンプレ、左に置けないか
+
+//	TODO:	頁挿入ダイヤログのチェックボックス覚えておくように
+
+//	TODO:	MAAで、ファイルクルックしたら、自動で副タブ開く機能・選択式がよい
+//もしくは中クルックで対応
+
+//	TODO:	ミニ複数行テンプレ・壱行ブラシのサブダイヤログに増やすか
+
+
+//ファイル開くとき、ページデータは生のテキストデータだけゲットしておいて、メモリ展開はしない
+//ページが選択されたら、本体に展開して、生データは消しておく・これをフラグにする
+//保存するときは、生データか、本体データを保存する
+//頁表示のステータスのほうは？バイト数計算だけならそんなに重くない？
+
+//	ファイル履歴は、いじった順番になるようにすべき
+
+//プレビューの更新ボタンつける
+//プレビュー開いてる時に、開く操作したら閉じる？
+
+//ビューワのアイコン変える。緑とか
 
 
 //バグ＜影響ないようにした
@@ -135,9 +152,6 @@ If not, see <http://www.gnu.org/licenses/>.
 //	ACCEL構造体
 //	Ctrl Shift Alt の順番
 
-
-
-
 //外部スクリプトはどのように実現するか。Rubyの組込とかつかえない？
 //(д)EditはFreePascal？
 
@@ -163,6 +177,7 @@ If not, see <http://www.gnu.org/licenses/>.
 //OK?
 //	TODO:	Enterでコピー・表示の一番上でいいか
 //	TODO:	Editorのプロファイル使用履歴が動かない
+//	TODO:	新規で開いて、それを名づけ保存したファイルは、履歴に入いってない
 
 //	TODO:	頁削除のAlt+D付ける。注意ダイヤログ出す。
 //	TODO:	UTF8でもセーブ出来るように・エクスポートでいいか
@@ -390,6 +405,7 @@ ASDファイル　　壱行が壱コンテンツ
 					枠作成に、複数行使えるようにした
 					枠の個数を２０個保持できるようにした
 					ツールバーに、ユニコード空白の使用／不使用トグルボタンつけた
+					左右反転、上下反転機能を追加
 
 更新日時注意
 
@@ -456,6 +472,10 @@ static  HWND		ghStsBarWnd;	//!<	ステータスバー
 
 static HANDLE		ghMutex;		//!<	多重起動防止用Mutex
 
+#ifdef WORK_LOG_OUT
+static HANDLE		ghLogFlie;		//!<	ログ出力
+#endif
+
 EXTERNED HFONT		ghNameFont;		//!<	ファイルタブ用フォント
 
 EXTERNED HWND		ghMaaWnd;		//!<	複数行ＡＡテンプレ
@@ -483,10 +503,8 @@ static TCHAR		gatIniPath[MAX_PATH];	//!<	ＩＮＩファイルの位置
 
 EXTERNED INT		gbTmpltDock;	//!<	テンプレのドッキング
 
-#ifdef OPEN_HISTORY
 static list<OPENHIST>	gltOpenHist;	//!<	ファイル開いた履歴・
 EXTERNED HMENU	ghHistyMenu;			//!<	履歴表示する部分・動的に内容作成せないかん
-#endif
 
 #ifdef FIND_STRINGS
 extern  HWND	ghFindDlg;		//	検索ダイヤログのハンドル
@@ -558,6 +576,9 @@ INT APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 	LPACCEL	pstAccel;
 	INT	iEntry;
 
+#ifdef WORK_LOG_OUT
+	SYSTEMTIME	stTime;
+#endif
 
 #ifdef _DEBUG
 	//_CRTDBG_ALLOC_MEM_DF;		//	指定が必要なフラグ
@@ -617,14 +638,37 @@ INT APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 
 	gbDockTmplView = TRUE;
 
+
+#ifdef WORK_LOG_OUT
+	iCode = InitParamValue( INIT_LOAD, VL_WORKLOG, 0 );
+	if( iCode )
+	{
+		ghLogFlie = CreateFile( TEXT("LogFile.txt"), GENERIC_WRITE, 0, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL );
+		if( INVALID_HANDLE_VALUE != ghLogFlie )
+		{
+			SetFilePointer( ghLogFlie, 0, NULL, FILE_END );
+
+			GetLocalTime( &stTime );
+			TRACE( TEXT("LOG START [%u/%02u/%02u %02u:%02u:%02u]"), stTime.wYear, stTime.wMonth, stTime.wDay, stTime.wHour, stTime.wMinute, stTime.wSecond );
+		}
+	}
+	else
+	{
+		ghLogFlie = INVALID_HANDLE_VALUE;
+	}
+#endif
+
+
 	iCode = InitParamValue( INIT_LOAD, VL_CLASHCOVER, 0 );
 	if( iCode )
 	{
+		TRACE( TEXT("異常終了の可能性アリ") );
 		iCode = MessageBox( NULL, TEXT("エディタが正しく終了出来なかった気配があるよ。\r\nバックアップが残っているかもしれないから、先に確認してみて！\r\nこのまま起動してもいいかい？　「いいえ」を選ぶと、ここで終了するよ。"), TEXT("ごめんね"), MB_YESNO|MB_ICONWARNING|MB_DEFBUTTON2 );
 		if( IDNO == iCode ){	return 0;	}
 	}
 
 	InitParamValue( INIT_SAVE, VL_CLASHCOVER, 1 );
+
 
 	ViewingFontNameLoad(  );	//	フォント名確保
 
@@ -682,6 +726,16 @@ INT APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 
 	ReleaseMutex( ghMutex );
 	CloseHandle( ghMutex );
+
+	TRACE( TEXT("Program Terminate") );
+
+#ifdef WORK_LOG_OUT
+	if( INVALID_HANDLE_VALUE != ghLogFlie )
+	{
+		SetEndOfFile( ghLogFlie );	
+		CloseHandle( ghLogFlie );	
+	}
+#endif
 
 	return (int)msg.wParam;
 }
@@ -858,6 +912,10 @@ BOOL InitInstance( HINSTANCE hInstance, INT nCmdShow, LPTSTR ptArgv )
 	OpenHistoryInitialise( hWnd );
 
 	OpenProfileInitialise( hWnd );
+
+#ifdef AA_INVERSE
+	DocInverseInit( TRUE );
+#endif
 
 	SetFocus( ghViewWnd );
 
@@ -1429,6 +1487,10 @@ VOID Cls_OnDestroy( HWND hWnd )
 	Shell_NotifyIcon( NIM_DELETE, &nid );
 #endif
 
+#ifdef AA_INVERSE
+	DocInverseInit( FALSE );
+#endif
+
 	ToolBarBandInfoGet( NULL );
 
 	PreviewInitialise( NULL, NULL );
@@ -1488,6 +1550,7 @@ VOID Cls_OnDestroy( HWND hWnd )
 		}
 	}
 
+
 	//	MAAのはそっち側でやってる
 	DestroyWindow( ghMaaWnd );
 
@@ -1495,6 +1558,8 @@ VOID Cls_OnDestroy( HWND hWnd )
 
 
 	InitMultiFileTabOpen( INIT_SAVE, 0, NULL );
+
+	DocInitialise( FALSE );
 
 	SetWindowFont( ghFileTabWnd, GetStockFont(DEFAULT_GUI_FONT), FALSE );
 
@@ -2038,6 +2103,7 @@ INT InitParamValue( UINT dMode, UINT dStyle, INT nValue )
 		case  VL_LAST_OPEN:		StringCchCopy( atKeyName, SUB_STRING, TEXT("LastOpenStyle") );	break;
 		case  VL_MAA_MCLICK:	StringCchCopy( atKeyName, SUB_STRING, TEXT("MaaSubMethod") );	break;
 		case  VL_DRT_MCLICK:	StringCchCopy( atKeyName, SUB_STRING, TEXT("DraughtSubDef") );	break;
+		case  VL_WORKLOG:		StringCchCopy( atKeyName, SUB_STRING, TEXT("WorkLogDebug") );	break;
 		default:	return nValue;
 	}
 
@@ -2235,7 +2301,6 @@ HRESULT WindowFocusChange( INT nowWnd, INT iDir )
 }
 //-------------------------------------------------------------------------------------------------
 
-#ifdef OPEN_PROFILE
 /*!
 	プロフ履歴をINIから読んだり書いたり
 	@param[in]		dMode	非０ロード　０セーブ
@@ -2275,9 +2340,8 @@ HRESULT InitProfHistory( UINT dMode, UINT dNumber, LPTSTR ptFile )
 }
 //-------------------------------------------------------------------------------------------------
 
-#endif
 
-#ifdef OPEN_HISTORY
+
 
 /*!
 	ファイルから履歴取り込んだり書き込んだり
@@ -2446,7 +2510,7 @@ HRESULT OpenHistoryLogging( HWND hWnd, LPTSTR ptFile )
 }
 //-------------------------------------------------------------------------------------------------
 
-#endif
+
 
 /*!
 	おぷしょんダイヤログ開く
@@ -3249,13 +3313,18 @@ HRESULT DockingTmplViewToggle( UINT bMode )
 }
 //-------------------------------------------------------------------------------------------------
 
-#ifdef _DEBUG
+//	WORK_LOG_OUT
+//#ifdef _DEBUG
 VOID OutputDebugStringPlus( DWORD rixError, LPSTR pcFile, INT rdLine, LPSTR pcFunc, LPTSTR ptFormat, ... )
 {
 	va_list	argp;
 	TCHAR	atBuf[MAX_PATH], atOut[MAX_PATH], atFiFu[MAX_PATH], atErrMsg[MAX_PATH];
 	CHAR	acFile[MAX_PATH], acFiFu[MAX_PATH];
 	UINT	length;
+#ifdef WORK_LOG_OUT
+	UINT_PTR	cchLen;
+	DWORD	wrote;
+#endif
 
 	StringCchCopyA( acFile, MAX_PATH, pcFile );
 	PathStripPathA( acFile );
@@ -3274,7 +3343,17 @@ VOID OutputDebugStringPlus( DWORD rixError, LPSTR pcFile, INT rdLine, LPSTR pcFu
 
 	StringCchPrintf( atOut, MAX_PATH, TEXT("%s @ %s\r\n"), atBuf, atFiFu );//
 
+#ifdef _DEBUG
 	OutputDebugString( atOut );
+#endif
+
+#ifdef WORK_LOG_OUT
+	if( INVALID_HANDLE_VALUE != ghLogFlie )
+	{
+		StringCchLength( atOut, MAX_PATH, &cchLen );
+		WriteFile( ghLogFlie, atOut, cchLen * sizeof(TCHAR), &wrote, NULL );
+	}
+#endif
 
 	if( rixError )
 	{
@@ -3283,11 +3362,21 @@ VOID OutputDebugStringPlus( DWORD rixError, LPSTR pcFile, INT rdLine, LPSTR pcFu
 		//	メッセージには改行が含まれているようだ
 		StringCchPrintf( atBuf, MAX_PATH, TEXT("[%d]%s"), rixError, atErrMsg );//
 
+#ifdef _DEBUG
 		OutputDebugString( atBuf );
+#endif
+#ifdef WORK_LOG_OUT
+		if( INVALID_HANDLE_VALUE != ghLogFlie )
+		{
+			StringCchLength( atBuf, MAX_PATH, &cchLen );
+			WriteFile( ghLogFlie, atBuf, cchLen * sizeof(TCHAR), &wrote, NULL );
+		}
+#endif
+
 		SetLastError( 0 );
 	}
 }
 //-------------------------------------------------------------------------------------------------
-#endif
+//#endif
 
 //	Dirty Deeds Done Dirt Cheap 自分のスタンドに「いとも容易く行われるえげつない行為」なんて名前を付けるのはどうかと思う。

@@ -7,7 +7,7 @@
 
 /*
 Orinrin Editor : AsciiArt Story Editor for Japanese Only
-Copyright (C) 2011 Orinrin/SikigamiHNQ
+Copyright (C) 2011 - 2012 Orinrin/SikigamiHNQ
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
@@ -337,7 +337,7 @@ HRESULT FindPageSearch( LPTSTR ptPattern, INT iTgtPage, FILES_ITR itFile )
 	StringCchLength( ptPattern, MAX_PATH, &cchSzPtn );
 
 	//	•Å‘S‘ÌŠm•Û
-	dBytes = DocAllTextGetAlloc( iTgtPage, D_UNI, (LPVOID *)(&ptPage), itFile );
+	dBytes = DocPageTextGetAlloc( itFile, iTgtPage, D_UNI, (LPVOID *)(&ptPage), FALSE );
 	StringCchLength( ptPage, STRSAFE_MAX_CCH, &cchSize );
 
 	ptCaret = ptPage;
@@ -385,13 +385,8 @@ HRESULT FindPageHitHighlight( INT iOffset, INT iRange, INT iPage, FILES_ITR itFi
 
 	LINE_ITR	itLine, itLnEnd;
 
-#ifdef LINE_VEC_LIST
 	itLine  = itFile->vcCont.at( iPage ).ltPage.begin();
 	itLnEnd = itFile->vcCont.at( iPage ).ltPage.end();
-#else
-	itLine  = itFile->vcCont.at( iPage ).vcPage.begin();
-	itLnEnd = itFile->vcCont.at( iPage ).vcPage.end();
-#endif
 
 	iTotal = 0;
 	iLnTop = 0;
@@ -508,13 +503,9 @@ INT FindPageHighlightOff( INT iPage, FILES_ITR itFile )
 
 	ZeroMemory( gatNowPtn, sizeof(gatNowPtn) );
 
-#ifdef LINE_VEC_LIST
 	itLine  = itFile->vcCont.at( iPage ).ltPage.begin();
 	itLnEnd = itFile->vcCont.at( iPage ).ltPage.end();
-#else
-	itLine  = itFile->vcCont.at( iPage ).vcPage.begin();
-	itLnEnd = itFile->vcCont.at( iPage ).vcPage.end();
-#endif
+
 	for( ln = 0; itLnEnd != itLine; itLine++, ln++ )
 	{
 		FindLineHighlightOff( ln, itLine );

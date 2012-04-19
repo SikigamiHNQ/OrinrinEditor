@@ -124,6 +124,10 @@
 #define IDBMQ_LINESSHIFTRIGHT           418
 #define IDBMP_LINESSHIFTLEFT            419
 #define IDBMQ_LINESSHIFTLEFT            420
+#define IDBMP_MIRROR_INVERSE			421
+#define IDBMQ_MIRROR_INVERSE			422
+#define IDBMP_UPSET_INVERSE				423
+#define IDBMQ_UPSET_INVERSE				424
 #define IDBMPQ_VIEW_TB_FIRST            431
 #define IDBMP_UNIPALETTE                431
 #define IDBMQ_UNIPALETTE                432
@@ -603,6 +607,9 @@
 #define IDM_MOZI_ADVANCE                33011
 #define IDM_MOZI_LISTDEL                33012
 #define IDM_AATABS_ALLDELETE            33013
+#define IDM_MIRROR_INVERSE				33021
+#define IDM_UPSET_INVERSE				33022
+
 #define IDC_STATIC                      -1
 
 // Next default values for new objects

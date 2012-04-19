@@ -7,7 +7,7 @@
 
 /*
 Orinrin Editor : AsciiArt Story Editor for Japanese Only
-Copyright (C) 2011 Orinrin/SikigamiHNQ
+Copyright (C) 2011 - 2012 Orinrin/SikigamiHNQ
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
@@ -39,9 +39,7 @@ static HIMAGELIST	ghViewImgLst;	//!<
 
 static WNDPROC	gpfOrigTBProc;		//!<	
 
-#ifdef OPEN_HISTORY
 extern HMENU	ghHistyMenu;		//	履歴表示する部分・動的に内容作成せないかん
-#endif
 //-------------------------------------------------------------------------------------------------
 
 static LRESULT	CALLBACK gpfToolbarProc( HWND, UINT, WPARAM, LPARAM );
@@ -95,21 +93,24 @@ static TBBUTTON gstInsertTBInfo[] = {
 };
 
 //	整形
-#define TB_LAYOUT_ITEMS	13
+#define TB_LAYOUT_ITEMS	16
 static TBBUTTON gstLayoutTBInfo[] = {
-	{  0, IDM_RIGHT_GUIDE_SET,	TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,	{0, 0}, 0, 0  },	//	
-	{  1, IDM_INS_TOPSPACE,		TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,	{0, 0}, 0, 0  },	//	
+	{  0, IDM_RIGHT_GUIDE_SET,	TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,	{0, 0}, 0, 0  },	//	右揃え線
+	{  1, IDM_INS_TOPSPACE,		TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,	{0, 0}, 0, 0  },	//	行頭に空白挿入
 	{  0, 0,					TBSTATE_ENABLED,	TBSTYLE_SEP,		{0, 0}, 0, 0  },
-	{  2, IDM_DEL_TOPSPACE,		TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,	{0, 0}, 0, 0  },	//	
-	{  3, IDM_DEL_LASTSPACE,	TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,	{0, 0}, 0, 0  },	//	
-	{  4, IDM_DEL_LASTLETTER,	TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,	{0, 0}, 0, 0  },	//	
+	{  2, IDM_DEL_TOPSPACE,		TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,	{0, 0}, 0, 0  },	//	行頭空白削除
+	{  3, IDM_DEL_LASTSPACE,	TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,	{0, 0}, 0, 0  },	//	行末空白削除
+	{  4, IDM_DEL_LASTLETTER,	TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,	{0, 0}, 0, 0  },	//	行末文字削除
 	{  0, 0,					TBSTATE_ENABLED,	TBSTYLE_SEP,		{0, 0}, 0, 0  },
-	{  5, IDM_RIGHT_SLIDE,		TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,	{0, 0}, 0, 0  },	//	
-	{  6, IDM_INCREMENT_DOT,	TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,	{0, 0}, 0, 0  },	//	
-	{  7, IDM_DECREMENT_DOT,	TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,	{0, 0}, 0, 0  },	//	
+	{ 10, IDM_MIRROR_INVERSE,	TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,	{0, 0}, 0, 0  },	//	
+	{ 11, IDM_UPSET_INVERSE,	TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,	{0, 0}, 0, 0  },	//	
 	{  0, 0,					TBSTATE_ENABLED,	TBSTYLE_SEP,		{0, 0}, 0, 0  },
-	{  8, IDM_INCR_DOT_LINES,	TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,	{0, 0}, 0, 0  },	//	
-	{  9, IDM_DECR_DOT_LINES,	TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,	{0, 0}, 0, 0  } 	//	
+	{  5, IDM_RIGHT_SLIDE,		TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,	{0, 0}, 0, 0  },	//	右に寄せる
+	{  6, IDM_INCREMENT_DOT,	TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,	{0, 0}, 0, 0  },	//	１ドット増やす
+	{  7, IDM_DECREMENT_DOT,	TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,	{0, 0}, 0, 0  },	//	１ドット減らす
+	{  0, 0,					TBSTATE_ENABLED,	TBSTYLE_SEP,		{0, 0}, 0, 0  },
+	{  8, IDM_INCR_DOT_LINES,	TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,	{0, 0}, 0, 0  },	//	１ドット右へ
+	{  9, IDM_DECR_DOT_LINES,	TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,	{0, 0}, 0, 0  } 	//	１ドット左へ
 };
 
 //	表示
@@ -345,9 +346,9 @@ VOID ToolBarCreate( HWND hWnd, HINSTANCE lcInst )
 	//stToolBmp.hInst = HINST_COMMCTRL;
 	//stToolBmp.nID   = IDB_VIEW_SMALL_COLOR;
 	//SendMessage( ghLayoutTBWnd, TB_ADDBITMAP, 0, (LPARAM)&stToolBmp );
-	ghLayoutImgLst = ImageList_Create( 16, 16, ILC_COLOR24 | ILC_MASK, 8, 1 );
+	ghLayoutImgLst = ImageList_Create( 16, 16, ILC_COLOR24 | ILC_MASK, 12, 1 );
 	resnum = IDBMPQ_LAYOUT_TB_FIRST;
-	for( ici = 0; 10 > ici; ici++ )
+	for( ici = 0; 12 > ici; ici++ )
 	{
 		hImg = LoadBitmap( lcInst, MAKEINTRESOURCE( (resnum++) ) );
 		hMsq = LoadBitmap( lcInst, MAKEINTRESOURCE( (resnum++) ) );
@@ -365,11 +366,13 @@ VOID ToolBarCreate( HWND hWnd, HINSTANCE lcInst )
 	StringCchCopy( atBuff, MAX_STRING, TEXT("行頭空白削除") );			gstLayoutTBInfo[ 3].iString = SendMessage( ghLayoutTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
 	StringCchCopy( atBuff, MAX_STRING, TEXT("行末空白削除") );			gstLayoutTBInfo[ 4].iString = SendMessage( ghLayoutTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
 	StringCchCopy( atBuff, MAX_STRING, TEXT("行末文字削除") );			gstLayoutTBInfo[ 5].iString = SendMessage( ghLayoutTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-	StringCchCopy( atBuff, MAX_STRING, TEXT("右に寄せる") );			gstLayoutTBInfo[ 7].iString = SendMessage( ghLayoutTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-	StringCchCopy( atBuff, MAX_STRING, TEXT("１ドット増やす") );		gstLayoutTBInfo[ 8].iString = SendMessage( ghLayoutTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-	StringCchCopy( atBuff, MAX_STRING, TEXT("１ドット減らす") );		gstLayoutTBInfo[ 9].iString = SendMessage( ghLayoutTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-	StringCchCopy( atBuff, MAX_STRING, TEXT("全体を１ドット右へ") );	gstLayoutTBInfo[11].iString = SendMessage( ghLayoutTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-	StringCchCopy( atBuff, MAX_STRING, TEXT("全体を１ドット左へ") );	gstLayoutTBInfo[12].iString = SendMessage( ghLayoutTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING, TEXT("左右反転") );				gstLayoutTBInfo[ 7].iString = SendMessage( ghLayoutTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING, TEXT("上下反転") );				gstLayoutTBInfo[ 8].iString = SendMessage( ghLayoutTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING, TEXT("右に寄せる") );			gstLayoutTBInfo[10].iString = SendMessage( ghLayoutTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING, TEXT("１ドット増やす") );		gstLayoutTBInfo[11].iString = SendMessage( ghLayoutTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING, TEXT("１ドット減らす") );		gstLayoutTBInfo[12].iString = SendMessage( ghLayoutTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING, TEXT("全体を１ドット右へ") );	gstLayoutTBInfo[14].iString = SendMessage( ghLayoutTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING, TEXT("全体を１ドット左へ") );	gstLayoutTBInfo[15].iString = SendMessage( ghLayoutTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
 
 	SendMessage( ghLayoutTBWnd , TB_ADDBUTTONS, (WPARAM)TB_LAYOUT_ITEMS, (LPARAM)&gstLayoutTBInfo );	//	ツールバーにボタンを挿入
 

@@ -7,7 +7,7 @@
 
 /*
 Orinrin Editor : AsciiArt Story Editor for Japanese Only
-Copyright (C) 2011 Orinrin/SikigamiHNQ
+Copyright (C) 2011 - 2012 Orinrin/SikigamiHNQ
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
@@ -137,9 +137,7 @@ HRESULT DocDoOpenFile( HWND hWnd, LPTSTR ptFile )
 	else
 	{
 		MultiFileTabAppend( dNumber, ptFile );	//	ダイヤログからファイルオーポン
-#ifdef OPEN_HISTORY
 		OpenHistoryLogging( hWnd , ptFile );	//	ファイルオーポン記録を追加
-#endif
 	}
 
 	return S_OK;
@@ -294,7 +292,7 @@ HRESULT DocFileBackup( HWND hWnd )
 				if( 1 <= i ){	WriteFile( hFile , pbSplit, cbSplSz, &wrote, NULL );	}
 			}
 
-			iByteSize = DocAllTextGetAlloc( i, D_SJIS, &pBuffer, itFile );
+			iByteSize = DocPageTextGetAlloc( itFile, i, D_SJIS, &pBuffer, TRUE );
 
 			if( (i+1) == iPages ){	iByteSize -=  iCrLf;	}
 			//	最終頁の末端の改行は不要のはず
@@ -349,6 +347,8 @@ HRESULT DocFileSave( HWND hWnd, UINT bStyle )
 	INT		isAST, isMLT, ddExten;
 	BOOLEAN	bExtChg =FALSE, bLastChg = FALSE;
 
+	BOOLEAN	bNoName = FALSE;
+
 	BOOLEAN	bUtf8 = FALSE;	//	ＵＴＦ８で保存セヨ
 	BOOLEAN	bUnic = FALSE;	//	ユニコードで保存セヨ
 
@@ -378,8 +378,10 @@ HRESULT DocFileSave( HWND hWnd, UINT bStyle )
 
 	StringCchCopy( atFilePath, MAX_PATH, (*gitFileIt).atFileName );
 
+	if( NULL == (*gitFileIt).atFileName[0] )	bNoName = TRUE;
+
 	//	リネームか、ファイル名が無かったら保存ダイヤログ開く
-	if( (bStyle & D_RENAME) || NULL == (*gitFileIt).atFileName[0] )
+	if( (bStyle & D_RENAME) || bNoName )
 	{
 
 		//ここで FileSaveDialogue を出す
@@ -495,7 +497,7 @@ HRESULT DocFileSave( HWND hWnd, UINT bStyle )
 
 		if( bUnic )
 		{
-			cbSplSz = (MLT_SPRT_CCH + CH_CRLF_CCH) * 2;
+			cbSplSz = (MLT_SPRT_CCH + CH_CRLF_CCH) * sizeof(TCHAR);
 			StringCchPrintfW( (LPTSTR)pbSplit, 15, TEXT("%s%s"), MLT_SEPARATERW, CH_CRLFW );
 		}
 		else	//	UTF8の場合は、ASCII文字はそのままでおｋ
@@ -526,13 +528,12 @@ HRESULT DocFileSave( HWND hWnd, UINT bStyle )
 			if( 1 <= i ){	WriteFile( hFile , pbSplit, cbSplSz, &wrote, NULL );	}
 		}
 
-		iByteSize = DocAllTextGetAlloc( i, bStyle, &pBuffer, gitFileIt );
+		iByteSize = DocPageTextGetAlloc( gitFileIt, i, bStyle, &pBuffer, TRUE );
 
 		if( bUtf8 ){	iByteSize = DocUnicode2UTF8( &pBuffer );	}
 		//	pBufferの中身を付け替える
 
-		if( (i+1) == iPages ){	iByteSize -=  iCrLf;	}
-		//	最終頁の末端の改行は不要のはず
+		if( (i+1) == iPages ){	iByteSize -=  iCrLf;	}	//	最終頁の末端の改行は不要のはず
 		WriteFile( hFile, pBuffer, iByteSize - iNullTmt, &wrote, NULL );
 
 		FREE( pBuffer );
@@ -554,6 +555,8 @@ HRESULT DocFileSave( HWND hWnd, UINT bStyle )
 		AppTitleChange( atFilePath );
 		StringCchPrintf( atBuffer, MAX_STRING, TEXT("拡張子を %s にして保存したのです。あぅあぅ"), aatExte[ddExten] );
 		NotifyBalloonExist( atBuffer, TEXT("拡張子を変更したのです"), NIIF_INFO );
+
+		OpenHistoryLogging( hWnd , atFilePath );	//	ファイル名変更したので記録取り直し
 	}
 	else
 	{
@@ -563,6 +566,8 @@ HRESULT DocFileSave( HWND hWnd, UINT bStyle )
 			//InitLastOpen( INIT_SAVE, atFilePath );
 			MultiFileTabRename( (*gitFileIt).dUnique, atFilePath );	//	タブ名称変更
 			AppTitleChange( atFilePath );
+
+			OpenHistoryLogging( hWnd , atFilePath );	//	ファイル名変更したので記録取り直し
 		}
 
 		if( bUnic || bUtf8 )
@@ -625,11 +630,11 @@ INT DocAstSeparatorGetAlloc( INT dPage, UINT bStyle, LPVOID *pText, FILES_ITR it
 
 	if( bStyle & D_UNI )
 	{
-		cbSize = (cchSize + 1) * 2;	//	NULLターミネータ
+		cbSize = (cchSize + 1) * sizeof(TCHAR);	//	NULLターミネータ
 
 		*pText = (LPTSTR)malloc( cbSize );
 		ZeroMemory( *pText, cbSize );
-		StringCchCopy( (LPTSTR)(*pText), cbSize, atBuffer );
+		StringCchCopy( (LPTSTR)(*pText), (cchSize + 1), atBuffer );
 	}
 	else
 	{
@@ -643,94 +648,6 @@ INT DocAstSeparatorGetAlloc( INT dPage, UINT bStyle, LPVOID *pText, FILES_ITR it
 	return cbSize;
 }
 //-------------------------------------------------------------------------------------------------Yippee-ki-yay!
-
-/*!
-	ページ全体を文字列で確保する・freeは呼んだ方でやる
-	@param[in]	dPage	確保する頁番号
-	@param[in]	bStyle	１ユニコードかシフトJISで、矩形かどうか
-	@param[out]	pText	確保した領域を返す・ワイド文字かマルチ文字になる・NULLだと必要バイト数を返すのみ
-	@return				確保したバイト数・NULLターミネータ含む
-*/
-INT DocAllTextGetAlloc( INT dPage, UINT bStyle, LPVOID *pText, FILES_ITR itFile )
-{
-	UINT_PTR	iLines, iLetters, j, iSize;
-
-	string	srString;
-	wstring	wsString;
-
-#ifdef LINE_VEC_LIST
-	LINE_ITR	itLines;
-#else
-	UINT_PTR	i;
-#endif
-
-	srString.clear( );
-	wsString.clear( );
-
-	//	全文字を頂く
-#ifdef LINE_VEC_LIST
-	iLines = itFile->vcCont.at( dPage ).ltPage.size( );
-
-	for( itLines = itFile->vcCont.at( dPage ).ltPage.begin();
-	itLines != itFile->vcCont.at( dPage ).ltPage.end();
-	itLines++ )
-	{
-		iLetters = itLines->vcLine.size( );
-
-		for( j = 0; iLetters > j; j++ )
-		{
-			srString +=  string( itLines->vcLine.at( j ).acSjis );
-			wsString += itLines->vcLine.at( j ).cchMozi;
-		}
-#else
-	iLines = itFile->vcCont.at( dPage ).vcPage.size( );
-
-	for( i = 0; iLines > i; i++ )
-	{
-		iLetters = itFile->vcCont.at( dPage ).vcPage.at( i ).vcLine.size( );
-
-		for( j = 0; iLetters > j; j++ )
-		{
-			srString +=  string( itFile->vcCont.at( dPage ).vcPage.at( i ).vcLine.at( j ).acSjis );
-			wsString += itFile->vcCont.at( dPage ).vcPage.at( i ).vcLine.at( j ).cchMozi;
-		}
-#endif
-
-		if( !(1 == iLines && 0 == iLetters) )	//	壱行かつ零文字は空である
-		{
-			//	構造上、常に改行は必要
-			srString +=  string( CH_CRLFA );
-			wsString += wstring( CH_CRLFW );
-		}
-	}
-
-	if( bStyle & D_UNI )
-	{
-		iSize = wsString.size( ) + 1;	//	NULLターミネータ
-		iSize *= 2;	//	ユニコードなのでバイト数は２倍である
-
-		if( pText )
-		{
-			*pText = (LPTSTR)malloc( iSize );
-			ZeroMemory( *pText, iSize );
-			StringCchCopy( (LPTSTR)(*pText), iSize, wsString.c_str( ) );
-		}
-	}
-	else
-	{
-		iSize = srString.size( ) + 1;	//	NULLターミネータ
-
-		if( pText )
-		{
-			*pText = (LPSTR)malloc( iSize );
-			ZeroMemory( *pText, iSize );
-			StringCchCopyA( (LPSTR)(*pText), iSize, srString.c_str( ) );
-		}
-	}
-
-	return (INT)iSize;
-}
-//-------------------------------------------------------------------------------------------------
 
 /*!
 	画像で頁を保存・BMPかPNG、JPEGは向いてない
@@ -806,7 +723,7 @@ HRESULT DocImageSave( HWND hWnd, UINT bStyle, HFONT hFont )
 
 	TRACE( TEXT("サイズ %d x %d"), iDotX, iDotY );
 
-	iByteSize = DocAllTextGetAlloc( gixFocusPage, D_UNI, &pBuffer, gitFileIt );
+	iByteSize = DocPageTextGetAlloc( gitFileIt, gixFocusPage, D_UNI, &pBuffer, TRUE );
 	StringCchLength( (LPTSTR)pBuffer, STRSAFE_MAX_CCH, &cchSize );
 
 	//	描画用ビットマップ作成

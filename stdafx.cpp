@@ -7,7 +7,7 @@
 
 /*
 Orinrin Editor : AsciiArt Story Editor for Japanese Only
-Copyright (C) 2011 Orinrin/SikigamiHNQ
+Copyright (C) 2011 - 2012 Orinrin/SikigamiHNQ
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
@@ -279,8 +279,8 @@ LPTSTR SjisDecodeAlloc( LPSTR pcBuff )
 	cchSize = MultiByteToWideChar( CP_ACP, MB_PRECOMPOSED, pcBuff, -1, NULL, 0 );
 
 	//	出力用ユニコードバッファ
-	ptBuffer = (LPTSTR)malloc( (cchSize+1) * 2 );
-	ZeroMemory( ptBuffer, (cchSize+1) * 2 );
+	ptBuffer = (LPTSTR)malloc( (cchSize+1) * sizeof(TCHAR) );
+	ZeroMemory( ptBuffer, (cchSize+1) * sizeof(TCHAR) );
 
 	dStart = 0;
 	dEnd   = 0;

@@ -7,7 +7,7 @@
 
 /*
 Orinrin Editor : AsciiArt Story Editor for Japanese Only
-Copyright (C) 2011 Orinrin/SikigamiHNQ
+Copyright (C) 2011 - 2012 Orinrin/SikigamiHNQ
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
@@ -38,9 +38,7 @@ typedef struct tagMULTIPLEMAA
 
 extern  HWND		ghSplitaWnd;	//	スプリットバーハンドル
 
-#ifdef OPEN_PROFILE
 extern HMENU		ghProfHisMenu;	//	履歴表示する部分・動的に内容作成せないかん
-#endif
 
 static HFONT		ghTabFont;
 
@@ -228,6 +226,10 @@ LRESULT CALLBACK gpfTreeViewProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPa
 
 		HANDLE_MSG( hWnd, WM_KEYDOWN, Aai_OnKey );			//	20120221
 		HANDLE_MSG( hWnd, WM_KEYUP,   Aai_OnKey );			//	
+
+		case WM_MBUTTONUP:
+			ulRslt = 1;
+			break;
 
 		case WM_MOUSEWHEEL:
 			ulRslt = Maa_OnMouseWheel( hWnd, (int)(short)LOWORD(lParam), (int)(short)HIWORD(lParam), (int)(short)HIWORD(wParam), (UINT)(short)LOWORD(wParam) );
@@ -421,12 +423,10 @@ VOID Maa_OnContextMenu( HWND hWnd, HWND hWndContext, UINT xPos, UINT yPos )
 			EnableMenuItem( hSubMenu, IDM_MAA_IADD_OPEN, MF_GRAYED );
 		}
 
-#ifdef OPEN_PROFILE
 		//	プロフ履歴入替
 	//	ModifyMenu( hSubMenu, IDM_OPEN_HISTORY, MF_BYCOMMAND | MF_POPUP, (UINT_PTR)ghProfHisMenu, TEXT("ファイル使用履歴(&H)") );
 		ModifyMenu( hSubMenu, 2, MF_BYPOSITION | MF_POPUP, (UINT_PTR)ghProfHisMenu, TEXT("ファイル使用履歴(&H)") );
 		//	ポップアップへの変更は、Position指定でないと出来ない？
-#endif
 
 		//	右クリではノード選択されないようだ
 		dRslt = TrackPopupMenu( hSubMenu, TPM_RETURNCMD, stPost.x, stPost.y, 0, hWnd, NULL );	//	TPM_CENTERALIGN | TPM_VCENTERALIGN | 
@@ -449,11 +449,9 @@ VOID Maa_OnContextMenu( HWND hWnd, HWND hWndContext, UINT xPos, UINT yPos )
 #endif
 			case  IDM_MAA_IADD_OPEN:	TreeSelItemProc( hWnd, hTvHitItem , 3 );	break;
 
-#ifdef OPEN_PROFILE
 			case IDM_OPEN_HIS_CLEAR:	OpenProfileLogging( hWnd, NULL );	break;
-#endif
+
 			default:
-#ifdef OPEN_PROFILE
 				if( IDM_OPEN_HIS_FIRST <= dRslt && dRslt <= IDM_OPEN_HIS_LAST )
 				{
 					OpenProfileLoad( hWnd, dRslt );
@@ -462,7 +460,6 @@ VOID Maa_OnContextMenu( HWND hWnd, HWND hWndContext, UINT xPos, UINT yPos )
 				{
 					OpenProfileLogging( hWnd, NULL );
 				}
-#endif
 				break;
 		}
 

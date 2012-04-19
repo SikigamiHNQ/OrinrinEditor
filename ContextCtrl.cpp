@@ -7,7 +7,7 @@
 
 /*
 Orinrin Editor : AsciiArt Story Editor for Japanese Only
-Copyright (C) 2011 Orinrin/SikigamiHNQ
+Copyright (C) 2011 - 2012 Orinrin/SikigamiHNQ
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
@@ -32,7 +32,7 @@ typedef struct tagCONTEXTITEM
 //-------------------------------------------------------------------------------------------------
 
 
-
+//
 
 
 CONST static CONTEXTITEM	gstContextItem[] =
@@ -109,59 +109,67 @@ CONST static CONTEXTITEM	gstContextItem[] =
 		{  TEXT("選択範囲を空白にする"),			IDM_FILL_SPACE			},
 /*70*/	{  TEXT("頁全体を空白で埋める"),			IDM_FILL_ZENSP			},
 		{  TEXT("行頭半角空白をユニコードに変換"),	IDM_HEADHALF_EXCHANGE	},
+		{  TEXT("左右反転"),						IDM_MIRROR_INVERSE		},
+		{  TEXT("上下反転"),						IDM_UPSET_INVERSE		},
 		{  TEXT("右に寄せる"),						IDM_RIGHT_SLIDE			},
-		{  TEXT("１ドット増やす"),					IDM_INCREMENT_DOT		},
+/*75*/	{  TEXT("１ドット増やす"),					IDM_INCREMENT_DOT		},
 		{  TEXT("１ドット減らす"),					IDM_DECREMENT_DOT		},
-/*75*/	{  TEXT("全体を１ドット右へ"),				IDM_INCR_DOT_LINES		},
+		{  TEXT("全体を１ドット右へ"),				IDM_INCR_DOT_LINES		},
 		{  TEXT("全体を１ドット左へ"),				IDM_DECR_DOT_LINES		},
 		{  TEXT("調整基準ロック"),					IDM_DOTDIFF_LOCK		},
-		{  TEXT("カーソル位置で調整"),				IDM_DOTDIFF_ADJT		},
+/*80*/	{  TEXT("カーソル位置で調整"),				IDM_DOTDIFF_ADJT		},
 		{  TEXT("（セパレータ）"),					0						},
-/*80*/	{  TEXT("空白を表示"),	/*表示*/			IDM_SPACE_VIEW_TOGGLE	},
+		{  TEXT("空白を表示"),	/*表示*/			IDM_SPACE_VIEW_TOGGLE	},
 		{  TEXT("グリッド線を表示"),				IDM_GRID_VIEW_TOGGLE	},
-		{  TEXT("右ガイド線を表示"),				IDM_RIGHT_RULER_TOGGLE	},
-		{  TEXT("複数行テンプレート"),				IDM_MAATMPLE_VIEW		},
-/*84*/	{  TEXT("頁一覧"),							IDM_PAGELIST_VIEW		},
-/*85*/	{  TEXT("壱行テンプレート"),				IDM_LINE_TEMPLATE		},
+/*84*/	{  TEXT("右ガイド線を表示"),				IDM_RIGHT_RULER_TOGGLE	},
+/*85*/	{  TEXT("複数行テンプレート"),				IDM_MAATMPLE_VIEW		},
+		{  TEXT("頁一覧"),							IDM_PAGELIST_VIEW		},
+		{  TEXT("壱行テンプレート"),				IDM_LINE_TEMPLATE		},
 		{  TEXT("塗り潰しブラシ"),					IDM_BRUSH_PALETTE		},
 		{  TEXT("ユニコード表"),					IDM_UNI_PALETTE			},
-		{  TEXT("トレスモード"),					IDM_TRACE_MODE_ON		},
+/*90*/	{  TEXT("トレスモード"),					IDM_TRACE_MODE_ON		},
 		{  TEXT("プレビュー"),						IDM_ON_PREVIEW			},
-/*90*/	{  TEXT("ドラフトボードを開く"),			IDM_DRAUGHT_OPEN		},
+		{  TEXT("ドラフトボードを開く"),			IDM_DRAUGHT_OPEN		},
 		{  TEXT("サムネイルを表示"),				IDM_MAA_THUMBNAIL_OPEN	},
 		{  TEXT("（セパレータ）"),					0						},
-		{  TEXT("選択範囲をドラフトボードへ"),		IDM_COPY_TO_DRAUGHT		},
+/*95*/	{  TEXT("選択範囲をドラフトボードへ"),		IDM_COPY_TO_DRAUGHT		},
 		{  TEXT("（セパレータ）"),	0	/*以下、内容固定？の特殊コマンド*/	},
-/*95*/	{  TEXT("選択頁を複製"),					IDM_PAGEL_DUPLICATE		},
+		{  TEXT("選択頁を複製"),					IDM_PAGEL_DUPLICATE		},
 		{  TEXT("選択頁を削除"),					IDM_PAGEL_DELETE		},
 		{  TEXT("次の頁と統合"),					IDM_PAGEL_COMBINE		},
-		{  TEXT("選択頁の次に新規作成"),			IDM_PAGEL_INSERT		},
+/*100*/	{  TEXT("選択頁の次に新規作成"),			IDM_PAGEL_INSERT		},
 		{  TEXT("末尾に頁を新規作成"),				IDM_PAGEL_ADD			},
-/*100*/	{  TEXT("頁を下へ移動"),					IDM_PAGEL_DOWNSINK		},
+		{  TEXT("頁を下へ移動"),					IDM_PAGEL_DOWNSINK		},
 		{  TEXT("頁を上へ移動"),					IDM_PAGEL_UPFLOW		},
 		{  TEXT("頁名称の変更"),					IDM_PAGEL_RENAME		},
-		{  TEXT("トレス画像表示/非表示"),			IDM_TRC_VIEWTOGGLE		},
+/*105*/	{  TEXT("トレス画像表示/非表示"),			IDM_TRC_VIEWTOGGLE		},
 		{  TEXT("テンプレグループ切替↑"),			IDM_TMPLT_GROUP_PREV	},
-/*105*/	{  TEXT("テンプレグループ切替↓"),			IDM_TMPLT_GROUP_NEXT	},
+		{  TEXT("テンプレグループ切替↓"),			IDM_TMPLT_GROUP_NEXT	},
 		{  TEXT("窓フォーカス切替↑"),				IDM_WINDOW_CHANGE		},
 		{  TEXT("窓フォーカス切替↓"),				IDM_WINDOW_CHG_RVRS		},
-		{  TEXT("ファイルを閉じる"),				IDM_FILE_CLOSE			},
+/*110*/	{  TEXT("ファイルを閉じる"),				IDM_FILE_CLOSE			},
 		{  TEXT("ファイル切替↑"),					IDM_FILE_PREV			},
-/*110*/	{  TEXT("ファイル切替↓"),					IDM_FILE_NEXT			},
+		{  TEXT("ファイル切替↓"),					IDM_FILE_NEXT			},
 		{  TEXT("前の頁へ移動"),					IDM_PAGE_PREV			},
 		{  TEXT("次の頁へ移動"),					IDM_PAGE_NEXT			},
-		{  TEXT("テンプレグリッド増加"),			IDM_TMPL_GRID_INCREASE	},
+/*115*/	{  TEXT("テンプレグリッド増加"),			IDM_TMPL_GRID_INCREASE	},
 		{  TEXT("テンプレグリッド減少"),			IDM_TMPL_GRID_DECREASE	},
-/*115*/	{  TEXT("表示画面再描画"),					IDM_NOW_PAGE_REFRESH	},
+		{  TEXT("表示画面再描画"),					IDM_NOW_PAGE_REFRESH	},
 		{  TEXT("（未実装）文字列検索"),			IDM_FIND_DLG_OPEN		},
 		{  TEXT("（未実装）検索ハイライト解除"),	IDM_FIND_HIGHLIGHT_OFF	},
-		{  TEXT("（未実装）次の検索位置"),			IDM_FIND_JUMP_NEXT		},
+/*120*/	{  TEXT("（未実装）次の検索位置"),			IDM_FIND_JUMP_NEXT		},
 		{  TEXT("（未実装）前の検索位置"),			IDM_FIND_JUMP_PREV		},
-/*120*/	{  TEXT("（未実装）新しい文字列を検索"),	IDM_FIND_TARGET_SET		},
+		{  TEXT("（未実装）新しい文字列を検索"),	IDM_FIND_TARGET_SET		},
 		{  TEXT("（セパレータ）"),					0						}
 };
-#define ALL_ITEMS	94	//	右クリ用　０インデックス
-#define FULL_ITEMS	122	//	全アイテム
+#define ALL_ITEMS	96	//	右クリ用　０インデックス
+#define FULL_ITEMS	124	//	全アイテム
+
+//	右クリ用サブアイテム
+#define CTS_UNISPACE	22
+#define CTS_COLOURINS	31
+#define CTS_FRAMEINS	37
+
 
 //	サブ展開するアイテムに注意セヨ・コンテキストメニューとアクセルキー
 
@@ -392,22 +400,21 @@ VOID CntxEditBuild( VOID )
 			{
 				default:	AppendMenu( ghPopupMenu, MF_STRING, itMnItm->dCommandoID, atItem );	break;
 
-#pragma message ("サブメニューアイテムのサーチ、キメうちでやらないようにする")
 				case IDM_MN_UNISPACE:
 					ghUniSpMenu = CreatePopupMenu(  );
-					for( d = 0; 8 > d; d++ )	AppendMenu( ghUniSpMenu, MF_STRING, gstContextItem[22+d].dCommandoID, gstContextItem[22+d].atString );
+					for( d = 0; 8 > d; d++ )	AppendMenu( ghUniSpMenu, MF_STRING, gstContextItem[CTS_UNISPACE+d].dCommandoID, gstContextItem[22+d].atString );
 					AppendMenu( ghPopupMenu, MF_POPUP, (UINT_PTR)ghUniSpMenu, atItem );
 					break;
 
 				case IDM_MN_COLOUR_SEL:
 					ghColourMenu = CreatePopupMenu(  );
-					for( d = 0; 5 > d; d++ )	AppendMenu( ghColourMenu, MF_STRING, gstContextItem[31+d].dCommandoID, gstContextItem[31+d].atString );
+					for( d = 0; 5 > d; d++ )	AppendMenu( ghColourMenu, MF_STRING, gstContextItem[CTS_COLOURINS+d].dCommandoID, gstContextItem[31+d].atString );
 					AppendMenu( ghPopupMenu, MF_POPUP, (UINT_PTR)ghColourMenu, atItem );
 					break;
 
 				case IDM_MN_INSFRAME_SEL:
 					ghFrameMenu = CreatePopupMenu(  );
-					for( d = 0; 10 > d; d++ )	AppendMenu( ghFrameMenu, MF_STRING, gstContextItem[37+d].dCommandoID, gstContextItem[37+d].atString );
+					for( d = 0; FRAME_MAX > d; d++ )	AppendMenu( ghFrameMenu, MF_STRING, gstContextItem[CTS_FRAMEINS+d].dCommandoID, gstContextItem[37+d].atString );
 					AppendMenu( ghPopupMenu, MF_POPUP, (UINT_PTR)ghFrameMenu, atItem );
 					break;
 

@@ -7,7 +7,7 @@
 
 /*
 Orinrin Editor : AsciiArt Story Editor for Japanese Only
-Copyright (C) 2011 Orinrin/SikigamiHNQ
+Copyright (C) 2011 - 2012 Orinrin/SikigamiHNQ
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
@@ -664,6 +664,10 @@ VOID Lyb_OnPaint( HWND hWnd )
 
 	hdc = BeginPaint( hWnd, &ps );
 
+#ifdef DO_TRY_CATCH
+	try{
+#endif
+
 	height = gdToolBarHei;
 
 	for( itLyr = gltLayer.begin(); itLyr != gltLayer.end(); itLyr++ )
@@ -749,12 +753,15 @@ VOID Lyb_OnPaint( HWND hWnd )
 
 			SelectFont( hdc, hFtOld );
 
-
-
-
 			break;
 		}
 	}
+
+#ifdef DO_TRY_CATCH
+	}
+	catch( exception &err ){	ETC_MSG( err.what(), 0 );	 return;	}
+	catch( ... ){	ETC_MSG( ("etc error"), 0 );	 return;	}
+#endif
 
 	EndPaint( hWnd, &ps );
 
@@ -1010,6 +1017,10 @@ HRESULT LayerTransparentToggle( HWND hWnd, UINT bMode )
 	LETR_ITR	itMozi;
 	LAYER_ITR	itLyr;
 
+#ifdef DO_TRY_CATCH
+	try{
+#endif
+
 	for( itLyr = gltLayer.begin(); itLyr != gltLayer.end(); itLyr++ )
 	{
 		if( itLyr->hBoxWnd == hWnd ){	break;	}
@@ -1040,6 +1051,12 @@ HRESULT LayerTransparentToggle( HWND hWnd, UINT bMode )
 		//	全部解除
 	}
 
+#ifdef DO_TRY_CATCH
+	}
+	catch( exception &err ){	return (HRESULT)ETC_MSG( err.what(), E_UNEXPECTED );	}
+	catch( ... ){	return (HRESULT)ETC_MSG( ("etc error") , E_UNEXPECTED );	}
+#endif
+
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
@@ -1057,6 +1074,9 @@ INT LayerTransparentAdjust( LAYER_ITR itLyr, INT dNowDot, INT rdLine )
 	TCHAR	ch, chb;
 	LETR_ITR	itMozi, itHead, itTail, itTemp;
 
+#ifdef DO_TRY_CATCH
+	try{
+#endif
 
 	//	行のはみ出しを？
 	iLines = itLyr->vcLyrImg.size(  );
@@ -1116,6 +1136,12 @@ INT LayerTransparentAdjust( LAYER_ITR itLyr, INT dNowDot, INT rdLine )
 
 		itTemp->mzStyle ^= CT_LYR_TRNC;
 	}
+
+#ifdef DO_TRY_CATCH
+	}
+	catch( exception &err ){	return ETC_MSG( err.what(), 0 );	}
+	catch( ... ){	return  ETC_MSG( ("etc error"), 0 );	}
+#endif
 
 	return iLetter;
 }
@@ -1366,6 +1392,9 @@ HRESULT LayerFromSelectArea( LAYER_ITR itLyr, UINT bSqSel )
 	ONELINE	stLine;
 
 	TRACE( TEXT("選択範囲から取得") );
+#ifdef DO_TRY_CATCH
+	try{
+#endif
 
 	ZeroONELINE( &stLine );
 
@@ -1380,6 +1409,11 @@ HRESULT LayerFromSelectArea( LAYER_ITR itLyr, UINT bSqSel )
 	FREE(ptString);
 	FREE(pstPos);
 
+#ifdef DO_TRY_CATCH
+	}
+	catch( exception &err ){	return (HRESULT)ETC_MSG( err.what(), E_UNEXPECTED );	}
+	catch( ... ){	return (HRESULT)ETC_MSG( ("etc error") , E_UNEXPECTED );	}
+#endif
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
@@ -1425,6 +1459,9 @@ HRESULT LayerBoxSizeAdjust( LAYER_ITR itLyr )
 	INT_PTR	iLine, i;
 	SIZE	wdSize, tgtSize;//clSize
 
+#ifdef DO_TRY_CATCH
+	try{
+#endif
 	//	最小サイズってことで
 	//clSize.cx = LB_WIDTH  - gstFrmSz.x;
 	//clSize.cy = LB_HEIGHT - gstFrmSz.y;
@@ -1458,6 +1495,12 @@ HRESULT LayerBoxSizeAdjust( LAYER_ITR itLyr )
 	SetWindowPos( itLyr->hBoxWnd, HWND_TOPMOST, 0, 0, tgtSize.cx, tgtSize.cy, SWP_NOMOVE | SWP_NOZORDER );
 #endif
 
+#ifdef DO_TRY_CATCH
+	}
+	catch( exception &err ){	return (HRESULT)ETC_MSG( err.what(), E_UNEXPECTED );	}
+	catch( ... ){	return (HRESULT)ETC_MSG( ("etc error") , E_UNEXPECTED );	}
+#endif
+
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
@@ -1479,6 +1522,9 @@ HRESULT LayerBoxSetString( LAYER_ITR itLyr, LPCTSTR ptText, UINT cchSize, LPPOIN
 	LPTSTR	ptBuff, ptSpace = NULL;
 	ONELINE	stLine;
 
+#ifdef DO_TRY_CATCH
+	try{
+#endif
 	ZeroONELINE( &stLine );
 
 	//	オフセット設定が有る場合、その分を埋める空白が必要
@@ -1572,6 +1618,12 @@ HRESULT LayerBoxSetString( LAYER_ITR itLyr, LPCTSTR ptText, UINT cchSize, LPPOIN
 	//	サイズ調整
 	if( bStyle ){	LayerBoxSizeAdjust( itLyr );	}
 
+#ifdef DO_TRY_CATCH
+	}
+	catch( exception &err ){	return (HRESULT)ETC_MSG( err.what(), E_UNEXPECTED );	}
+	catch( ... ){	return (HRESULT)ETC_MSG( ("etc error") , E_UNEXPECTED );	}
+#endif
+
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
@@ -1588,6 +1640,9 @@ INT LayerHeadSpaceCheck( vector<LETTER> *vcTgLine, PINT pdMozi )
 	INT			cchSp, dDot;	//	文字数とドット数
 	UINT_PTR	i, iMozi;
 
+#ifdef DO_TRY_CATCH
+	try{
+#endif
 	iMozi = vcTgLine->size(  );
 
 	dDot = 0;	cchSp = 0;
@@ -1607,6 +1662,11 @@ INT LayerHeadSpaceCheck( vector<LETTER> *vcTgLine, PINT pdMozi )
 	}
 
 	if( pdMozi ){	*pdMozi = cchSp;	}
+#ifdef DO_TRY_CATCH
+	}
+	catch( exception &err ){	return ETC_MSG( err.what(), 0 );	}
+	catch( ... ){	return  ETC_MSG( ("etc error"), 0 );	}
+#endif
 
 	return dDot;
 }
@@ -1625,6 +1685,9 @@ INT LayerInputLetter( LAYER_ITR itLyr, INT nowDot, INT rdLine, TCHAR ch )
 	LETTER	stLetter;
 //	INT		iRslt;
 
+#ifdef DO_TRY_CATCH
+	try{
+#endif
 	//	データ作成
 	ZeroMemory( &stLetter, sizeof(LETTER) );
 	stLetter.cchMozi = ch;
@@ -1643,6 +1706,12 @@ INT LayerInputLetter( LAYER_ITR itLyr, INT nowDot, INT rdLine, TCHAR ch )
 	itLyr->vcLyrImg.at( rdLine ).iByteSz += stLetter.mzByte;
 
 //	iRslt = DocBadSpaceCheck( rdLine );
+
+#ifdef DO_TRY_CATCH
+	}
+	catch( exception &err ){	return ETC_MSG( err.what(), 0 );	}
+	catch( ... ){	return  ETC_MSG( ("etc error"), 0 );	}
+#endif
 
 	return stLetter.rdWidth;
 }
@@ -1677,6 +1746,10 @@ HRESULT LayerContentsImportable( HWND hWnd, UINT cmdID, LPINT pXdot, LPINT pYlin
 
 	LETR_ITR	itLtr, itDel;
 	wstring	wsBuff;
+
+#ifdef DO_TRY_CATCH
+	try{
+#endif
 
 	for( itLyr = gltLayer.begin(); itLyr != gltLayer.end(); itLyr++ )
 	{
@@ -1796,7 +1869,7 @@ HRESULT LayerContentsImportable( HWND hWnd, UINT cmdID, LPINT pXdot, LPINT pYlin
 				if( 0 < iDivid )	//	行末端より後にきてる
 				{
 					xDot = iSrcDot;
-					ptBuffer = DocPaddingSpaceMake( iDivid );// DocPaddingSpaceWithPeriod( iDivid, NULL, NULL, NULL, TRUE );
+					ptBuffer = DocPaddingSpaceWithPeriod( iDivid, NULL, NULL, NULL, TRUE );
 					//	行末端からレイヤ内オブジェクトまでを埋める空白
 					if( ptBuffer )
 					{
@@ -1847,7 +1920,7 @@ HRESULT LayerContentsImportable( HWND hWnd, UINT cmdID, LPINT pXdot, LPINT pYlin
 						{
 							dInBgn  = xDot;
 							//	レイヤ内オブジェクト末端から元絵の開始位置までを埋める数ドットの空白
-							ptBuffer = DocPaddingSpaceMake( dGap );//DocPaddingSpaceWithPeriod( dGap, NULL, NULL, NULL, TRUE );
+							ptBuffer = DocPaddingSpaceWithPeriod( dGap, NULL, NULL, NULL, TRUE );
 							if( ptBuffer )
 							{
 								DocInsertString( &dInBgn, &dWkLine, NULL, ptBuffer, dStyle, bFirst );	bFirst = FALSE;
@@ -1870,7 +1943,7 @@ HRESULT LayerContentsImportable( HWND hWnd, UINT cmdID, LPINT pXdot, LPINT pYlin
 						dLeft = xDot;
 					}
 
-					ptBuffer = DocPaddingSpaceMake( dGap );//DocPaddingSpaceWithPeriod( dGap, NULL, NULL, NULL, TRUE );
+					ptBuffer = DocPaddingSpaceWithPeriod( dGap, NULL, NULL, NULL, TRUE );
 					if( ptBuffer )
 					{
 						//	行末端からレイヤ内オブジェクトまでを埋める空白
@@ -1917,6 +1990,11 @@ HRESULT LayerContentsImportable( HWND hWnd, UINT cmdID, LPINT pXdot, LPINT pYlin
 	//	最終的なキャレットの位置をリセット
 	//	ViewPosResetCaret( xDot , dWkLine-1 );
 	//	ここでは処理しない
+#ifdef DO_TRY_CATCH
+	}
+	catch( exception &err ){	return (HRESULT)ETC_MSG( err.what(), E_UNEXPECTED );	}
+	catch( ... ){	return (HRESULT)ETC_MSG( ("etc error") , E_UNEXPECTED );	}
+#endif
 
 	return S_OK;
 }
@@ -1967,7 +2045,7 @@ HRESULT LayerForClipboard( HWND hWnd, UINT bStyle )
 	if( bStyle & D_UNI )	//	ユニコードである
 	{
 		cchSize = wsString.size( ) + 1;
-		DocClipboardDataSet( (LPTSTR)(wsString.c_str()), cchSize * 2, bStyle );
+		DocClipboardDataSet( (LPTSTR)(wsString.c_str()), cchSize * sizeof(TCHAR), bStyle );
 	}
 	else
 	{

@@ -7,7 +7,7 @@
 
 /*
 Orinrin Editor : AsciiArt Story Editor for Japanese Only
-Copyright (C) 2011 Orinrin/SikigamiHNQ
+Copyright (C) 2011 - 2012 Orinrin/SikigamiHNQ
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
@@ -303,7 +303,7 @@ HRESULT FrameInitialise( LPTSTR ptCurrent, HINSTANCE hInstance )
 HRESULT FrameNameModifyMenu( HWND hWnd )
 {
 	HMENU	hMenu, hSubMenu;
-	UINT	i;
+	UINT	i, j, k;
 	TCHAR	atBuffer[MAX_PATH], atName[MAX_STRING];
 
 	//	メニュー構造変わったらここも変更・どうにかならんのか
@@ -311,10 +311,14 @@ HRESULT FrameNameModifyMenu( HWND hWnd )
 	hSubMenu = GetSubMenu( hMenu, 2 );
 
 	//	枠
-	for( i = 0; FRAME_MAX > i; i++ )
+	for( i = 0, j = 1; FRAME_MAX > i; i++, j++ )
 	{
 		FrameNameLoad( i, atName, MAX_STRING );
-		StringCchPrintf( atBuffer, MAX_PATH, TEXT("枠：(&%c)%s"), 'A'+i, atName );
+
+		if(  9 >= j ){		k = j + '0';	}
+		else if( 10 == j ){	k = '0';	}
+		else{		k = 'A' + j - 11;	}
+		StringCchPrintf( atBuffer, MAX_PATH, TEXT("枠：(&%c)%s"), k, atName );
 		ModifyMenu( hSubMenu, IDM_INSFRAME_ALPHA+i, MF_BYCOMMAND | MFT_STRING, IDM_INSFRAME_ALPHA+i, atBuffer );
 		//	メニューリソース番号の連番に注意
 	}
@@ -333,16 +337,19 @@ HRESULT FrameNameModifyMenu( HWND hWnd )
 */
 HRESULT FrameNameModifyPopUp( HMENU hPopMenu, UINT bMode )
 {
-	UINT	i, j;
+	UINT	i, j, k;
 	TCHAR	atBuffer[MAX_PATH], atName[MAX_STRING];
 
-	for( i = 0, j = 0; FRAME_MAX > i; i++, j++ )
+	for( i = 0, j = 1; FRAME_MAX > i; i++, j++ )
 	{
 		FrameNameLoad( i, atName, MAX_STRING );
 
 		if( bMode )
 		{
-			StringCchPrintf( atBuffer, MAX_PATH, TEXT("枠：(&%c)%s"), 'A'+j, atName );
+			if(  9 >= j ){		k = j + '0';	}
+			else if( 10 == j ){	k = '0';	}
+			else{		k = 'A' + j - 11;	}
+			StringCchPrintf( atBuffer, MAX_PATH, TEXT("枠：(&%c)%s"), k, atName );
 		}
 		else
 		{
@@ -1093,7 +1100,9 @@ LPTSTR FrameMakeOutsideBoundary( CONST INT iWidth, CONST INT iHeight, LPFRAMEINF
 	wstring	wsWorkStr;
 	vector<wstring>	vcString;	//	作業用
 
-//#error 外周に沿わせるなら、床と天井のパディングどうする？オフセットが意味なくなるか
+#ifdef DO_TRY_CATCH
+	try{
+#endif
 
 	wsWorkStr.assign( TEXT("") );
 
@@ -1109,29 +1118,11 @@ LPTSTR FrameMakeOutsideBoundary( CONST INT iWidth, CONST INT iHeight, LPFRAMEINF
 
 	//	行数の確認
 	FrameMultiSizeGet( pstInfo, &iUpLine, &iDnLine );
-	//iUpLine = pstInfo->stMorning.iLine;	//	左上
-	//if( iUpLine < pstInfo->stNoon.iLine )	iUpLine = pstInfo->stNoon.iLine;	//	上
-	//if( iUpLine < pstInfo->stAfternoon.iLine )	iUpLine = pstInfo->stAfternoon.iLine;	//	右上
-
-	//iDnLine = pstInfo->stDawn.iLine;	//	左下
-	//if( iDnLine < pstInfo->stMidnight.iLine )	iDnLine = pstInfo->stMidnight.iLine;	//	下
-	//if( iDnLine < pstInfo->stTwilight.iLine )	iDnLine = pstInfo->stTwilight.iLine;	//	右下
 
 	iMdLine = iLines - (iUpLine + iDnLine);	//	柱
 	TRACE( TEXT("MF R[%d] P[%d] F[%d]"), iUpLine, iMdLine, iDnLine );
 
 	iRealWid = iWidth;
-	//	幅の確認
-	//iRitOff = iWidth - pstInfo->stAfternoon.dDot;	//	右柱の開始位置
-	//iRitBuf = iWidth - pstInfo->stTwilight.dDot;	//	幅がある方にあわせないかん
-	//if( iRitOff > iRitBuf ){	iRitOff = iRitBuf;	};
-	//iPillarDot = pstInfo->dRightOffset + pstInfo->stNightfall.dDot;	//	オフセット含めた柱の幅
-	//iFloodDot = (iRitOff + iPillarDot) - iWidth;	//	使用幅に収まっているか
-	////	もしはみ出していたら
-	//if( 0 < iFloodDot ){	iRealWid -= iFloodDot;	}	//	使える幅が減る
-	//iRitOff = iRealWid - pstInfo->stAfternoon.dDot;	//	オフセット考慮した右柱の開始位置
-	//iRitBuf = iRealWid - pstInfo->stTwilight.dDot;	//	幅がある方にあわせないかん
-	//if( iRitOff > iRitBuf ){	iRitOff = iRitBuf;	};
 
 	//	右パーツの占有幅、一番長いのを確認
 	iRitOccup = pstInfo->stAfternoon.dDot;	//	右上
@@ -1272,7 +1263,7 @@ LPTSTR FrameMakeOutsideBoundary( CONST INT iWidth, CONST INT iHeight, LPFRAMEINF
 	dCount = vcString.size();	//	有効行数
 	//	全体の文字数を確保
 	for( d = 0; dCount > d; d++ ){	cchTotal += vcString.at( d ).size();	}
-	cchTotal += (dCount * 2);	//改行分＋余裕
+	cchTotal += (dCount * sizeof(TCHAR));	//改行分＋余裕
 	ptBufStr = (LPTSTR)malloc( cchTotal * sizeof(TCHAR) );	//	サイズ作って
 	if( ptBufStr )	//	チェック
 	{
@@ -1283,6 +1274,12 @@ LPTSTR FrameMakeOutsideBoundary( CONST INT iWidth, CONST INT iHeight, LPFRAMEINF
 			hRslt = StringCchCat( ptBufStr, cchTotal, vcString.at( d ).c_str() );
 		}
 	}
+
+#ifdef DO_TRY_CATCH
+	}
+	catch( exception &err ){	return (LPTSTR)ETC_MSG( err.what( ), NULL );	}
+	catch( ... ){	return (LPTSTR)ETC_MSG( ("etc error"), NULL );	}
+#endif
 
 	return ptBufStr;
 }
@@ -1320,6 +1317,9 @@ LPTSTR FrameMakeInsideBoundary( UINT dType, PINT piValue, LPFRAMEINFO pstInfo )
 	wstring	wsWorkStr;
 	vector<wstring>	vcString;	//	作業用
 
+#ifdef DO_TRY_CATCH
+	try{
+#endif
 
 	wsWorkStr.assign( TEXT("") );
 
@@ -1463,7 +1463,7 @@ LPTSTR FrameMakeInsideBoundary( UINT dType, PINT piValue, LPFRAMEINFO pstInfo )
 	dCount = vcString.size();	//	有効行数
 	//	全体の文字数を確保
 	for( d = 0; dCount > d; d++ ){	cchTotal += vcString.at( d ).size();	}
-	cchTotal += ((dCount+1) * 2);	//改行分＋余裕
+	cchTotal += ((dCount+1) * sizeof(TCHAR));	//改行分＋余裕
 	ptBufStr = (LPTSTR)malloc( cchTotal * sizeof(TCHAR) );	//	サイズ作って
 	if( ptBufStr )	//	チェック
 	{
@@ -1475,6 +1475,12 @@ LPTSTR FrameMakeInsideBoundary( UINT dType, PINT piValue, LPFRAMEINFO pstInfo )
 			//	改行は常に必要である
 		}
 	}
+
+#ifdef DO_TRY_CATCH
+	}
+	catch( exception &err ){	return (LPTSTR)ETC_MSG( err.what( ), NULL );	}
+	catch( ... ){	return (LPTSTR)ETC_MSG( ("etc error"), NULL );	}
+#endif
 
 	return ptBufStr;
 }
@@ -1627,7 +1633,7 @@ HRESULT FrameInfoDisp( HWND hDlg )
 HRESULT DocFrameInsert( INT dMode, INT dStyle )
 {
 	UINT_PTR	iLines;
-	INT_PTR		iLns;
+	INT_PTR		iLns, iLast;
 	INT			iTop, iBtm, iInX, iEndot, iPadding, i, baseDot;
 	INT			xMidLen;
 	LPTSTR		ptPadding;
@@ -1645,15 +1651,14 @@ HRESULT DocFrameInsert( INT dMode, INT dStyle )
 	TCHAR		atStr[BIG_STRING];	//	足りるか？
 #endif
 
-//#error 枠、直挿入のほう。天井とかの必要な行数を確認して、外枠に渡す
+
+#ifdef DO_TRY_CATCH
+	try{
+#endif
 
 	FrameDataGet( dMode, &stInfo );
 
-#ifdef LINE_VEC_LIST
 	iLines = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.size( );	//	ページ全体の行数
-#else
-	iLines = (*gitFileIt).vcCont.at( gixFocusPage ).vcPage.size( );	//	ページ全体の行数
-#endif
 
 	//	開始地点から開始	//	D_SQUARE
 	iTop = (*gitFileIt).vcCont.at( gixFocusPage ).dSelLineTop;
@@ -1665,13 +1670,12 @@ HRESULT DocFrameInsert( INT dMode, INT dStyle )
 	iInX = DocLineParamGet( iBtm, NULL, NULL );
 	if( 0 == iInX ){	 iBtm--;	}
 
-	//	矩形選択無しとみなす・ていうか矩形に対応って蝶☆ややこしいＹＯ！
+	//	矩形選択無しとみなす
 
 	ViewSelPageAll( -1 );	//	範囲とったので解除しておｋ
 
 	//	選択範囲内でもっとも長いドット数を確認
 	baseDot = DocPageMaxDotGet( iTop, iBtm );
-	//	右余裕を足しておく。これは枠の左右を含まない量である
 
 //天井の行数、左の幅、床の行数を確保
 #ifdef FRAME_MLINE
@@ -1720,6 +1724,16 @@ HRESULT DocFrameInsert( INT dMode, INT dStyle )
 		pstItem->iNowLn++;	//	壱行ずつループさせていく
 		if( pstItem->iLine <= pstItem->iNowLn ){	pstItem->iNowLn = 0;	}
 		DocInsertString( &iEndot, &iLns, NULL, atSubStr, 0, FALSE );
+	}
+
+	//	行末がＥＯＦならここでおかしな事になる
+	iLast = DocPageParamGet( NULL, NULL );
+	if( iLast <= iLns )
+	{
+		iLns = iLast - 1;
+		iInX = DocLineParamGet( iLns, NULL, NULL );
+		DocCrLfAdd( iInX , iLns, FALSE );	//	床を入れるために改行
+		iLns++;
 	}
 
 	//	床作る
@@ -1773,7 +1787,7 @@ HRESULT DocFrameInsert( INT dMode, INT dStyle )
 		DocInsertString( &iInX, &i, NULL, stInfo.stDaybreak.atParts, 0, FALSE );
 		iEndot = DocLineParamGet( i, NULL, NULL );
 		iPadding  = xNightPos - iEndot;	//	右追加
-		ptPadding = DocPaddingSpaceMake( iPadding );//DocPaddingSpaceWithPeriod( iPadding, NULL, NULL, NULL, TRUE );
+		ptPadding = DocPaddingSpaceWithPeriod( iPadding, NULL, NULL, NULL, TRUE );
 		iInX = iEndot;
 		DocInsertString( &iInX, &i, NULL, ptPadding, 0, FALSE );
 		FREE(ptPadding);
@@ -1796,34 +1810,39 @@ HRESULT DocFrameInsert( INT dMode, INT dStyle )
 
 #endif
 
+#ifdef DO_TRY_CATCH
+	}
+	catch( exception &err ){	return (HRESULT)ETC_MSG( err.what(), E_UNEXPECTED );	}
+	catch( ... ){	return (HRESULT)ETC_MSG( ("etc error") , E_UNEXPECTED );	}
+#endif
+#ifdef DO_TRY_CATCH
+	try{
+#endif
 
 	//	最終的なキャレットの位置をリセット
 	ViewPosResetCaret( iInX , iLns );
 
 	ViewRedrawSetLine( iTop );
 	DocBadSpaceCheck( iTop );	//	バッド空白チェキ
-	//for( i = iTop+1; iBtm > i; i++ )
-	//{
-	//	DocBadSpaceCheck( i );	//	バッド空白チェキ
-	//	ViewRedrawSetLine( i );
-	//}
+
 	//	改行してるから、これ以降全部再描画必要
-#ifdef LINE_VEC_LIST
 	iLns = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.size( );	//	現在行数再認識
-#else
-	iLns = (*gitFileIt).vcCont.at( gixFocusPage ).vcPage.size( );	//	現在行数再認識
-#endif
-	for( ; iLns >= i; i++ )
+	for( i = iTop; iLns > i; i++ )
 	{
 		DocBadSpaceCheck( i );	//	バッド空白チェキ
 		ViewRedrawSetLine(  i );
 	}
-	ViewRedrawSetLine( i );	//	念のため
-	DocBadSpaceCheck( i );	//	バッド空白チェキ
+	//ViewRedrawSetLine( i );	//	念のため
+	//DocBadSpaceCheck( i );	//	バッド空白チェキ
 
 
 	DocPageInfoRenew( -1, 1 );
 
+#ifdef DO_TRY_CATCH
+	}
+	catch( exception &err ){	return (HRESULT)ETC_MSG( err.what(), E_UNEXPECTED );	}
+	catch( ... ){	return (HRESULT)ETC_MSG( ("etc error") , E_UNEXPECTED );	}
+#endif
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
@@ -1901,50 +1920,6 @@ VOID FrameDataTranslate( LPTSTR ptData, UINT bMode )
 	return;
 }
 //-------------------------------------------------------------------------------------------------
-
-#if 0
-/*!
-	パーツの文字列を受けて、最大ドット数と行数を返す
-	@param[in]	ptParts	パーツ文字列へのポインター
-	@param[out]	pLine	行数を戻す
-	@return	INT	ドット数を返す
-*/
-INT FramePartsSizeCalc( LPTSTR ptParts, PINT pLine )
-{
-	INT	iDot, iLine, iMax;
-	TCHAR	atBuffer[PARTS_CCH];
-	UINT_PTR	d, e, cchLen;
-
-	StringCchLength( ptParts, PARTS_CCH, &cchLen );	//	チェキ文字列の長さ確認
-	ZeroMemory( atBuffer, sizeof(atBuffer) );
-
-	iDot = 0;	iLine = 0;	iMax = 0;
-	for( d = 0, e = 0; cchLen >= d; d++ )	//	ヌルタミネタまで必要
-	{
-		if( 0x0000 == ptParts[d] || 0x000D == ptParts[d] )
-		{
-			iLine++;	//	壱行
-			iDot = ViewStringWidthGet( atBuffer );
-			if( iMax < iDot )	iMax = iDot;	//	ドット長
-
-			if( 0x0000 == ptParts[d] )	break;	//	終わりならここまで
-
-			d++;	//	次の行の為に
-			e = 0;
-			ZeroMemory( atBuffer, sizeof(atBuffer) );
-		}
-		else
-		{
-			atBuffer[e++] =  ptParts[d];	//	文字列を壱行ずつ確認していく
-		}
-	}
-
-	if( pLine ){	*pLine =  iLine;	}
-
-	return iMax;
-}
-//-------------------------------------------------------------------------------------------------
-#endif
 
 /*!
 	改行を含む文字列を受け取って、指定行の内容をバッファに入れる

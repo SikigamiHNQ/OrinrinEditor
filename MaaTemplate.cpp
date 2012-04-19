@@ -7,7 +7,7 @@
 
 /*
 Orinrin Editor : AsciiArt Story Editor for Japanese Only
-Copyright (C) 2011 Orinrin/SikigamiHNQ
+Copyright (C) 2011 - 2012 Orinrin/SikigamiHNQ
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
@@ -61,10 +61,8 @@ static TCHAR	gatProfilePath[MAX_PATH];	//!<	プロファイルディレクトリ
 
 static TCHAR	gatTemplatePath[MAX_PATH];	//!<	MLTルートディレクトリ
 
-#ifdef OPEN_PROFILE
 static list<OPENHIST>	gltProfHist;	//!<	プロフ開いた履歴・
 EXTERNED HMENU	ghProfHisMenu;			//!<	履歴表示する部分・動的に内容作成せないかん
-#endif
 
 static CONST INT	giStbRoom[] = { 250 , 350 , -1 };
 //-------------------------------------------------------------------------------------------------
@@ -348,7 +346,7 @@ VOID Maa_OnCommand( HWND hWnd, INT id, HWND hwndCtl, UINT codeNotify )
 {
 	LONG_PTR	rdExStyle;
 
-#if defined(_ORRVW)  && defined(OPEN_PROFILE)
+#ifdef _ORRVW
 	if( IDM_OPEN_HIS_FIRST <= id && id <= IDM_OPEN_HIS_LAST )	//	開く
 	{
 		OpenProfileLoad( hWnd, id );
@@ -690,10 +688,9 @@ INT TreeProfileMake( HWND hWnd, LPTSTR ptProf )
 
 	ZeroMemory( atFolder,  sizeof(atFolder) );
 
-#ifdef OPEN_PROFILE
 	//	開いたPROFILEを記録
 	OpenProfileLogging( hWnd, atFilePath );
-#endif
+
 
 	//	MLTディレクトリをセット
 	ZeroMemory( gatTemplatePath,  sizeof(gatTemplatePath) );
@@ -1351,8 +1348,8 @@ LPTSTR StringLineGet( LPCTSTR ptSource, LPCTSTR *ptNextLn )
 	*ptNextLn = &(ptSource[t]);
 
 	len = wStr.size() + 1;
-	ptDest = (LPTSTR)malloc( len * 2 );
-	ZeroMemory( ptDest, len * 2 );
+	ptDest = (LPTSTR)malloc( len * sizeof(TCHAR) );
+	ZeroMemory( ptDest, len * sizeof(TCHAR) );
 	StringCchCopy( ptDest, len, wStr.c_str() );
 
 	return ptDest;
@@ -1575,7 +1572,7 @@ HRESULT TreeMaaFileFind( HWND hWnd )
 
 
 
-#ifdef OPEN_PROFILE
+
 
 /*!
 	ファイルからプロフ履歴取り込んだり書き込んだり
@@ -1749,5 +1746,5 @@ HRESULT OpenProfileLogging( HWND hWnd, LPCTSTR ptProf )
 }
 //-------------------------------------------------------------------------------------------------
 
-#endif
+
 

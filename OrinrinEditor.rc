@@ -105,74 +105,77 @@ BEGIN
         END
         POPUP "色指定(&C)"
         BEGIN
-            MENUITEM "白(&W)",                       IDM_INSTAG_WHITE
-            MENUITEM "青(&U)",                       IDM_INSTAG_BLUE
-            MENUITEM "黒(&B)",                       IDM_INSTAG_BLACK
-            MENUITEM "赤(&R)",                       IDM_INSTAG_RED
-            MENUITEM "緑(&G)",                       IDM_INSTAG_GREEN
+            MENUITEM "白(&W)",			IDM_INSTAG_WHITE
+            MENUITEM "青(&U)",			IDM_INSTAG_BLUE
+            MENUITEM "黒(&B)",			IDM_INSTAG_BLACK
+            MENUITEM "赤(&R)",			IDM_INSTAG_RED
+            MENUITEM "緑(&G)",			IDM_INSTAG_GREEN
         END
         MENUITEM SEPARATOR
-        MENUITEM "枠挿入ボックス(&I)",                 IDM_FRMINSBOX_OPEN
-        MENUITEM "枠　&Alpha",                    IDM_INSFRAME_ALPHA
+        MENUITEM "枠挿入ボックス(&I)",	IDM_FRMINSBOX_OPEN
+        MENUITEM "枠　&Alpha",			IDM_INSFRAME_ALPHA
         POPUP "枠...(&F)"
         BEGIN
-            MENUITEM "枠編集(&A)",                     IDM_INSFRAME_EDIT
+            MENUITEM "枠編集(&A)",		IDM_INSFRAME_EDIT
             MENUITEM SEPARATOR
-			MENUITEM "枠　&Bravo",                    IDM_INSFRAME_BRAVO
-			MENUITEM "枠　&Charlie",                  IDM_INSFRAME_CHARLIE
-            MENUITEM "枠　&Delta",                    IDM_INSFRAME_DELTA
-            MENUITEM "枠　&Echo",                     IDM_INSFRAME_ECHO
-            MENUITEM "枠　&Foxtrot",                  IDM_INSFRAME_FOXTROT
-            MENUITEM "枠　&Golf",                     IDM_INSFRAME_GOLF
-            MENUITEM "枠　&Hotel",                    IDM_INSFRAME_HOTEL
-            MENUITEM "枠　&India",                    IDM_INSFRAME_INDIA
-            MENUITEM "枠　&Juliette",                 IDM_INSFRAME_JULIETTE
-			MENUITEM "枠　&Kilo",				IDM_INSFRAME_KILO
-			MENUITEM "枠　&Lima",				IDM_INSFRAME_LIMA
-            MENUITEM "枠　&Mike",				IDM_INSFRAME_MIKE
-            MENUITEM "枠　&November",			IDM_INSFRAME_NOVEMBER
-            MENUITEM "枠　&Oscar",				IDM_INSFRAME_OSCAR
-            MENUITEM "枠　&Poppa",				IDM_INSFRAME_POPPA
-            MENUITEM "枠　&Quebec",				IDM_INSFRAME_QUEBEC
-            MENUITEM "枠　&Romeo",				IDM_INSFRAME_ROMEO
-            MENUITEM "枠　&Sierra",				IDM_INSFRAME_SIERRA
-            MENUITEM "枠　&Tango",				IDM_INSFRAME_TANGO
+			MENUITEM "枠　&Bravo",		IDM_INSFRAME_BRAVO
+			MENUITEM "枠　&Charlie",	IDM_INSFRAME_CHARLIE
+            MENUITEM "枠　&Delta",		IDM_INSFRAME_DELTA
+            MENUITEM "枠　&Echo",		IDM_INSFRAME_ECHO
+            MENUITEM "枠　&Foxtrot",	IDM_INSFRAME_FOXTROT
+            MENUITEM "枠　&Golf",		IDM_INSFRAME_GOLF
+            MENUITEM "枠　&Hotel",		IDM_INSFRAME_HOTEL
+            MENUITEM "枠　&India",		IDM_INSFRAME_INDIA
+            MENUITEM "枠　&Juliette",	IDM_INSFRAME_JULIETTE
+			MENUITEM "枠　&Kilo",		IDM_INSFRAME_KILO
+			MENUITEM "枠　&Lima",		IDM_INSFRAME_LIMA
+            MENUITEM "枠　&Mike",		IDM_INSFRAME_MIKE
+            MENUITEM "枠　&November",	IDM_INSFRAME_NOVEMBER
+            MENUITEM "枠　&Oscar",		IDM_INSFRAME_OSCAR
+            MENUITEM "枠　&Poppa",		IDM_INSFRAME_POPPA
+            MENUITEM "枠　&Quebec",		IDM_INSFRAME_QUEBEC
+            MENUITEM "枠　&Romeo",		IDM_INSFRAME_ROMEO
+            MENUITEM "枠　&Sierra",		IDM_INSFRAME_SIERRA
+            MENUITEM "枠　&Tango",		IDM_INSFRAME_TANGO
         END
         MENUITEM SEPARATOR
-        MENUITEM "文字ＡＡ変換ボックス(&M)",              IDM_MOZI_SCR_OPEN
-        MENUITEM "縦書き変換ボックス(&V)",               IDM_VERT_SCRIPT_OPEN
+        MENUITEM "文字ＡＡ変換ボックス(&M)",	IDM_MOZI_SCR_OPEN
+        MENUITEM "縦書き変換ボックス(&V)",	IDM_VERT_SCRIPT_OPEN
         MENUITEM SEPARATOR
         POPUP "ユーザ定義(&U)"
         BEGIN
-            MENUITEM "(无)",                         IDM_USERINS_NA
+            MENUITEM "(无)",	IDM_USERINS_NA
         END
         MENUITEM SEPARATOR
-        MENUITEM "各頁に通し番号を入れる(&N)",             IDM_PAGENUM_DLG_OPEN
+        MENUITEM "各頁に通し番号を入れる(&N)",	IDM_PAGENUM_DLG_OPEN
     END
     POPUP "整形(&P)"
     BEGIN
-        MENUITEM "右揃え線(&R)",                    IDM_RIGHT_GUIDE_SET
-        MENUITEM "行頭に全角空白追加(&I)",               IDM_INS_TOPSPACE
+        MENUITEM "右揃え線(&R)",	IDM_RIGHT_GUIDE_SET
+        MENUITEM "行頭に全角空白追加(&I)",	IDM_INS_TOPSPACE
         MENUITEM SEPARATOR
-        MENUITEM "行頭空白削除(&U)",                  IDM_DEL_TOPSPACE
-        MENUITEM "行末空白削除(&G)",                  IDM_DEL_LASTSPACE
-        MENUITEM "行末文字削除(&E)",                  IDM_DEL_LASTLETTER
-        MENUITEM "選択範囲を空白にする(&F)",              IDM_FILL_SPACE
-        MENUITEM "頁全体を空白で埋める(&B)",              IDM_FILL_ZENSP
+        MENUITEM "行頭空白削除(&U)",	IDM_DEL_TOPSPACE
+        MENUITEM "行末空白削除(&G)",	IDM_DEL_LASTSPACE
+        MENUITEM "行末文字削除(&E)",	IDM_DEL_LASTLETTER
+        MENUITEM "選択範囲を空白にする(&F)",	IDM_FILL_SPACE
+        MENUITEM "頁全体を空白で埋める(&B)",	IDM_FILL_ZENSP
         MENUITEM SEPARATOR
-        MENUITEM "行頭半角空白をユニコードに変換(&L)",         IDM_HEADHALF_EXCHANGE
+        MENUITEM "行頭半角空白をユニコードに変換(&L)",	IDM_HEADHALF_EXCHANGE
         MENUITEM SEPARATOR
-        MENUITEM "右に寄せる(&H)",                   IDM_RIGHT_SLIDE
-        MENUITEM "１ドット増やす(&D)",                 IDM_INCREMENT_DOT
-        MENUITEM "１ドット減らす(&O)",                 IDM_DECREMENT_DOT
+		MENUITEM "左右反転(&M)",			IDM_MIRROR_INVERSE
+		MENUITEM "上下反転(&N)",			IDM_UPSET_INVERSE
         MENUITEM SEPARATOR
-        MENUITEM "全体を１ドット右へ(&J)",               IDM_INCR_DOT_LINES
-        MENUITEM "全体を１ドット左へ(&K)",               IDM_DECR_DOT_LINES
+        MENUITEM "右に寄せる(&H)",		IDM_RIGHT_SLIDE
+        MENUITEM "１ドット増やす(&D)",	IDM_INCREMENT_DOT
+        MENUITEM "１ドット減らす(&O)",	IDM_DECREMENT_DOT
+        MENUITEM SEPARATOR
+        MENUITEM "全体を１ドット右へ(&J)",	IDM_INCR_DOT_LINES
+        MENUITEM "全体を１ドット左へ(&K)",	IDM_DECR_DOT_LINES
         MENUITEM SEPARATOR
         POPUP "ドットずれ調整(&A)"
         BEGIN
-            MENUITEM "調整基準ロック(&R)",                 IDM_DOTDIFF_LOCK
-            MENUITEM "カーソル位置で調整(&D)",               IDM_DOTDIFF_ADJT
+            MENUITEM "調整基準ロック(&R)",	IDM_DOTDIFF_LOCK
+            MENUITEM "カーソル位置で調整(&D)",	IDM_DOTDIFF_ADJT
         END
     END
     POPUP "表示(&N)"
@@ -399,7 +402,7 @@ CAPTION "バージョン情報 - Orinrin Editor"
 FONT 9, "MS UI Gothic"
 BEGIN
     ICON            IDI_ORINRINEDITOR,IDC_MYICON,6,6,20,20
-    LTEXT           "Orinrin Editor, Version 0.30 Aurora (2012.406.2200.920)",IDC_STATIC,36,6,168,8,SS_NOPREFIX
+    LTEXT           "Orinrin Editor, Version 0.30 Aurora (2012.416.2200.920)",IDC_STATIC,36,6,168,8,SS_NOPREFIX
     LTEXT           "Copyright (C) 2011 - 2012 SikigamiHNQ",IDC_STATIC,36,18,168,8
     LTEXT           "Site ： お燐ちゃんは俺の嫁．ｃｏｍ",IDC_STATIC,36,30,168,8
     DEFPUSHBUTTON   "OK",IDOK,84,180,48,12,WS_GROUP
@@ -834,7 +837,7 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 2012,406,2200,920
+ FILEVERSION 2012,416,2200,920
  PRODUCTVERSION 0,30,0,920
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
@@ -860,7 +863,7 @@ BEGIN
             VALUE "LegalTrademarks", "License : GPLv3"
             VALUE "PrivateBuild", "Build by Visual C++ 2008 Express"
             VALUE "SpecialBuild", "Not Speciality"
-            VALUE "FileVersion", "2012.406.2200.920"
+            VALUE "FileVersion", "2012.416.2200.920"
             VALUE "ProductVersion", "0.30.0.920"
             VALUE "FileDescription", "AsciiArt Story Editor by Orinrin!"
             VALUE "OriginalFilename", "OrinrinEditor.exe"
@@ -1044,7 +1047,13 @@ IDBMQ_VERT_LEFT         BITMAP                  "resource\\VertLeft_q.bmp"
 IDBMP_VERT_TRANS        BITMAP                  "resource\\VertTrans.bmp"
 IDBMQ_VERT_TRANS        BITMAP                  "resource\\VertTrans_q.bmp"
 IDBMP_UNICODE_MODE      BITMAP                  "resource\\Unicode_Use.bmp"
-IDBMQ_UNICODE_MODE      BITMAP                  "resource\\Unicode_Use_q.bmp"
+IDBMQ_UNICODE_MODE		BITMAP                  "resource\\Unicode_Use_q.bmp"
+
+IDBMP_MIRROR_INVERSE	BITMAP					"resource\\arrow_leftright.bmp"
+IDBMQ_MIRROR_INVERSE	BITMAP					"resource\\arrow_leftright_q.bmp"
+IDBMP_UPSET_INVERSE		BITMAP					"resource\\arrow_updown.bmp"
+IDBMQ_UPSET_INVERSE		BITMAP					"resource\\arrow_updown_q.bmp"
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
