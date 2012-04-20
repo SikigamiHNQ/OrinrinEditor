@@ -288,9 +288,9 @@ UINT SqnAppendString( LPUNDOBUFF pstBuff, UINT dCmd, LPTSTR ptStr, INT xDot, INT
 
 	//	入力した文字・もしくは削除した文字
 	StringCchLength( ptStr, STRSAFE_MAX_CCH, &cchSize );
-	cchSize++;	//	ﾇﾙﾀｰﾐﾈｰﾀ分
-	stOpe.cchSize   = cchSize;
-	stOpe.ptText    = (LPTSTR)malloc( cchSize * sizeof(TCHAR) );	//	必要分確保
+	stOpe.cchSize = cchSize;	//	文字数にはヌルターミネータ分は含めない
+	cchSize++;	//	ヌルターミネータ分
+	stOpe.ptText  = (LPTSTR)malloc( cchSize * sizeof(TCHAR) );	//	必要分確保
 	StringCchCopy( stOpe.ptText, cchSize, ptStr );
 
 	pstBuff->vcOpeSqn.push_back( stOpe );

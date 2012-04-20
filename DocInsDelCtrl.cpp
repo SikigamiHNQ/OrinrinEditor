@@ -540,23 +540,35 @@ INT DocInputLetter( INT nowDot, INT rdLine, TCHAR ch )
 	INT_PTR	iLetter, iCount, iLines;
 	LETTER	stLetter;
 	LETR_ITR	vcItr;
+	LINE_ITR	itLine;
 
 	//	アンドゥリドゥは呼んだところで
 
+#ifdef DO_TRY_CATCH
+	try{
+#endif
 
-	LINE_ITR	itLine;
+	if( 0 == ch )
+	{
+		TRACE( TEXT("NULL文字が入った") );
+		return 0;
+	}
 
 	iLines = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.size( );
 
-	if( iLines <=  rdLine )	return 0;
+	if( iLines <= rdLine )
+	{
+		TRACE( TEXT("OutOfRange 指定[%d] 行数[%d]"), rdLine, iLines );
+		return 0;
+	}
 
 	//	今の文字位置を確認・現在行なのでずれてはないはず
 	iLetter = DocLetterPosGetAdjust( &nowDot, rdLine, 0 );
 
-	//	文字数確認
 	itLine = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.begin();
-	std::advance( itLine, rdLine );
+	std::advance( itLine, rdLine );	//	対象行までイテレートする
 
+	//	文字数確認
 	iCount = itLine->vcLine.size( );
 
 	//	データ作成
@@ -588,6 +600,12 @@ INT DocInputLetter( INT nowDot, INT rdLine, TCHAR ch )
 	(*gitFileIt).vcCont.at( gixFocusPage ).dByteSz += stLetter.mzByte;
 
 //	DocBadSpaceCheck( rdLine );	呼んだところでまとめてやる
+
+#ifdef DO_TRY_CATCH
+	}
+	catch( exception &err ){	return ETC_MSG( err.what(), 0 );	}
+	catch( ... ){	return  ETC_MSG( ("etc error"), 0 );	}
+#endif
 
 	return stLetter.rdWidth;
 }
