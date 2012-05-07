@@ -106,17 +106,17 @@ static CONST GUID gcstGUID = { 0x66D3E881, 0x972B, 0x458B, { 0x93, 0x5E, 0x9E, 0
 //	ファイル開いた履歴
 //	プロフ開いた履歴
 
+#define WORK_LOG_OUT	
 
 #define USE_NOTIFYICON	//	タスクトレイアイコンを有効
 
 //	作成中の機能
 //#define FIND_STRINGS	//	文字列検索機能
-#define  FRAME_MLINE	//	枠パーツ複数行
 //#define PAGE_MULTISELECT//	頁一覧の複数選択
-#define AA_INVERSE		//	上下左右反転機能
-//#define PAGE_DELAY_LOAD		//	ファイル読み込んだ時は頁展開しない、ひつようになったら開く
-#define WORK_LOG_OUT	
+#define PAGE_DELAY_LOAD	//	ファイル読み込んだ時は頁展開しない、ひつようになったら開く
 
+#define  FRAME_MLINE	//	枠パーツ複数行
+#define AA_INVERSE		//	上下左右反転機能
 #define ACCELERATOR_EDIT//	キーのアレ編集
 //#define COPY_SWAP
 

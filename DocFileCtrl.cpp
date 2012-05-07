@@ -234,14 +234,14 @@ HRESULT DocFileBackup( HWND hWnd )
 
 			if( isAST )	//	ASTは優先的に適用
 			{
-				if( StrCmp( atExBuf, aatExte[0] ) )	//	もしASTじゃなかったら変更
+				if( StrCmp( atExBuf , aatExte[0] ) )	//	もしASTじゃなかったら変更
 				{
 					StringCchCopy( ptExten, 5, aatExte[0] );
 				}
 			}
 			else if( isMLT )	//	名前無いけど複数頁ならMLTじゃないとダメ
 			{
-				if( StrCmp( atExBuf, aatExte[1] ) )	//	もしMLTじゃなかったら変更
+				if( StrCmp( atExBuf , aatExte[1] ) )	//	もしMLTじゃなかったら変更
 				{
 					StringCchCopy( ptExten, 5, aatExte[1] );
 				}
@@ -660,10 +660,14 @@ HRESULT DocImageSave( HWND hWnd, UINT bStyle, HFONT hFont )
 {
 
 	LPVOID	pBuffer;
+	LPTSTR	ptText;
 	UINT	dLines;
 	INT		iDotX, iDotY, iByteSize, bType;
 	UINT_PTR	cchSize;
 	RECT	rect;
+
+	INT	iLine;
+	UINT_PTR	cchLen, start, caret = 0;
 
 	BOOL	bOpened;
 	OPENFILENAME	stSaveFile;
@@ -724,7 +728,8 @@ HRESULT DocImageSave( HWND hWnd, UINT bStyle, HFONT hFont )
 	TRACE( TEXT("サイズ %d x %d"), iDotX, iDotY );
 
 	iByteSize = DocPageTextGetAlloc( gitFileIt, gixFocusPage, D_UNI, &pBuffer, TRUE );
-	StringCchLength( (LPTSTR)pBuffer, STRSAFE_MAX_CCH, &cchSize );
+	ptText = (LPTSTR)pBuffer;
+	StringCchLength( ptText, STRSAFE_MAX_CCH, &cchSize );
 
 	//	描画用ビットマップ作成
 	hdc = GetDC( hWnd );
@@ -739,7 +744,30 @@ HRESULT DocImageSave( HWND hWnd, UINT bStyle, HFONT hFont )
 
 	ReleaseDC( hWnd, hdc );
 
-	DrawText( hMemDC, (LPTSTR)pBuffer, cchSize, &rect, DT_LEFT | DT_NOPREFIX | DT_NOCLIP | DT_WORDBREAK );
+	iLine  = 0;
+	cchLen = 0;
+	start  = 0;
+	//	文字列全体を見ていく
+	for( caret = 0; cchSize > caret; )
+	{
+		if( TEXT('\r') == ptText[caret] )	//	壱行の終わり
+		{
+			TextOut( hMemDC, 0, iLine, &(ptText[start]), cchLen );
+			cchLen = 0;	//	文字数リセット
+			caret += 2;	//	次の行の開始位置
+			start = caret;	//	開始位置確認
+
+			iLine += LINE_HEIGHT;	//	描画Ｙ位置
+		}
+		else
+		{
+			cchLen++;
+			caret++;
+		}
+	}
+	//	最後の行描画
+	TextOut( hMemDC, 0, iLine, &(ptText[start]), cchLen );
+
 
 	FREE(pBuffer);
 

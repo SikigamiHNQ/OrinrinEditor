@@ -383,14 +383,14 @@ HRESULT DocMirrorTranceLine( INT iTop, INT iBtm )
 		if( 0 >= iMzDot )	continue;	//	その行の内容がないなら何もしないでおｋ
 
 		iPadd = baseDot - iMzDot;	//	埋めに必要な幅確保
-		ptPadd = DocPaddingSpaceMake( iPadd );
+		ptPadd = DocPaddingSpaceMake( iPadd );	//	そこまでを埋める
 
 		//	該当行を確保して
 		iBytes = DocLineTextGetAlloc( gitFileIt, gixFocusPage, D_UNI, iLns, (LPVOID *)(&ptString) );
 		if( 0 < iBytes )
 		{
 			StringCchLength( ptString, STRSAFE_MAX_CCH, &cchSz );
-			for( d = 0; cchSz > d; )
+			for( d = 0; cchSz > d; )	//	順番に見ていく
 			{
 				d += InversePartsCheck( IV_MIRROR, &(ptString[d]), atBuff, MIN_STRING );
 				wsInvBuff.insert( 0, atBuff );
@@ -398,6 +398,7 @@ HRESULT DocMirrorTranceLine( INT iTop, INT iBtm )
 		}
 		FREE( ptString );
 
+		//	元文字列と入れ替え
 		cchSz = wsInvBuff.size() + 2;	//	使い回し注意
 		ptInvStr = (LPTSTR)malloc( cchSz * sizeof(TCHAR) );
 		StringCchCopy( ptInvStr, cchSz, wsInvBuff.c_str() );
@@ -737,7 +738,7 @@ UINT InversePartsCheck( UINT dMode, LPCTSTR ptSource, LPTSTR ptOutput, UINT_PTR 
 		//	ヒットしたら、変換語文字列をコピーして終わり
 	}
 
-	StringCchLength( ptOutput, cchSz, &cchPrt );	//	長さ確認
+//	StringCchLength( ptOutput, cchSz, &cchPrt );	//	長さ確認・しちゃいかん
 
 	return cchPrt;
 }

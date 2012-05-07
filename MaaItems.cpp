@@ -570,7 +570,7 @@ VOID Aai_OnMouseMove( HWND hWnd, INT x, INT y, UINT keyFlags )
 		{
 			bottom += gvcViewOrder.at( i ).dHeight;
 
-			if( y < bottom ){	iItem = gvcViewOrder.at( i  ).index;	break;	}
+			if( y < bottom ){	iItem = gvcViewOrder.at(  i ).index;	break;	}
 		}
 	}
 
@@ -579,9 +579,10 @@ VOID Aai_OnMouseMove( HWND hWnd, INT x, INT y, UINT keyFlags )
 
 	if( bReDraw && gbAAtipView )	SendMessage( ghToolTipWnd, TTM_UPDATE, 0, 0 );
 
+	TRACE( TEXT("MAA MOUSE [%d x %d] %d %u"), x, y, iItem, bReDraw );
+
 	//	デバッグ用・あとで消すか内容変更
 	StringCchPrintf( atBuffer, MAX_STRING, TEXT("(%d x %d) %d"), x, y, iItem );
-
 	StatusBarMsgSet( 1, atBuffer );
 
 	return;
@@ -715,7 +716,7 @@ LRESULT Aai_OnNotify( HWND hWnd, INT idFrom, LPNMHDR pstNmhdr )
 			return 0;
 		}
 
-		FREE( gptTipBuffer );	//	NULLフリーでも問題は無い
+		FREE( gptTipBuffer );
 
 		pcConts = AacAsciiArtGet( gixNowSel );	//	該当するインデックスAAを引っ張ってくる
 		if( !pcConts  ){	return 0;	}

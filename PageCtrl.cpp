@@ -190,7 +190,7 @@ HWND PageListInitialise( HINSTANCE hInstance, HWND hParentWnd, LPRECT pstFrame )
 	{
 		dwExStyle = WS_EX_TOOLWINDOW;
 		if( InitWindowTopMost( INIT_LOAD, WDP_PLIST , 0 ) ){	dwExStyle |=  WS_EX_TOPMOST;	}
-		dwStyle = WS_POPUP | WS_THICKFRAME | WS_CAPTION | WS_VISIBLE;
+		dwStyle = WS_POPUP | WS_THICKFRAME | WS_CAPTION | WS_VISIBLE | WS_SYSMENU;
 		hPrWnd = NULL;
 	}
 	ghPageWnd = CreateWindowEx( dwExStyle, PAGELIST_CLASS, TEXT("Page List"), dwStyle,
@@ -247,13 +247,13 @@ HWND PageListInitialise( HINSTANCE hInstance, HWND hParentWnd, LPRECT pstFrame )
 	tbRect.left    = 0;
 	tbRect.top     = 0;
 
-//リストビュー
+//リストビュー	LVS_SHOWSELALWAYS
 	ghPageListWnd = CreateWindowEx( 0, WC_LISTVIEW, TEXT("pagelist"),
 		WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | 
 #ifdef PAGE_MULTISELECT
-		LVS_REPORT | LVS_NOSORTHEADER | LVS_SHOWSELALWAYS,
+		LVS_REPORT | LVS_NOSORTHEADER,
 #else
-		LVS_REPORT | LVS_NOSORTHEADER | LVS_SHOWSELALWAYS | LVS_SINGLESEL,
+		LVS_REPORT | LVS_NOSORTHEADER | LVS_SINGLESEL,
 #endif
 		tbRect.right, clRect.top, clRect.right - tbRect.right, clRect.bottom, ghPageWnd,
 		(HMENU)IDLV_PAGELISTVIEW, hInstance, NULL );
@@ -353,6 +353,8 @@ LRESULT CALLBACK PageListProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lP
 			FREE( gptPgTipBuf );
 			ImageList_Destroy( ghPgLstImgLst );
 			return 0;
+
+		case WM_CLOSE:	ShowWindow( ghPageWnd, SW_HIDE );	return 0;
 
 		default:	break;
 	}
@@ -1318,7 +1320,7 @@ VOID Plv_OnMouseMove( HWND hWnd, INT x, INT y, UINT keyFlags )
 	//	そのときマウスカーソル下にあるアイテムを選択しておく
 
 	ZeroMemory( &stHitInfo, sizeof(LVHITTESTINFO) );
-	stHitInfo.pt.x = 1;	//	高さが重要なのでここは適当でいい
+	stHitInfo.pt.x = 10;	//	高さが重要なのでここは適当でいい
 	stHitInfo.pt.y = y;
 
 	iItem = ListView_HitTest( hWnd, &stHitInfo );
@@ -1327,7 +1329,7 @@ VOID Plv_OnMouseMove( HWND hWnd, INT x, INT y, UINT keyFlags )
 
 	if( bReDraw )	SendMessage( ghPageTipWnd, TTM_UPDATE, 0, 0 );
 
-//	TRACE( TEXT("PLV MM %d,%d,%d"), iItem, stHitInfo.iItem, stHitInfo.iSubItem );
+	TRACE( TEXT("PLV MM %d,%d,%d [%d]"), iItem, stHitInfo.iItem, stHitInfo.iSubItem, bReDraw );
 
 	return;
 }
@@ -1361,6 +1363,7 @@ LRESULT Plv_OnNotify( HWND hWnd, INT idFrom, LPNMHDR pstNmhdr )
 
 			if( 0 > gixMouseSel ){	return 0;	}
 
+			TRACE( TEXT("TTN_GETDISPINFO %d"), gixMouseSel );
 			//	該当ページから引っ張る
 			dBytes = DocPageTextGetAlloc( gitFileIt, gixMouseSel, D_UNI, (LPVOID *)(&gptPgTipBuf), FALSE );
 
@@ -1383,7 +1386,6 @@ LRESULT Plv_OnNotify( HWND hWnd, INT idFrom, LPNMHDR pstNmhdr )
 		}
 	}
 
-//	TRACE( TEXT("%u"), pstNmhdr->code );
 	//	処理なかったら続ける？
 	return CallWindowProc( gpfOrigPageViewProc, hWnd, WM_NOTIFY, (WPARAM)idFrom, (LPARAM)pstNmhdr );
 

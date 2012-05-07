@@ -66,8 +66,8 @@ LONG_PTR WndTagGet( HWND hWnd )
 
 /*!
 ファイルの拡張子を比較
-	@param[in]	adMozi	チェキりたいユニコード文字
-	@param[in]	adMozi	チェキりたいユニコード文字
+	@param[in]	ptFile	チェキりたいファイル名
+	@param[in]	ptExte	チェキりたい拡張子・ピリヲドを含める
 	@return		BOOLEAN	非０該当拡張子である　０違うか、拡張子が無い
 */
 BOOLEAN FileExtensionCheck( LPTSTR ptFile, LPTSTR ptExte )

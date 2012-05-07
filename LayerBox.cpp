@@ -52,14 +52,16 @@ typedef list<LAYERBOXSTRUCT>::iterator	LAYER_ITR;
 #define LB_HEIGHT	220
 //-------------------------------------------------------------------------------------------------
 
-#define TB_ITEMS	6
+#define TB_ITEMS	8
 static  TBBUTTON	gstTBInfo[] = {
-	{ 0,	IDM_LYB_INSERT,		TBSTATE_ENABLED,	TBSTYLE_BUTTON | TBSTYLE_AUTOSIZE,	{0, 0}, 0, 0  },	//	挿入
-	{ 1,	IDM_LYB_OVERRIDE,	TBSTATE_ENABLED,	TBSTYLE_BUTTON | TBSTYLE_AUTOSIZE,	{0, 0}, 0, 0  },	//	上書
+	{ 0,	IDM_LYB_INSERT,		TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,					{0, 0}, 0, 0  },	//	挿入
+	{ 1,	IDM_LYB_OVERRIDE,	TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,					{0, 0}, 0, 0  },	//	上書
 	{ 0,	0,					TBSTATE_ENABLED,	TBSTYLE_SEP,						{0, 0}, 0, 0  },
-	{ 2,	IDM_LYB_COPY,		TBSTATE_ENABLED,	TBSTYLE_BUTTON | TBSTYLE_AUTOSIZE,	{0, 0}, 0, 0  },	//	コピー
+	{ 2,	IDM_LYB_COPY,		TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,					{0, 0}, 0, 0  },	//	コピー
 	{ 0,	0,					TBSTATE_ENABLED,	TBSTYLE_SEP,						{0, 0}, 0, 0  },
-	{ 3,	IDM_LYB_DO_EDIT,	TBSTATE_ENABLED,	TBSTYLE_BUTTON | TBSTYLE_CHECK | TBSTYLE_AUTOSIZE,	{0, 0}, 0, 0  } 	//	編集ボックスON/OFF
+	{ 3,	IDM_LYB_DO_EDIT,	TBSTATE_ENABLED,	TBSTYLE_CHECK | TBSTYLE_AUTOSIZE,	{0, 0}, 0, 0  },	//	編集ボックスON/OFF
+	{ 0,	0,					TBSTATE_ENABLED,	TBSTYLE_SEP,						{0, 0}, 0, 0  },
+	{ 4,	IDM_LYB_DELETE,		TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,					{0, 0}, 0, 0  } 	//	20120507	内容クルヤー
 
 };	//	
 //-------------------------------------------------------------------------------------------------
@@ -106,13 +108,13 @@ static LRESULT	CALLBACK gpfLyrEditProc( HWND, UINT, WPARAM, LPARAM );	//!<
 
 LRESULT	CALLBACK LayerBoxProc( HWND, UINT, WPARAM, LPARAM );	//!<	
 
-BOOLEAN	Lyb_OnCreate( HWND, LPCREATESTRUCT );		//!<	WM_CREATE の処理
-VOID	Lyb_OnCommand( HWND , INT, HWND, UINT );	//!<	
-//VOID	Lyb_OnSize( HWND , UINT, INT, INT );		//!<	
-VOID	Lyb_OnKey( HWND, UINT, BOOL, INT, UINT );	//!<	
-VOID	Lyb_OnPaint( HWND );						//!<	
-VOID	Lyb_OnDestroy( HWND );						//!<	
-VOID	Lyb_OnMoving( HWND, LPRECT );				//!<	
+BOOLEAN	Lyb_OnCreate( HWND, LPCREATESTRUCT );				//!<	WM_CREATE の処理
+VOID	Lyb_OnCommand( HWND , INT, HWND, UINT );			//!<	
+//VOID	Lyb_OnSize( HWND , UINT, INT, INT );				//!<	
+VOID	Lyb_OnKey( HWND, UINT, BOOL, INT, UINT );			//!<	
+VOID	Lyb_OnPaint( HWND );								//!<	
+VOID	Lyb_OnDestroy( HWND );								//!<	
+VOID	Lyb_OnMoving( HWND, LPRECT );						//!<	
 BOOL	Lyb_OnWindowPosChanging( HWND, LPWINDOWPOS );		//!<	
 VOID	Lyb_OnWindowPosChanged( HWND, const LPWINDOWPOS );	//!<	
 VOID	Lyb_OnLButtonDown( HWND, BOOL, INT, INT, UINT );	//!<	
@@ -125,7 +127,8 @@ HRESULT	LayerStringObliterate( LAYER_ITR  );			//!<
 HRESULT	LayerFromString( LAYER_ITR, LPCTSTR );			//!<	
 HRESULT	LayerFromSelectArea( LAYER_ITR , UINT );		//!<	
 HRESULT	LayerFromClipboard( LAYER_ITR );				//!<	
-HRESULT LayerForClipboard( HWND, UINT );				//!<	
+HRESULT	LayerForClipboard( HWND, UINT );				//!<	
+HRESULT	LayerOnDelete( HWND );							//!<	
 INT		LayerInputLetter( LAYER_ITR, INT, INT, TCHAR );	//!<	
 LPTSTR	LayerLineTextGetAlloc( LAYER_ITR, INT );		//!<	
 HRESULT	LayerBoxSetString( LAYER_ITR, LPCTSTR, UINT, LPPOINT, UINT );	//!<	
@@ -173,7 +176,7 @@ VOID LayerBoxInitialise( HINSTANCE hInstance, LPRECT pstFrame )
 	gdBoxID = 0;
 
 	//ツールバー用イメージリスト作成
-	ghLayerImgLst = ImageList_Create( 16, 16, ILC_COLOR24 | ILC_MASK, 4, 1 );
+	ghLayerImgLst = ImageList_Create( 16, 16, ILC_COLOR24 | ILC_MASK, 5, 1 );
 
 	hImg = LoadBitmap( hInstance, MAKEINTRESOURCE( (IDBMP_LAYERINSERT) ) );
 	hMsq = LoadBitmap( hInstance, MAKEINTRESOURCE( (IDBMQ_LAYERINSERT) ) );
@@ -192,6 +195,11 @@ VOID LayerBoxInitialise( HINSTANCE hInstance, LPRECT pstFrame )
 
 	hImg = LoadBitmap( hInstance, MAKEINTRESOURCE( (IDBMP_LAYERTEXTEDIT) ) );
 	hMsq = LoadBitmap( hInstance, MAKEINTRESOURCE( (IDBMQ_LAYERTEXTEDIT) ) );
+	ImageList_Add( ghLayerImgLst, hImg, hMsq );
+	DeleteBitmap( hImg );	DeleteBitmap( hMsq );
+
+	hImg = LoadBitmap( hInstance, MAKEINTRESOURCE( (IDBMP_DELETE) ) );
+	hMsq = LoadBitmap( hInstance, MAKEINTRESOURCE( (IDBMQ_DELETE) ) );
 	ImageList_Add( ghLayerImgLst, hImg, hMsq );
 	DeleteBitmap( hImg );	DeleteBitmap( hMsq );
 
@@ -504,6 +512,7 @@ BOOLEAN Lyb_OnCreate( HWND hWnd, LPCREATESTRUCT lpCreateStruct )
 	StringCchCopy( atBuffer, MAX_STRING, TEXT("ここらに上書") );	gstTBInfo[1].iString = SendMessage( hToolWnd, TB_ADDSTRING, 0, (LPARAM)atBuffer );
 	StringCchCopy( atBuffer, MAX_STRING, TEXT("コピーする") );		gstTBInfo[3].iString = SendMessage( hToolWnd, TB_ADDSTRING, 0, (LPARAM)atBuffer );
 	StringCchCopy( atBuffer, MAX_STRING, TEXT("テキスト編集") );	gstTBInfo[5].iString = SendMessage( hToolWnd, TB_ADDSTRING, 0, (LPARAM)atBuffer );
+	StringCchCopy( atBuffer, MAX_STRING, TEXT("内容を削除") );		gstTBInfo[7].iString = SendMessage( hToolWnd, TB_ADDSTRING, 0, (LPARAM)atBuffer );
 
 	SendMessage( hToolWnd , TB_ADDBUTTONS, (WPARAM)TB_ITEMS, (LPARAM)&gstTBInfo );	//	ツールバーにボタンを挿入
 
@@ -514,7 +523,7 @@ BOOLEAN Lyb_OnCreate( HWND hWnd, LPCREATESTRUCT lpCreateStruct )
 	gpfOrigLyrTBProc = SubclassWindow( hToolWnd, gpfLayerTBProc );
 
 	//	貼り付けたら閉じるチェックボックスを付ける
-	CreateWindowEx( 0, WC_BUTTON, TEXT("貼り付けたら閉じる"), WS_CHILD | WS_VISIBLE | BS_AUTOCHECKBOX, 128, 2, 170, 23, hToolWnd, (HMENU)IDCB_LAYER_QUICKCLOSE, lcInst, NULL );
+	CreateWindowEx( 0, WC_BUTTON, TEXT("貼り付けたら閉じる"), WS_CHILD | WS_VISIBLE | BS_AUTOCHECKBOX, 150, 2, 170, 23, hToolWnd, (HMENU)IDCB_LAYER_QUICKCLOSE, lcInst, NULL );
 	CheckDlgButton( hToolWnd, IDCB_LAYER_QUICKCLOSE, gbQuickClose ? BST_CHECKED : BST_UNCHECKED );
 
 	if( 0 == gdBoxID )	//	最初の壱個目のときに計算
@@ -582,6 +591,10 @@ VOID Lyb_OnCommand( HWND hWnd, INT id, HWND hWndCtl, UINT codeNotify )
 			LayerEditOnOff( hWnd, (lRslt&TBSTATE_CHECKED) ? TRUE : FALSE );
 			SendMessage( GetDlgItem(hWnd,IDW_LYB_TOOL_BAR), TB_SETSTATE, IDM_LYB_INSERT,   (lRslt&TBSTATE_CHECKED) ? 0 : TBSTATE_ENABLED );
 			SendMessage( GetDlgItem(hWnd,IDW_LYB_TOOL_BAR), TB_SETSTATE, IDM_LYB_OVERRIDE, (lRslt&TBSTATE_CHECKED) ? 0 : TBSTATE_ENABLED );
+			break;
+
+		case IDM_LYB_DELETE:	//	内容を削除
+			LayerOnDelete( hWnd );
 			break;
 
 		case IDCB_LAYER_QUICKCLOSE:
@@ -2016,7 +2029,7 @@ HRESULT LayerForClipboard( HWND hWnd, UINT bStyle )
 	string	srString;
 	wstring	wsString;
 
-
+	//	該当のレイヤーボックスを確認
 	for( itLyr = gltLayer.begin(); itLyr != gltLayer.end(); itLyr++ )
 	{
 		if( itLyr->hBoxWnd == hWnd ){	break;	}
@@ -2024,7 +2037,7 @@ HRESULT LayerForClipboard( HWND hWnd, UINT bStyle )
 	if( itLyr == gltLayer.end( ) )	return E_OUTOFMEMORY;
 
 
-	iLines = itLyr->vcLyrImg.size( );
+	iLines = itLyr->vcLyrImg.size( );	//	文字数確認
 
 	srString.clear( );
 	wsString.clear( );
@@ -2052,6 +2065,44 @@ HRESULT LayerForClipboard( HWND hWnd, UINT bStyle )
 		cbSize = srString.size( ) + 1;
 		DocClipboardDataSet( (LPSTR)(srString.c_str()), cbSize, bStyle );
 	}
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+
+/*!
+	レイヤボックスの内容を削除する
+	@param[in]	hWnd	ボックスのウインドウハンドル
+	@return		HRESULT	終了状態コード
+*/
+HRESULT LayerOnDelete( HWND hWnd )
+{
+	ONELINE		stLine;
+
+	LAYER_ITR	itLyr;
+
+#ifdef DO_TRY_CATCH
+	try{
+#endif
+
+	//	該当のレイヤーボックスを確認
+	for( itLyr = gltLayer.begin(); itLyr != gltLayer.end(); itLyr++ )
+	{
+		if( itLyr->hBoxWnd == hWnd ){	break;	}
+	}
+	if( itLyr == gltLayer.end( ) )	return E_OUTOFMEMORY;
+
+	LayerStringObliterate( itLyr );	//	中身破壊
+	ZeroONELINE( &stLine );
+	itLyr->vcLyrImg.push_back( stLine );	//	空データを作成しておく
+
+	InvalidateRect( hWnd, NULL, TRUE );
+
+#ifdef DO_TRY_CATCH
+	}
+	catch( exception &err ){	return (HRESULT)ETC_MSG( err.what(), E_UNEXPECTED );	}
+	catch( ... ){	return (HRESULT)ETC_MSG( ("etc error") , E_UNEXPECTED );	}
+#endif
 
 	return S_OK;
 }

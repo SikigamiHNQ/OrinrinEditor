@@ -74,8 +74,8 @@
 #define IDBMQ_COPY                      338
 #define IDBMP_PASTE                     339
 #define IDBMQ_PASTE                     340
-#define IDBMP_DELETE                    341
-#define IDBMQ_DELETE                    342
+#define IDBMP_DELETE					341
+#define IDBMQ_DELETE					342
 #define IDBMP_SJISCOPY                  343
 #define IDBMQ_SJISCOPY                  344
 #define IDBMP_PAGESJISCOPY              345
@@ -593,6 +593,7 @@
 #define IDM_LYB_TRANCE_RELEASE          32995
 #define IDM_LYB_TRANCE_ALL              32996
 #define IDM_LYB_COPY                    32997
+#define IDM_LYB_DELETE					32998
 #define IDM_MAATMPLE_VIEW               33000
 #define IDM_AATREE_MAINOPEN             33001
 #define IDM_AATREE_SUBADD               33002

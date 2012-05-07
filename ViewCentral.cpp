@@ -2099,7 +2099,7 @@ VOID OperationOnCommand( HWND hWnd, INT id, HWND hWndCtl, UINT codeNotify )
 		case  IDM_ON_PREVIEW:		PreviewVisibalise( gixFocusPage, TRUE );	break;
 
 		//	頁一覧を前面に
-		case  IDM_PAGELIST_VIEW:	SetForegroundWindow( ghPgVwWnd );	break;
+		case  IDM_PAGELIST_VIEW:	ShowWindow( ghPgVwWnd , SW_SHOW );		SetForegroundWindow( ghPgVwWnd );	break;
 
 		//	壱行テンプレを前面に
 		case  IDM_LINE_TEMPLATE:	ShowWindow( ghLnTmplWnd , SW_SHOW );	SetForegroundWindow( ghLnTmplWnd  );	break;
@@ -2131,7 +2131,7 @@ VOID OperationOnCommand( HWND hWnd, INT id, HWND hWndCtl, UINT codeNotify )
 		case IDM_USERINS_NA:		ToolBarPseudoDropDown( hWnd , id );	break;
 
 		//	頁挿入窓オーポン
-		case IDM_PAGENUM_DLG_OPEN:	DocPageNumInsert( ghInst, hWnd );	break;
+		case IDM_PAGENUM_DLG_OPEN:	DocPageNumInsert( ghInst, hWnd );	DocLetterPosGetAdjust( &gdDocXdot, gdDocLine, 0 );	break;
 
 		//	ブラシ機能をON/OFFする
 		case IDM_BRUSH_STYLE:		BrushModeToggle(  );	break;
@@ -2196,6 +2196,9 @@ VOID OperationOnCommand( HWND hWnd, INT id, HWND hWndCtl, UINT codeNotify )
 		//	文字列検索
 		case  IDM_FIND_DLG_OPEN:		FindDialogueOpen( ghInst, hWnd );	break;
 		case IDM_FIND_HIGHLIGHT_OFF:	FindHighlightOff(  );	break;
+
+		case IDM_FIND_JUMP_NEXT:	FindStringJump( 0 );	break;
+		case IDM_FIND_JUMP_PREV:	FindStringJump( 1 );	break;
 
 #endif
 

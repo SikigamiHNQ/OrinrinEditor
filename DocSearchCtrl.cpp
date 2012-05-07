@@ -31,6 +31,12 @@ Ctrl+F3で、選択範囲を検索範囲に・範囲なかったら無視
 F3用ジャンプテーブルも修正・編集はいったら、該当行のデータ全部けして、その行だけ再検索
 
 イテレータ、eraseの返り値は、削除したやつの次の位置
+
+
+F3ジャンプの記録、頁移動したら、その頁に合わせる
+新規検索したらそれに合わせる
+
+検索位置に文字を追加削除したときの処理は？
 */
 
 #ifdef FIND_STRINGS
@@ -45,29 +51,34 @@ typedef struct tagFINDPATTERN
 } FINDPATTERN, *LPFINDPATTERN;
 //--------------------------------
 
-//	ヒット位置を記録・リストのほうがいい？
+//	ヒット位置を記録
 typedef struct tagFINDPOSITION
 {
-	INT	iPage;	//!<	属してる頁
-	INT	iLine;	//!<	該当行
-	INT	iCaret;	//!<	該当の開始位置
+	LPARAM	dUnique;	//!<	ファイル通し番号・１インデックス
+	INT		iPage;		//!<	属してる頁
+	INT		iLine;		//!<	該当行
+	INT		iCaret;		//!<	行内での文字位置
 
 } FINDPOSITION, *LPFINDPOSITION;
 
 //-------------------------------------------------------------------------------------------------
 
-extern list<ONEFILE>	gltMultiFiles;	//!<	複数ファイル保持
+extern list<ONEFILE>	gltMultiFiles;	//	複数ファイル保持
 //イテレータのtypedefはヘッダへ
 
-extern FILES_ITR	gitFileIt;	//	今見てるファイルの本体
+extern FILES_ITR	gitFileIt;		//	今見てるファイルの本体
 //#define gstFile	(*gitFileIt)	//!<	イテレータを構造体と見なす
 
-extern INT		gixFocusPage;	//	注目中のページ・とりあえず０・０インデックス
+extern INT		gixFocusPage;		//	注目中のページ・とりあえず０・０インデックス
 
-EXTERNED HWND	ghFindDlg;	//!<	検索ダイヤログのハンドル
+EXTERNED HWND	ghFindDlg;		//!<	検索ダイヤログのハンドル
 
-static TCHAR	gatNowPtn[MAX_PATH];			//!<	最新の検索文字列
-static list<FINDPOSITION>	gltFindPosition;	//!<	検索結果保持
+static TCHAR	gatNowPtn[MAX_PATH];	//!<	最新の検索文字列
+static INT		gixFindMode;	//!<	検索モード　０頁のみ　１単ファイル　２全ファイル
+
+static FINDPOSITION	gstFindPos;	//!<	検索ジャンプ位置
+
+//static list<FINDPOSITION>	gltFindPosition;	//!<	検索結果保持
 //-------------------------------------------------------------------------------------------------
 
 
@@ -275,13 +286,15 @@ HRESULT FindExecute( HWND hDlg )
 	TCHAR	atPattern[MAX_PATH], atBuf[MAX_PATH];
 
 	FindHighlightOff(  );	//	先のパヤーン破棄
+	ZeroMemory( &gstFindPos, sizeof(FINDPOSITION) );
 
 	//	￥ｎを改行、￥￥を￥にするか
 	bModCrlf = IsDlgButtonChecked( hDlg, IDCB_MOD_CRLF_YEN );
 
 	//	検索範囲
 	dRange = ComboBox_GetCurSel( GetDlgItem(hDlg,IDCB_FIND_TARGET) );
-	//	０頁　１ファイル
+	//	０頁　１ファイル　２全オーポンファイル
+	gixFindMode = dRange;
 
 	//検索パヤーン
 	Edit_GetText( GetDlgItem(hDlg,IDE_FIND_TEXT), atBuf, MAX_PATH );
@@ -290,8 +303,8 @@ HRESULT FindExecute( HWND hDlg )
 	{
 		for( d = 0, h = 0; MAX_PATH > d; d++, h++ )
 		{
-			atPattern[h] = atBuf[d];	//	0x005Cは￥
-			if( 0x005C == atBuf[d] )	
+			atPattern[h] = atBuf[d];	
+			if( 0x005C == atBuf[d] )	//	0x005Cは￥
 			{
 				d++;
 				if( TEXT('n') ==  atBuf[d] )	//	改行指示である場合
@@ -471,6 +484,19 @@ HRESULT FindPageHitHighlight( INT iOffset, INT iRange, INT iPage, FILES_ITR itFi
 }
 //-------------------------------------------------------------------------------------------------
 
+
+/*!
+	検索位置へジャンプ
+	@param[in]	dMode	０次へ　１前へ
+*/
+HRESULT FindStringJump( UINT dMode )
+{
+
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+
 /*!
 	全部ハイライトＯＦＦ
 */
@@ -508,7 +534,7 @@ INT FindPageHighlightOff( INT iPage, FILES_ITR itFile )
 
 	for( ln = 0; itLnEnd != itLine; itLine++, ln++ )
 	{
-		FindLineHighlightOff( ln, itLine );
+		FindLineHighlightOff( ln, itLine );	//	中でREDRAW処理してる
 	}
 
 //	ViewRedrawSetLine( -1 );	//	画面表示更新

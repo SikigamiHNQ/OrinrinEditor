@@ -789,6 +789,8 @@ HRESULT		VertMoveFromView( HWND, UINT );
 #ifdef FIND_STRINGS
 HRESULT		FindDialogueOpen( HINSTANCE, HWND );
 HRESULT		FindHighlightOff( VOID );
+HRESULT		FindStringJump( UINT );
+
 #endif
 
 #endif	//	NOT _ORRVW
