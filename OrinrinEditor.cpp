@@ -19,58 +19,41 @@ If not, see <http://www.gnu.org/licenses/>.
 
 //	大日本帝国公用語は↓を見られたい
 
+
+
 //	TODO:	カーソル位置で、矩形上書き、強制矩形挿入が欲しい
-
-//	TODO:	ページにページ数を挿入、を選択したとき、一番上の行を削除して挿入　のチェックボックスが保存されない
-
-//	TODO:	プロファイルのツリーの編集、もっと手軽にできないか
-
+//	TODO:	頁挿入ダイヤログのチェックボックス覚えておくように
 //	TODO:	ページリストも、ばらしたとき閉じられるように
 
-//	TODO:	MAA窓も統合できないか
+//	TODO:	矩形選択範囲バイトカウントが遅い
+
+//非ユニコードの埋めパターン、半角空白気にしない用にする？＜ちゅっと変更してみた
 
 
 //考え中
 //	頁削除メッセージの確認無しは、起動中だけにしたほうがいい？
-
 //	キーバインド・メニューに入ってない機能に注意
-
-//	ステータスバー・オーナードローで、容量オーバーしたら、容量のところ赤くする
-
-//	反転パーツ、文字数の多い順に並べ直す
-
 //	枠編集DIALOGUE、オフセットでENTERとか直書換に対応セヨ
-
 //	ドッキングテンプレ、左に置けないか
-
-//	TODO:	頁挿入ダイヤログのチェックボックス覚えておくように
-
-//	TODO:	MAAで、ファイルクルックしたら、自動で副タブ開く機能・選択式がよい
-//もしくは中クルックで対応
-
-//	TODO:	ミニ複数行テンプレ・壱行ブラシのサブダイヤログに増やすか
-
 //	セーブ時メッセージON/OFFできるように
+//	ファイル履歴は、いじった順番になるようにすべき
+//プレビューの更新ボタンつける
+//プレビュー開いてる時に、開く操作したら閉じる？
 
 //ファイル開くとき、ページデータは生のテキストデータだけゲットしておいて、メモリ展開はしない
 //ページが選択されたら、本体に展開して、生データは消しておく・これをフラグにする
 //保存するときは、生データか、本体データを保存する
 //頁表示のステータスのほうは？バイト数計算だけならそんなに重くない？
 
-//	ファイル履歴は、いじった順番になるようにすべき
 
-//プレビューの更新ボタンつける
-//プレビュー開いてる時に、開く操作したら閉じる？
 
 //ビューワのアイコン変える。緑とか
 
 
-//バグ＜影響ないようにした
-//選択範囲がある状態でCtrlU＞アンドゥ＞選択範囲がおかしくなる。さらに切り取りとかすると落ちる
-//アンドゥリドゥしたら、選択範囲解除する・DocInsDelCtrl.cpp:559あたりでおかしい？
 
-
-
+//バグ
+//	TODO:	選択範囲をマウスドラッグで移動したときのリドゥがおかしい？描画更新エラーか？
+//	TODO:	描画更新タイミングがおかしい場合が多々ある
 //	TODO:	MLTに右クリからアイテム追加して、そのAAを連続で貼り付けると落ちる
 //	TODO:	追加したAAの最後にステルス空白がある？
 //	TODO:	複数の空白を、まとめてドラッグでけしてもバッド空白チェキが外れない
@@ -85,8 +68,14 @@ If not, see <http://www.gnu.org/licenses/>.
 
 //確認：Viewer側、↑↓PageUpDownつかえてるか
 
+//影響ないようにした
+//選択範囲がある状態でCtrlU＞アンドゥ＞選択範囲がおかしくなる。さらに切り取りとかすると落ちる
+//アンドゥリドゥしたら、選択範囲解除する・DocInsDelCtrl.cpp:559あたりでおかしい？
+
+
 //変更・修正
 //	TODO:	サムネ表示、ポップアップで落ちやすい？メモリの扱いを考える必要がある・NULLチェキとか
+//	文字数とバイト数の計算間違っていた所をなおした
 
 //	TODO:	頁の複数選択して移動、Ｄ＆Ｄも
 //	TODO:	CtrlF4で、Viewer側なら副タブ閉じる
@@ -98,9 +87,6 @@ If not, see <http://www.gnu.org/licenses/>.
 //	TODO:	已に開いているファイルをさらに開く場合は該当ファイルにフォーカスする
 
 //	TODO:	デカいファイル開こうとしたときはメッセージ出すとか
-//	TODO:	デカいファイル開いたら時間かかる（1000コマとか）
-//			逐次読み込みにするとか、先読みしたらvector確保してからいれるとかvectorじゃなくlistにするとか？
-//			壱行毎のサイズ確認して、確保してからブチ込むとか
 //	TODO:	Viewer、右クリメニューからのドラフトボードが開かない？・追加されない？
 //	TODO:	最大化して終わる＞起動して、最大化解除すると、メインスプリットバーが見えなくなる//右にイッちゃってるまま
 //	TODO:	メインスプリットバーの位置情報リセットが居るかも
@@ -116,11 +102,9 @@ If not, see <http://www.gnu.org/licenses/>.
 
 //機能追加
 //	TODO:	MAAのアイテム追加、カーソル位置のAAの手前に入るように
-//	TODO:	選択範囲をマウスドラッグで移動
 //	TODO:	viewerの主タブをマウスとスクロールバーだけでなく、ホウィール、キーボードの矢印やPageUp,PageDnキーで操作出来る様にならない？
 //	TODO:	Viewer側、ポップアップで、容量も出せないか
 //	TODO:	右揃え線消し
-
 //	TODO:	使用をファイル出力できるように
 //	TODO:	MLTのブックマーク機能・タブ増やすか、ツリーに増やすか・副タブじゃいけない？
 //	TODO:	viewの使用のグループ名の変更機能・グループ自体、単体両方で
@@ -155,16 +139,14 @@ If not, see <http://www.gnu.org/licenses/>.
 //	TODO:	トレスの２画面だと、背景絵はどっちのペインでも表示出来るようにしたい
 //	TODO:	トレスで、画像をつまんで直接移動できるように
 //	TODO:	プレビューをリヤルタイムに変更する
+//	TODO:	プロファイルのツリーの編集、もっと手軽にできないか
+//	TODO:	MAA窓も統合できないか
+//	TODO:	ミニ複数行テンプレ・壱行ブラシのサブダイヤログに増やすか
 
 
 
 
 
-//	CopyAcceleratorTable
-//	CreateAcceleratorTable
-//	DestroyAcceleratorTable
-//	ACCEL構造体
-//	Ctrl Shift Alt の順番
 
 //外部スクリプトはどのように実現するか。Rubyの組込とかつかえない？
 //(д)EditはFreePascal？
@@ -189,28 +171,13 @@ If not, see <http://www.gnu.org/licenses/>.
 
 
 //OK?
-//	TODO:	Enterでコピー・表示の一番上でいいか
-//	TODO:	Editorのプロファイル使用履歴が動かない
 //	TODO:	新規で開いて、それを名づけ保存したファイルは、履歴に入いってない
-
 //	TODO:	頁削除のAlt+D付ける。注意ダイヤログ出す。
-//	TODO:	UTF8でもセーブ出来るように・エクスポートでいいか
-//	TODO:	フォント変更出来るように
-//	TODO:	ViewerEXEの場合、最前面に表示になってたらドラフトボード・サムネが裏になってまう
-//	TODO:	MAAのリストアップは、テキストも対象に入れる
 //	TODO:	サムネからだと使用履歴に反映されない
 //	TODO:	IEプレビュー、CSSでフォント表示を正規化する http://b4t.jp/823
 //	TODO:	文字ＡＡの入力とか、レイヤボックスの編集とかで、キーボードショートカット使えるように
-//	TODO:	枠機能で、複数行パーツを使いたい
 
-//	TODO:	未保存で閉じようとしたときのメッセージのYes/Noを逆にしてほしい。
-//			未保存のまま閉じようとした場合の確認は『セーブしますか? Yes（Save)/No/Cancel』だが、Orinrinは『終了していいですか? Yes/No』なのでYesとNoの動作が逆になっていて紛らわしいため。
-
-//コピーモード入れ替え、起動時の処理と、Ctrl+Cの表記
-//レイヤボックスで、SJISコピーしたら中身が内のを修正
-
-//	リバーの、「編集」とかの説明書きクルックするとスライドする機能
-//	ダブルクルックで移動するようにした。最大化と最小化らしい
+//	TODO:	MAAで、ファイルクルックしたら、自動で副タブ開く機能・選択式がよい・もしくは中クルックで対応
 
 /*
 
@@ -412,7 +379,7 @@ ASDファイル　　壱行が壱コンテンツ
 					アクセラキー編集機能を搭載
 					アンドゥリドゥをするときは選択範囲解除するようにした
 					已に開いているファイルを開こうとしたら、そのタブに移るようにした
-2012/04/05	0.30	MAA窓でENTER押したら、そのときトップに見えてるAAを左クリック動作するようにした
+2012/05/08	0.30	MAA窓でENTER押したら、そのときトップに見えてるAAを左クリック動作するようにした
 					文字列若しくは空白列でダブルクルックすると、その範囲を選択状態にする
 					選択範囲をドラッグ移動出来るようにした
 					プレビュー開いてたら、保存したときに再描画するようにした
@@ -420,6 +387,8 @@ ASDファイル　　壱行が壱コンテンツ
 					枠の個数を２０個保持できるようにした
 					ツールバーに、ユニコード空白の使用／不使用トグルボタンつけた
 					左右反転、上下反転機能を追加
+					レイヤボックスに、内容削除ボタンを追加
+					4096byte超えたら、ステータスバーのバイト表示位置が赤くなる。
 
 更新日時注意
 
@@ -483,6 +452,7 @@ static  HWND		ghFileTabTip;	//!<	複数ファイルタブツールチップ
 
 static  HWND		ghMainWnd;		//!<	メインウインドウハンドル
 static  HWND		ghStsBarWnd;	//!<	ステータスバー
+static  HBRUSH		ghStsRedBrush;	//!<	ステータスバー用紅ブラシ
 
 static HANDLE		ghMutex;		//!<	多重起動防止用Mutex
 
@@ -539,21 +509,22 @@ extern  UINT	gdRightRuler;	//	右線の位置
 
 //	ステータスバーの区切り
 #define SB_ITEMS	8
-CONST INT	gadStsBarSize[] = { 50, 200, 350, 500, 650, 750, 850, -1 };
+CONST INT	gadStsBarSize[] = { 50, 200, 350, 500, 700, 800, 900, -1 };
 //-------------------------------------------------------------------------------------------------
 
-VOID	Cls_OnActivate( HWND, UINT, HWND, BOOL );	//!<	
-BOOLEAN	Cls_OnCreate( HWND, LPCREATESTRUCT );		//!<	本体の WM_CREATE の処理・固定Editとかつくる
-VOID	Cls_OnCommand( HWND , INT, HWND, UINT );	//!<	本体の WM_COMMAND の処理
-VOID	Cls_OnPaint( HWND );						//!<	本体の WM_PAINT の処理・枠線描画とか
-VOID	Cls_OnSize( HWND , UINT, INT, INT );		//!<	
-VOID	Cls_OnMove( HWND, INT, INT );				//!<	
-VOID	Cls_OnDestroy( HWND );						//!<	本体の WM_DESTROY の処理・BRUSHとかのオブジェクトの破壊を忘れないように
-LRESULT	Cls_OnNotify( HWND , INT, LPNMHDR );		//!<	
-VOID	Cls_OnTimer( HWND, UINT );					//!<	
-VOID	Cls_OnDropFiles( HWND , HDROP );			//!<	
-VOID	Cls_OnContextMenu(HWND,HWND,UINT,UINT );	//!<	
-VOID	Cls_OnHotKey(HWND, INT, UINT, UINT );		//!<	
+VOID	Cls_OnActivate( HWND, UINT, HWND, BOOL );		//!<	
+BOOLEAN	Cls_OnCreate( HWND, LPCREATESTRUCT );			//!<	本体の WM_CREATE の処理・固定Editとかつくる
+VOID	Cls_OnCommand( HWND , INT, HWND, UINT );		//!<	本体の WM_COMMAND の処理
+VOID	Cls_OnPaint( HWND );							//!<	本体の WM_PAINT の処理・枠線描画とか
+VOID	Cls_OnSize( HWND , UINT, INT, INT );			//!<	
+VOID	Cls_OnMove( HWND, INT, INT );					//!<	
+VOID	Cls_OnDestroy( HWND );							//!<	本体の WM_DESTROY の処理・BRUSHとかのオブジェクトの破壊を忘れないように
+LRESULT	Cls_OnNotify( HWND , INT, LPNMHDR );			//!<	
+VOID	Cls_OnTimer( HWND, UINT );						//!<	
+VOID	Cls_OnDropFiles( HWND , HDROP );				//!<	
+VOID	Cls_OnContextMenu(HWND,HWND,UINT,UINT );		//!<	
+VOID	Cls_OnHotKey(HWND, INT, UINT, UINT );			//!<	
+VOID	Cls_OnDrawItem( HWND, CONST DRAWITEMSTRUCT * );	//!<	
 
 INT_PTR	CALLBACK OptionDlgProc( HWND, UINT, WPARAM, LPARAM );	//!<	
 
@@ -1129,18 +1100,20 @@ LRESULT CALLBACK WndProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam 
 		HANDLE_MSG( hWnd, WM_PAINT,			Cls_OnPaint );		//	画面の更新とか
 		HANDLE_MSG( hWnd, WM_COMMAND,		Cls_OnCommand );	//	ボタン押されたとかのコマンド処理
 		HANDLE_MSG( hWnd, WM_DESTROY,		Cls_OnDestroy );	//	ソフト終了時の処理
-		HANDLE_MSG( hWnd, WM_SIZE,			Cls_OnSize );		//	
-		HANDLE_MSG( hWnd, WM_MOVE,			Cls_OnMove );		//	
-		HANDLE_MSG( hWnd, WM_DROPFILES,		Cls_OnDropFiles );	//	D&D
-		HANDLE_MSG( hWnd, WM_ACTIVATE,		Cls_OnActivate );	//	
+		HANDLE_MSG( hWnd, WM_SIZE,			Cls_OnSize );		//	サイズ変更されたら
+		HANDLE_MSG( hWnd, WM_MOVE,			Cls_OnMove );		//	位置変更されたら
+		HANDLE_MSG( hWnd, WM_DROPFILES,		Cls_OnDropFiles );	//	ドラッグンドロッペ
+		HANDLE_MSG( hWnd, WM_ACTIVATE,		Cls_OnActivate );	//	アクティブになったりはずれたり
 		HANDLE_MSG( hWnd, WM_NOTIFY,		Cls_OnNotify  );	//	コモンコントロールの個別イベント
-		HANDLE_MSG( hWnd, WM_TIMER,			Cls_OnTimer );		//	
-		HANDLE_MSG( hWnd, WM_CONTEXTMENU,	Cls_OnContextMenu );	//	
-		HANDLE_MSG( hWnd, WM_HOTKEY,		Cls_OnHotKey  );	//	
+		HANDLE_MSG( hWnd, WM_TIMER,			Cls_OnTimer );		//	タイマ
+		HANDLE_MSG( hWnd, WM_CONTEXTMENU,	Cls_OnContextMenu );//	右クリめにう
+		HANDLE_MSG( hWnd, WM_HOTKEY,		Cls_OnHotKey  );	//	ホットキーが押された
 
-		HANDLE_MSG( hWnd, WM_KEYDOWN,		Evw_OnKey );			//	
-		HANDLE_MSG( hWnd, WM_KEYUP,			Evw_OnKey );			//	
-		HANDLE_MSG( hWnd, WM_CHAR,			Evw_OnChar );			//	
+		HANDLE_MSG( hWnd, WM_DRAWITEM,		Cls_OnDrawItem );	//	オーナードロー
+
+		HANDLE_MSG( hWnd, WM_KEYDOWN,		Evw_OnKey );		//	
+		HANDLE_MSG( hWnd, WM_KEYUP,			Evw_OnKey );		//	
+		HANDLE_MSG( hWnd, WM_CHAR,			Evw_OnChar );		//	
 		HANDLE_MSG( hWnd, WM_MOUSEWHEEL,	Evw_OnMouseWheel );	//	
 
 #ifdef NDEBUG
@@ -1304,12 +1277,14 @@ BOOLEAN Cls_OnCreate( HWND hWnd, LPCREATESTRUCT lpCreateStruct )
 
 
 
+	ghStsRedBrush = CreateSolidBrush( 0xFF );
 
 	ghStsBarWnd = CreateStatusWindow( WS_CHILD | WS_VISIBLE | CCS_BOTTOM | SBARS_SIZEGRIP, TEXT(""), hWnd, IDSB_VIEW_STATUS_BAR );
-	SendMessage( ghStsBarWnd, SB_SIMPLE, FALSE, 0L );
 	SendMessage( ghStsBarWnd, SB_SETPARTS, (WPARAM)SB_ITEMS, (LPARAM)(LPINT)gadStsBarSize );
 
 	StatusBar_SetText( ghStsBarWnd, 1 , TEXT("") );
+
+//	StatusBar_SetText( ghStsBarWnd, (SB_BYTECNT | SBT_OWNERDRAW) , 0 );	//	オーナードロー
 
 	return TRUE;
 }
@@ -1579,6 +1554,8 @@ VOID Cls_OnDestroy( HWND hWnd )
 
 	DeleteFont( ghNameFont );
 
+	DeleteBrush( ghStsRedBrush );
+
 	ToolBarDestroy(  );
 
 	DestroyWindow( ghViewWnd );
@@ -1803,33 +1780,60 @@ VOID Cls_OnHotKey(HWND hWnd, INT idHotKey, UINT fuModifiers, UINT vk )
 //-------------------------------------------------------------------------------------------------
 
 /*!
+	オーナードローの処理
+	@param[in]	hWnd			ウインドウハンドル
+	@param[in]	*pstDrawItem	オーナドローデータ
+	@return		無し
+*/
+VOID Cls_OnDrawItem( HWND hWnd, CONST DRAWITEMSTRUCT *pstDrawItem )
+{
+	UINT	dBytes;
+	TCHAR	atBuff[SUB_STRING];
+	RECT	rect;
+
+	//	ステータスバー以外は関係ないので放置
+	if( IDSB_VIEW_STATUS_BAR != pstDrawItem->CtlID )	return;
+
+	if( SB_BYTECNT == pstDrawItem->itemID )
+	{
+		SetBkMode( pstDrawItem->hDC, TRANSPARENT );
+		rect = pstDrawItem->rcItem;
+
+		dBytes =  pstDrawItem->itemData;	//	文字列ポインタとか入ってる
+		StringCchPrintf( atBuff, SUB_STRING, TEXT("%d Bytes"), dBytes );
+
+		if( PAGE_BYTE_MAX < dBytes )	FillRect( pstDrawItem->hDC, &(pstDrawItem->rcItem), ghStsRedBrush );
+
+		DrawText( pstDrawItem->hDC, atBuff, -1, &(rect), DT_LEFT | DT_VCENTER | DT_SINGLELINE );
+	}
+
+	return;
+}
+//-------------------------------------------------------------------------------------------------
+
+/*!
 	ステータスバーに文字列追加
 	@param[in]	room	入れる枠０インデックス
 	@param[in]	ptText	入れる文字列
 	@return		HRESULT	終了状態コード
 */
-HRESULT StatusBarSetText( INT room, LPCTSTR ptText )
+HRESULT MainStatusBarSetText( INT room, LPCTSTR ptText )
 {
-	StatusBar_SetText( ghStsBarWnd, room , ptText );
+	if( SB_MODIFY == room )	StatusBar_SetText( ghStsBarWnd, (room | SBT_OWNERDRAW), ptText );
+	else	StatusBar_SetText( ghStsBarWnd, room , ptText );
 
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	ステータスバーに数字を乳力
-	@param[in]	room	入れる枠０インデックス
-	@param[in]	value	入れる数値
+	ステータスバーにバイト数をオーナードローで乳力
+	@param[in]	dByte	バイト数
 	@return		HRESULT	終了状態コード
 */
-HRESULT StatusBarSetTextInt( INT room, INT value )
+HRESULT MainSttBarSetByteCount( UINT dByte )
 {
-	TCHAR	atString[SUB_STRING];
-
-	ZeroMemory( atString, sizeof(atString) );
-	StringCchPrintf( atString, SUB_STRING, TEXT("%d"), value );
-
-	StatusBar_SetText( ghStsBarWnd, room , atString );
+	SendMessage( ghStsBarWnd, SB_SETTEXT, (WPARAM)(SB_BYTECNT | SBT_OWNERDRAW), (LPARAM)dByte );
 
 	return S_OK;
 }

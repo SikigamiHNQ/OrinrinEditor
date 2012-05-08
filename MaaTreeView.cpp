@@ -72,6 +72,8 @@ HRESULT	TreeItemFromSqlII( HTREEITEM );
 UINT	TreeItemFromSql( LPCTSTR, HTREEITEM, UINT );
 #endif
 
+VOID	Mtv_OnMButtonUp( HWND, INT, INT, UINT );
+
 HRESULT	TabMultipleRestore( HWND );
 INT		TabMultipleSelect( HWND, INT, UINT );	//!<	
 //INT	TabMultipleOpen( HWND , HTREEITEM );	//!<	
@@ -227,9 +229,7 @@ LRESULT CALLBACK gpfTreeViewProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPa
 		HANDLE_MSG( hWnd, WM_KEYDOWN, Aai_OnKey );			//	20120221
 		HANDLE_MSG( hWnd, WM_KEYUP,   Aai_OnKey );			//	
 
-		case WM_MBUTTONUP:
-			ulRslt = 1;
-			break;
+		HANDLE_MSG( hWnd, WM_MBUTTONUP, Mtv_OnMButtonUp );	
 
 		case WM_MOUSEWHEEL:
 			ulRslt = Maa_OnMouseWheel( hWnd, (int)(short)LOWORD(lParam), (int)(short)HIWORD(lParam), (int)(short)HIWORD(wParam), (UINT)(short)LOWORD(wParam) );
@@ -240,6 +240,36 @@ LRESULT CALLBACK gpfTreeViewProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPa
 	}
 
 	return CallWindowProc( gpfOriginTreeViewProc, hWnd, msg, wParam, lParam );
+}
+//-------------------------------------------------------------------------------------------------
+
+
+/*!
+	ツリービューでマウスの中バラァンがうｐされたら
+	@param[in]	hWnd	ツリービューのハンドル
+	@param[in]	x		クルックされたクライヤントＸ位置
+	@param[in]	y		クルックされたクライヤントＹ位置
+	@param[in]	flags	
+*/
+VOID Mtv_OnMButtonUp( HWND hWnd, INT x, INT y, UINT flags )
+{
+	INT	iRslt;
+	HTREEITEM	hTreeItem;
+	TVHITTESTINFO	stTvItemInfo;
+
+	TRACE( TEXT("ツリービューで中クルック[%d x %d]"), x, y );
+
+	ZeroMemory( &stTvItemInfo, sizeof(TVHITTESTINFO) );
+	stTvItemInfo.pt.x = x;
+	stTvItemInfo.pt.y = y;
+
+	//	該当するアイテムを確保して
+	hTreeItem = TreeView_HitTest( ghTreeWnd, &stTvItemInfo );
+
+	//	操作する
+	iRslt = TreeSelItemProc( GetParent( hWnd ), hTreeItem, 1 );
+
+	return;
 }
 //-------------------------------------------------------------------------------------------------
 
@@ -998,7 +1028,7 @@ LRESULT TreeNotify( HWND hWnd, LPNMTREEVIEW pstNmTrView )
 	@param[in]	hWnd		親ウインドウのハンドル
 	@param[in]	hSelItem	選択してるアイテム
 	@param[in]	dMode		０主タブで　１副タブで　２編集ビューで　開く　３アイテム追加
-	@return		処理した内容とか
+	@return		非０処理した　０してない
 */
 INT TreeSelItemProc( HWND hWnd, HTREEITEM hSelItem, UINT dMode )
 {

@@ -141,9 +141,6 @@ UINT ViewSqSelModeToggle( UINT bMode, LPVOID pVoid )
 	MenuItemCheckOnOff( IDM_SQSELECT, gbSqSelect );	//	メニューチェック
 
 	OperationOnStatusBar(  );
-	//if( gbSqSelect )	StatusBarSetText( SB_SQSEL, TEXT("[矩形]") );
-	//else				StatusBarSetText( SB_SQSEL, TEXT("") );
-
 
 	return gbSqSelect;
 }

@@ -695,7 +695,7 @@ VOID Mzv_OnMoving( HWND hWnd, LPRECT pstPos )
 	dLine += gdViewTopLine;
 
 	StringCchPrintf( atBuffer, SUB_STRING, TEXT("MOZI %d[dot] %d[line]"), xSb, dLine );
-	StatusBarSetText( SB_LAYER, atBuffer );
+	MainStatusBarSetText( SB_LAYER, atBuffer );
 
 	return;
 }
@@ -1070,7 +1070,7 @@ VOID Mzs_OnDestroy( HWND hWnd )
 {
 	MZTM_ITR	itMzitm;
 
-	StatusBarSetText( SB_LAYER, TEXT("") );
+	MainStatusBarSetText( SB_LAYER, TEXT("") );
 
 	if( ghMoziViewWnd ){	DestroyWindow( ghMoziViewWnd  );	}
 
@@ -1387,6 +1387,10 @@ HRESULT MoziScriptInsert( HWND hWnd )
 	ixNowPage = gixFocusPage;	//	頁番号バックアップ
 	ixTmpPage = gixFocusPage;
 
+#ifdef DO_TRY_CATCH
+	try{
+#endif
+
 	if( !(bTranst) )	//	一時頁に作成
 	{
 		ixTmpPage = DocPageCreate( -1 );	//	作業用一時頁作成
@@ -1438,8 +1442,8 @@ HRESULT MoziScriptInsert( HWND hWnd )
 		iByteSize = DocPageTextGetAlloc( gitFileIt, ixTmpPage, D_UNI, &pBuffer, TRUE );
 
 	//	gixFocusPage = ixNowPage;	//	元に戻す
-		DocPageDelete( ixTmpPage  );	//	一時頁削除
-		DocPageChange( ixNowPage );	//	削除したら頁移動
+		DocPageDelete( ixTmpPage, ixNowPage );	//	一時頁削除して移動
+//		DocPageChange( ixNowPage  );	//	削除したら頁移動
 
 		//	レイヤの位置を変更
 		GetWindowRect( ghViewWnd, &rect );	//	編集ビューが基準位置である
@@ -1482,6 +1486,11 @@ HRESULT MoziScriptInsert( HWND hWnd )
 
 	ViewPosResetCaret( iX, iY );	
 
+#ifdef DO_TRY_CATCH
+	}
+	catch( exception &err ){	return ETC_MSG( err.what(), E_FAIL );	}
+	catch( ... ){	return  ETC_MSG( ("etc error"), E_FAIL );	}
+#endif
 
 	//	終わったら閉じる
 	DestroyWindow( hLyrWnd );

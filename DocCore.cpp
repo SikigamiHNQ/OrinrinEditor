@@ -115,11 +115,11 @@ HRESULT DocModifyContent( UINT dMode )
 		if( (*gitFileIt).dModify )	return S_FALSE;
 		//	変更のとき、已に変更の処理してたら何もしなくて良い
 
-		StatusBarSetText( SB_MODIFY, MODIFY_MSG );
+		MainStatusBarSetText( SB_MODIFY, MODIFY_MSG );
 	}
 	else
 	{
-		StatusBarSetText( SB_MODIFY, TEXT("") );
+		MainStatusBarSetText( SB_MODIFY, TEXT("") );
 	}
 
 	DocMultiFileModify( dMode );
@@ -1064,14 +1064,19 @@ INT DocPageCreate( INT iAdding )
 /*!
 	頁を削除
 	@param[in]	iPage	削除する頁の番号
+	@param[in]	iBack	－１無視　０～削除したあと移動する頁指定
 	@return		HRESULT	終了状態コード
 */
-HRESULT DocPageDelete( INT iPage )
+HRESULT DocPageDelete( INT iPage, INT iBack )
 {
 	INT	i, iNew;
 	PAGE_ITR	itPage;
 
 	if( 1 >= (*gitFileIt).vcCont.size( ) )	return E_ACCESSDENIED;
+
+#ifdef DO_TRY_CATCH
+	try{
+#endif
 
 	//	ここでバックアップを？
 
@@ -1079,20 +1084,33 @@ HRESULT DocPageDelete( INT iPage )
 	itPage = (*gitFileIt).vcCont.begin(  );
 	for( i = 0; iPage > i; i++ ){	itPage++;	}
 
+#ifdef PAGE_DELAY_LOAD
+	FREE( itPage->ptRawData );
+#endif
 	SqnFreeAll( &(itPage->stUndoLog)  );	//	アンドゥログ削除
 	(*gitFileIt).vcCont.erase( itPage  );	//	さっくり削除
 	gixFocusPage = -1;	//	頁選択無効にする
 
-#ifdef PAGE_DELAY_LOAD
-	FREE( itPage->ptRawData );
-#endif
 
 	PageListDelete( iPage );
 
-	iNew = iPage - 1;	//	削除したら一つ前の頁へ
-	if( 0 > iNew )	iNew = 0;
+	if( 0 <= iBack )	//	戻り先指定
+	{
+		iNew = iBack;
+	}
+	else
+	{
+		iNew = iPage - 1;	//	削除したら一つ前の頁へ
+		if( 0 > iNew )	iNew = 0;
+	}
 
 	DocPageChange( iNew );	//	削除したら頁移動
+
+#ifdef DO_TRY_CATCH
+	}
+	catch( exception &err ){	return ETC_MSG( err.what(), E_FAIL );	}
+	catch( ... ){	return  ETC_MSG( ("etc error"), E_FAIL );	}
+#endif
 
 	return S_OK;
 }
@@ -1165,7 +1183,7 @@ HRESULT DocPageInfoRenew( INT dPage, UINT bMode )
 {
 	UINT_PTR	dLines;
 	UINT		dBytes;
-	TCHAR		atBuff[SUB_STRING];
+//	TCHAR		atBuff[SUB_STRING];
 
 	if( 0 > dPage ){	dPage = gixFocusPage;	}
 
@@ -1175,8 +1193,9 @@ HRESULT DocPageInfoRenew( INT dPage, UINT bMode )
 	if( bMode )
 	{
 		//	バイト数を入れる
-		StringCchPrintf( atBuff, SUB_STRING, TEXT("%d Bytes"), dBytes );
-		StatusBarSetText( SB_BYTECNT, atBuff );
+		//StringCchPrintf( atBuff, SUB_STRING, TEXT("%d Bytes"), dBytes );
+		//MainStatusBarSetText( SB_BYTECNT, atBuff );
+		MainSttBarSetByteCount( dBytes );
 	}
 
 	dLines = (*gitFileIt).vcCont.at( dPage ).ltPage.size( );

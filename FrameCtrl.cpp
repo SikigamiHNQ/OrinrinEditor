@@ -2576,7 +2576,7 @@ VOID Fib_OnDestroy( HWND hWnd )
 	FREE( gstFrmInsInfo.ptFloor );
 #endif
 
-	StatusBarSetText( SB_LAYER, TEXT("") );
+	MainStatusBarSetText( SB_LAYER, TEXT("") );
 
 	ghFrInbxWnd = NULL;
 
@@ -2621,7 +2621,7 @@ VOID Fib_OnMoving( HWND hWnd, LPRECT pstPos )
 	dLine += gdViewTopLine;
 
 	StringCchPrintf( atBuffer, SUB_STRING, TEXT("Frame %d[dot] %d[line]"), xSb, dLine );
-	StatusBarSetText( SB_LAYER, atBuffer );
+	MainStatusBarSetText( SB_LAYER, atBuffer );
 
 	return;
 }

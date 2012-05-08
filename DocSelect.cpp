@@ -372,11 +372,11 @@ VOID DocSelectedByteStatus( VOID )
 	if( gdSelByte )
 	{
 		StringCchPrintf( atBuffer, MIN_STRING, TEXT("SEL %d Bytes"), gdSelByte );
-		StatusBarSetText( SB_SELBYTE, atBuffer );
+		MainStatusBarSetText( SB_SELBYTE, atBuffer );
 	}
 	else
 	{
-		StatusBarSetText( SB_SELBYTE, TEXT("") );
+		MainStatusBarSetText( SB_SELBYTE, TEXT("") );
 	}
 
 	return;

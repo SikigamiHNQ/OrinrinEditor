@@ -797,7 +797,7 @@ VOID Lyb_OnDestroy( HWND hWnd )
 		if( itLyr->hBoxWnd == hWnd )
 		{
 			LayerStringObliterate( itLyr );
-			StatusBarSetText( SB_LAYER, TEXT("") );
+			MainStatusBarSetText( SB_LAYER, TEXT("") );
 
 			gltLayer.erase( itLyr );
 
@@ -936,7 +936,7 @@ VOID Lyb_OnMoving( HWND hWnd, LPRECT pstPos )
 	dLine += gdViewTopLine;
 
 	StringCchPrintf( atBuffer, SUB_STRING, TEXT("Layer %d[dot] %d[line]"), xSb, dLine );
-	StatusBarSetText( SB_LAYER, atBuffer );
+	MainStatusBarSetText( SB_LAYER, atBuffer );
 
 	return;
 }

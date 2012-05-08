@@ -520,7 +520,7 @@ VOID Vrt_OnPaint( HWND hWnd )
 */
 VOID Vrt_OnDestroy( HWND hWnd )
 {
-	StatusBarSetText( SB_LAYER, TEXT("") );
+	MainStatusBarSetText( SB_LAYER, TEXT("") );
 
 	if( ghVertViewWnd ){	DestroyWindow( ghVertViewWnd  );	}
 
@@ -767,7 +767,7 @@ VOID Vvw_OnMoving( HWND hWnd, LPRECT pstPos )
 	dLine += gdViewTopLine;
 
 	StringCchPrintf( atBuffer, SUB_STRING, TEXT("VLINE %d[dot] %d[line]"), xSb, dLine );
-	StatusBarSetText( SB_LAYER, atBuffer );
+	MainStatusBarSetText( SB_LAYER, atBuffer );
 
 	return;
 }

@@ -416,8 +416,8 @@ ATOM		InitWndwClass( HINSTANCE );
 BOOL		InitInstance( HINSTANCE, INT, LPTSTR );
 LRESULT		CALLBACK WndProc( HWND, UINT, WPARAM, LPARAM );
 
-HRESULT		StatusBarSetText( INT, LPCTSTR );
-HRESULT		StatusBarSetTextInt( INT, INT );
+HRESULT		MainStatusBarSetText( INT, LPCTSTR );
+HRESULT		MainSttBarSetByteCount( UINT );
 
 HRESULT		MenuItemCheckOnOff( UINT, UINT );
 HRESULT		NotifyBalloonExist( LPTSTR, LPTSTR, DWORD );
@@ -632,7 +632,7 @@ HRESULT		DocPageInfoRenew( INT, UINT );
 HRESULT		DocPageNameSet( LPTSTR );
 
 INT			DocPageCreate( INT );
-HRESULT		DocPageDelete( INT );
+HRESULT		DocPageDelete( INT, INT );
 HRESULT		DocPageChange( INT );
 
 HRESULT		DocModifyContent( UINT );

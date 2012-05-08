@@ -104,7 +104,7 @@ HRESULT InversePartsLoad( UINT dMode )
 
 	LPTSTR	ptString;
 	LPSTR	pcText;
-	UINT	cchSize;
+	UINT	cchSize, cchLen;
 	TCHAR	atFileName[MAX_PATH];
 
 	TCHAR	atBuff[INV_ITEMS][MIN_STRING];
@@ -112,8 +112,12 @@ HRESULT InversePartsLoad( UINT dMode )
 	UINT	caret, dItem;
 	//BOOLEAN	bEmpty = FALSE;
 
+
 	INVERSEPARTS	stData;
 
+	UINT_PTR	loop;
+	list<INVERSEPARTS>	ltParts;	//	パーツ読込バッファ
+	list<INVERSEPARTS>::iterator	itParts, itPtPos;	//	バッファのイテレータ
 
 
 	StringCchCopy( atFileName, MAX_PATH, ExePathGet( ) );
@@ -192,15 +196,13 @@ HRESULT InversePartsLoad( UINT dMode )
 				ZeroMemory( &stData, sizeof(INVERSEPARTS) );	//	クリンナップ
 				StringCchCopy( stData.atSrcStr,  MIN_STRING, atBuff[0] );
 				StringCchCopy( stData.atDestStr, MIN_STRING, atBuff[1] );
-				if( dMode ){	gvcMirrorParts.push_back( stData );	}	//	左右
-				else{			gvcUpsetParts.push_back( stData );	}	//	上下
+				ltParts.push_back( stData );	//	まずバッファへ
 
 				//	反対向きも必要
 				ZeroMemory( &stData, sizeof(INVERSEPARTS) );
 				StringCchCopy( stData.atSrcStr,  MIN_STRING, atBuff[1] );
 				StringCchCopy( stData.atDestStr, MIN_STRING, atBuff[0] );
-				if( dMode ){	gvcMirrorParts.push_back( stData );	}	//	左右
-				else{			gvcUpsetParts.push_back( stData );	}	//	上下
+				ltParts.push_back( stData );	//	まずバッファへ
 
 			}//内容が有るかどうか
 
@@ -218,6 +220,31 @@ HRESULT InversePartsLoad( UINT dMode )
 
 	FREE( pBuffer );
 
+	//	文字数の順番に並べ直すべし
+	cchSize = 0;
+
+	loop = ltParts.size();
+	while( loop )	//	全体をみないかん
+	{
+		itParts = ltParts.begin();	//	とりあえず１個目
+		StringCchLength( itParts->atSrcStr, MIN_STRING , &cchSize );	//	文字数確認
+
+		for( itPtPos = ltParts.begin(); ltParts.end() != itPtPos; itPtPos++ )
+		{
+			StringCchLength( itPtPos->atSrcStr, MIN_STRING, &cchLen );
+			if( cchSize <  cchLen ){	itParts = itPtPos;	}	//	文字数多かったら変更
+		}
+
+		ZeroMemory( &stData, sizeof(INVERSEPARTS) );	//	クリンナップ
+		StringCchCopy( stData.atSrcStr,  MIN_STRING, itParts->atSrcStr );
+		StringCchCopy( stData.atDestStr, MIN_STRING, itParts->atDestStr );
+		if( dMode ){	gvcMirrorParts.push_back( stData );	}	//	左右
+		else{			gvcUpsetParts.push_back( stData );	}	//	上下
+
+		ltParts.erase( itParts );	//	記録したらそれは消す
+
+		loop = ltParts.size();	//	残りがあるか
+	}
 
 	return S_OK;
 }

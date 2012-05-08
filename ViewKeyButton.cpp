@@ -162,15 +162,20 @@ VOID Evw_OnKey( HWND hWnd, UINT vk, BOOL fDown, INT cRepeat, UINT flags )
 				if( bSelect )	//	選択状態なら、そこだけ削除する
 				{
 					bCrLf = DocSelectedDelete( &gdDocXdot , &gdDocLine, bSqSel, TRUE );
+					DocBadSpaceCheck( gdDocLine );
 				}
 				else
 				{
 					bCrLf = DocInputDelete( gdDocXdot , gdDocLine );
 				}
 				//	負で異常発生
-				if( 0 < bCrLf  )	//	処理した行以降全取っ替え
+				if( 0 <  bCrLf )	//	処理した行以降全取っ替え
 				{
-					for( i = gdDocLine; iLines > i; i++ ){	ViewRedrawSetLine(  i );	}
+					for( i = gdDocLine; iLines >= i; i++ )
+					{
+						DocBadSpaceCheck( i );
+						ViewRedrawSetLine(  i );	
+					}
 				}
 				else{	ViewRedrawSetLine( gdDocLine  );	}
 				ViewDrawCaret( gdDocXdot, gdDocLine, 1 );	//	キャレット位置を決める
@@ -298,7 +303,11 @@ VOID Evw_OnChar( HWND hWnd, TCHAR ch, INT cRepeat )
 				gdXmemory = gdDocXdot;	//	最新位置記憶
 				//	改行した行以降全取っ替え
 				iLines = DocPageParamGet( NULL, NULL );
-				for( i = gdDocLine; iLines > i; i++ ){	ViewRedrawSetLine(  i );	}
+				for( i = gdDocLine; iLines > i; i++ )
+				{
+					DocBadSpaceCheck( i );
+					ViewRedrawSetLine(  i );
+				}
 			}
 		}
 
@@ -309,6 +318,7 @@ VOID Evw_OnChar( HWND hWnd, TCHAR ch, INT cRepeat )
 			if( bSelect )	//	選択状態なら、そこだけ削除する
 			{
 				bCrLf = DocSelectedDelete( &gdDocXdot , &gdDocLine, bSqSel, TRUE );
+				DocBadSpaceCheck( gdDocLine );
 			}
 			else
 			{
@@ -316,7 +326,11 @@ VOID Evw_OnChar( HWND hWnd, TCHAR ch, INT cRepeat )
 			}
 			if( bCrLf  )	//	処理した行以降全取っ替え
 			{
-				for( i = gdDocLine; iLines > i; i++ ){	ViewRedrawSetLine(  i );	}
+				for( i = gdDocLine; iLines >= i; i++ )
+				{
+					DocBadSpaceCheck( i );
+					ViewRedrawSetLine(  i );
+				}
 			}
 			else{	ViewRedrawSetLine( gdDocLine  );	}
 
@@ -522,7 +536,7 @@ VOID Evw_OnMouseMove( HWND hWnd, INT x, INT y, UINT keyFlags )
 	}
 
 	StringCchPrintf( atString, SUB_STRING, TEXT("MOUSE %d[dot] %d[line]"), gstCursor.x, gstCursor.y );
-	StatusBarSetText( SB_MOUSEPOS, atString );
+	MainStatusBarSetText( SB_MOUSEPOS, atString );
 
 	return;
 }

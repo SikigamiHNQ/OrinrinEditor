@@ -1104,7 +1104,7 @@ HRESULT ViewNowPosStatus( VOID )
 
 	StringCchPrintf( atString, SUB_STRING, TEXT("%d[dot] %d[char] %d[line]"), gdDocXdot, gdDocMozi, gdDocLine + 1 );
 
-	StatusBarSetText( SB_CURSOR, atString );
+	MainStatusBarSetText( SB_CURSOR, atString );
 
 	//	ルーラの、直前のドット位置と今のドット位置のあたりで、再描画発生させる
 
@@ -2021,7 +2021,7 @@ HRESULT OperationOnStatusBar( VOID )
 	if( gbExtract ){	StringCchCat( atString, SUB_STRING, catTexts[2] );	}
 	if( gdSpaceView ){	StringCchCat( atString, SUB_STRING, catTexts[3] );	}
 
-	StatusBarSetText( SB_OP_STYLE, atString );
+	MainStatusBarSetText( SB_OP_STYLE, atString );
 
 	return S_OK;
 }

@@ -477,7 +477,7 @@ VOID Plt_OnCommand( HWND hWnd, INT id, HWND hWndCtl, UINT codeNotify )
 					{
 						iItem = ListView_GetNextItem( ghPageListWnd, -1, LVNI_ALL | LVNI_SELECTED );
 						if( 0 > iItem ){	break;	}
-						DocPageDelete( iItem  );
+						DocPageDelete( iItem , -1 );
 					}
 				}
 			}
@@ -485,7 +485,7 @@ VOID Plt_OnCommand( HWND hWnd, INT id, HWND hWndCtl, UINT codeNotify )
 			{
 #endif
 				mRslt = MessageBoxCheckBox( hWnd, ghInst, 2 );	//	確認入れて
-				if( IDYES == mRslt ){	DocPageDelete( iItem  );	}
+				if( IDYES == mRslt ){	DocPageDelete( iItem , -1 );	}
 #ifdef PAGE_MULTISELECT
 			}
 #endif
@@ -1275,7 +1275,7 @@ HRESULT PageListCombine( HWND hWnd, INT iNowPage )
 
 	SqnFreeAll( &((*gitFileIt).vcCont.at( iNowPage ).stUndoLog) );	//	アンドゥログ削除
 
-	DocPageDelete( iNext  );	//	次の頁は削除しちゃう
+	DocPageDelete( iNext , -1 );	//	次の頁は削除しちゃう
 
 	return S_OK;
 }

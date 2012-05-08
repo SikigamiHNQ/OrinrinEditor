@@ -536,6 +536,8 @@ LRESULT Maa_OnNotify( HWND hWnd, INT idFrom, LPNMHDR pstNmhdr )
 {
 	//	ツリービューのやつ
 	if( IDTV_ITEMTREE == idFrom ){	TreeNotify( hWnd , (LPNMTREEVIEW)pstNmhdr );	}
+
+	//	タブバーのやつ
 	if( IDTB_TREESEL == idFrom ){	TabBarNotify( hWnd , pstNmhdr );	}
 
 	return 0;	//	何もないなら０を戻す
