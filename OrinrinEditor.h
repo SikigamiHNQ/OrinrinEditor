@@ -617,18 +617,19 @@ HRESULT		LayerStringReplace( HWND, LPTSTR );
 
 HRESULT		DocInitialise( UINT );
 
-BOOLEAN		DocRangeIsError( INT, INT );
+BOOLEAN		DocRangeIsError( FILES_ITR, INT, INT );
 
-INT_PTR		DocPageCount( VOID );
+UINT_PTR	DocNowFilePageCount( VOID );
+UINT_PTR	DocNowFilePageLineCount( VOID );
 
 VOID		DocCaretPosMemory( UINT, LPPOINT );
 
 HRESULT		DocOpenFromNull( HWND );
-UINT		DocPageParamGet( PINT, PINT );
-INT			DocPageMaxDotGet( INT, INT );
-INT			DocPageByteCount( INT, PINT );
-HRESULT		DocPageInfoRenew( INT, UINT );
 
+UINT		DocPageParamGet( PINT, PINT );
+UINT		DocPageByteCount( FILES_ITR, INT, PINT, PINT );
+HRESULT		DocPageInfoRenew( INT, UINT );
+INT			DocPageMaxDotGet( INT, INT );
 HRESULT		DocPageNameSet( LPTSTR );
 
 INT			DocPageCreate( INT );
@@ -638,6 +639,7 @@ HRESULT		DocPageChange( INT );
 HRESULT		DocModifyContent( UINT );
 
 LPARAM		DocMultiFileCreate( LPTSTR );
+HRESULT		DocActivateEmptyCreate( LPTSTR );
 
 INT			DocLineParamGet( INT, PINT, PINT );
 
@@ -652,7 +654,7 @@ INT_PTR		DocLetterByteCheck( LPLETTER );
 INT			DocInputLetter( INT, INT, TCHAR );
 INT			DocInputBkSpace( PINT, PINT );
 INT			DocInputDelete( INT, INT );
-INT			DocInputFromClipboard( PINT, PINT, PINT );
+INT			DocInputFromClipboard( PINT, PINT, PINT, UINT );
 
 INT			DocAdditionalLine( INT, BOOLEAN );
 

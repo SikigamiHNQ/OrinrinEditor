@@ -131,7 +131,7 @@ HRESULT DocModifyContent( UINT dMode )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	新しいファイル置き場を作ってフォーカスする
+	新しいファイル置き場を作ってフォーカスする・ファイルコア函数
 	@param[in]	ptDmyName	ダミー名を返す。NULL可。MAX_PATHであること
 	@return		LPARAM	対応するユニーク番号
 */
@@ -182,6 +182,26 @@ LPARAM DocMultiFileCreate( LPTSTR ptDmyName )
 //-------------------------------------------------------------------------------------------------
 
 /*!
+	起動時の完全新規作成・開くファイルが全く無い場合の処理
+	@param[in]	ptFile	開いたファイルのDummy名を返す・MAX_PATHであること
+	@return		HRESULT	終了状態コード
+*/
+HRESULT DocActivateEmptyCreate( LPTSTR ptFile )
+{
+	INT	iNewPage;
+
+	DocMultiFileCreate( ptFile );	//	新しいファイル置き場の準備・ここで返り血は要らない
+	iNewPage = DocPageCreate( -1 );	//	ページ作っておく
+	PageListInsert( iNewPage  );	//	ページリストビューに追加
+	DocPageChange( iNewPage );		//	その頁にフォーカスを合わせる
+	MultiFileTabFirst( ptFile );	//	完全新規作成
+	AppTitleChange( ptFile );
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+
+/*!
 	内容を変更したらタブのファイル名に[変更]つける
 	@param[in]	dMode	非０変更した　０変更はなかったことに
 	@return		HRESULT	終了状態コード
@@ -204,7 +224,7 @@ HRESULT DocMultiFileModify( UINT dMode )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	ファイルタブを選択した
+	ファイルタブを選択した・ファイルコア函数
 	@param[in]	uqNumber	選択されたファイルのUNIQUE番号
 	@return		HRESULT	終了状態コード
 */
@@ -246,7 +266,7 @@ HRESULT DocMultiFileSelect( LPARAM uqNumber )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	全内容を破棄
+	全内容を破棄・ファイルコア函数
 	@return		HRESULT	終了状態コード
 */
 HRESULT DocMultiFileDeleteAll( VOID )
@@ -281,7 +301,7 @@ HRESULT DocMultiFileDeleteAll( VOID )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	ファイルタブを閉じるとき・最後の一つは閉じれないようにするか
+	ファイルタブを閉じるとき・最後の一つは閉じれないようにするか・ファイルコア函数
 	@param[in]	hWnd		ウインドウハンドル
 	@param[in]	uqNumber	閉じたいタブの通し番号
 	@return		LPARAM		開き直したタブの通し番号・失敗したら０
@@ -386,7 +406,7 @@ INT DocMultiFileFetch( INT iTgt, LPTSTR ptFile, LPTSTR ptIniPath )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	開いてるタブを保存する
+	開いてるタブを記録する・ファイルコア函数
 	@param[in]	ptIniPath	INIファイルのパス
 	@return		HRESULT	終了状態コード
 */
@@ -699,8 +719,9 @@ UINT CALLBACK DocPageLoad( LPTSTR ptName, LPTSTR ptCont, INT cchSize )
 		DocStringAdd( &dmyX, &dmyY, ptCont, cchSize );	//	この中で改行とか面倒見る
 	}
 #endif
-	//	再計算しちゃう
-	DocPageParamGet( NULL, NULL );	//	DocPageInfoRenew( -1, 0 );
+
+	DocPageParamGet( NULL, NULL );	//	再計算しちゃう
+//	DocPageInfoRenew( -1, 0 );
 
 	return 1;
 }
@@ -970,7 +991,7 @@ UINT DocImportSplitASD( LPSTR pcStr, INT cbSize, PAGELOAD pfPageLoad )
 
 
 /*!
-	頁名をセットする
+	頁名をセットする・ファイルコア函数
 	@param[in]	ptName	セットする頁名称へのポインター
 	@return		HRESULT	終了状態コード
 */
@@ -985,7 +1006,7 @@ HRESULT DocPageNameSet( LPTSTR ptName )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	ページ追加処理
+	ページ追加処理・ファイルコア函数
 	@param[in]	iAdding	この指定ページの次に追加・-1で末端に追加
 	@return	INT	新規作成したページ番号
 */
@@ -1023,7 +1044,7 @@ INT DocPageCreate( INT iAdding )
 	SqnInitialise( &(stPage.stUndoLog) );
 
 	//	今の頁の次に作成
-	iTotal = (*gitFileIt).vcCont.size(  );
+	iTotal = DocNowFilePageCount(  );
 
 	if( 0 <= iAdding )
 	{
@@ -1039,7 +1060,7 @@ INT DocPageCreate( INT iAdding )
 	{
 		(*gitFileIt).vcCont.push_back( stPage  );	//	ファイル構造体に追加
 
-		iAddPage = (*gitFileIt).vcCont.size( );
+		iAddPage = DocNowFilePageCount( );
 		iAddPage--;	//	末端に追加したんだから、個数数えて－１したら０インデックス番号
 	}
 	else
@@ -1062,7 +1083,7 @@ INT DocPageCreate( INT iAdding )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	頁を削除
+	頁を削除・ファイルコア函数
 	@param[in]	iPage	削除する頁の番号
 	@param[in]	iBack	－１無視　０～削除したあと移動する頁指定
 	@return		HRESULT	終了状態コード
@@ -1072,7 +1093,7 @@ HRESULT DocPageDelete( INT iPage, INT iBack )
 	INT	i, iNew;
 	PAGE_ITR	itPage;
 
-	if( 1 >= (*gitFileIt).vcCont.size( ) )	return E_ACCESSDENIED;
+	if( 1 >= DocNowFilePageCount( ) )	return E_ACCESSDENIED;
 
 #ifdef DO_TRY_CATCH
 	try{
@@ -1117,7 +1138,7 @@ HRESULT DocPageDelete( INT iPage, INT iBack )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	ページを変更
+	ページを変更・ファイルコア函数
 	@param[in]	dPageNum	変更したい頁番号
 	@return		HRESULT	終了状態コード
 */
@@ -1154,8 +1175,9 @@ HRESULT DocPageChange( INT dPageNum )
 		{
 			DocStringAdd( &dmyX, &dmyY, (*gitFileIt).vcCont.at( gixFocusPage ).ptRawData, cchSize );	//	この中で改行とか面倒見る
 		}
-		//	再計算しちゃう
-		DocPageParamGet( NULL, NULL );	//	DocPageInfoRenew( -1, 0 );
+
+	//	DocPageParamGet( NULL, NULL );	//	再計算しちゃう＜文字追加でやってるので問題無い
+	//	DocPageInfoRenew( -1, 0 );
 
 		FREE( (*gitFileIt).vcCont.at( gixFocusPage ).ptRawData );
 	}
@@ -1190,9 +1212,8 @@ HRESULT DocPageInfoRenew( INT dPage, UINT bMode )
 
 	dBytes = (*gitFileIt).vcCont.at( dPage ).dByteSz;
 	
-	if( bMode )
+	if( bMode )	//	ステータスバーにバイト数を表示する
 	{
-		//	バイト数を入れる
 		//StringCchPrintf( atBuff, SUB_STRING, TEXT("%d Bytes"), dBytes );
 		//MainStatusBarSetText( SB_BYTECNT, atBuff );
 		MainSttBarSetByteCount( dBytes );
@@ -1225,7 +1246,7 @@ INT DocLineDataGetAlloc( INT rdLine, INT iStart, LPLETTER *pstTexts, PINT pchLen
 
 	LINE_ITR	itLine;
 
-	iLines = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.size( );
+	iLines = DocNowFilePageLineCount( );
 	if( iLines <=  rdLine )	return -1;
 
 
@@ -1546,7 +1567,7 @@ INT DocPageTextAllGetAlloc( UINT bStyle, LPVOID *pText )
 	{
 #endif
 		//	ページ全体の行数
-		iLines = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.size( );
+		iLines = DocNowFilePageLineCount( );
 
 		itLine = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.begin();
 
@@ -1630,7 +1651,7 @@ LPSTR DocPageTextPreviewAlloc( INT iPage, PINT pdBytes )
 
 	if( pdBytes )	*pdBytes = 0;
 
-	if( DocRangeIsError( iPage, 0 ) )	return NULL;
+	if( DocRangeIsError( gitFileIt, iPage, 0 ) )	return NULL;
 
 	//	ページ全体の行数
 	iLines    = (*gitFileIt).vcCont.at( iPage ).ltPage.size( );
@@ -1685,7 +1706,7 @@ HRESULT UnicodeRadixExchange( LPVOID pVoid )
 
 	LINE_ITR	itLine;
 
-	iPage = (*gitFileIt).vcCont.size(  );
+	iPage = DocNowFilePageCount(  );
 
 	for( dP = 0; iPage >  dP; dP++ )	//	全頁
 	{
@@ -1738,11 +1759,13 @@ HRESULT DocPageDivide( HWND hWnd, HINSTANCE hInst, INT iNow )
 //分割は、アンドゥをリセットすべし
 //今の頁の該当部分を削除しちゃう
 
+	//	必要なのは行数確認のみ
 	iLines = DocPageParamGet( NULL, NULL );
+
 	if( iLines <= iDivLine )	return E_OUTOFMEMORY;
 
 	//	今の頁の次に作成
-	//iTotal = (*gitFileIt).vcCont.size(  );
+	//iTotal = DocNowFilePageCount(  );
 	//iNext = gixFocusPage + 1;	//	次の頁
 	//if( iTotal <= iNext ){	iNext =  -1;	}	//	全頁より多いなら末端指定
 
@@ -1753,21 +1776,21 @@ HRESULT DocPageDivide( HWND hWnd, HINSTANCE hInst, INT iNow )
 	(*gitFileIt).vcCont.at( iNewPage ).ltPage.clear(  );
 
 	itLine = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.begin( );
-	std::advance( itLine, iDivLine );
+	std::advance( itLine, iDivLine );	//	該当行まで進める
 
-	itEnd  = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.end( );
+	itEnd  = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.end( );	//	末端位置確保
 
-	std::copy(	itLine, itEnd, back_inserter( (*gitFileIt).vcCont.at( iNewPage ).ltPage ) );
+	std::copy( itLine, itEnd, back_inserter( (*gitFileIt).vcCont.at( iNewPage ).ltPage ) );
 
 	(*gitFileIt).vcCont.at( gixFocusPage ).ltPage.erase( itLine, itEnd );
 
 	SqnFreeAll( &((*gitFileIt).vcCont.at( gixFocusPage ).stUndoLog) );	//	アンドゥログ削除
 
 	//	バイト情報とかの取り直し
-	DocPageByteCount( gixFocusPage, NULL );
+	DocPageByteCount( gitFileIt, gixFocusPage, NULL, NULL );
 	DocPageInfoRenew( gixFocusPage, TRUE );
 
-	DocPageByteCount( iNewPage, NULL );
+	DocPageByteCount( gitFileIt, iNewPage, NULL, NULL );
 	DocPageInfoRenew( iNewPage, FALSE );
 
 	ViewRedrawSetLine( -1 );
@@ -1811,7 +1834,7 @@ HRESULT DocThreadDropCopy( VOID )
 
 	gixDropPage++;	//	次の頁へ
 
-	maxPage = DocPageCount(  );
+	maxPage = DocNowFilePageCount(  );
 	if( maxPage <= gixDropPage )	gixDropPage = 0;
 	//	最終頁までイッたら先頭に戻る
 

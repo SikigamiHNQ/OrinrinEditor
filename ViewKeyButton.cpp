@@ -162,7 +162,6 @@ VOID Evw_OnKey( HWND hWnd, UINT vk, BOOL fDown, INT cRepeat, UINT flags )
 				if( bSelect )	//	選択状態なら、そこだけ削除する
 				{
 					bCrLf = DocSelectedDelete( &gdDocXdot , &gdDocLine, bSqSel, TRUE );
-					DocBadSpaceCheck( gdDocLine );
 				}
 				else
 				{
@@ -171,11 +170,7 @@ VOID Evw_OnKey( HWND hWnd, UINT vk, BOOL fDown, INT cRepeat, UINT flags )
 				//	負で異常発生
 				if( 0 <  bCrLf )	//	処理した行以降全取っ替え
 				{
-					for( i = gdDocLine; iLines >= i; i++ )
-					{
-						DocBadSpaceCheck( i );
-						ViewRedrawSetLine(  i );	
-					}
+					for( i = gdDocLine; iLines >= i; i++  ){	ViewRedrawSetLine(  i );	}
 				}
 				else{	ViewRedrawSetLine( gdDocLine  );	}
 				ViewDrawCaret( gdDocXdot, gdDocLine, 1 );	//	キャレット位置を決める
@@ -295,7 +290,7 @@ VOID Evw_OnChar( HWND hWnd, TCHAR ch, INT cRepeat )
 					bCrLf = DocSelectedDelete( &gdDocXdot , &gdDocLine, bSqSel, TRUE );
 				}
 
-				DocCrLfAdd( gdDocXdot , gdDocLine, TRUE );
+				DocCrLfAdd( gdDocXdot , gdDocLine, TRUE );	//	中のほうで空白チェックやってる
 				ViewRedrawSetLine( gdDocLine );
 
 				gdDocXdot = 0;	gdDocMozi = 0;	gdDocLine++;	//	次の行に移る
@@ -303,11 +298,7 @@ VOID Evw_OnChar( HWND hWnd, TCHAR ch, INT cRepeat )
 				gdXmemory = gdDocXdot;	//	最新位置記憶
 				//	改行した行以降全取っ替え
 				iLines = DocPageParamGet( NULL, NULL );
-				for( i = gdDocLine; iLines > i; i++ )
-				{
-					DocBadSpaceCheck( i );
-					ViewRedrawSetLine(  i );
-				}
+				for( i = gdDocLine; iLines > i; i++ ){	ViewRedrawSetLine(  i );	}
 			}
 		}
 
@@ -318,7 +309,6 @@ VOID Evw_OnChar( HWND hWnd, TCHAR ch, INT cRepeat )
 			if( bSelect )	//	選択状態なら、そこだけ削除する
 			{
 				bCrLf = DocSelectedDelete( &gdDocXdot , &gdDocLine, bSqSel, TRUE );
-				DocBadSpaceCheck( gdDocLine );
 			}
 			else
 			{
@@ -326,11 +316,7 @@ VOID Evw_OnChar( HWND hWnd, TCHAR ch, INT cRepeat )
 			}
 			if( bCrLf  )	//	処理した行以降全取っ替え
 			{
-				for( i = gdDocLine; iLines >= i; i++ )
-				{
-					DocBadSpaceCheck( i );
-					ViewRedrawSetLine(  i );
-				}
+				for( i = gdDocLine; iLines >= i; i++  ){	ViewRedrawSetLine(  i );	}
 			}
 			else{	ViewRedrawSetLine( gdDocLine  );	}
 

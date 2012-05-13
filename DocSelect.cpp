@@ -22,11 +22,9 @@ If not, see <http://www.gnu.org/licenses/>.
 //-------------------------------------------------------------------------------------------------
 
 extern FILES_ITR	gitFileIt;	//	今見てるファイルの本体・イテレータを構造体と見なす
-
 extern INT		gixFocusPage;	//	注目中のページ・とりあえず０・０インデックス
 
 extern  UINT	gbUniPad;		//	パディングにユニコードをつかって、ドットを見せないようにする
-
 extern  UINT	gbCrLfCode;		//	改行コード：０したらば・非０ＹＹ 
 
 #ifdef COPY_SWAP
@@ -96,7 +94,7 @@ UINT DocLetterSelStateGet( INT nowDot, INT rdLine )
 
 	LINE_ITR	itLine;
 
-	iLines = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.size( );
+	iLines = DocNowFilePageLineCount( );
 	if( iLines <= rdLine )	return 0;
 
 	iLetter = DocLetterPosGetAdjust( &nowDot, rdLine, 0 );
@@ -133,7 +131,7 @@ INT DocLetterSelStateToggle( INT nowDot, INT rdLine, INT dForce )
 
 	LINE_ITR	itLine;
 
-	iLines = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.size( );
+	iLines = DocNowFilePageLineCount( );
 	if( iLines <= rdLine )	return 0;
 
 	iLetter = DocLetterPosGetAdjust( &nowDot, rdLine, 0 );
@@ -149,6 +147,7 @@ INT DocLetterSelStateToggle( INT nowDot, INT rdLine, INT dForce )
 	dLtrDot = itLine->vcLine.at( iLetter ).rdWidth;
 	dByte   = itLine->vcLine.at( iLetter ).mzByte;
 
+
 	//	フラグ操作
 	dStyle  = itLine->vcLine.at( iLetter ).mzStyle;
 	maeSty = dStyle;
@@ -156,6 +155,8 @@ INT DocLetterSelStateToggle( INT nowDot, INT rdLine, INT dForce )
 	else if( 0 < dForce ){	dStyle |=  CT_SELECT;	}
 	else if( 0 > dForce ){	dStyle &= ~CT_SELECT;	}
 	itLine->vcLine.at( iLetter ).mzStyle = dStyle;
+
+	TRACE( TEXT("L[%d] D[%d] B[%d] f[0x%X]"), rdLine, dLtrDot, dByte, dStyle );
 
 	if( maeSty != dStyle )	//	フラグ操作されてたら
 	{
@@ -184,7 +185,7 @@ INT DocRangeSelStateToggle( INT dBgnDot, INT dEndDot, INT rdLine, INT dForce )
 	INT	dLtrDot = 0, dMaxDots, dDot;
 	RECT	rect;
 
-	iLines = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.size( );
+	iLines = DocNowFilePageLineCount( );
 	if( (INT)iLines <=  rdLine )	return 0;
 
 	dMaxDots = DocLineParamGet( rdLine, NULL, NULL );
@@ -228,7 +229,7 @@ HRESULT DocReturnSelStateToggle( INT rdLine, INT dForce )
 
 	LINE_ITR	itLine;
 
-	iLines = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.size( );
+	iLines = DocNowFilePageLineCount( );
 	if( (INT)iLines <=  rdLine )	return E_OUTOFMEMORY;
 
 	iLnDot = DocLineParamGet( rdLine, NULL, NULL );
@@ -288,7 +289,7 @@ INT DocPageSelStateToggle( INT dForce )
 
 	iTotal = 0;
 
-	iLines = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.size( );
+	iLines = DocNowFilePageLineCount( );
 
 	itLine = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.begin();
 	for( ln = 0; iLines > ln; ln++, itLine++ )
@@ -410,7 +411,7 @@ INT DocSelectedDelete( PINT pdDot, PINT pdLine, UINT bSqSel, BOOLEAN bFirst )
 	bSqSel &= D_SQUARE;	//	矩形ビットだけ残す
 
 	//	ページ全体の行数
-//	iLines = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.size( );
+//	iLines = DocNowFilePageLineCount( );
 	i = (*gitFileIt).vcCont.at( gixFocusPage ).dSelLineTop;
 	j = (*gitFileIt).vcCont.at( gixFocusPage ).dSelLineBottom;
 	TRACE( TEXT("範囲削除[T%d - B%d]"), i, j );
@@ -478,16 +479,16 @@ INT DocSelectedDelete( PINT pdDot, PINT pdLine, UINT bSqSel, BOOLEAN bFirst )
 		}
 
 		//	改行が含まれていたら
-		if( CT_SELRTN & itLine->dStyle )
-		{
-			DocLineCombine( j );
-		}
-		DocLineParamGet( j, NULL, NULL );
+		if( CT_SELRTN & itLine->dStyle ){	DocLineCombine( j );	}
+
+		DocLineParamGet( j, NULL, NULL );	//	バイト数再計算
+
+		//	矩形の場合は、各行毎に面倒みないかん
+		if( D_SQUARE & bSqSel ){	DocBadSpaceCheck( j );	}
 
 		//	改行サクるとこれによりatが無効になる？
-
 	
-	//	iLines = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.size(  );	//	ページ全体の行数再設定？
+	//	iLines = DocNowFilePageLineCount( );	//	ページ全体の行数再設定？
 
 		if( (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.begin() == itLine )	break;
 		//	位置的に末端だったらループせずに終わる
@@ -497,6 +498,9 @@ INT DocSelectedDelete( PINT pdDot, PINT pdLine, UINT bSqSel, BOOLEAN bFirst )
 
 	//	カーソル位置移動せないかん
 	*pdDot = dBeginX;	*pdLine = dBeginY;
+
+	//	最終的に残っている行のチェックだけすればいい
+	if( !(D_SQUARE & bSqSel)  ){	DocBadSpaceCheck( dBeginY );	}
 
 	if( bSqSel ){	SqnAppendSquare( &((*gitFileIt).vcCont.at( gixFocusPage ).stUndoLog), DO_DELETE, ptText, pstPt, iLct , bFirst );	}
 	else{		SqnAppendString( &((*gitFileIt).vcCont.at( gixFocusPage ).stUndoLog), DO_DELETE, ptText, dBeginX, dBeginY, bFirst );	}
@@ -692,7 +696,7 @@ INT DocSelectTextGetAlloc( UINT bStyle, LPVOID *pText, LPPOINT *pstPt )
 	wsString.clear( );
 
 	//	ページ全体の行数
-	iLines = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.size( );
+	iLines = DocNowFilePageLineCount( );
 	//	開始地点から開始
 	d = (*gitFileIt).vcCont.at( gixFocusPage ).dSelLineTop;
 	k = (*gitFileIt).vcCont.at( gixFocusPage ).dSelLineBottom;
@@ -798,7 +802,7 @@ HRESULT DocExtractExecute( HINSTANCE hInst )
 	wstring	wsBuffer;
 
 
-	if( 0 >= (*gitFileIt).vcCont.size() )	return S_FALSE;
+	if( 0 >= DocNowFilePageCount( ) )	return S_FALSE;
 
 	//	開始行と終止行・オフセット量を検索
 	itLnErate = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.begin();

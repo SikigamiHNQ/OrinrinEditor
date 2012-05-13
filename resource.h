@@ -416,12 +416,15 @@
 #define IDB_CLIPSTEAL_FILEDEL           3006
 #define IDLV_CLIPSTEAL_FILELISTVW       3007
 #define IDHK_CLIPSTEAL_FILECHANGE       3008
+#define IDB_CLIP_STEAL_ACT_ON			3009
+#define IDHK_CLIP_POPUP_KEYBIND			3010
+#define IDM_CLIPSTEAL_OPTION			32001
+#define IDM_CLIPSTEAL_TOGGLE			32002
 #define IDM_OPEN_HISTORY                32680
 #define IDM_OPEN_HIS_FIRST              32681
 #define IDM_OPEN_HIS_RESERVE            32691
 #define IDM_OPEN_HIS_LAST               32692
 #define IDM_OPEN_HIS_CLEAR              32693
-#define IDM_CLIPSTEAL_OPTION            32694
 #define IDM_TRACE_MODE_ON               32695
 #define IDM_TRC_VIEWTOGGLE              32696
 #define IDM_TMPL_GRID_INCREASE          32697
@@ -495,6 +498,7 @@
 #define IDM_PAGENUM_DLG_OPEN            32824
 #define IDM_MENUEDIT_DLG_OPEN           32825
 #define IDM_ACCELKEY_EDIT_DLG_OPEN      32826
+#define IDM_SQUARE_PASTE				32827
 #define IDM_FINDMAA_DLG_OPEN            32828
 #define IDM_DRAUGHT_OPEN                32831
 #define IDM_DRAUGHT_CLOSE               32832
@@ -610,6 +614,15 @@
 #define IDM_AATABS_ALLDELETE            33013
 #define IDM_MIRROR_INVERSE				33021
 #define IDM_UPSET_INVERSE				33022
+
+#ifdef PLUGIN_ENABLE
+//---------------------------------------------------------------------
+//[_16in] Add - 2012/05/01
+
+//-- 以下プラグイン用
+#define IDM_PLUGIN_ITEM_BASE			34000
+//---------------------------------------------------------------------
+#endif
 
 #define IDC_STATIC                      -1
 

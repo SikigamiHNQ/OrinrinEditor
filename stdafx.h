@@ -106,14 +106,16 @@ static CONST GUID gcstGUID = { 0x66D3E881, 0x972B, 0x458B, { 0x93, 0x5E, 0x9E, 0
 //	ファイル開いた履歴
 //	プロフ開いた履歴
 
-#define WORK_LOG_OUT	
+//#define WORK_LOG_OUT	
 
 #define USE_NOTIFYICON	//	タスクトレイアイコンを有効
+
+//#define PLUGIN_ENABLE
 
 //	作成中の機能
 //#define FIND_STRINGS	//	文字列検索機能
 //#define PAGE_MULTISELECT//	頁一覧の複数選択
-#define PAGE_DELAY_LOAD	//	ファイル読み込んだ時は頁展開しない、ひつようになったら開く
+//#define PAGE_DELAY_LOAD	//	ファイル読み込んだ時は頁展開しない、ひつようになったら開く
 
 #define  FRAME_MLINE	//	枠パーツ複数行
 #define AA_INVERSE		//	上下左右反転機能
@@ -127,26 +129,22 @@ static CONST GUID gcstGUID = { 0x66D3E881, 0x972B, 0x458B, { 0x93, 0x5E, 0x9E, 0
 #define EXTERNED
 //-------------------------------------------------------------------------------------------------
 
-//	WORK_LOG_OUT
 
-//#ifdef _DEBUG
-
-#define TRACE(str,...)	OutputDebugStringPlus( GetLastError(), __FILE__, __LINE__, __FUNCTION__, str, __VA_ARGS__ )
-
-#ifndef _ORCOLL
-#define SQL_DEBUG(db)	SqlErrMsgView(db,__LINE__)
+#if defined(_DEBUG) || defined(WORK_LOG_OUT)
+	#define TRACE(str,...)	OutputDebugStringPlus( GetLastError(), __FILE__, __LINE__, __FUNCTION__, str, __VA_ARGS__ )
+	VOID	OutputDebugStringPlus( DWORD, LPSTR, INT, LPSTR, LPTSTR, ... );	//!<	
+#else
+	#define TRACE(x,...)
 #endif
 
-VOID	OutputDebugStringPlus( DWORD, LPSTR, INT, LPSTR, LPTSTR, ... );	//!<	
-VOID	SqlErrMsgView( sqlite3 *, DWORD );
-
-//#else
-//	#define TRACE(x,...)
-//
-//  #ifndef _ORCOLL
-//	#define SQL_DEBUG(db)
-//  #endif
-//#endif
+#ifndef _ORCOLL
+	#ifdef _DEBUG
+		#define SQL_DEBUG(db)	SqlErrMsgView(db,__LINE__)
+		VOID	SqlErrMsgView( sqlite3 *, DWORD );
+	#else
+		#define SQL_DEBUG(db)
+	#endif
+#endif
 
 #ifdef DO_TRY_CATCH
 #define ETC_MSG(str,ret)	ExceptionMessage( str, __FUNCTION__, __LINE__, ret )
@@ -171,7 +169,7 @@ LRESULT	ExceptionMessage( LPCSTR, LPCSTR, UINT, LPARAM );
 
 //	ウインドウサイズ
 #define WCL_WIDTH	480
-#define WCL_HEIGHT	320
+#define WCL_HEIGHT	370
 
 //	ドッキングサイズ
 #define PLIST_DOCK	190
@@ -244,7 +242,7 @@ LRESULT	ExceptionMessage( LPCSTR, LPCSTR, UINT, LPARAM );
 #define VL_MAATIP_SIZE	9	//	ＭＡＡのＡＡツールチップの文字サイズ・16か12
 #define VL_LINETMP_CLM	10	//	壱行テンプレのカラム数
 #define VL_BRUSHTMP_CLM	11	//	ブラシテンプレのカラム数
-#define VL_UNIRADIX_HEX	12	//	ユニコード数値参照を１６進数にするかどうか
+#define VL_UNIRADIX_HEX	12	//	ユニコード数値参照を１６進数にするかどうか[COL][EDIT]
 #define VL_BACKUP_INTVL	13	//	バックアップ感覚・デフォ５分くらい？
 #define VL_BACKUP_MSGON	14	//	バックアップしたときのメッセージを表示するか？
 #define VL_GRID_X_POS	15	//	グリッド線のＸドット数
@@ -260,8 +258,8 @@ LRESULT	ExceptionMessage( LPCSTR, LPCSTR, UINT, LPARAM );
 #define VL_PDIVIDE_NM	25	//	１なら分割Message無し
 #define VL_PDELETE_NM	26	//	１なら削除Message無し
 #define VL_MAASEP_STYLE	27	//	複数テンプレ・１なら区切り線スタイル
-#define VL_USE_BALLOON	28	//	保存確認メッセージ表示するかどうか
-#define VL_CLIPFILECNT	29
+#define VL_USE_BALLOON	28	//	[COL]保存確認メッセージ表示するかどうか
+#define VL_CLIPFILECNT	29	//	[COL]保存ファイルの個数
 #define VL_PLS_LN_DOCK	30	//	頁一覧窓はくっつくか
 //#define VL_BRUSH_DOCK	31	//	壱行・Brushテンプレ窓はくっつくか
 #define VS_PROFILE_NAME	32	//	
@@ -276,6 +274,11 @@ LRESULT	ExceptionMessage( LPCSTR, LPCSTR, UINT, LPARAM );
 #define VL_DRT_MCLICK	41	//	ドラフトボードクリックのデフォ動作
 #define VS_FONT_NAME	42	//	メインのフォント名、ＭＳ Ｐゴシック
 #define VL_WORKLOG		43	//	動作ログを出力するか
+#define VL_PAGE_UNDER	44	//	頁番号を最下行に挿入
+#define VL_PAGE_OVWRITE	45	//	該当行の内容を削除して上書
+#define VL_COLLECT_AON	46	//	[COL]起動時にコピペ保存をONにする
+#define VL_COLHOT_MODY	47	//	[COL]ポップアップホットキー・修飾子
+#define VL_COLHOT_VKEY	48	//	[COL]ポップアップホットキー・仮想キーコード
 
 //増やしたら、函数内に取扱つくっておくこと
 

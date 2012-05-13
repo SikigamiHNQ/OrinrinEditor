@@ -39,9 +39,7 @@ typedef struct tagINVERSEPARTS
 //-------------------------------------------------------------------------------------------------
 
 extern list<ONEFILE>	gltMultiFiles;	//	複数ファイル保持
-
 extern FILES_ITR	gitFileIt;		//	今見てるファイルの本体
-
 extern INT			gixFocusPage;	//	注目中のページ・とりあえず０・０インデックス
 
 static  vector<INVERSEPARTS>	gvcMirrorParts;	//!<	左右反転用入替パーツ
@@ -321,7 +319,7 @@ HRESULT DocInverseTransform( UINT dStyle, UINT dMode, PINT pXdot, INT dLine )
 	try{
 #endif
 
-	iLines = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.size(  );	//	ページ全体の行数
+	iLines = DocNowFilePageLineCount( );	//	ページ全体の行数
 
 	//	開始地点から開始	//	D_SQUARE
 	iTop = (*gitFileIt).vcCont.at( gixFocusPage ).dSelLineTop;

@@ -1995,7 +1995,8 @@ HRESULT LayerContentsImportable( HWND hWnd, UINT cmdID, LPINT pXdot, LPINT pYlin
 			iSpDot -= xTgDot;
 		}
 
-		DocBadSpaceCheck( dWkLine );	//	バッド空白チェキ
+		//DocBadSpaceCheck( dWkLine );	//	バッド空白チェキ
+		//	DocInsertStringの中の方でやってるので、ここでは不要だと思われ
 	}
 
 	TRACE( TEXT("Layer Insert OK！") );

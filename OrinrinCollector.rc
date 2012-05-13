@@ -66,8 +66,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 2011,1014,2000,920
- PRODUCTVERSION 1,1,0,920
+ FILEVERSION 2012,510,2200,920
+ PRODUCTVERSION 1,2,0,920
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -88,12 +88,12 @@ BEGIN
         BEGIN
             VALUE "Comments", "Japanese Only, Perfectly No Warranty"
             VALUE "CompanyName", "I love 2ch, Yaruo and TohoProject"
-            VALUE "LegalCopyright", "Copyright (C) 2011 SikigamiHNQ"
+            VALUE "LegalCopyright", "Copyright (C) 2011 - 2012 Orinrin/SikigamiHNQ"
             VALUE "LegalTrademarks", "License : GPLv3"
-            VALUE "PrivateBuild", "Build by Visual Studio 2008"
+            VALUE "PrivateBuild", "Build by Visual C++ 2008 Express"
             VALUE "SpecialBuild", "Not Speciality"
-            VALUE "FileVersion", "2011.1014.2000.920"
-            VALUE "ProductVersion", "1.1.0.920"
+            VALUE "FileVersion", "2012.510.2200.920"
+            VALUE "ProductVersion", "1.2.0.920"
             VALUE "FileDescription", "AsciiArt Collector"
             VALUE "OriginalFilename", "OrinrinCollector.exe"
             VALUE "InternalName", "Orinrin Collector"

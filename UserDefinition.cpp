@@ -356,7 +356,7 @@ HRESULT UserDefItemInsert( HWND hWnd, UINT idNum )
 		bFirst = FALSE;
 
 		//	‚±‚Ì•Å‚Ìs”Žæ‚è’¼‚µ
-		iLines = DocPageParamGet( NULL, NULL );
+		iLines = DocPageParamGet( NULL, NULL );	//	ÄŒvŽZ‚¢‚é‚©H
 	}
 
 	for( i = 0; dNeedLine > i; i++, yLine++ )

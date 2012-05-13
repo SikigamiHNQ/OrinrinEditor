@@ -556,7 +556,7 @@ HRESULT PreviewPageWrite( INT iViewPage )
 	{
 		asString  = string( gpcHtmlHdr );
 
-		iPage = DocPageCount(  );
+		iPage = DocNowFilePageCount(  );
 		for( i = 0; iPage > i; i++ )
 		{
 			StringCchPrintfA( acSeper, MAX_STRING, gacResHeaderFmt, (i+1),

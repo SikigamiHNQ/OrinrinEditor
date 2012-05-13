@@ -1,13 +1,13 @@
 /*! @file
 	@brief アプリ全体で使う定数や函数です
-	このファイルは OrinrinEditor.h です。
+	このファイルは OrinrinCollector.h です。
 	@author	SikigamiHNQ
 	@date	2011/10/06
 */
 
 /*
-Orinrin Editor : AsciiArt Story Editor for Japanese Only
-Copyright (C) 2011 Orinrin/SikigamiHNQ
+Orinrin Collector : Clipboard Auto Stocker for Japanese Only
+Copyright (C) 2011 - 2012 Orinrin/SikigamiHNQ
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
@@ -52,7 +52,7 @@ HRESULT	TaskTrayIconBalloon( HWND, LPTSTR, LPTSTR, DWORD );	//!<
 
 INT		InitParamValue( UINT, UINT, INT );			//!<	
 HRESULT	InitClipStealOpen( UINT, UINT, LPTSTR );	//!<	
-HRESULT	InitSettingSave( HWND );					//!<	
+HRESULT	InitSettingSave( HWND, UINT );				//!<	
 
 HRESULT	FileListViewInit( HWND );				//!<	
 INT		FileListViewAdd( HWND, LPTSTR );		//!<	
@@ -66,7 +66,9 @@ HMENU	CreateFileSelMenu( HWND, UINT );	//!<
 HRESULT	ClipStealDoing( HWND  );		//!<	
 LPTSTR	ClipboardDataGet( LPVOID  );	//!<	
 
+UINT	RegHotModExchange( UINT , BOOLEAN );	//!<	
+
 LPTSTR	SjisDecodeAlloc( LPSTR );		//!<	
-LPSTR	SjisEncodeAlloc( LPTSTR );		//!<	
+LPSTR	SjisEncodeAlloc( LPCTSTR );		//!<	
 LPSTR	SjisEntityExchange( LPCSTR );	//!<	
 TCHAR	UniRefCheck( LPSTR );			//!<	

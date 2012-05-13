@@ -131,6 +131,14 @@ extern  UINT	gbCpModSwap;	//	SJISとユニコードコピーを入れ替える
 #endif
 extern  HWND	ghMainSplitWnd;	//	メインのスプリットバーハンドル
 extern  LONG	grdSplitPos;	//	スプリットバーの、左側の、画面右からのオフセット
+
+#ifdef PLUGIN_ENABLE
+//---------------------------------------------------------------------
+//[_16in] Add - 2012/05/01
+//
+//-- プラグイン関係
+extern plugin::PLUGIN_FILE_LIST gPluginList;
+#endif
 //-------------------------------------------------------------------------------------------------
 
 //	使用する色
@@ -273,7 +281,7 @@ HWND ViewInitialise( HINSTANCE hInstance, HWND hParentWnd, LPRECT pstFrame, LPTS
 
 	LOGFONT		stFont;
 
-	INT			iNewPage;
+//	INT			iNewPage;
 	INT			iFiles, i;
 	LPARAM		dNumber;
 	BOOLEAN		bOpen = FALSE;
@@ -456,12 +464,13 @@ HWND ViewInitialise( HINSTANCE hInstance, HWND hParentWnd, LPRECT pstFrame, LPTS
 
 	if( !(bOpen) )	//	完全に開けなかったら
 	{
-		DocMultiFileCreate( atFile );	//	新しいファイル置き場の準備・ここで返り血は要らない
-		iNewPage = DocPageCreate( -1 );	//	ページ作っておく
-		PageListInsert( iNewPage  );	//	ページリストビューに追加
-		DocPageChange( 0 );
-		MultiFileTabFirst( atFile );	//	完全新規作成
-		AppTitleChange( atFile );
+		DocActivateEmptyCreate( atFile );
+		//DocMultiFileCreate( atFile );	//	新しいファイル置き場の準備・ここで返り血は要らない
+		//iNewPage = DocPageCreate( -1 );	//	ページ作っておく
+		//PageListInsert( iNewPage  );	//	ページリストビューに追加
+		//DocPageChange( 0 );
+		//MultiFileTabFirst( atFile );	//	完全新規作成
+		//AppTitleChange( atFile );
 	}
 
 	ViewScrollBarAdjust( NULL );
@@ -968,7 +977,7 @@ VOID Evw_OnVScroll( HWND hWnd, HWND hWndCtl, UINT code, INT pos )
 	//	posを、ホイールフラグにする
 
 	//	総行数より、表示領域のほうが大きかったら処理しない
-	iLines = DocPageParamGet( NULL, NULL );
+	iLines = DocPageParamGet( NULL, NULL );	//	要るのは行数
 	if( gdDispingLine >= iLines )	return;
 
 	//	状態をくやしく
@@ -2084,6 +2093,21 @@ VOID OperationOnCommand( HWND hWnd, INT id, HWND hWndCtl, UINT codeNotify )
 		return;
 	}
 
+#ifdef PLUGIN_ENABLE
+	//---------------------------------------------------------------------
+	//[_16in] Add - 2012/05/01
+	//
+	//-- プラグインメニューの選択
+	if( id >= IDM_PLUGIN_ITEM_BASE )
+	{
+		if( plugin::RunPlugin( gPluginList, id - IDM_PLUGIN_ITEM_BASE ) )
+		{
+			return;
+		}
+	}
+
+	//---------------------------------------------------------------------
+#endif
 
 	switch( id )
 	{
@@ -2261,7 +2285,10 @@ VOID OperationOnCommand( HWND hWnd, INT id, HWND hWndCtl, UINT codeNotify )
 		case IDM_COPY_TO_DRAUGHT:	DraughtItemAddFromSelect( gbSqSelect  );	break;
 
 		//	カーソル位置の操作も必要・ポインタ渡しして中で弄る
-		case IDM_PASTE:			DocInputFromClipboard( &gdDocXdot, &gdDocLine, &gdDocMozi );	break;
+		case IDM_PASTE:			DocInputFromClipboard( &gdDocXdot, &gdDocLine, &gdDocMozi , 0 );	break;
+
+		//	矩形貼付・無理矢理矩形として貼り付ける
+		case IDM_SQUARE_PASTE:	DocInputFromClipboard( &gdDocXdot, &gdDocLine, &gdDocMozi , 1 );	break;
 
 		//	削除
 		case IDM_DELETE:		Evw_OnKey( hWnd, VK_DELETE, TRUE, 0, 0 );	break;

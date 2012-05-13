@@ -6,8 +6,8 @@
 */
 
 /*
-Orinrin Editor : AsciiArt Story Editor for Japanese Only
-Copyright (C) 2011 Orinrin/SikigamiHNQ
+Orinrin Collector : Clipboard Auto Stocker for Japanese Only
+Copyright (C) 2011 - 2012 Orinrin/SikigamiHNQ
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
@@ -22,23 +22,28 @@ If not, see <http://www.gnu.org/licenses/>.
 //-------------------------------------------------------------------------------------------------
 
 // グローバル変数:
+static HANDLE		ghMutex;					//!<	多重起動防止用Mutex
+
 static HINSTANCE	ghInst;						//!<	現在のインターフェイス
 static TCHAR		gatTitle[MAX_STRING];		//!<	タイトルバーのテキスト
 static TCHAR		gatWindowClass[MAX_STRING];	//!<	メインウィンドウクラス名
 
-static  HWND		ghToolTipWnd;			//!<	ツールチップのウインドウハンドル
-static HBRUSH		ghBrush;				//!<	背景色ブラシ
-static HICON		ghIcon;					//!<	メインアイコン
-static  UINT		grdTaskbarResetID;		//!<	タスクバーが再起動するときのメッセージIDを保持
-static  HWND		ghNextViewer;			//!<	クリップボードチェインの次のやつ
-static BOOLEAN		gbClipSteal;			//!<	コピー頂戴する
-static BOOLEAN		gGetMsgOn;				//!<	保存したらバルーンする
-static BOOLEAN		gIsAST;					//!<	保存はAST形式で
-static TCHAR		gatIniPath[MAX_PATH];	//!<	ＩＮＩファイルの位置
-static TCHAR		gatClipFile[MAX_PATH];	//!<	クリップ内容を保存するファイル名
-static NOTIFYICONDATA	gstNtfyIcon;		//!<	タスクトレイアイコン制御の構造体
+static  HWND		ghToolTipWnd;				//!<	ツールチップのウインドウハンドル
+static HBRUSH		ghBrush;					//!<	背景色ブラシ
+static HICON		ghIcon;						//!<	メインアイコン
+static  UINT		grdTaskbarResetID;			//!<	タスクバーが再起動するときのメッセージIDを保持
+static  HWND		ghNextViewer;				//!<	クリップボードチェインの次のやつ
+static BOOLEAN		gbClipSteal;				//!<	コピー頂戴する
+static BOOLEAN		gGetMsgOn;					//!<	保存したらバルーンする
+static BOOLEAN		gIsAST;						//!<	保存はAST形式で
+static TCHAR		gatIniPath[MAX_PATH];		//!<	ＩＮＩファイルの位置
+static TCHAR		gatClipFile[MAX_PATH];		//!<	クリップ内容を保存するファイル名
+static NOTIFYICONDATA	gstNtfyIcon;			//!<	タスクトレイアイコン制御の構造体
 
-EXTERNED UINT		gbUniRadixHex;			//!<	数値参照を１６進数型で保存する
+EXTERNED UINT		gbUniRadixHex;				//!<	数値参照を１６進数型で保存する
+
+static  UINT		gbHotMod;					//!<	ポップアップホットキー修飾子
+static  UINT		gbHotVkey;					//!<	ポップアップホットキー仮想キーコード
 //-------------------------------------------------------------------------------------------------
 
 /*!
@@ -66,6 +71,17 @@ INT APIENTRY _tWinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpC
 	//	ここで使用するフラグを指定
 	_CrtSetDbgFlag( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_CHECK_ALWAYS_DF | _CRTDBG_LEAK_CHECK_DF );
 #endif
+
+	//	多重起動防止
+	ghMutex = CreateMutex( NULL, TRUE, TEXT("OrinrinCollector") );	//	すでに起動しているか判定
+	if( GetLastError() == ERROR_ALREADY_EXISTS )	//	すでに起動している
+	{
+		MessageBox( NULL, TEXT("已にアプリは起動してるよ！"), TEXT("お燐からのお知らせ"), MB_OK|MB_ICONINFORMATION );
+		ReleaseMutex( ghMutex );
+		CloseHandle( ghMutex );
+		return 0;
+	}
+
 
 	INITCOMMONCONTROLSEX	iccex;
 	iccex.dwSize = sizeof(INITCOMMONCONTROLSEX);
@@ -102,12 +118,10 @@ INT APIENTRY _tWinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpC
 
 /*!
 	ウインドウクラス生成
-	この関数および使い方は、'RegisterClassEx' 関数が追加された
-	Windows 95 より前の Win32 システムと互換させる場合にのみ必要です。
-	アプリケーションが、関連付けられた正しい形式の小さいアイコンを
-	取得できるようにするには、この関数を呼び出してください。
+	この関数および使い方は、'RegisterClassEx' 関数が追加された Windows 95 より前の Win32 システムと互換させる場合にのみ必要です。
+	アプリケーションが、関連付けられた正しい形式の小さいアイコンを取得できるようにするには、この関数を呼び出してください。
 	@param[in]	hInstance	このモジュールのインスタンスハンドル
-	@return 登録したクラスアトム
+	@return		登録したクラスアトム
 */
 ATOM InitWndwClass( HINSTANCE hInstance )
 {
@@ -147,23 +161,10 @@ BOOL InitInstance( HINSTANCE hInstance, int nCmdShow )
 	INT		xxx, yyy;
 	RECT	rect;
 
+	BOOL	bHotRslt;
+
 	ghInst = hInstance;	//	グローバル変数にインスタンス処理を格納します。
 
-	hWnd = GetDesktopWindow(  );
-	GetWindowRect( hWnd, &rect );
-	xxx = ( rect.right  - WCL_WIDTH ) / 2;
-	yyy = ( rect.bottom - WCL_HEIGHT ) / 2;
-
-	hWnd = CreateWindowEx( WS_EX_TOOLWINDOW, gatWindowClass, gatTitle,
-		WS_CAPTION | WS_POPUPWINDOW, xxx, yyy, WCL_WIDTH, WCL_HEIGHT, NULL, NULL, hInstance, NULL);
-
-	if( !hWnd ){	return FALSE;	}
-
-	//	タスクトレイがあぼ～んしたときの再起動メッセージ番号を確保
-	grdTaskbarResetID = RegisterWindowMessage( TEXT("TaskbarCreated") );
-
-	//	クリップボードチェーンに自分を登録
-	ghNextViewer = SetClipboardViewer( hWnd );
 
 	//	設定ファイル位置確認
 	GetModuleFileName( hInstance, gatIniPath, MAX_PATH );
@@ -171,32 +172,75 @@ BOOL InitInstance( HINSTANCE hInstance, int nCmdShow )
 	PathAppend( gatIniPath, INI_FILE );
 
 	//	ここらで初期設定確保
-	gbClipSteal   = FALSE;	//	起動時はOFFでよろし？
-	gGetMsgOn     = InitParamValue( INIT_LOAD, VL_USE_BALLOON, 1 );
+	gbClipSteal   = InitParamValue( INIT_LOAD, VL_COLLECT_AON,  0 );	//	コピペ保存・デフォは起動時ＯＦＦ
+	gGetMsgOn     = InitParamValue( INIT_LOAD, VL_USE_BALLOON,  1 );
 	gbUniRadixHex = InitParamValue( INIT_LOAD, VL_UNIRADIX_HEX, 0 );
+
+	//	初期設定は Ctrl+Shift+C
+	gbHotMod      = InitParamValue( INIT_LOAD, VL_COLHOT_MODY, (MOD_CONTROL | MOD_SHIFT) );
+	gbHotVkey     = InitParamValue( INIT_LOAD, VL_COLHOT_VKEY, VK_C );
+
+
+	hWnd = GetDesktopWindow(  );
+	GetWindowRect( hWnd, &rect );
+	xxx = ( rect.right  - WCL_WIDTH ) / 2;
+	yyy = ( rect.bottom - WCL_HEIGHT ) / 2;
+
+	hWnd = CreateWindowEx( WS_EX_TOOLWINDOW | WS_EX_APPWINDOW, gatWindowClass, gatTitle, WS_CAPTION | WS_POPUPWINDOW, xxx, yyy, WCL_WIDTH, WCL_HEIGHT, NULL, NULL, hInstance, NULL);
+
+	if( !hWnd ){	return FALSE;	}
+
+
+	//	タスクトレイがあぼ～んしたときの再起動メッセージ番号を確保
+	grdTaskbarResetID = RegisterWindowMessage( TEXT("TaskbarCreated") );
+
+	//	クリップボードチェーンに自分を登録
+	ghNextViewer = SetClipboardViewer( hWnd );
+
 
 	FileListViewInit( hWnd );	//	リスト初期化
 	FileListViewGet( hWnd, 0, gatClipFile );	//	取り込みファイルを確保しておく
 	FileTypeCheck( gatClipFile );	//	ASTかそうでないかを確認
 
-	if( gGetMsgOn ){	Button_SetCheck( GetDlgItem(hWnd,IDB_CLIP_USE_BALLOON), BST_CHECKED );	}
-
-	if( gbUniRadixHex ){	Button_SetCheck( GetDlgItem(hWnd,IDB_CLIP_UNIRADIX_HEX), BST_CHECKED );	}
+	if( gGetMsgOn ){		Button_SetCheck( GetDlgItem(hWnd,IDB_CLIP_USE_BALLOON)  , BST_CHECKED );	}
+	if( gbUniRadixHex ){	Button_SetCheck( GetDlgItem(hWnd,IDB_CLIP_UNIRADIX_HEX) , BST_CHECKED );	}
+	if( gbClipSteal ){		Button_SetCheck( GetDlgItem(hWnd,IDB_CLIP_STEAL_ACT_ON) , BST_CHECKED );	}
 
 	TasktrayIconAdd( hWnd );
 
 	//	とりあえず、Ctrl+Shift+C
-	RegisterHotKey( hWnd, IDHK_CLIPSTEAL_FILECHANGE, MOD_CONTROL | MOD_SHIFT, VK_C );
-
-//#define MOD_ALT         0x0001
-//#define MOD_CONTROL     0x0002
-//#define MOD_SHIFT       0x0004
-//#define MOD_WIN         0x0008
-
+	bHotRslt = RegisterHotKey( hWnd, IDHK_CLIPSTEAL_FILECHANGE, gbHotMod, gbHotVkey );
 
 	ShowWindow( hWnd, SW_HIDE );	//	SW_HIDE
 
 	return TRUE;
+}
+//-------------------------------------------------------------------------------------------------
+
+/*!
+	レジスタホットキーとホットキーコントロールの修飾子を入替
+	@param[in]	bSrc	元の修飾子コード
+	@param[in]	bDrct	非０レジスタ→コントロール　０コントロール→レジスタ
+	@return	変換したコード
+*/
+UINT RegHotModExchange( UINT bSrc, BOOLEAN bDrct )
+{
+	BYTE	bDest = 0;
+
+	if( bDrct  )	//	レジスタ→コントロール
+	{
+		if( bSrc & MOD_SHIFT )		bDest |= HOTKEYF_SHIFT;		//	シフト
+		if( bSrc & MOD_CONTROL )	bDest |= HOTKEYF_CONTROL;	//	コントロール
+		if( bSrc & MOD_ALT )		bDest |= HOTKEYF_ALT;		//	アルタネート
+	}
+	else	//	コントロール→レジスタ
+	{
+		if( bSrc & HOTKEYF_SHIFT )		bDest |= MOD_SHIFT;		//	シフト
+		if( bSrc & HOTKEYF_CONTROL )	bDest |= MOD_CONTROL;	//	コントロール
+		if( bSrc & HOTKEYF_ALT )		bDest |= MOD_ALT;		//	アルタネート
+	}
+
+	return bDest;
 }
 //-------------------------------------------------------------------------------------------------
 
@@ -342,7 +386,7 @@ INT FileListViewDelete( HWND hWnd )
 		FileListViewGet( hWnd, iItem, atPath );
 		if( 0 == StrCmp( gatClipFile, atPath ) )
 		{
-			MessageBox( hWnd, TEXT("使用中のファイルなのです。\r\n削除できないのです。"), TEXT("あぅあぅ"), MB_OK | MB_ICONERROR );
+			MessageBox( hWnd, TEXT("そのファイルは使用中だよ。\r\n削除できないよ。"), TEXT("お燐からのお知らせ"), MB_OK | MB_ICONERROR );
 		}
 		else	//	問題無いなら削除
 		{
@@ -358,9 +402,10 @@ INT FileListViewDelete( HWND hWnd )
 
 /*!
 	全設定をセーブする
-	@param[in]	hWnd	親ウインドウのハンドル
+	@param[in]	hWnd	ウインドウハンドル
+	@param[in]	bActOn	起動時コピペ保存機能ＯＮにしておくか
 */
-HRESULT InitSettingSave( HWND hWnd )
+HRESULT InitSettingSave( HWND hWnd, UINT bActOn )
 {
 	HWND	hLvWnd = GetDlgItem( hWnd, IDLV_CLIPSTEAL_FILELISTVW );
 	INT		iCount, i;
@@ -373,9 +418,12 @@ HRESULT InitSettingSave( HWND hWnd )
 	ZeroMemory( atBuff, sizeof(atBuff) );
 	WritePrivateProfileSection( TEXT("Collector"), atBuff, gatIniPath );
 
-	InitParamValue( INIT_SAVE, VL_USE_BALLOON, gGetMsgOn );
+	InitParamValue( INIT_SAVE, VL_USE_BALLOON,  gGetMsgOn );
 	InitParamValue( INIT_SAVE, VL_UNIRADIX_HEX, gbUniRadixHex );
-	InitParamValue( INIT_SAVE, VL_CLIPFILECNT, iCount );
+	InitParamValue( INIT_SAVE, VL_CLIPFILECNT,  iCount );
+	InitParamValue( INIT_SAVE, VL_COLLECT_AON,  bActOn );
+	InitParamValue( INIT_SAVE, VL_COLHOT_MODY,  gbHotMod );
+	InitParamValue( INIT_SAVE, VL_COLHOT_VKEY,  gbHotVkey );
 
 	for( i = 0; iCount > i; i++ )
 	{
@@ -444,6 +492,10 @@ INT InitParamValue( UINT dMode, UINT dStyle, INT nValue )
 		case VL_UNIRADIX_HEX:	StringCchCopy( atKeyName, SUB_STRING, TEXT("UniRadixHex") );	break;
 		case VL_USE_BALLOON:	StringCchCopy( atKeyName, SUB_STRING, TEXT("UseBalloon")  );	break;
 		case VL_CLIPFILECNT:	StringCchCopy( atKeyName, SUB_STRING, TEXT("FileCount") );		break;
+		case VL_COLLECT_AON:	StringCchCopy( atKeyName, SUB_STRING, TEXT("CollectActOn") );	break;
+		case VL_COLHOT_MODY:	StringCchCopy( atKeyName, SUB_STRING, TEXT("CollectHotMod") );	break;
+		case VL_COLHOT_VKEY:	StringCchCopy( atKeyName, SUB_STRING, TEXT("CollectHotVkey") );	break;
+
 		default:	return nValue;
 	}
 
@@ -477,16 +529,17 @@ LRESULT CALLBACK WndProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam 
 {
 	switch( message )
 	{
-		HANDLE_MSG( hWnd, WM_CREATE,  Cls_OnCreate );	//	画面の構成パーツを作る。ボタンとか
-		HANDLE_MSG( hWnd, WM_PAINT,   Cls_OnPaint );	//	画面の更新とか
-		HANDLE_MSG( hWnd, WM_COMMAND, Cls_OnCommand );	//	ボタン押されたとかのコマンド処理
-		HANDLE_MSG( hWnd, WM_DESTROY, Cls_OnDestroy );	//	ソフト終了時の処理
-		HANDLE_MSG( hWnd, WM_HOTKEY,  Cls_OnHotKey );	//	
+		HANDLE_MSG( hWnd, WM_CREATE,         Cls_OnCreate );	//	画面の構成パーツを作る。ボタンとか
+		HANDLE_MSG( hWnd, WM_PAINT,          Cls_OnPaint  );	//	画面の更新とか
+		HANDLE_MSG( hWnd, WM_COMMAND,        Cls_OnCommand );	//	ボタン押されたとかのコマンド処理
+		HANDLE_MSG( hWnd, WM_DESTROY,        Cls_OnDestroy );	//	ソフト終了時の処理
+		HANDLE_MSG( hWnd, WM_HOTKEY,         Cls_OnHotKey );	//	
 		HANDLE_MSG( hWnd, WM_CTLCOLORSTATIC, Cls_OnCtlColor );
 		HANDLE_MSG( hWnd, WM_DRAWCLIPBOARD,  Cls_OnDrawClipboard );	//	クリップボードに変更があったら
 		HANDLE_MSG( hWnd, WM_CHANGECBCHAIN,  Cls_OnChangeCBChain );	//	クリップボードビューワチェインに変更があったら
 
 		case WM_CLOSE:	//	設定閉じるとき
+			RegisterHotKey( hWnd, IDHK_CLIPSTEAL_FILECHANGE, gbHotMod, gbHotVkey );	//	登録し直し
 			ShowWindow( hWnd, SW_HIDE );
 			return 0;
 
@@ -520,6 +573,8 @@ BOOLEAN Cls_OnCreate( HWND hWnd, LPCREATESTRUCT lpCreateStruct )
 	RECT	rect;
 	LVCOLUMN	stLvColm;
 
+	UINT	bCtrlMod;
+
 	GetClientRect( hWnd, &rect );
 
 //ツールチップ
@@ -529,7 +584,7 @@ BOOLEAN Cls_OnCreate( HWND hWnd, LPCREATESTRUCT lpCreateStruct )
 	hWorkWnd = CreateWindowEx( 0, WC_STATIC, TEXT(""), WS_CHILD | WS_VISIBLE | SS_ICON, 8, 8, 32, 32, hWnd, (HMENU)IDC_MYICON, lcInst, NULL );
 	SendMessage( hWorkWnd, STM_SETICON, (WPARAM)ghIcon, 0 );
 
-	CreateWindowEx( 0, WC_STATIC, TEXT("OrinrinCollector, Version 1.1 (2011.1014.2000.920)"), WS_CHILD | WS_VISIBLE, 44, 8, 370, 23, hWnd, (HMENU)IDC_STATIC, lcInst, NULL );
+	CreateWindowEx( 0, WC_STATIC, TEXT("OrinrinCollector, Version 1.2 (2012.510.2200.920)"), WS_CHILD | WS_VISIBLE, 44, 8, 370, 23, hWnd, (HMENU)IDC_STATIC, lcInst, NULL );
 
 	CreateWindowEx( 0, WC_STATIC, TEXT("頂戴したクリップ内容を保存するファイル名"), WS_CHILD | WS_VISIBLE, 8, 48, 370, 23, hWnd, (HMENU)IDC_STATIC, lcInst, NULL );
 
@@ -561,7 +616,17 @@ BOOLEAN Cls_OnCreate( HWND hWnd, LPCREATESTRUCT lpCreateStruct )
 	CreateWindowEx( 0, WC_BUTTON, TEXT("ユニコード数値参照は１６進数型（非チェックで１０進数）"), WS_CHILD | WS_VISIBLE | BS_AUTOCHECKBOX, 8, 234, rect.right-16, 23, hWnd, (HMENU)IDB_CLIP_UNIRADIX_HEX, lcInst, NULL );
 	ToolTipSetting( hWnd, IDB_CLIP_UNIRADIX_HEX, TEXT("頂戴した内容にユニコードが含まれていたら、どういう形式で保存するのかを決めてね。") );
 
-	CreateWindowEx( 0, WC_BUTTON, TEXT("保存して閉じる"), WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, rect.right-8-150, 260, 150, 23, hWnd, (HMENU)IDB_CLIP_SAVE_AND_EXIT, lcInst, NULL );
+	CreateWindowEx( 0, WC_BUTTON, TEXT("起動したときに、コピペ保存をＯＮにする"), WS_CHILD | WS_VISIBLE | BS_AUTOCHECKBOX, 8, 261, rect.right-16, 23, hWnd, (HMENU)IDB_CLIP_STEAL_ACT_ON, lcInst, NULL );
+	ToolTipSetting( hWnd, IDB_CLIP_STEAL_ACT_ON, TEXT("起動したときに、コピペ保存機能をＯＮにしておくよ。") );
+
+	CreateWindowEx( 0, WC_STATIC, TEXT("メニューポップアップホットキー"), WS_CHILD | WS_VISIBLE, 8, 290, 260, 23, hWnd, (HMENU)IDC_STATIC, lcInst, NULL );
+	hWorkWnd = CreateWindowEx( 0, HOTKEY_CLASS, TEXT(""), WS_CHILD | WS_VISIBLE, 270, 290, 200, 23, hWnd, (HMENU)IDHK_CLIP_POPUP_KEYBIND, lcInst, NULL );
+	ToolTipSetting( hWnd, IDHK_CLIP_POPUP_KEYBIND, TEXT("ここをクリックして、キーの組み合わせを設定してね。") );
+
+	bCtrlMod = RegHotModExchange( gbHotMod, 1 );
+	SendMessage( hWorkWnd , HKM_SETHOTKEY, MAKEWORD(gbHotVkey, bCtrlMod), 0 );
+
+	CreateWindowEx( 0, WC_BUTTON, TEXT("保存して閉じる"), WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, rect.right-8-150, rect.bottom-30, 150, 23, hWnd, (HMENU)IDB_CLIP_SAVE_AND_EXIT, lcInst, NULL );
 	ToolTipSetting( hWnd, IDB_CLIP_SAVE_AND_EXIT, TEXT("変更内容を保存して、この窓を閉じるよ。") );
 
 	return TRUE;
@@ -581,11 +646,21 @@ VOID Cls_OnCommand( HWND hWnd, INT id, HWND hwndCtl, UINT codeNotify )
 	TCHAR	atPath[MAX_PATH], atBuff[MAX_PATH];
 	INT		iRslt, iTgt;
 
+	UINT	bActOn;
+	BOOL	bHotRslt;
+
+	LRESULT	lRslt;
+	UINT	bMod, bVkey;
+
 	switch( id )
 	{
 		case IDM_EXIT:	DestroyWindow( hWnd );	break;
 
-		case IDM_CLIPSTEAL_OPTION:	ShowWindow( hWnd, SW_SHOW );	break;
+
+		case IDM_CLIPSTEAL_OPTION:
+			ShowWindow( hWnd, SW_SHOW );
+			UnregisterHotKey( hWnd, IDHK_CLIPSTEAL_FILECHANGE );	//	キーバインド取得のために一時的に解除
+			break;
 
 		case IDM_CLIPSTEAL_TOGGLE:
 			gbClipSteal = !(gbClipSteal);
@@ -614,13 +689,32 @@ VOID Cls_OnCommand( HWND hWnd, INT id, HWND hwndCtl, UINT codeNotify )
 			break;
 
 		case IDB_CLIP_SAVE_AND_EXIT:
-			if( BST_CHECKED == IsDlgButtonChecked( hWnd, IDB_CLIP_USE_BALLOON ) )	gGetMsgOn = TRUE;
-			else	gGetMsgOn = FALSE;
+			//	ホットキー設定を確保
+			lRslt = SendDlgItemMessage( hWnd, IDHK_CLIP_POPUP_KEYBIND, HKM_GETHOTKEY, 0, 0 );
+			bVkey = LOBYTE( lRslt );
+			bMod  = RegHotModExchange( HIBYTE( lRslt ), 0 );
+			//	もしレジスト失敗したら閉じない・成功で非０もどる
+			bHotRslt = RegisterHotKey( hWnd, IDHK_CLIPSTEAL_FILECHANGE, bMod, bVkey );
+			if( bHotRslt )
+			{
+				gbHotVkey = bVkey;
+				gbHotMod  = bMod;
+			}
+			else
+			{
+				MessageBox( hWnd, TEXT("ホットキーが登録出来なかったよ。\r\n已に使われてるみたい。\r\n他の組み合わせを試してみて！"), TEXT("お燐からのお知らせ"), MB_OK | MB_ICONERROR );
+				break;
+			}
 
-			if( BST_CHECKED == IsDlgButtonChecked( hWnd, IDB_CLIP_UNIRADIX_HEX ) )	gbUniRadixHex = TRUE;
-			else	gbUniRadixHex = FALSE;
+			if( BST_CHECKED == IsDlgButtonChecked( hWnd, IDB_CLIP_USE_BALLOON ) ){	gGetMsgOn = TRUE;	}
+			else{	gGetMsgOn = FALSE;	}
 
-			InitSettingSave( hWnd );
+			if( BST_CHECKED == IsDlgButtonChecked( hWnd, IDB_CLIP_UNIRADIX_HEX ) ){	gbUniRadixHex = TRUE;	}
+			else{	gbUniRadixHex = FALSE;	}
+
+			bActOn = IsDlgButtonChecked( hWnd, IDB_CLIP_STEAL_ACT_ON );
+
+			InitSettingSave( hWnd, bActOn );
 
 			ShowWindow( hWnd, SW_HIDE );
 			break;
@@ -1060,7 +1154,7 @@ HRESULT ClipStealDoing( HWND hWnd )
 	if( gGetMsgOn )
 	{
 		StringCchPrintf( atMsg, MAX_STRING, TEXT("%u Byte 取得"), cbSize );
-		TaskTrayIconBalloon( hWnd, TEXT("コピーされた文字列を保存したのです。あぅ。"), atMsg, 1 );
+		TaskTrayIconBalloon( hWnd, TEXT("コピーされた文字列を保存したよ。"), atMsg, 1 );
 	}
 
 	return S_OK;

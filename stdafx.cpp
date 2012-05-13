@@ -18,8 +18,11 @@ If not, see <http://www.gnu.org/licenses/>.
 //-------------------------------------------------------------------------------------------------
 
 #include "stdafx.h"
+#ifdef _ORCOLL
+#include "OrinrinCollector.h"
+#else
 #include "OrinrinEditor.h"
-
+#endif
 #include "Entity.h"
 //------------------------------------------------------------------------------------------------------------------------
 

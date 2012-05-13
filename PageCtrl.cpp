@@ -1191,6 +1191,7 @@ HRESULT PageListNameSet( INT dPage, LPTSTR ptName )
 
 /*!
 	名前の付いている頁があるか
+	@param[in]	itFile	チェック対象ファイルのイテレータ
 	@return	INT	非０名前付きがあった　０なかった
 */
 INT PageListIsNamed( FILES_ITR itFile )
@@ -1221,7 +1222,7 @@ HRESULT PageListDuplicate( HWND hWnd, INT iNowPage )
 
 	TRACE( TEXT("頁複製") );
 
-	//iTotal = (*gitFileIt).vcCont.size(  );
+	//iTotal = DocNowFilePageCount(  );
 	//iNext = iNowPage + 1;	//	次の頁
 	//if( iTotal <= iNext ){	iNext =  -1;	}	//	全頁より多いなら末端指定
 
@@ -1256,7 +1257,7 @@ HRESULT PageListCombine( HWND hWnd, INT iNowPage )
 
 	TRACE( TEXT("頁統合") );
 
-	iTotal = (*gitFileIt).vcCont.size(  );
+	iTotal = DocNowFilePageCount(  );
 
 	//	頁数が足りないならナニもしない
 	if( 1 >= iTotal )	return E_ACCESSDENIED;

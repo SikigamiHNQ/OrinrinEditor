@@ -432,6 +432,8 @@ HRESULT ViewSqSelAdjust( INT dBaseLine )
 	INT	i, xDotBegin, xDotEnd, xDotLast;
 	//	もっと良いやり方ないか
 
+#pragma message ("ここで、選択範囲全体の処理が何度も行われているので重たい")
+
 	//	マウスクルックとかで、行単位で選択が変更された場合
 	//	上が開いてる・開いてる所の選択解除
 	if( dBaseLine < gstSqSelBegin.y )

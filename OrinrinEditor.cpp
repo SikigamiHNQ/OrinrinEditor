@@ -21,14 +21,18 @@ If not, see <http://www.gnu.org/licenses/>.
 
 
 
-//	TODO:	カーソル位置で、矩形上書き、強制矩形挿入が欲しい
-//	TODO:	頁挿入ダイヤログのチェックボックス覚えておくように
 //	TODO:	ページリストも、ばらしたとき閉じられるように
 
 //	TODO:	矩形選択範囲バイトカウントが遅い
 
 //非ユニコードの埋めパターン、半角空白気にしない用にする？＜ちゅっと変更してみた
 
+
+//	ファイルコア函数＜ファイルイテレータをグローバルで必要な函数を？
+
+//	トレス窓が、最大化してると隠れてしまう
+
+//	矩形モードにしたら、マウスカーソルの形変えられないか
 
 //考え中
 //	頁削除メッセージの確認無しは、起動中だけにしたほうがいい？
@@ -45,9 +49,10 @@ If not, see <http://www.gnu.org/licenses/>.
 //保存するときは、生データか、本体データを保存する
 //頁表示のステータスのほうは？バイト数計算だけならそんなに重くない？
 
+//頁番号挿入みたいに、複数頁にわたる処理がヤバイ
 
 
-//ビューワのアイコン変える。緑とか
+//	一行ラインテンプレートをレイヤボックスに貼り付け・中クルックとかで
 
 
 
@@ -178,6 +183,8 @@ If not, see <http://www.gnu.org/licenses/>.
 //	TODO:	文字ＡＡの入力とか、レイヤボックスの編集とかで、キーボードショートカット使えるように
 
 //	TODO:	MAAで、ファイルクルックしたら、自動で副タブ開く機能・選択式がよい・もしくは中クルックで対応
+//	TODO:	頁挿入ダイヤログのチェックボックス覚えておくように
+//	TODO:	カーソル位置で強制矩形挿入が欲しい＜上書きは意味が無いかも・・・
 
 /*
 
@@ -379,7 +386,7 @@ ASDファイル　　壱行が壱コンテンツ
 					アクセラキー編集機能を搭載
 					アンドゥリドゥをするときは選択範囲解除するようにした
 					已に開いているファイルを開こうとしたら、そのタブに移るようにした
-2012/05/08	0.30	MAA窓でENTER押したら、そのときトップに見えてるAAを左クリック動作するようにした
+2012/05/12	0.30	MAA窓でENTER押したら、そのときトップに見えてるAAを左クリック動作するようにした
 					文字列若しくは空白列でダブルクルックすると、その範囲を選択状態にする
 					選択範囲をドラッグ移動出来るようにした
 					プレビュー開いてたら、保存したときに再描画するようにした
@@ -389,6 +396,8 @@ ASDファイル　　壱行が壱コンテンツ
 					左右反転、上下反転機能を追加
 					レイヤボックスに、内容削除ボタンを追加
 					4096byte超えたら、ステータスバーのバイト表示位置が赤くなる。
+					頁挿入ダイヤログのチェックボックス覚えておくようにした
+					キャレットの位置に矩形貼付機能を追加
 
 更新日時注意
 
@@ -507,6 +516,16 @@ extern  UINT	gdGridYpos;		//	グリッド線のＹ間隔
 extern  UINT	gdRightRuler;	//	右線の位置
 //-------------------------------------------------------------------------------------------------
 
+#ifdef PLUGIN_ENABLE
+
+//[_16in] Add - 2012/05/01
+//-- プラグイン関係
+plugin::PLUGIN_FILE_LIST	gPluginList;
+#include "Plugin/PluginCtrlAsync.h"
+
+#endif
+
+
 //	ステータスバーの区切り
 #define SB_ITEMS	8
 CONST INT	gadStsBarSize[] = { 50, 200, 350, 500, 700, 800, 900, -1 };
@@ -583,7 +602,7 @@ INT APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 	ghMutex = CreateMutex( NULL , TRUE, TEXT("OrinrinEditor") );	//	すでに起動しているか判定
 	if( GetLastError() == ERROR_ALREADY_EXISTS )	//	すでに起動している
 	{
-		MessageBox( NULL, TEXT("すでに起動しているのです。あぅあぅ"), TEXT("多重起動は出来ないのです"), MB_OK|MB_ICONINFORMATION );
+		MessageBox( NULL, TEXT("已にアプリは起動してるよ！"), TEXT("お燐からのお知らせ"), MB_OK|MB_ICONINFORMATION );
 		ReleaseMutex( ghMutex );
 		CloseHandle( ghMutex );
 		return 0;
@@ -672,6 +691,30 @@ INT APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 	AccelKeyTableCreate( pstAccel, iEntry );
 	FREE( pstAccel );
 
+#ifdef PLUGIN_ENABLE
+	//---------------------------------------
+	//[_16in] Add - 2012/04/30
+	//	プラグイン初期化処理
+
+	// プラグインへ渡すパラメータの設定
+	// ウィンドウハンドル
+	plugin::PluginInputParam	param;
+	param.hMainWnd    = ghMainWnd;
+	param.hMlutAAWnd  = ghMaaWnd;
+	param.hFileTabWnd = ghFileTabWnd;
+	param.hViewWnd    = ghViewWnd;
+
+	// メニューハンドル
+	param.hMainMenu   = ghMenu;
+
+	// プラグインの初期化
+	plugin::InitializePlugin( param );
+	plugin::InitializePluginFileListAsync( ghMainWnd );
+
+	//---------------------------------------
+#endif
+
+
 	//	メインメッセージループ
 	for(;;)
 	{
@@ -704,6 +747,18 @@ INT APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 			DispatchMessage(&msg);
 		}
 	}
+
+#ifdef PLUGIN_ENABLE
+	//---------------------------------------------------------------------
+	//[_16in] Add - 2012/05/01
+	//
+	//-- プラグインの廃棄処理
+	plugin::FinalizePluginList( gPluginList );
+	plugin::FinalizePlugin();
+
+	//---------------------------------------------------------------------
+#endif
+
 
 	InitParamValue( INIT_SAVE, VL_CLASHCOVER, 0 );
 
@@ -843,7 +898,7 @@ BOOL InitInstance( HINSTANCE hInstance, INT nCmdShow, LPTSTR ptArgv )
 #ifndef FIND_STRINGS
 	DeleteMenu( hSubMenu, IDM_FIND_DLG_OPEN, MF_BYCOMMAND );
 	DeleteMenu( hSubMenu, IDM_FIND_HIGHLIGHT_OFF, MF_BYCOMMAND );
-	DeleteMenu( hSubMenu, 19, MF_BYPOSITION );	//	削除順番注意
+//	DeleteMenu( hSubMenu, 19, MF_BYPOSITION );	//	削除順番注意
 #endif
 
 //	hSubMenu = GetSubMenu( ghMenu , 2 );	//	挿入
@@ -2122,6 +2177,8 @@ INT InitParamValue( UINT dMode, UINT dStyle, INT nValue )
 		case  VL_MAA_MCLICK:	StringCchCopy( atKeyName, SUB_STRING, TEXT("MaaSubMethod") );	break;
 		case  VL_DRT_MCLICK:	StringCchCopy( atKeyName, SUB_STRING, TEXT("DraughtSubDef") );	break;
 		case  VL_WORKLOG:		StringCchCopy( atKeyName, SUB_STRING, TEXT("WorkLogDebug") );	break;
+		case  VL_PAGE_UNDER:	StringCchCopy( atKeyName, SUB_STRING, TEXT("PageNumUnder") );	break;
+		case  VL_PAGE_OVWRITE:	StringCchCopy( atKeyName, SUB_STRING, TEXT("PageNumOvWrite") );	break;
 		default:	return nValue;
 	}
 
@@ -3331,8 +3388,7 @@ HRESULT DockingTmplViewToggle( UINT bMode )
 }
 //-------------------------------------------------------------------------------------------------
 
-//	WORK_LOG_OUT
-//#ifdef _DEBUG
+#if defined(_DEBUG) || defined(WORK_LOG_OUT)
 VOID OutputDebugStringPlus( DWORD rixError, LPSTR pcFile, INT rdLine, LPSTR pcFunc, LPTSTR ptFormat, ... )
 {
 	va_list	argp;
@@ -3395,6 +3451,6 @@ VOID OutputDebugStringPlus( DWORD rixError, LPSTR pcFile, INT rdLine, LPSTR pcFu
 	}
 }
 //-------------------------------------------------------------------------------------------------
-//#endif
+#endif
 
 //	Dirty Deeds Done Dirt Cheap 自分のスタンドに「いとも容易く行われるえげつない行為」なんて名前を付けるのはどうかと思う。

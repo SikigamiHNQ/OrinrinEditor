@@ -197,7 +197,7 @@ HWND LineTmpleInitialise( HINSTANCE hInstance, HWND hParentWnd, LPRECT pstFrame 
 
 	SetWindowFont( ghLvItemWnd, ghAaFont, TRUE );
 
-	gpfOrigLineItemProc = SubclassWindow( ghLvItemWnd, gpfLineItemProc );
+	gpfOrigLineItemProc = SubclassWindow( ghLvItemWnd, gpfLineItemProc );	//	サブクラス
 
 	ZeroMemory( &stLvColm, sizeof(LVCOLUMN) );
 	stLvColm.mask     = LVCF_FMT | LVCF_WIDTH | LVCF_TEXT | LVCF_SUBITEM;
@@ -543,7 +543,7 @@ LRESULT Ltp_OnNotify( HWND hWnd, INT idFrom, LPNMHDR pstNmhdr )
 
 		hLvWnd = pstLv->hdr.hwndFrom;
 		nmCode = pstLv->hdr.code;
-
+#pragma message ("ラインテンプレ・クルックまってるやり方だと遅い・サブクラスでWM_LBUTTONDOWNを処理する？")
 		//	普通のクルックについて
 		if( NM_CLICK == nmCode )
 		{

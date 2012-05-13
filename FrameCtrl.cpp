@@ -102,9 +102,8 @@ CONST  TCHAR	*gatDefaultName[20] = {
 
 
 extern FILES_ITR	gitFileIt;	//!<	今見てるファイルの本体
-//#define gstFile	(*gitFileIt)	//!<	イテレータを構造体と見なす
-
 extern INT		gixFocusPage;	//!<	注目中のページ・とりあえず０・０インデックス
+
 
 extern  HWND	ghViewWnd;		//!<	ビューウインドウハンドル
 
@@ -1658,7 +1657,7 @@ HRESULT DocFrameInsert( INT dMode, INT dStyle )
 
 	FrameDataGet( dMode, &stInfo );
 
-	iLines = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.size( );	//	ページ全体の行数
+	iLines = DocNowFilePageLineCount( );	//	ページ全体の行数
 
 	//	開始地点から開始	//	D_SQUARE
 	iTop = (*gitFileIt).vcCont.at( gixFocusPage ).dSelLineTop;
@@ -1826,7 +1825,7 @@ HRESULT DocFrameInsert( INT dMode, INT dStyle )
 	DocBadSpaceCheck( iTop );	//	バッド空白チェキ
 
 	//	改行してるから、これ以降全部再描画必要
-	iLns = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.size( );	//	現在行数再認識
+	iLns = DocNowFilePageLineCount( );	//	現在行数再認識
 	for( i = iTop; iLns > i; i++ )
 	{
 		DocBadSpaceCheck( i );	//	バッド空白チェキ

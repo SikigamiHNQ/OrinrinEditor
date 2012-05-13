@@ -27,10 +27,7 @@ If not, see <http://www.gnu.org/licenses/>.
 
 
 extern list<ONEFILE>	gltMultiFiles;	//!<	複数ファイル保持
-
 extern FILES_ITR	gitFileIt;		//!<	今見てるファイルの本体
-//#define gstFile	(*gitFileIt)	//!<	イテレータを構造体と見なす
-
 extern INT		gixFocusPage;		//!<	注目中のページ・とりあえず０・０インデックス
 
 extern  UINT	gbAutoBUmsg;		//	自動バックアップメッセージ出すか？
@@ -362,7 +359,7 @@ HRESULT DocFileSave( HWND hWnd, UINT bStyle )
 
 	//	保存時は常に選択しているファイルを保存
 
-	iPages = (*gitFileIt).vcCont.size( );	//	総頁数
+	iPages = DocNowFilePageCount( );	//	総頁数
 	if( 1 >= iPages )	isMLT = FALSE;
 	else				isMLT = TRUE;
 
@@ -715,8 +712,7 @@ HRESULT DocImageSave( HWND hWnd, UINT bStyle, HFONT hFont )
 		case  2:	bType = ISAVE_PNG;	break;
 	}
 
-	//	頁情報確保
-	dLines = DocPageParamGet( NULL, NULL );
+	dLines = DocPageParamGet( NULL, NULL );	//	要るのは行数
 	iDotX  = DocPageMaxDotGet( -1, -1 );
 	iDotY  = dLines * LINE_HEIGHT;
 	//	ちゅっと余裕いれとく

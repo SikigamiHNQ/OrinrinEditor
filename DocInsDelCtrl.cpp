@@ -154,7 +154,7 @@ HRESULT DocInputReturn( INT nowDot, INT rdLine )
 	try{
 #endif
 
-	iLines = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.size( );
+	iLines = DocNowFilePageLineCount( );
 
 	if( iLines <= rdLine )	return E_OUTOFMEMORY;
 
@@ -245,7 +245,7 @@ INT DocInputBkSpace( PINT pdDot, PINT pdLine )
 	LINE_ITR	itLine;
 
 
-	iLines = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.size( );
+	iLines = DocNowFilePageLineCount( );
 
 	if( iLines <=  dLine )	return 0;	//	はみ出してたらアウツ！
 
@@ -256,6 +256,8 @@ INT DocInputBkSpace( PINT pdDot, PINT pdLine )
 //	TRACE( TEXT("後空白[D%d C%d]"), neDot, iLetter );
 
 	if( 0 == iLetter && 0 == dLine )	return 0;	//	先頭かつ最初の行なら、なにもしない
+
+	//	バックスペースとは、壱文字戻ってDELETEである
 
 	if( 0 != iLetter )	//	行の先頭でないなら
 	{
@@ -283,6 +285,7 @@ INT DocInputBkSpace( PINT pdDot, PINT pdLine )
 	}
 
 	DocLetterErase( *pdDot, dLine, iLetter );
+	DocBadSpaceCheck( dLine );	//	良くないスペースを調べておく
 
 	return bCrLf;
 }
@@ -303,7 +306,7 @@ INT DocInputDelete( INT xDot, INT yLine )
 
 	LINE_ITR	itLine;
 
-	iLines = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.size( );
+	iLines = DocNowFilePageLineCount( );
 	if( iLines <= yLine )	return 0;	//	はみ出してたらアウツ！
 
 	//	今の文字位置を確認・現在行なのでずれてはないはず
@@ -328,6 +331,8 @@ INT DocInputDelete( INT xDot, INT yLine )
 
 	iCrLf = DocLetterErase( xDot, yLine, iLetter );
 	if( 0 > iCrLf ){	return -1;	}
+
+	DocBadSpaceCheck( yLine );	//	良くないスペースを調べておく
 
 	if( 0 < iCrLf )
 	{
@@ -428,7 +433,8 @@ BOOLEAN DocLineErase( INT yLine, BOOLEAN bFirst )
 	itLine->vcLine.clear();
 
 	DocLineParamGet( yLine, NULL, NULL );	//	再計算
-	DocPageParamGet( NULL, NULL );	//	再計算
+//	DocPageParamGet( NULL, NULL );	//	再計算
+	DocPageByteCount( gitFileIt, gixFocusPage, NULL, NULL );	//	再計算
 	DocBadSpaceCheck( yLine );	//	リセットに必要
 	ViewRedrawSetLine( yLine );	//	要らないかも
 
@@ -461,7 +467,8 @@ INT DocIterateDelete( LETR_ITR itLtr, INT dBsLine )
 
 	(*gitFileIt).vcCont.at( gixFocusPage ).dByteSz -= bySz;
 
-	DocBadSpaceCheck( dBsLine );	//	ついでに良くないスペースを調べておく
+//	DocBadSpaceCheck( dBsLine );	//	ついでに良くないスペースを調べておく
+	//	ここで調べると重そうなので、もっと上のほうで纏めてチェキるほうがよい
 
 	return width;
 }
@@ -554,7 +561,7 @@ INT DocInputLetter( INT nowDot, INT rdLine, TCHAR ch )
 		return 0;
 	}
 
-	iLines = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.size( );
+	iLines = DocNowFilePageLineCount( );
 
 	if( iLines <= rdLine )
 	{
@@ -633,6 +640,8 @@ INT DocStringErase( INT xDot, INT yLine, LPTSTR ptDummy, INT cchSize )
 		if( 0 >  iCrLf )	break;	//	異常発生
 		if( iCrLf ){	i++;	rdCnt++;	}
 	}
+
+	DocBadSpaceCheck( yLine );	//	良くないスペースを調べておく
 
 	return rdCnt;
 }
@@ -779,7 +788,7 @@ INT DocAdditionalLine( INT addLine, BOOLEAN bFirst )
 	INT			dBaseDot, dBaseLine;
 	LPTSTR		ptBuffer = NULL;
 
-	iLines = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.size( );
+	iLines = DocNowFilePageLineCount( );
 	//	この頁の行数
 
 	//	追加するのは最終行の末端
@@ -824,7 +833,7 @@ INT DocSquareAddPreMod( INT xDot, INT yLine, INT dNeedLine, BOOLEAN bFirst )
 
 
 	//	この頁の行数
-	iLines = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.size( );
+	iLines = DocNowFilePageLineCount( );
 
 	//	全体行数より、追加行数が多かったら、改行増やす
 	if( iLines < (dNeedLine + yLine) )
@@ -834,7 +843,7 @@ INT DocSquareAddPreMod( INT xDot, INT yLine, INT dNeedLine, BOOLEAN bFirst )
 		DocAdditionalLine( iMinus, bFirst );	bFirst = FALSE;
 
 		//	この頁の行数取り直し
-		iLines = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.size( );
+		iLines = DocNowFilePageLineCount( );
 	}
 
 	//	各行のドット数を確認して、足りないところをパディングする
@@ -920,7 +929,7 @@ INT DocInsertString( PINT pNowDot, PINT pdLine, PINT pdMozi, LPTSTR ptText, UINT
 		SqnAppendString( &((*gitFileIt).vcCont.at( gixFocusPage ).stUndoLog), DO_INSERT, ptText, dBaseDot, dBaseLine, bFirst );
 		bFirst = FALSE;
 
-		dLastLine = DocPageParamGet( NULL, NULL );
+		dLastLine = DocPageParamGet( NULL, NULL );//再計算必要か？
 	}
 
 	if( dCrLf )
@@ -947,9 +956,10 @@ INT DocInsertString( PINT pNowDot, PINT pdLine, PINT pdMozi, LPTSTR ptText, UINT
 	@param[in,out]	pNowDot	今のキャレットのドット位置
 	@param[in,out]	pdLine	対象の行番号・絶対０インデックスか
 	@param[in,out]	pdMozi	今のキャレットの文字数
+	@param[in]		bSqMode	非０強制矩形貼付・内容増やすならFlagに注意
 	@return		０壱行ですんだ　非０複数行に渡った
 */
-INT DocInputFromClipboard( PINT pNowDot, PINT pdLine, PINT pdMozi )
+INT DocInputFromClipboard( PINT pNowDot, PINT pdLine, PINT pdMozi, UINT bSqMode )
 {
 	LPTSTR	ptString = NULL;
 	UINT	cchSize, dStyle = 0, i, j;
@@ -962,7 +972,7 @@ INT DocInputFromClipboard( PINT pNowDot, PINT pdLine, PINT pdMozi )
 	ptString = DocClipboardDataGet( &dStyle );
 	if( !(ptString) )
 	{
-		NotifyBalloonExist( TEXT("有効なデータがないのです。あぅあぅ"), TEXT("貼付られないのです"), NIIF_INFO );
+		NotifyBalloonExist( TEXT("テキストじゃないみたい。\t\n貼り付けられないよ。"), TEXT("お燐からのお知らせ"), NIIF_INFO );
 		return 0;
 	}
 
@@ -986,17 +996,18 @@ INT DocInputFromClipboard( PINT pNowDot, PINT pdLine, PINT pdMozi )
 	bSelect = IsSelecting( &dSqSel );	//	選択状態であるか
 	if( bSelect )
 	{
-		iLines = DocPageParamGet( NULL, NULL );
 		DocSelRangeGet( &dTop, &dBtm );
 		dCrLf = DocSelectedDelete( pNowDot, pdLine, dSqSel, TRUE );
 		if( dCrLf  )	//	処理した行以降全取っ替え
 		{
+			iLines = DocPageParamGet( NULL, NULL );
 			for( i = *pdLine; iLines > i; i++ ){	ViewRedrawSetLine(  i );	}
 		}
 		else{	ViewRedrawSetLine( *pdLine );	}
 
 	}
 
+	if( bSqMode )	dStyle |= D_SQUARE;	//	矩形挿入として扱うか
 	dCrLf = DocInsertString( pNowDot, pdLine, pdMozi, ptString, dStyle, TRUE );
 
 	FREE( ptString );
@@ -1235,7 +1246,7 @@ HRESULT DocScreenFill( LPTSTR ptFill )
 	wstring		wsBuffer;
 
 	//	現在行数と、右ドット数・ルーラ位置を使う
-	dLines = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.size( );
+	dLines = DocNowFilePageLineCount( );
 	dRiDot = gdRightRuler;
 
 	//	選択範囲あるならそっち優先。ないなら画面全体
@@ -1278,7 +1289,7 @@ HRESULT DocScreenFill( LPTSTR ptFill )
 		if( 0 < remain )	//	足りないなら
 		{
 			DocAdditionalLine( remain, bFirst );	//	とりあえず改行して
-			dLines = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.size( );
+			dLines = DocNowFilePageLineCount( );
 			iUnt  = (dRiDot / mDot) + 1;	//	埋める分・はみ出し・適当で良い
 
 			//	入れる文字列作成
@@ -1333,8 +1344,8 @@ INT_PTR CALLBACK PageNumDlgProc( HWND hDlg, UINT message, WPARAM wParam, LPARAM 
 			pstInfo = (LPPAGENUMINFO)lParam;
 			SetDlgItemInt(  hDlg, IDE_PN_START, pstInfo->dStartNum, FALSE );
 			SetDlgItemText( hDlg, IDE_PN_STYLE, pstInfo->atStyle );
-		//	CheckDlgButton( hDlg, IDCB_PN_UNDER, pstInfo->bInUnder ? BST_CHECKED : BST_UNCHECKED );
-			//	上書きは通常ＯＦＦでよろし
+			CheckDlgButton( hDlg, IDCB_PN_UNDER,    pstInfo->bInUnder );
+			CheckDlgButton( hDlg, IDCB_PN_OVERRIDE, pstInfo->bOverride );
 			return (INT_PTR)TRUE;
 
 		case WM_COMMAND:
@@ -1381,10 +1392,13 @@ HRESULT DocPageNumInsert( HINSTANCE hInst, HWND hWnd )
 	//	今の頁を待避
 	dNowPageBuffer = gixFocusPage;
 
-	maxPage = DocPageCount(  );
+	maxPage = DocNowFilePageCount(  );
 
 	ZeroMemory( &stInfo, sizeof(PAGENUMINFO) );
 	stInfo.dStartNum = 1;
+
+	stInfo.bInUnder  = InitParamValue( INIT_LOAD, VL_PAGE_UNDER,   BST_UNCHECKED );
+	stInfo.bOverride = InitParamValue( INIT_LOAD, VL_PAGE_OVWRITE, BST_UNCHECKED );
 
 	StringCchCopy( stInfo.atStyle, MAX_PATH, TEXT("%u") );	//	初期値
 	InitParamString( INIT_LOAD, VS_PAGE_FORMAT, stInfo.atStyle );
@@ -1396,12 +1410,15 @@ HRESULT DocPageNumInsert( HINSTANCE hInst, HWND hWnd )
 
 		InitParamString( INIT_SAVE, VS_PAGE_FORMAT, stInfo.atStyle );
 
+		InitParamValue( INIT_SAVE, VL_PAGE_UNDER,   stInfo.bInUnder );
+		InitParamValue( INIT_SAVE, VL_PAGE_OVWRITE, stInfo.bOverride );
+
 		for( iNow = 0; maxPage > iNow; iNow++, ixNumber++ )
 		{
 			StringCchPrintf( atText, MAX_PATH, stInfo.atStyle, ixNumber );
 
 			gixFocusPage = iNow;	//	内部操作
-
+#pragma message("ディレイロードしたら、頁番号挿入がおかしくなるはず")
 			if( stInfo.bInUnder )
 			{
 				if( stInfo.bOverride )

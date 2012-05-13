@@ -21,10 +21,8 @@ If not, see <http://www.gnu.org/licenses/>.
 #include "OrinrinEditor.h"
 //-------------------------------------------------------------------------------------------------
 
-extern list<ONEFILE>	gltMultiFiles;	//	複数ファイル保持
-
+//extern list<ONEFILE>	gltMultiFiles;	//	複数ファイル保持
 extern FILES_ITR	gitFileIt;		//	今見てるファイルの本体
-
 extern INT			gixFocusPage;	//	注目中のページ・とりあえず０・０インデックス
 
 extern  UINT		gbCrLfCode;		//	改行コード：０したらば・非０ＹＹ 
@@ -34,16 +32,16 @@ extern  UINT		gbCrLfCode;		//	改行コード：０したらば・非０ＹＹ
 
 /*!
 	統計情報
-	@param[in]	iPage	チェックしたい頁番号
 	@param[in]	itFile	ファイルイテレータ
+	@param[in]	iPage	チェックしたい頁番号
 	@return		HRESULT	終了状態コード
 */
-HRESULT DocStatisticsPage( INT iPage, FILES_ITR itFile )
+HRESULT DocStatisticsPage( FILES_ITR itFile, INT iPage )
 {
 
 	//	使用文字一覧とか・SQLで文字データベース作ればいい
 
-
+	//	プラグインに任せる？
 
 	return S_OK;
 }
@@ -51,20 +49,21 @@ HRESULT DocStatisticsPage( INT iPage, FILES_ITR itFile )
 
 /*!
 	文字存在の範囲外エラーが発生していないか
+	@param[in]	itFile	チェックしたいファイルのイテレータ
 	@param[in]	iPage	チェックしたい頁番号
 	@param[in]	iLine	チェックしたい行番号
 	@return	BOOLEAN		非０範囲外エラー　０問題無し
 */
-BOOLEAN DocRangeIsError( INT iPage, INT iLine )
+BOOLEAN DocRangeIsError( FILES_ITR itFile, INT iPage, INT iLine )
 {
 	INT_PTR	iSize;
 
 	if( 0 > iPage || 0 > iLine )	return TRUE;
 
-	iSize = (*gitFileIt).vcCont.size( );
+	iSize = itFile->vcCont.size( );
 	if( 0 >= iSize || iPage >= iSize )	return TRUE;
 
-	iSize = (*gitFileIt).vcCont.at( iPage ).ltPage.size( );
+	iSize = itFile->vcCont.at( iPage ).ltPage.size( );
 	if( 0 >= iSize || iLine >= iSize )	return TRUE;
 
 	return FALSE;
@@ -72,7 +71,7 @@ BOOLEAN DocRangeIsError( INT iPage, INT iLine )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	空白警告ありや
+	空白警告ありや・ファイルコア函数
 	@param[in]	rdLine	対象の行番号・絶対０インデックスか
 	@return	BOOLEAN		非０警告あり　０無し
 */
@@ -81,7 +80,7 @@ BOOLEAN DocBadSpaceIsExist( INT rdLine )
 	LINE_ITR	itLine;
 
 	//	状態確認
-	if( DocRangeIsError( gixFocusPage, rdLine ) ){	return 0;	}
+	if( DocRangeIsError( gitFileIt, gixFocusPage, rdLine ) ){	return 0;	}
 	//	ここの範囲外発生は必然なので特に警告は不要
 
 	itLine = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.begin();
@@ -92,7 +91,7 @@ BOOLEAN DocBadSpaceIsExist( INT rdLine )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	連続する半角スペース、先頭半角空白が有るかどうかチェキ
+	連続する半角スペース、先頭半角空白が有るかどうかチェキ・ファイルコア函数？
 	@param[in]	rdLine	対象の行番号・絶対０インデックスか
 	@return	UINT		非０警告あり　０無し
 */
@@ -108,7 +107,7 @@ UINT DocBadSpaceCheck( INT rdLine )
 //末端空白はDocLineDataGetAllocでも見てる
 
 	//	状態確認
-	if( DocRangeIsError( gixFocusPage, rdLine ) )
+	if( DocRangeIsError( gitFileIt, gixFocusPage, rdLine ) )
 	{
 		TRACE( TEXT("範囲外エラー発生 PAGE[%d], LINE[%d]"), gixFocusPage, rdLine );
 		return 0;
@@ -202,19 +201,29 @@ UINT DocBadSpaceCheck( INT rdLine )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	現在のファイルの頁数を返す
+	現在のファイルの頁数を返す・ファイルコア函数
 	@return	INT_PTR	頁数
 */
-INT_PTR DocPageCount( VOID )
+UINT_PTR DocNowFilePageCount( VOID )
 {
 	return (*gitFileIt).vcCont.size( );
 }
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	現在のページの総行数と文字数とバイト数を返す・ついでにバイト情報とか更新
-	@param[in]	pdMozi	文字数入れるバッファへのポインタ・NULLでも可
-	@param[in]	pdByte	バイト数入れるバッファへのポインタ・NULLでも可
+	現在のファイルの頁の行数を返す・ファイルコア函数
+	@return	INT_PTR	行数
+*/
+UINT_PTR DocNowFilePageLineCount( VOID )
+{
+	return (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.size( );
+}
+//-------------------------------------------------------------------------------------------------
+
+/*!
+	現在のページの総行数と文字数とバイト数を返す・ついでにバイト情報とか更新・ファイルコア函数
+	@param[out]	pdMozi	文字数入れるバッファへのポインタ・NULLでも可
+	@param[out]	pdByte	バイト数入れるバッファへのポインタ・NULLでも可
 	@return	UINT	行数
 */
 UINT DocPageParamGet( PINT pdMozi, PINT pdByte )
@@ -224,7 +233,11 @@ UINT DocPageParamGet( PINT pdMozi, PINT pdByte )
 
 	LINE_ITR	itLine;
 
-	iLines = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.size( );
+#ifdef PAGE_DELAY_LOAD
+#error もし頁展開前に呼ばれてたら・しかしこの函数はファイル読込時も呼ばれる
+#endif
+
+	iLines = DocNowFilePageLineCount( );
 
 	itLine = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.begin();
 	for( i = 0; iLines > i; i++, itLine++ )
@@ -245,6 +258,8 @@ UINT DocPageParamGet( PINT pdMozi, PINT pdByte )
 
 	(*gitFileIt).vcCont.at( gixFocusPage ).dByteSz = dBytes;
 
+
+
 	DocPageInfoRenew( -1, 1 );
 
 	return iLines;
@@ -252,43 +267,67 @@ UINT DocPageParamGet( PINT pdMozi, PINT pdByte )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	該当ページのバイト数と文字数をカウントし直す
+	指定ファイルの指定頁のバイト数と文字数をカウント
+	@param[in]	itFile	対象ファイルのイテレータ
 	@param[in]	dPage	頁指定・負数なら現在の頁
-	@param[out]	pMozi	文字数を入れる・NULL可
+	@param[out]	pMozi	文字数を入れるバッファへのポインタ・NULL可
+	@param[out]	pByte	バイト数入れるバッファへのポインタ・NULL可
+	@return	UINT	行数
 */
-INT DocPageByteCount( INT dPage, PINT pMozi )
+UINT DocPageByteCount( FILES_ITR itFile, INT dPage, PINT pMozi, PINT pByte )
 {
-	INT		iBytes, iMozis;
+	INT		iBytes, iMozis, i, iLnBy;
+	UINT	dLines;
 	LINE_ITR	itLine, endLine;
 	LETR_ITR	itMozi, endMozi;
 
+
 	if( 0 > dPage ){	dPage = gixFocusPage;	}
 
-//#error 行数とかの情報もまとめてリニューしたほうがいい
+#ifdef PAGE_DELAY_LOAD
+#error もし頁展開前に呼ばれてたら
+#endif
 
 	iBytes = 0;
 	iMozis = 0;
 
-	itLine  = (*gitFileIt).vcCont.at( dPage ).ltPage.begin();
-	endLine = (*gitFileIt).vcCont.at( dPage ).ltPage.end();
+	dLines = DocNowFilePageLineCount( );
 
-	for( ; itLine != endLine; itLine++ )
+
+	itLine  = itFile->vcCont.at( dPage ).ltPage.begin();
+	endLine = itFile->vcCont.at( dPage ).ltPage.end();
+	//	各行ごとにみていく
+	for( i = 0; itLine != endLine; itLine++, i++ )
 	{
+		//	行の最初と最後
 		itMozi  = itLine->vcLine.begin();
 		endMozi = itLine->vcLine.end();
 
+		//	この行の文字数とバイト数
+		iLnBy = 0;
 		for( ; itMozi != endMozi; itMozi++ )
 		{
-			iBytes += itMozi->mzByte;
+			iLnBy  += itMozi->mzByte;
 			iMozis++;
+		}
+		itLine->iByteSz = iLnBy;
+
+		//	全体のバイト数
+		iBytes += iLnBy;
+		//	改行のバイト数・2ch、YY＝6byte・したらば＝4byte
+		if( 1 <= i )	//	弐行目から改行分追加
+		{
+			if( gbCrLfCode )	iBytes += YY2_CRLF;
+			else				iBytes += STRB_CRLF;
 		}
 	}
 
-	(*gitFileIt).vcCont.at( dPage ).dByteSz = iBytes;
+	itFile->vcCont.at( dPage ).dByteSz = iBytes;
 
 	if( pMozi ){	*pMozi = iMozis;	}
+	if( pByte ){	*pByte = iBytes;	}
 
-	return iBytes;
+	return dLines;
 }
 //-------------------------------------------------------------------------------------------------
 
@@ -306,7 +345,7 @@ INT DocPageMaxDotGet( INT dTop, INT dBottom )
 
 	LINE_ITR	itLine;
 
-	iLines = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.size( );
+	iLines = DocNowFilePageLineCount( );
 
 	if( 0 > dTop )		dTop = 0;
 	if( 0 > dBottom )	dBottom = iLines - 1;
@@ -342,7 +381,7 @@ INT DocLineParamGet( INT rdLine, PINT pdMozi, PINT pdByte )
 
 	LINE_ITR	itLine;
 
-	iLines = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.size( );
+	iLines = DocNowFilePageLineCount( );
 	if( iLines <= rdLine )	return -1;
 
 	itLine = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.begin();
@@ -398,7 +437,7 @@ INT DocLetterPosGetAdjust( PINT pNowDot, INT rdLine, INT round )
 #endif
 
 	//	もし範囲外なら、範囲内にいれておく
-	iMaxLine = DocPageParamGet( NULL, NULL );
+	iMaxLine = DocPageParamGet( NULL, NULL );	//	行数のみ？
 	if( iMaxLine <= rdLine )	rdLine = iMaxLine - 1;
 
 
@@ -459,7 +498,7 @@ INT DocLetterPosGetAdjust( PINT pNowDot, INT rdLine, INT round )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	現在位置から１文字前後したときの位置を調べる
+	現在位置から１文字前後したときの位置を調べる・ファイルコア函数
 	@param[in]	nowDot		今のキャレットのドット位置
 	@param[in]	rdLine		対象の行番号・絶対０インデックスか
 	@param[in]	bDirect		移動方向　(-)先頭へ　(+)末尾へ
@@ -474,7 +513,7 @@ INT DocLetterShiftPos( INT nowDot, INT rdLine, INT bDirect, PINT pdAbsDot, PBOOL
 
 	LINE_ITR	itLine;
 
-	iLines = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.size( );
+	iLines = DocNowFilePageLineCount( );
 	if( iLines <=  rdLine ){	return -1;	}
 
 	if( 0 == bDirect )

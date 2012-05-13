@@ -235,7 +235,7 @@ BEGIN
         BEGIN
             VALUE "Comments", "Japanese Only, Perfectly No Warranty"
             VALUE "CompanyName", "I love 2ch, Yaruo and TohoProject"
-            VALUE "LegalCopyright", "Copyright (C) 2011 - 2012 SikigamiHNQ"
+            VALUE "LegalCopyright", "Copyright (C) 2011 - 2012 Orinrin/SikigamiHNQ"
             VALUE "LegalTrademarks", "License : GPLv3"
             VALUE "PrivateBuild", "Build by Visual C++ 2008 Express"
             VALUE "SpecialBuild", "Not Speciality"

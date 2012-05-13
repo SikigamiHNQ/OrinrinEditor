@@ -21,16 +21,6 @@ If not, see <http://www.gnu.org/licenses/>.
 #include "OrinrinEditor.h"
 //-------------------------------------------------------------------------------------------------
 
-extern FILES_ITR	gitFileIt;	//!<	今見てるファイルの本体
-//#define gstFile	(*gitFileIt)	//!<	イテレータを構造体と見なす
-
-extern INT		gixFocusPage;	//!<	注目中のページ・とりあえず０・０インデックス
-
-extern  UINT	gbUniPad;		//!<	パディングにユニコードをつかって、ドットを見せないようにする
-
-static INT		gdDiffLock;		//!<	ずれ調整の基準ドット値
-//-------------------------------------------------------------------------------------------------
-
 /*
 １ドットずらし
 目標の幅を１１で割って、余りゲット
@@ -61,6 +51,15 @@ static INT		gdDiffLock;		//!<	ずれ調整の基準ドット値
 ・ユニコード
 */
 
+//-------------------------------------------------------------------------------------------------
+
+
+extern FILES_ITR	gitFileIt;	//!<	今見てるファイルの本体
+extern INT		gixFocusPage;	//!<	注目中のページ・とりあえず０・０インデックス
+
+extern  UINT	gbUniPad;		//!<	パディングにユニコードをつかって、ドットを見せないようにする
+
+static INT		gdDiffLock;		//!<	ずれ調整の基準ドット値
 //-------------------------------------------------------------------------------------------------
 
 //	右揃え用空白パヤーン
@@ -662,7 +661,7 @@ HRESULT DocRightGuideSet( INT dTop, INT dBottom )
 	wstring		wsBuffer;
 
 	//	範囲確認
-	iLines = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.size( );
+	iLines = DocNowFilePageLineCount( );
 	if( 0 > dTop )		dTop = 0;
 	if( 0 > dBottom )	dBottom = iLines - 1;
 
@@ -944,7 +943,7 @@ HRESULT DocTopLetterInsert( TCHAR ch, PINT pXdot, INT dLine )
 	TRACE( TEXT("行頭空白を追加") );
 	
 	//	範囲確認
-	iLines = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.size( );
+	iLines  = DocNowFilePageLineCount( );
 	iTop    = (*gitFileIt).vcCont.at( gixFocusPage ).dSelLineTop;
 	iBottom = (*gitFileIt).vcCont.at( gixFocusPage ).dSelLineBottom;
 	if( 0 <= iTop &&  0 <= iBottom )	bSeled = TRUE;
@@ -1001,7 +1000,7 @@ HRESULT DocTopSpaceErase( PINT pXdot, INT dLine )
 	LINE_ITR	itLine;
 
 	//	範囲確認
-	iLines = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.size( );
+	iLines  = DocNowFilePageLineCount( );
 	iTop    = (*gitFileIt).vcCont.at( gixFocusPage ).dSelLineTop;
 	iBottom = (*gitFileIt).vcCont.at( gixFocusPage ).dSelLineBottom;
 	if( 0 <= iTop &&  0 <= iBottom )	bSeled = TRUE;
@@ -1073,7 +1072,7 @@ HRESULT DocLastLetterErase( PINT pXdot, INT dLine )
 	LINE_ITR	itLine;
 
 	//	範囲確認
-	iLines = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.size( );
+	iLines  = DocNowFilePageLineCount( );
 	iTop    = (*gitFileIt).vcCont.at( gixFocusPage ).dSelLineTop;
 	iBottom = (*gitFileIt).vcCont.at( gixFocusPage ).dSelLineBottom;
 	if( 0 <= iTop &&  0 <= iBottom )	bSeled = TRUE;
@@ -1112,7 +1111,9 @@ HRESULT DocLastLetterErase( PINT pXdot, INT dLine )
 				rect.left  = xDot;
 				rect.right = xDot + 40;	//	壱文字＋改行・適当でよろし
 
-				ViewRedrawSetRect( &rect );
+				ViewRedrawSetRect( &rect );	//	末端だけ書き換えればいい？
+
+				DocBadSpaceCheck( i );	//	良くないスペースを調べておく
 			}
 		}
 
@@ -1121,8 +1122,6 @@ HRESULT DocLastLetterErase( PINT pXdot, INT dLine )
 			DocRangeSelStateToggle( -1, -1, i , 1 );	//	該当行全体を選択状態にする
 			DocReturnSelStateToggle( i, 1 );	//	改行も選択で
 		}
-
-//		ViewRedrawSetLine( i );
 	}
 
 	//	キャレット位置適当に調整
@@ -1154,11 +1153,11 @@ HRESULT DocLastSpaceErase( PINT pXdot, INT dLine )
 
 	TRACE( TEXT("行末空白削除") );
 
+	//	範囲確認
+	iLines = DocNowFilePageLineCount( );
 	iTop    = (*gitFileIt).vcCont.at( gixFocusPage ).dSelLineTop;
 	iBottom = (*gitFileIt).vcCont.at( gixFocusPage ).dSelLineBottom;
 
-	//	範囲確認
-	iLines = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.size( );
 	if( 0 > iTop )		iTop = 0;
 	if( 0 > iBottom )	iBottom = iLines - 1;
 
@@ -1263,6 +1262,7 @@ LPTSTR DocLastSpDel( vector<LETTER> *vcTgLine )
 UINT DocRangeDeleteByMozi( INT xDot, INT yLine, INT dBgnMozi, INT dEndMozi, PBOOLEAN pFirst )
 {
 	UINT_PTR	cchSize;
+	INT			iBytes;
 	LPTSTR		ptBuffer;
 	LETR_ITR	vcLtrBgn, vcLtrEnd, vcItr;
 	wstring		wsDelBuf;
@@ -1278,10 +1278,17 @@ UINT DocRangeDeleteByMozi( INT xDot, INT yLine, INT dBgnMozi, INT dEndMozi, PBOO
 	vcLtrEnd += dEndMozi;	//	そのエリアの終端も確認
 
 	wsDelBuf.clear();
-	for( vcItr = vcLtrBgn; vcLtrEnd != vcItr; vcItr++ ){	wsDelBuf +=  vcItr->cchMozi;	}
+	iBytes = 0;
+	for( vcItr = vcLtrBgn; vcLtrEnd != vcItr; vcItr++ )
+	{
+		wsDelBuf += vcItr->cchMozi;
+		iBytes   += vcItr->mzByte;
+	}
 
 	//	該当部分を削除
 	itLine->vcLine.erase( vcLtrBgn, vcLtrEnd );
+	itLine->iByteSz -= iBytes;
+	//	アンドゥバッファ作成
 	cchSize = wsDelBuf.size( ) + 1;
 	ptBuffer = (LPTSTR)malloc( cchSize * sizeof(TCHAR) );
 	StringCchCopy( ptBuffer, cchSize, wsDelBuf.c_str( ) );
@@ -1314,11 +1321,11 @@ HRESULT DocRightSlide( PINT pXdot, INT dLine )
 	//	右寄せ限界確認
 	dSliDot = InitParamValue( INIT_LOAD, VL_RIGHT_SLIDE, 790 );
 
+	//	範囲確認
+	iLines = DocNowFilePageLineCount( );
 	iTop    = (*gitFileIt).vcCont.at( gixFocusPage ).dSelLineTop;
 	iBottom = (*gitFileIt).vcCont.at( gixFocusPage ).dSelLineBottom;
 
-	//	範囲確認
-	iLines = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.size( );
 	if( 0 > iTop )		iTop = 0;
 	if( 0 > iBottom )	iBottom = iLines - 1;
 
@@ -1438,8 +1445,8 @@ HRESULT DocPositionShift( UINT vk, PINT pXdot, INT dLine )
 	else if( VK_LEFT == vk )	bRight = FALSE;
 	else	return E_INVALIDARG;
 
-	iLines  = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.size( );
 	//	範囲確認
+	iLines  = DocNowFilePageLineCount( );
 	iTop    = (*gitFileIt).vcCont.at( gixFocusPage ).dSelLineTop;
 	iBottom = (*gitFileIt).vcCont.at( gixFocusPage ).dSelLineBottom;
 	if( 0 <= iTop &&  0 <= iBottom )	bSeled = TRUE;
@@ -1538,6 +1545,7 @@ HRESULT DocPositionShift( UINT vk, PINT pXdot, INT dLine )
 	DocLetterPosGetAdjust( &iDot, dLine, 0 );
 	ViewDrawCaret( iDot, dLine, 1 );
 
+	DocPageByteCount( gitFileIt, gixFocusPage, NULL, NULL );
 	DocPageInfoRenew( -1, 1 );
 
 	return S_OK;
@@ -1545,7 +1553,7 @@ HRESULT DocPositionShift( UINT vk, PINT pXdot, INT dLine )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	行頭半角空白をユニコードに変換
+	行頭半角空白をユニコードに変換・ファイルコア函数
 */
 HRESULT DocHeadHalfSpaceExchange( HWND hWnd )
 {
@@ -1558,9 +1566,9 @@ HRESULT DocHeadHalfSpaceExchange( HWND hWnd )
 	LETR_ITR	vcLtrItr;
 	LINE_ITR	itLine;
 
-	iLines  = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.size( );
 
 	//	範囲確認
+	iLines  = DocNowFilePageLineCount( );
 	iTop    = (*gitFileIt).vcCont.at( gixFocusPage ).dSelLineTop;
 	iBottom = (*gitFileIt).vcCont.at( gixFocusPage ).dSelLineBottom;
 	if( 0 <= iTop &&  0 <= iBottom )	bSeled = TRUE;
