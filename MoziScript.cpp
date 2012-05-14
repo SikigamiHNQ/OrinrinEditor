@@ -172,7 +172,7 @@ HRESULT	MoziFileListAdd( LPTSTR );	//!<
 HRESULT MoziFileListDelete( HWND );	//!<	
 
 HRESULT	MoziFileStore( LPTSTR );	//!<	
-UINT	CALLBACK MoziItemTablise( LPTSTR, LPTSTR, INT );	//!<	
+UINT	CALLBACK MoziItemTablise( LPTSTR, LPCTSTR, INT );	//!<	
 VOID	MoziItemRemovePeriod( LPTSTR );	//!<	
 
 HRESULT	MoziSpaceCreate( VOID );
@@ -1506,7 +1506,7 @@ HRESULT MoziScriptInsert( HWND hWnd )
 	@param[in]	cchSize	“à—e‚Ì•¶Žš”
 	@return		UINT	“Á‚ÉˆÓ–¡‚È‚µ
 */
-UINT CALLBACK MoziItemTablise( LPTSTR ptLter, LPTSTR ptCont, INT cchSize )
+UINT CALLBACK MoziItemTablise( LPTSTR ptLter, LPCTSTR ptCont, INT cchSize )
 {
 	UINT_PTR	cchSz;
 	LPTSTR		ptItem;

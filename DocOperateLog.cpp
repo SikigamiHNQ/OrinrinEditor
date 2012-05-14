@@ -198,11 +198,11 @@ UINT SqnAppendLetter( LPUNDOBUFF pstBuff, UINT dCmd, TCHAR ch, INT xDot, INT yLi
 	@param[in]	bAlone	単独かどうか・単独ら、グループシーケンス番号をインクリして記録
 	@return		UINT	先端番号？
 */
-UINT SqnAppendSquare( LPUNDOBUFF pstBuff, UINT dCmd, LPTSTR ptStr, LPPOINT pstPt, INT yLine, UINT bAlone )
+UINT SqnAppendSquare( LPUNDOBUFF pstBuff, UINT dCmd, LPCTSTR ptStr, LPPOINT pstPt, INT yLine, UINT bAlone )
 {
 	INT	i;
 	UINT_PTR	cchMozi, cchSize;
-	LPTSTR		ptCaret, ptSprt;
+	LPCTSTR		ptCaret, ptSprt;
 	OPERATELOG	stOpe;
 
 	//	アンドゥとかで最新位置がずれてたら、そこより新しいの破棄して付け足していく
@@ -264,7 +264,7 @@ UINT SqnAppendSquare( LPUNDOBUFF pstBuff, UINT dCmd, LPTSTR ptStr, LPPOINT pstPt
 	@param[in]	bAlone	単独かどうか・単独ら、グループシーケンス番号をインクリして記録
 	@return		UINT	先端番号？
 */
-UINT SqnAppendString( LPUNDOBUFF pstBuff, UINT dCmd, LPTSTR ptStr, INT xDot, INT yLine, UINT bAlone )
+UINT SqnAppendString( LPUNDOBUFF pstBuff, UINT dCmd, LPCTSTR ptStr, INT xDot, INT yLine, UINT bAlone )
 {
 	UINT_PTR	cchSize;
 	OPERATELOG	stOpe;

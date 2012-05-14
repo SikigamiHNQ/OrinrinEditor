@@ -341,6 +341,19 @@ LPTSTR SjisDecodeAlloc( LPSTR pcBuff )
 	@param[in]	pt	改行を検索開始するところ
 	@return		改行の次の位置
 */
+LPCTSTR NextLineW( LPCTSTR pt )
+{
+	while( *pt && *pt != 0x000D ){	pt++;	}
+
+	if( 0x000D == *pt )
+	{
+		pt++;
+		if( 0x000A == *pt ){	pt++;	}
+	}
+
+	return pt;
+}
+//-------------------------------------------------------------------------------------------------
 LPTSTR NextLineW( LPTSTR pt )
 {
 	while( *pt && *pt != 0x000D ){	pt++;	}
@@ -354,6 +367,7 @@ LPTSTR NextLineW( LPTSTR pt )
 	return pt;
 }
 //-------------------------------------------------------------------------------------------------
+
 
 /*!
 	現在行から、次の行の先頭へ移動

@@ -119,7 +119,7 @@ UINT ViewSqSelModeToggle( UINT bMode, LPVOID pVoid )
 	TRACE( TEXT("矩形選択ON/OFF") );
 
 	//	選択動作中はモード変更しない
-	if( gbSelecting )	gbSqSelect;
+	if( gbSelecting )	return gbSqSelect;	//	なぜかRETURNが抜けてた？
 
 	if( bMode )	//	20120313
 	{
@@ -138,9 +138,19 @@ UINT ViewSqSelModeToggle( UINT bMode, LPVOID pVoid )
 	gstSqSelEnd.x   = -1;
 	gstSqSelEnd.y   = -1;
 
-	MenuItemCheckOnOff( IDM_SQSELECT, gbSqSelect );	//	メニューチェック
+	MenuItemCheckOnOff( IDM_SQSELECT , gbSqSelect );	//	メニューチェック
 
 	OperationOnStatusBar(  );
+
+	//	カーソルを変更してみる・矩形ならクロスで
+	if( D_SQUARE & gbSqSelect )
+	{
+		SetClassLongPtr( ghViewWnd, GCLP_HCURSOR, (LONG_PTR)(LoadCursor( NULL, IDC_CROSS ) ) );
+	}
+	else
+	{
+		SetClassLongPtr( ghViewWnd, GCLP_HCURSOR, (LONG_PTR)(LoadCursor( NULL, IDC_IBEAM ) ) );
+	}
 
 	return gbSqSelect;
 }

@@ -26,6 +26,8 @@ If not, see <http://www.gnu.org/licenses/>.
 #define LT_HEIGHT	240
 //-------------------------------------------------------------------------------------------------
 
+//	ラインテンプレ・クルックまってるやり方だと遅い・サブクラスでWM_LBUTTONDOWNを処理する？
+#define LTP_CLICK_NEW
 //-------------------------------------------------------------------------------------------------
 
 extern HFONT	ghAaFont;		//	AA用フォント
@@ -61,20 +63,25 @@ static vector<AATEMPLATE>	gvcTmples;	//!<	テンプレの保持
 LRESULT	CALLBACK LineTmpleProc( HWND, UINT, WPARAM, LPARAM );	//!<	
 VOID	Ltp_OnCommand( HWND , INT, HWND, UINT );	//!<	
 VOID	Ltp_OnSize( HWND , UINT, INT, INT );	//!<	
+VOID	Ltp_OnContextMenu( HWND, HWND, UINT, UINT );	//!<	
+#ifndef LTP_CLICK_NEW
 LRESULT	Ltp_OnNotify( HWND , INT, LPNMHDR );	//!<	
-VOID	Ltp_OnContextMenu( HWND, HWND, UINT, UINT );	
+#endif
 
-UINT	CALLBACK LineTmpleItemData( LPTSTR, LPTSTR, INT );	//!<	
+UINT	CALLBACK LineTmpleItemData( LPTSTR, LPCTSTR, INT );	//!<	
 
 HRESULT	LineTmpleItemListOn( UINT );	//!<	
 HRESULT	LineTmpleItemReload( HWND );	//!<	
 
 HRESULT	TemplateItemSplit( LPTSTR, UINT, PAGELOAD );	//!<	
-HRESULT	TemplateItemScatter( LPTSTR, INT, PAGELOAD );	//!<	
+HRESULT	TemplateItemScatter( LPCTSTR, INT, PAGELOAD );	//!<	
 
 LRESULT	CALLBACK gpfLineCtgryProc( HWND, UINT, WPARAM, LPARAM );	//!<	
 LRESULT	CALLBACK gpfLineItemProc(  HWND, UINT, WPARAM, LPARAM );	//!<	
-LRESULT	Ltl_OnNotify( HWND , INT, LPNMHDR );	//!<	
+LRESULT	Ltl_OnNotify( HWND , INT, LPNMHDR );						//!<	
+#ifdef LTP_CLICK_NEW
+VOID	Ltl_OnMouseButtonUp( HWND, UINT, INT, INT, UINT );			//!<	
+#endif
 
 HWND	DockingTabCreate( HINSTANCE, HWND, LPRECT );	//!<	
 //-------------------------------------------------------------------------------------------------
@@ -391,8 +398,10 @@ LRESULT CALLBACK LineTmpleProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 	{
 		HANDLE_MSG( hWnd, WM_SIZE,        Ltp_OnSize );	
 		HANDLE_MSG( hWnd, WM_COMMAND,     Ltp_OnCommand );	
-		HANDLE_MSG( hWnd, WM_NOTIFY,      Ltp_OnNotify );	//	コモンコントロールの個別イベント
 		HANDLE_MSG( hWnd, WM_CONTEXTMENU, Ltp_OnContextMenu );
+#ifndef LTP_CLICK_NEW
+		HANDLE_MSG( hWnd, WM_NOTIFY,      Ltp_OnNotify );	//	コモンコントロールの個別イベント
+#endif
 
 		case WM_MOUSEWHEEL:	SendMessage( ghLvItemWnd, WM_MOUSEWHEEL, wParam, lParam );	return 0;
 
@@ -521,6 +530,7 @@ VOID Ltp_OnSize( HWND hWnd, UINT state, INT cx, INT cy )
 }
 //-------------------------------------------------------------------------------------------------
 
+#ifndef LTP_CLICK_NEW
 /*!
 	ノーティファイメッセージの処理
 	@param[in]	hWnd		親ウインドウのハンドル
@@ -543,7 +553,7 @@ LRESULT Ltp_OnNotify( HWND hWnd, INT idFrom, LPNMHDR pstNmhdr )
 
 		hLvWnd = pstLv->hdr.hwndFrom;
 		nmCode = pstLv->hdr.code;
-#pragma message ("ラインテンプレ・クルックまってるやり方だと遅い・サブクラスでWM_LBUTTONDOWNを処理する？")
+
 		//	普通のクルックについて
 		if( NM_CLICK == nmCode )
 		{
@@ -574,12 +584,11 @@ LRESULT Ltp_OnNotify( HWND hWnd, INT idFrom, LPNMHDR pstNmhdr )
 			}
 		}
 	}
-	
 
 	return 0;	//	何もないなら０を戻す
 }
 //-------------------------------------------------------------------------------------------------
-
+#endif
 
 /*!
 	コンテキストメニュー呼びだしアクション(要は右クルック）
@@ -627,7 +636,7 @@ VOID Ltp_OnContextMenu( HWND hWnd, HWND hWndContext, UINT xPos, UINT yPos )
 	@param[in]	cchSize	どっちかの内容の文字数
 	@return	UINT	特に意味はない
 */
-UINT CALLBACK LineTmpleItemData( LPTSTR ptName, LPTSTR ptLine, INT cchSize )
+UINT CALLBACK LineTmpleItemData( LPTSTR ptName, LPCTSTR ptLine, INT cchSize )
 {
 //	両方NULLだったら、本体に追加処理をすれ
 	static AATEMPLATE	cstItem;
@@ -806,8 +815,8 @@ HRESULT TemplateItemLoad( LPTSTR ptFileName, PAGELOAD pfCalling )
 */
 HRESULT TemplateItemSplit( LPTSTR ptStr, UINT cchSize, PAGELOAD pfCalling )
 {
-	LPTSTR	ptCaret;	//	読込開始・現在位置
-	LPTSTR	ptStart;	//	セパレータの直前
+	LPCTSTR	ptCaret;	//	読込開始・現在位置
+	LPCTSTR	ptStart;	//	セパレータの直前
 	LPTSTR	ptEnd;
 	UINT	iNumber;	//	通し番号カウント
 	UINT	cchItem;
@@ -875,7 +884,7 @@ HRESULT TemplateItemSplit( LPTSTR ptStr, UINT cchSize, PAGELOAD pfCalling )
 	@param[in]	pfCalling	受け取ったデータを処理する函数へのポインター
 	@return		HRESULT	終了状態コード
 */
-HRESULT TemplateItemScatter( LPTSTR ptCont, INT cchSize, PAGELOAD pfCalling )
+HRESULT TemplateItemScatter( LPCTSTR ptCont, INT cchSize, PAGELOAD pfCalling )
 {
 	//	改行で区切られた壱行単位のアイテムである
 	INT	nowCaret, nYct, nXct, rtcnt;
@@ -1016,6 +1025,17 @@ LRESULT CALLBACK gpfLineItemProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPa
 	{
 		HANDLE_MSG( hWnd, WM_NOTIFY, Ltl_OnNotify );	//	コモンコントロールの個別イベント
 
+#ifdef LTP_CLICK_NEW
+		case WM_LBUTTONDOWN:	//	この部分がないとクルックに反応しない
+		case WM_MBUTTONDOWN:
+			TRACE( TEXT("LTL_MOUSenAN") );
+			return 0;
+
+		case WM_LBUTTONUP:
+		case WM_MBUTTONUP:
+			Ltl_OnMouseButtonUp( hWnd, msg, (INT)(SHORT)LOWORD(lParam), (INT)(SHORT)HIWORD(lParam), (UINT)(wParam) );
+			return 0;
+#endif
 		case WM_COMMAND:
 			id = LOWORD(wParam);
 			switch( id )
@@ -1036,6 +1056,79 @@ LRESULT CALLBACK gpfLineItemProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPa
 }
 //-------------------------------------------------------------------------------------------------
 
+#ifdef LTP_CLICK_NEW
+/*!
+	ビューでマウスのボタンがうっｐされたとき
+	@param[in]	hWnd		ウインドウハンドル・ビューのとは限らない？
+	@param[in]	msg			メッセージ・押されたボタン識別
+	@param[in]	x			発生したクライヤントＸ座標値
+	@param[in]	y			発生したクライヤントＹ座標値
+	@param[in]	keyFlags	他に押されてるキーについて
+*/
+VOID Ltl_OnMouseButtonUp( HWND hWnd, UINT msg, INT x, INT y, UINT keyFlags )
+{
+	INT		iPos, iItem, iSubItem;
+	INT_PTR	items;
+	//TCHAR	atItem[SUB_STRING];
+	//LPTSTR	ptStr = NULL, ptItem = NULL;
+	//UINT_PTR	cchSz;
+	LVHITTESTINFO	stHitTestInfo;
+
+	TRACE( TEXT("LTL_MOUSEB %d x %d"), x, y );
+
+	ZeroMemory( &stHitTestInfo, sizeof(LVHITTESTINFO) );
+	stHitTestInfo.pt.x = x;
+	stHitTestInfo.pt.y = y;
+	ListView_SubItemHitTest( hWnd, &stHitTestInfo );
+
+	iItem = stHitTestInfo.iItem;
+	iSubItem = stHitTestInfo.iSubItem;
+	iPos = iItem * gLnClmCnt + iSubItem;
+	TRACE( TEXT("LINE TMPL[%d x %d][%d]"), iItem, iSubItem, iPos );
+
+	if( 0 < gvcTmples.size() )
+	{
+		items = gvcTmples.at( gNowGroup ).vcItems.size( );
+
+		if( 0 <= iPos && iPos <  items )	//	なんか選択した
+		{
+			//cchSz = gvcTmples.at( gNowGroup ).vcItems.at( iPos ).size() + 1;
+			//if( SUB_STRING <= cchSz )
+			//{
+			//	ptStr = (LPTSTR)malloc( cchSz * sizeof(TCHAR) );
+			//	ZeroMemory( ptStr, cchSz * sizeof(TCHAR) );
+			//	StringCchCopy( ptStr, cchSz, gvcTmples.at( gNowGroup ).vcItems.at( iPos ).c_str( ) );
+			//	ptItem = ptStr;
+			//}
+			//else	//	配列よりデカいなら、ダイナミックにゲット
+			//{
+			//	StringCchCopy( atItem, SUB_STRING, gvcTmples.at( gNowGroup ).vcItems.at( iPos ).c_str( ) );
+			//	ptItem = atItem;
+			//}
+			//if( WM_LBUTTONUP == msg )		ViewInsertTmpleString( ptItem );	//	挿入処理
+			//else if( WM_MBUTTONUP == msg )	LayerBoxVisibalise( GetModuleHandle(NULL), ptItem, 0x00 );
+			//FREE( ptStr );
+
+			if( WM_LBUTTONUP == msg )
+			{
+				ViewInsertTmpleString( gvcTmples.at( gNowGroup ).vcItems.at( iPos ).c_str(  ) );	//	挿入処理
+				ViewFocusSet(  );	//	フォーカスを描画に戻す
+			}
+			else if( WM_MBUTTONUP == msg )
+			{
+				LayerBoxVisibalise( GetModuleHandle(NULL), gvcTmples.at( gNowGroup ).vcItems.at( iPos ).c_str( ), 0x00 );
+			}
+		}
+	}
+	else
+	{
+		ViewFocusSet(  );	//	フォーカスを描画に戻す
+	}
+
+	return;
+}
+//-------------------------------------------------------------------------------------------------
+#endif
 
 /*!
 	ノーティファイメッセージの処理

@@ -43,7 +43,7 @@ static  UINT	gdItemCnt;	//!<
 static USERITEMS	gstUserItem[USER_ITEM_MAX];	//	固定でいいかな
 //-------------------------------------------------------------------------------------------------
 
-UINT	CALLBACK UserDefItemLoad( LPTSTR, LPTSTR, INT );	//!<	
+UINT	CALLBACK UserDefItemLoad( LPTSTR, LPCTSTR, INT );	//!<	
 
 HRESULT	UserDefAppendMenu( HWND );	//!<	
 //-------------------------------------------------------------------------------------------------
@@ -162,7 +162,7 @@ INT UserDefInitialise( HWND hWnd, UINT bFirst )
 	@param[in]	cchSize	内容の文字数
 	@return	非０しょりした　０しなかった
 */
-UINT CALLBACK UserDefItemLoad( LPTSTR ptName, LPTSTR ptCont, INT cchSize )
+UINT CALLBACK UserDefItemLoad( LPTSTR ptName, LPCTSTR ptCont, INT cchSize )
 {
 	//	枠自体はある
 	//	名前をセットしておく
@@ -198,7 +198,7 @@ UINT CALLBACK UserDefItemLoad( LPTSTR ptName, LPTSTR ptCont, INT cchSize )
 	@param[in]	cchSize		文字数
 	@return		HRESULT		終了状態コード
 */
-HRESULT UserDefSetString( vector<ONELINE> *pvcUnits, LPTSTR ptText, UINT cchSize )
+HRESULT UserDefSetString( vector<ONELINE> *pvcUnits, LPCTSTR ptText, UINT cchSize )
 {
 	UINT	i;
 	INT		yLine;

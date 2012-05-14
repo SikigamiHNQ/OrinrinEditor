@@ -337,7 +337,7 @@ typedef struct tagREBARLAYOUTINFO
 
 //-------------------------------------------------------------------------------------------------
 
-typedef UINT (CALLBACK* PAGELOAD)(LPTSTR, LPTSTR, INT);
+typedef UINT (CALLBACK* PAGELOAD)(LPTSTR, LPCTSTR, INT);
 
 #endif	//	NOT _ORRVW
 
@@ -537,7 +537,7 @@ HRESULT		ViewSelAreaSelect( LPVOID );	//!<
 
 INT			ViewInsertUniSpace( UINT );
 INT			ViewInsertColourTag( UINT );
-INT			ViewInsertTmpleString( LPTSTR );
+INT			ViewInsertTmpleString( LPCTSTR );
 
 HRESULT		ViewBrushStyleSetting( UINT, LPTSTR );
 
@@ -587,7 +587,7 @@ VOID		BrushTmpleResize( HWND, LPRECT );
 INT			UserDefInitialise( HWND, UINT );
 HRESULT		UserDefItemInsert( HWND, UINT );
 HRESULT		UserDefMenuWrite( HMENU );
-HRESULT		UserDefSetString( vector<ONELINE> *, LPTSTR, UINT );	//!<	
+HRESULT		UserDefSetString( vector<ONELINE> *, LPCTSTR, UINT );	//!<	
 
 HRESULT		FrameNameModifyMenu( HWND );
 
@@ -660,11 +660,11 @@ INT			DocAdditionalLine( INT, BOOLEAN );
 
 INT			DocStringAdd( PINT, PINT, LPCTSTR, INT );
 HRESULT		DocCrLfAdd( INT, INT, BOOLEAN );
-INT			DocSquareAdd( PINT, PINT, LPTSTR, INT, LPPOINT * );
+INT			DocSquareAdd( PINT, PINT, LPCTSTR, INT, LPPOINT * );
 INT			DocStringErase( INT, INT, LPTSTR, INT );
 
 INT			DocInsertLetter( PINT, INT, TCHAR );
-INT			DocInsertString( PINT, PINT, PINT, LPTSTR, UINT, BOOLEAN );
+INT			DocInsertString( PINT, PINT, PINT, LPCTSTR, UINT, BOOLEAN );
 
 INT			DocIterateDelete( LETR_ITR, INT );
 HRESULT		DocLineCombine( INT );
@@ -775,8 +775,8 @@ HRESULT		SqnInitialise( LPUNDOBUFF );
 HRESULT		SqnFreeAll( LPUNDOBUFF );
 HRESULT		SqnSetting( VOID );
 UINT		SqnAppendLetter( LPUNDOBUFF, UINT, TCHAR, INT, INT, UINT );
-UINT		SqnAppendString( LPUNDOBUFF, UINT, LPTSTR, INT, INT, UINT );
-UINT		SqnAppendSquare( LPUNDOBUFF, UINT, LPTSTR, LPPOINT, INT, UINT );
+UINT		SqnAppendString( LPUNDOBUFF, UINT, LPCTSTR, INT, INT, UINT );
+UINT		SqnAppendSquare( LPUNDOBUFF, UINT, LPCTSTR, LPPOINT, INT, UINT );
 
 HRESULT		UnicodeRadixExchange( LPVOID );
 
@@ -797,7 +797,9 @@ HRESULT		FindStringJump( UINT );
 
 #endif	//	NOT _ORRVW
 
+LPCTSTR		NextLineW( LPCTSTR );
 LPTSTR		NextLineW( LPTSTR );
+
 LPSTR		NextLineA( LPSTR );
 
 

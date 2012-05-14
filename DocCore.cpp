@@ -68,7 +68,7 @@ extern  UINT		gbUniRadixHex;	//	ユニコード数値参照が１６進数であるか
 extern  UINT		gbCrLfCode;		//	改行コード：０したらば・非０ＹＹ 
 //-------------------------------------------------------------------------------------------------
 
-UINT	CALLBACK DocPageLoad( LPTSTR, LPTSTR, INT );
+UINT	CALLBACK DocPageLoad( LPTSTR, LPCTSTR, INT );
 //-------------------------------------------------------------------------------------------------
 
 /*!
@@ -695,7 +695,7 @@ LPARAM DocFileInflate( LPTSTR ptFileName )
 	@param[in]	cchSize	内容の文字数
 	@return		UINT	特に意味なし
 */
-UINT CALLBACK DocPageLoad( LPTSTR ptName, LPTSTR ptCont, INT cchSize )
+UINT CALLBACK DocPageLoad( LPTSTR ptName, LPCTSTR ptCont, INT cchSize )
 {
 #ifndef PAGE_DELAY_LOAD
 	INT	dmyX = 0, dmyY = 0;

@@ -74,7 +74,7 @@ VOID	Btp_OnSize( HWND, UINT, INT, INT );
 LRESULT	Btp_OnNotify( HWND, INT, LPNMHDR );
 VOID	Btp_OnContextMenu( HWND, HWND, UINT, UINT );
 
-UINT	CALLBACK BrushTmpleItemData( LPTSTR, LPTSTR, INT );
+UINT	CALLBACK BrushTmpleItemData( LPTSTR, LPCTSTR, INT );
 
 UINT	BrushTmpleItemListOn( UINT );
 HRESULT	BrushTmpleItemReload( HWND );
@@ -638,7 +638,7 @@ VOID Btp_OnContextMenu( HWND hWnd, HWND hWndContext, UINT xPos, UINT yPos )
 	@param[in]	cchSize	Ç«Ç¡ÇøÇ©ÇÃì‡óeÇÃï∂éöêî
 	@return		ì¡Ç…à”ñ°ÇÕÇ»Ç¢
 */
-UINT CALLBACK BrushTmpleItemData( LPTSTR ptName, LPTSTR ptLine, INT cchSize )
+UINT CALLBACK BrushTmpleItemData( LPTSTR ptName, LPCTSTR ptLine, INT cchSize )
 {
 //	óºï˚NULLÇæÇ¡ÇΩÇÁÅAñ{ëÃÇ…í«â¡èàóùÇÇ∑ÇÍ
 	static AATEMPLATE	cstItem;

@@ -726,9 +726,9 @@ INT DocStringAdd( PINT pNowDot, PINT pdLine, LPCTSTR ptStr, INT cchSize )
 	@param[out]	*ppstPt	各挿入場所を入れるバッファのポインタをポインタ
 	@return		INT		処理した行数
 */
-INT DocSquareAdd( PINT pNowDot, PINT pdLine, LPTSTR ptStr, INT cchSize, LPPOINT *ppstPt )
+INT DocSquareAdd( PINT pNowDot, PINT pdLine, LPCTSTR ptStr, INT cchSize, LPPOINT *ppstPt )
 {
-	LPTSTR		ptCaret, ptSprt;
+	LPCTSTR		ptCaret, ptSprt;
 	UINT_PTR	cchMozi;
 	INT			dCrLf;
 	INT			dBaseDot, dBaseLine;
@@ -887,7 +887,7 @@ INT DocSquareAddPreMod( INT xDot, INT yLine, INT dNeedLine, BOOLEAN bFirst )
 	@param[in]		bFirst	アンドゥ用・これが最初のアクションか
 	@return		０壱行ですんだ　非０複数行に渡った
 */
-INT DocInsertString( PINT pNowDot, PINT pdLine, PINT pdMozi, LPTSTR ptText, UINT dStyle, BOOLEAN bFirst )
+INT DocInsertString( PINT pNowDot, PINT pdLine, PINT pdMozi, LPCTSTR ptText, UINT dStyle, BOOLEAN bFirst )
 {
 	INT		dBaseDot, dBaseLine, dNeedLine;
 	INT		dCrLf, i, dLastLine;

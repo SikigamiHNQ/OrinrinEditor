@@ -822,7 +822,7 @@ INT ViewInsertColourTag( UINT dCommando )
 	@param[in]	ptText	挿入する文字列
 	@return		使ったドット数
 */
-INT ViewInsertTmpleString( LPTSTR ptText )
+INT ViewInsertTmpleString( LPCTSTR ptText )
 {
 	UINT	dCrLf;
 	INT		dDot;
