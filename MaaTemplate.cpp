@@ -401,6 +401,9 @@ VOID Maa_OnCommand( HWND hWnd, INT id, HWND hwndCtl, UINT codeNotify )
 
 		case IDCB_AAITEMTITLE:	AaTitleSelect( hWnd, codeNotify );	break;
 
+		case IDM_FILE_CLOSE:	TabMultipleSelDelete( hWnd );	break;
+
+
 		//	ここに来るのは、メインメニューからの選択のみ
 
 #ifdef _ORRVW

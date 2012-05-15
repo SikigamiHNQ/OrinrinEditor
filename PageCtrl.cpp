@@ -95,7 +95,6 @@ VOID	Plt_OnContextMenu( HWND, HWND, UINT, UINT );
 LRESULT	PageListNotify( HWND, LPNMLISTVIEW );
 HRESULT	PageListNameChange( INT );
 HRESULT	PageListSpinning( HWND, INT, INT );
-HRESULT	PageListViewRewrite( INT );
 HRESULT	PageListDuplicate( HWND, INT );
 HRESULT PageListCombine( HWND, INT );
 
@@ -918,6 +917,8 @@ HRESULT PageListBuild( LPVOID pVoid )
 	ZeroMemory( &stLvi, sizeof(stLvi) );
 	stLvi.mask  = LVIF_TEXT;
 
+#pragma message ("頁一覧再構成・項目注意")
+
 	i = 0;
 	for( itPage = (*gitFileIt).vcCont.begin(); itPage != (*gitFileIt).vcCont.end(); itPage++ )
 	{
@@ -1046,31 +1047,42 @@ HRESULT PageListInfoSet( INT iPage, INT dByte, INT dLine )
 
 /*!
 	ある頁の情報を書き換えする
-	@param[in]	dPage	頁番号
+	@param[in]	iPage	頁番号
 	@return		HRESULT	終了状態コード
 */
-HRESULT PageListViewRewrite( INT dPage )
+HRESULT PageListViewRewrite( INT iPage )
 {
+#pragma message ("頁一覧再描画・項目注意")
 	UINT_PTR	dLines;
 	UINT		dBytes;
-	INT			iPageCount;
+	INT			iPageCount, i;
 	TCHAR	atBuffer[MIN_STRING];
 
 	iPageCount = ListView_GetItemCount( ghPageListWnd );
-	if( iPageCount <= dPage )	return E_OUTOFMEMORY;
+	if( iPageCount <= iPage )	return E_OUTOFMEMORY;
 
-	StringCchPrintf( atBuffer, MIN_STRING, TEXT("%d"), dPage + 1 );
-	ListView_SetItemText( ghPageListWnd, dPage, 0, atBuffer );
+	if( 0 >  iPage )	//	再帰で全描画
+	{
+		for( i = 0; iPageCount > i; i++ )
+		{
+			PageListViewRewrite( i );
+		}
 
-	ListView_SetItemText( ghPageListWnd, dPage, 1, (*gitFileIt).vcCont.at( dPage ).atPageName );
+		return S_OK;
+	}
 
-	dBytes = (*gitFileIt).vcCont.at( dPage ).dByteSz;
+	StringCchPrintf( atBuffer, MIN_STRING, TEXT("%d"), iPage + 1 );
+	ListView_SetItemText( ghPageListWnd, iPage, 0, atBuffer );
+
+	ListView_SetItemText( ghPageListWnd, iPage, 1, (*gitFileIt).vcCont.at( iPage ).atPageName );
+
+	dBytes = (*gitFileIt).vcCont.at( iPage ).dByteSz;
 	StringCchPrintf( atBuffer, MIN_STRING, TEXT("%d"), dBytes );	//	byte
-	ListView_SetItemText( ghPageListWnd, dPage, 2, atBuffer );
+	ListView_SetItemText( ghPageListWnd, iPage, 2, atBuffer );
 
-	dLines = (*gitFileIt).vcCont.at( dPage ).ltPage.size( );
+	dLines = (*gitFileIt).vcCont.at( iPage ).ltPage.size( );
 	StringCchPrintf( atBuffer, MIN_STRING, TEXT("%d"), dLines );	//	line
-	ListView_SetItemText( ghPageListWnd, dPage, 3, atBuffer );
+	ListView_SetItemText( ghPageListWnd, iPage, 3, atBuffer );
 
 
 

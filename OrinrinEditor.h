@@ -566,6 +566,7 @@ HRESULT		PageListInfoSet( INT, INT, INT );
 HRESULT		PageListNameSet( INT, LPTSTR );
 INT			PageListIsNamed( FILES_ITR );
 
+HRESULT		PageListViewRewrite( INT );
 HRESULT		PageListBuild( LPVOID );
 
 
@@ -689,6 +690,7 @@ UINT		DocLetterSelStateGet( INT, INT );
 INT			DocPageSelStateToggle( INT );
 HRESULT		DocSelRangeSet( INT, INT );
 HRESULT		DocSelRangeGet( PINT, PINT );
+HRESULT		DocSelRangeReset( PINT, PINT );
 VOID		DocSelByteSet( INT );
 //BOOLEAN		DocIsSelecting( VOID );
 

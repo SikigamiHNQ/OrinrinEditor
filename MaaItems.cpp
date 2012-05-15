@@ -837,6 +837,8 @@ VOID Aai_OnDropFiles( HWND hWnd, HDROP hDrop )
 
 	TRACE( TEXT("MAA DROP[%s]"), atFileName );
 
+#pragma message ("ドラッグンドロッペした後の処理がない")
+
 	return;
 }
 //-------------------------------------------------------------------------------------------------

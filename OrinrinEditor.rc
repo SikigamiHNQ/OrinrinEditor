@@ -203,22 +203,22 @@ IDC_PGLVPOPUPMENU MENU
 BEGIN
     POPUP "頁一覧操作"
     BEGIN
-        MENUITEM "内容ポップアップ表示(&T)",              IDM_PAGEL_AATIP_TOGGLE
+        MENUITEM "内容ポップアップ表示(&T)",	IDM_PAGEL_AATIP_TOGGLE
         MENUITEM SEPARATOR
-        MENUITEM "末尾に新規作成(&N)",                 IDM_PAGEL_ADD
-        MENUITEM "選択頁の次に新規作成(&I)",              IDM_PAGEL_INSERT
-        MENUITEM "選択頁を複製(&C)",                  IDM_PAGEL_DUPLICATE
+        MENUITEM "末尾に新規作成(&N)",			IDM_PAGEL_ADD
+        MENUITEM "選択頁の次に新規作成(&I)",	IDM_PAGEL_INSERT
+        MENUITEM "選択頁を複製(&C)",			IDM_PAGEL_DUPLICATE
         MENUITEM SEPARATOR
-        MENUITEM "選択頁を削除(&D)",                  IDM_PAGEL_DELETE
-        MENUITEM "次の頁と統合(&U)",                  IDM_PAGEL_COMBINE
-        MENUITEM "頁を上へ移動(&W)",                  IDM_PAGEL_UPFLOW
-        MENUITEM "頁を下へ移動(&S)",                  IDM_PAGEL_DOWNSINK
+        MENUITEM "選択頁を削除(&D)",			IDM_PAGEL_DELETE
+        MENUITEM "次の頁と統合(&U)",			IDM_PAGEL_COMBINE
+        MENUITEM "頁を上へ移動(&W)",			IDM_PAGEL_UPFLOW
+        MENUITEM "頁を下へ移動(&S)",			IDM_PAGEL_DOWNSINK
         MENUITEM SEPARATOR
-        MENUITEM "頁名称の変更(&R)",                  IDM_PAGEL_RENAME
+        MENUITEM "頁名称の変更(&R)",			IDM_PAGEL_RENAME
         MENUITEM SEPARATOR
-        MENUITEM "最新の情報に更新(&Y)",                IDM_PAGEL_DETAIL, GRAYED
+        MENUITEM "最新の情報に更新(&Y)",		IDM_PAGEL_DETAIL, GRAYED
         MENUITEM SEPARATOR
-        MENUITEM "常に手前に表示(&Z)",                 IDM_TOPMOST_TOGGLE
+        MENUITEM "常に手前に表示(&Z)",			IDM_TOPMOST_TOGGLE
     END
 END
 
@@ -404,7 +404,7 @@ CAPTION "バージョン情報 - Orinrin Editor"
 FONT 9, "MS UI Gothic"
 BEGIN
     ICON            IDI_ORINRINEDITOR,IDC_MYICON,6,6,20,20
-    LTEXT           "Orinrin Editor, Version 0.30 Aurora (2012.514.2200.920)",IDC_STATIC,36,6,168,8,SS_NOPREFIX
+    LTEXT           "Orinrin Editor, Version 0.30 Aurora (2012.515.2200.920)",IDC_STATIC,36,6,168,8,SS_NOPREFIX
     LTEXT           "Copyright (C) 2011 - 2012 Orinrin/SikigamiHNQ",IDC_STATIC,36,18,168,8
     LTEXT           "Site ： お燐ちゃんは俺の嫁．ｃｏｍ",IDC_STATIC,36,30,168,8
     DEFPUSHBUTTON   "OK",IDOK,84,180,48,12,WS_GROUP
@@ -839,10 +839,14 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 2012,514,2200,920
+ FILEVERSION 2012,515,2200,920
  PRODUCTVERSION 0,30,0,920
  FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
  FILEFLAGS 0x0L
+#endif
  FILEOS 0x4L
  FILETYPE 0x1L
  FILESUBTYPE 0x0L
@@ -861,7 +865,7 @@ BEGIN
             VALUE "LegalTrademarks", "License : GPLv3"
             VALUE "PrivateBuild", "Build by Visual C++ 2008 Express"
             VALUE "SpecialBuild", "Not Speciality"
-            VALUE "FileVersion", "2012.514.2200.920"
+            VALUE "FileVersion", "2012.515.2200.920"
             VALUE "ProductVersion", "0.30.0.920"
             VALUE "FileDescription", "AsciiArt Story Editor by Orinrin!"
             VALUE "OriginalFilename", "OrinrinEditor.exe"

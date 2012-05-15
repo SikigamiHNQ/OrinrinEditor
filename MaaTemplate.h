@@ -73,6 +73,7 @@ LRESULT		CALLBACK FavListFolderNameBack( UINT, UINT, UINT, LPCVOID );	//!<
 HRESULT		FavListSelected( HWND, UINT );		//!<	
 HRESULT		FavContsRedrawRequest( HWND );		//!<	
 
+HRESULT		TabMultipleSelDelete( HWND );
 HRESULT		TabMultipleDeleteAll( HWND );
 HRESULT		TabMultipleStore( HWND );
 INT			TabMultipleTopMemory( INT );

@@ -71,6 +71,50 @@ HRESULT DocSelRangeGet( PINT pdTop, PINT pdBtm )
 //-------------------------------------------------------------------------------------------------
 
 /*!
+	選択範囲を探して数値を再設定する
+	@param[in]	pdTop	選択範囲開始行いれるバッファえのぽうんた・NULL可
+	@param[in]	pdBtm	選択範囲終了行いれるバッファえのぽいんた・NULL可
+	@return		HRESULT	終了状態コード
+*/
+HRESULT DocSelRangeReset( PINT pdTop, PINT pdBtm )
+{
+	INT	iTop, iEnd, iLine;
+	LINE_ITR	itLine, itLnEnd;
+	LETR_ITR	itLtr;
+
+	itLine = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.begin();
+	itLnEnd = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.end();
+
+	iTop = -1;	iEnd = -1;
+	for( iLine = 0; itLnEnd != itLine; itLine++, iLine++ )
+	{
+		for( itLtr = itLine->vcLine.begin(); itLine->vcLine.end() != itLtr; itLtr++ )
+		{
+			if( CT_SELECT & itLtr->mzStyle )
+			{
+				if( 0 > iTop )	iTop = iLine;
+				iEnd = iLine;
+
+				break;	//	一個でもヒットすれば関係ない
+			}
+			else
+			{
+				if( 0 <= iTop )	break;
+			}
+		}
+	}
+
+	(*gitFileIt).vcCont.at( gixFocusPage ).dSelLineTop    = iTop;
+	(*gitFileIt).vcCont.at( gixFocusPage ).dSelLineBottom = iEnd;
+
+	if( pdTop ){	*pdTop = iTop;	}
+	if( pdBtm ){	*pdBtm = iEnd;	}
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+
+/*!
 	選択バイト数を指定した値に書き直す・多分クルヤー用
 	@param[in]	iBytes	新しい値
 */

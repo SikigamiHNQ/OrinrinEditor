@@ -157,29 +157,29 @@ typedef vector<MOZIITEM>::iterator	MZTM_ITR;
 static LRESULT	CALLBACK gpfMoziEditProc( HWND , UINT, WPARAM, LPARAM );	//!<	
 
 
-LRESULT	CALLBACK MoziProc( HWND, UINT, WPARAM, LPARAM );
-VOID	Mzs_OnCommand( HWND, INT, HWND, UINT );
-VOID	Mzs_OnPaint( HWND );
-VOID	Mzs_OnDestroy( HWND );
-VOID	Mzs_OnContextMenu( HWND, HWND, UINT, UINT );
-VOID	Mzs_OnDropFiles( HWND, HDROP );
-LRESULT	Mzs_OnNotify( HWND, INT, LPNMHDR );
+LRESULT	CALLBACK MoziProc( HWND, UINT, WPARAM, LPARAM );	//!<	
+VOID	Mzs_OnCommand( HWND , INT, HWND, UINT );			//!<	
+VOID	Mzs_OnPaint( HWND );								//!<	
+VOID	Mzs_OnDestroy( HWND );								//!<	
+VOID	Mzs_OnContextMenu( HWND, HWND, UINT, UINT );		//!<	
+VOID	Mzs_OnDropFiles( HWND , HDROP );					//!<	
+LRESULT	Mzs_OnNotify( HWND , INT, LPNMHDR );				//!<	
 
-HRESULT	MoziFileRefresh( HWND );
-HRESULT	MoziFileRebuild( HWND, UINT );
+HRESULT	MoziFileRefresh( HWND );							//!<	
+HRESULT	MoziFileRebuild( HWND, UINT );						//!<	
 
-HRESULT	MoziFileListAdd( LPTSTR );	//!<	
-HRESULT MoziFileListDelete( HWND );	//!<	
+HRESULT	MoziFileListAdd( LPTSTR );							//!<	
+HRESULT MoziFileListDelete( HWND  );						//!<	
 
-HRESULT	MoziFileStore( LPTSTR );	//!<	
+HRESULT	MoziFileStore( LPTSTR );							//!<	
 UINT	CALLBACK MoziItemTablise( LPTSTR, LPCTSTR, INT );	//!<	
-VOID	MoziItemRemovePeriod( LPTSTR );	//!<	
+VOID	MoziItemRemovePeriod( LPTSTR  );					//!<	
 
-HRESULT	MoziSpaceCreate( VOID );
+HRESULT	MoziSpaceCreate( VOID );							//!<	
 
-HRESULT	MoziScriptInsert( HWND );
+HRESULT	MoziScriptInsert( HWND );							//!<	
 
-LRESULT	CALLBACK MoziViewProc( HWND, UINT, WPARAM, LPARAM );
+LRESULT	CALLBACK MoziViewProc( HWND, UINT, WPARAM, LPARAM );//!<	
 VOID	Mzv_OnKey( HWND, UINT, BOOL, INT, UINT );			//!<	
 VOID	Mzv_OnPaint( HWND );								//!<	
 VOID	Mzv_OnMoving( HWND, LPRECT );						//!<	
@@ -187,12 +187,12 @@ BOOL	Mzv_OnWindowPosChanging( HWND, LPWINDOWPOS );		//!<
 VOID	Mzv_OnWindowPosChanged( HWND, const LPWINDOWPOS );	//!<	
 VOID	MoziViewDraw( HDC );								//!<	
 
-HRESULT	MoziSqlTableOpenClose( UINT );	//!<	
-HRESULT	MoziSqlTransOnOff( BYTE );	//!<	
-UINT	MoziSqlItemInsert( LPTSTR, LPTSTR, INT, INT );	//!<	
-LPTSTR	MoziSqlItemSelect( TCHAR, LPINT, LPINT );	//!<	
-UINT	MoziSqlItemCount( LPINT, LPINT );	//!<	
-HRESULT	MoziSqlItemDeleteAll( VOID );	//!<	
+HRESULT	MoziSqlTableOpenClose( UINT );						//!<	
+HRESULT	MoziSqlTransOnOff( BYTE );							//!<	
+UINT	MoziSqlItemInsert( LPTSTR, LPTSTR, INT, INT );		//!<	
+LPTSTR	MoziSqlItemSelect( TCHAR, LPINT, LPINT );			//!<	
+UINT	MoziSqlItemCount( LPINT, LPINT );					//!<	
+HRESULT	MoziSqlItemDeleteAll( VOID );						//!<	
 
 //-------------------------------------------------------------------------------------------------
 

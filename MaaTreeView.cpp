@@ -17,6 +17,7 @@ If not, see <http://www.gnu.org/licenses/>.
 */
 //-------------------------------------------------------------------------------------------------
 
+//	タブにお気に入りを登録するには
 
 #include "stdafx.h"
 #include "OrinrinEditor.h"
@@ -505,6 +506,7 @@ VOID Maa_OnContextMenu( HWND hWnd, HWND hWndContext, UINT xPos, UINT yPos )
 
 		//	固定の二つの場合は無視
 		if( 1 >= curSel )	return;
+#pragma message ("MAAタブの固定タブの判別に注意")
 
 		hMenu = LoadMenu( GetModuleHandle(NULL), MAKEINTRESOURCE(IDM_AATABS_POPUP) );
 		hSubMenu = GetSubMenu( hMenu, 0 );
@@ -540,7 +542,7 @@ VOID Maa_OnContextMenu( HWND hWnd, HWND hWndContext, UINT xPos, UINT yPos )
 			case  IDM_AATREE_GOEDIT:	TabMultipleSelect( hWnd, curSel, 1 );	break;
 			//	ツリー側とはアプローチが違うから注意
 			case  IDM_AATABS_ALLDELETE:	
-				iRslt = MessageBox( hWnd, TEXT("全ての副タブを閉じようとしているのです。\r\n本当に閉じちゃうのですか？"), TEXT("操作確認なのです"), MB_YESNO | MB_ICONQUESTION | MB_DEFBUTTON2 );
+				iRslt = MessageBox( hWnd, TEXT("全ての副タブを閉じようとしてるよ。\r\n本当に閉じちゃっていいかい？"), TEXT("お燐からの確認"), MB_YESNO | MB_ICONQUESTION | MB_DEFBUTTON2 );
 				if( IDYES == iRslt ){	TabMultipleDeleteAll( hWnd );	}
 			default:	break;
 		}
@@ -1208,9 +1210,9 @@ LRESULT TabBarNotify( HWND hWnd, LPNMHDR pstNmhdr )
 
 		if( ACT_ALLTREE == curSel )
 		{
+	//		AacMatrixClear(  );
 			ShowWindow( ghTreeWnd, SW_SHOW );
 			gixUseTab = ACT_ALLTREE;
-
 			//	選択を発生させる
 			ZeroMemory( &stNmTrView, sizeof(NMTREEVIEW) );
 			stNmTrView.hdr.hwndFrom = ghTreeWnd;
@@ -1225,6 +1227,7 @@ LRESULT TabBarNotify( HWND hWnd, LPNMHDR pstNmhdr )
 			while( ListBox_GetCount( ghFavLtWnd ) ){	ListBox_DeleteString( ghFavLtWnd, 0 );	}
 			SqlFavFolderEnum( FavListFolderNameBack );
 
+	//		AacMatrixClear(  );
 			ShowWindow( ghFavLtWnd, SW_SHOW );
 			gixUseTab = ACT_FAVLIST;
 		}
@@ -1528,6 +1531,26 @@ HRESULT TabMultipleDelete( HWND hWnd, CONST INT tabSel )
 //この段階では、記録の書き直しはしない
 
 	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+
+/*!
+	今現在開いている副タブを閉じる
+	@param[in]	hWnd	ウインドウハンドル
+	@return		HRESULT	終了状態コード
+*/
+HRESULT TabMultipleSelDelete( HWND hWnd )
+{
+	INT		curSel;
+
+	curSel = TabCtrl_GetCurSel( ghTabWnd );
+
+	TRACE( TEXT("VIEW FILE CLOSE [%d]"), curSel );
+
+	//	固定の二つの場合は無視
+	if( 1 >= curSel )	return E_ACCESSDENIED;
+
+	return TabMultipleDelete( hWnd, curSel );	//	タブ削除に渡す
 }
 //-------------------------------------------------------------------------------------------------
 

@@ -257,7 +257,7 @@ VOID Evw_OnKey( HWND hWnd, UINT vk, BOOL fDown, INT cRepeat, UINT flags )
 */
 VOID Evw_OnChar( HWND hWnd, TCHAR ch, INT cRepeat )
 {
-	BOOLEAN	bSelect;
+	BOOLEAN	bSelect, bFirst;
 	UINT	bSqSel = 0;
 	INT		isctrl, bCrLf, iLines, i;
 	//	バックスペースとか改行0x0Dもくる
@@ -285,12 +285,13 @@ VOID Evw_OnChar( HWND hWnd, TCHAR ch, INT cRepeat )
 			}
 			else
 			{
+				bFirst = TRUE;
 				if( bSelect )	//	選択状態で有る場合・削除
 				{
-					bCrLf = DocSelectedDelete( &gdDocXdot , &gdDocLine, bSqSel, TRUE );
+					bCrLf = DocSelectedDelete( &gdDocXdot , &gdDocLine, bSqSel, bFirst );	bFirst = FALSE;
 				}
 
-				DocCrLfAdd( gdDocXdot , gdDocLine, TRUE );	//	中のほうで空白チェックやってる
+				DocCrLfAdd( gdDocXdot , gdDocLine, bFirst );	//	中のほうで空白チェックやってる
 				ViewRedrawSetLine( gdDocLine );
 
 				gdDocXdot = 0;	gdDocMozi = 0;	gdDocLine++;	//	次の行に移る
@@ -575,8 +576,10 @@ VOID Evw_OnLButtonUp( HWND hWnd, INT x, INT y, UINT keyFlags )
 				cbSize = DocSelectTextGetAlloc( D_UNI | bSqSel, (LPVOID *)(&ptString), NULL );
 				iCrLf = DocInsertString( &gdDocXdot, &gdDocLine, NULL, ptString, bSqSel, TRUE );
 				FREE( ptString );
-				//	選択範囲を削除する
+				//	選択範囲を削除
+				DocSelRangeReset( NULL , NULL );	//	選択範囲がずれてまうのでリセット
 				iCrLf = DocSelectedDelete( &gdDocXdot, &gdDocLine, bSqSel, FALSE );
+
 				//REDRAW指示
 				ViewRedrawSetLine( -1 );	//	範囲不明なので全画面書換
 			}

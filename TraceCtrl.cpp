@@ -175,7 +175,9 @@ INT TraceInitialise( HWND hWnd, UINT bMode )
 */
 HRESULT TraceDialogueOpen( HINSTANCE hInst, HWND hWnd )
 {
-	RECT	rect;
+	HWND	hDktpWnd;
+	LONG	x;
+	RECT	rect, dtRect, trRect;
 
 	if( !(ghImgctl) )	return E_HANDLE;	//	DLL死んでたらアウツ！
 
@@ -186,7 +188,7 @@ HRESULT TraceDialogueOpen( HINSTANCE hInst, HWND hWnd )
 		return S_OK;
 	}
 
-	GetWindowRect( hWnd, &rect );
+	GetWindowRect( hWnd, &rect );	//	メイン窓のスクリーン座標
 	
 	//	スクロールバーにしてみるテスト
 #ifdef TRC_SCROLLBAR
@@ -194,6 +196,15 @@ HRESULT TraceDialogueOpen( HINSTANCE hInst, HWND hWnd )
 #else
 	ghTraceDlg = CreateDialogParam( hInst, MAKEINTRESOURCE(IDD_TRACEADJUST_DLG), hWnd, TraceCtrlDlgProc, 0 );
 #endif
+	GetClientRect( ghTraceDlg, &trRect );	//	トレス制御窓のサイズ
+
+	//	ディスクトップからはみ出さないように
+	hDktpWnd = GetDesktopWindow(  );
+	GetWindowRect( hDktpWnd, &dtRect );
+
+	x = dtRect.right - rect.right;	//	右の余裕確認
+	if( trRect.right >  x ){	rect.right = dtRect.right - trRect.right;	}
+	//	足りないようなら、表示位置をオフセットしておく
 
 	SetWindowPos( ghTraceDlg, HWND_TOP, rect.right, rect.top, 0, 0, SWP_NOSIZE | SWP_NOZORDER | SWP_SHOWWINDOW );
 

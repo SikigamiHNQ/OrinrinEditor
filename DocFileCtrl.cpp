@@ -36,7 +36,7 @@ static TCHAR	gatBackUpDirty[MAX_PATH];
 
 //-------------------------------------------------------------------------------------------------
 
-INT	DocAstSeparatorGetAlloc( INT, UINT, LPVOID *, FILES_ITR );
+INT	DocAstSeparatorGetAlloc( FILES_ITR, INT, UINT, LPVOID * );
 
 INT	DocUnicode2UTF8( LPVOID * );
 //-------------------------------------------------------------------------------------------------
@@ -181,7 +181,7 @@ HRESULT DocFileBackup( HWND hWnd )
 	LPVOID	pbSplit;
 	UINT	cbSplSz;
 
-	INT		isAST, isMLT, ddExten;
+	INT		isAST, isMLT, idExten;
 
 	UINT_PTR	iPages, i;	//	頁数
 
@@ -201,9 +201,9 @@ HRESULT DocFileBackup( HWND hWnd )
 
 		isAST = PageListIsNamed( itFile );	//	頁に名前が付いてる？
 
-		if( isAST ){		ddExten = 0;	}	//	AST
-		else if( isMLT ){	ddExten = 1;	}	//	MLT
-		else{				ddExten = 2;	}	//	TXT
+		if( isAST ){		idExten = 0;	}	//	AST
+		else if( isMLT ){	idExten = 1;	}	//	MLT
+		else{				idExten = 2;	}	//	TXT
 
 		StringCchCopy( atBuffer, MAX_PATH, itFile->atFileName );
 
@@ -222,7 +222,7 @@ HRESULT DocFileBackup( HWND hWnd )
 		if( 0 == *ptExten )
 		{
 			//	拡張子指定がないならそのまま対応のをくっつける
-			StringCchCopy( ptExten, 5, aatExte[ddExten] );
+			StringCchCopy( ptExten, 5, aatExte[idExten] );
 		}
 		else	//	既存の拡張子があったら
 		{
@@ -279,7 +279,7 @@ HRESULT DocFileBackup( HWND hWnd )
 		{
 			if( isAST )
 			{
-				cbSplSz = DocAstSeparatorGetAlloc( i, D_SJIS, &pbSplit, itFile );
+				cbSplSz = DocAstSeparatorGetAlloc( itFile, i, D_SJIS, &pbSplit );
 
 				WriteFile( hFile , pbSplit, (cbSplSz- iNullTmt), &wrote, NULL );
 				FREE(pbSplit);
@@ -341,9 +341,9 @@ HRESULT DocFileSave( HWND hWnd, UINT bStyle )
 	LPVOID	pbSplit;
 	UINT	cbSplSz;
 
-	INT		isAST, isMLT, ddExten;
+	INT		isAST, isMLT, idExten, mbRslt;
 	BOOLEAN	bExtChg =FALSE, bLastChg = FALSE;
-
+	BOOLEAN	bForceMLT = FALSE;
 	BOOLEAN	bNoName = FALSE;
 
 	BOOLEAN	bUtf8 = FALSE;	//	ＵＴＦ８で保存セヨ
@@ -367,9 +367,9 @@ HRESULT DocFileSave( HWND hWnd, UINT bStyle )
 
 	isAST = PageListIsNamed( gitFileIt );	//	頁に名前が付いてる？
 
-	if( isAST ){		ddExten = 0;	}	//	AST
-	else if( isMLT ){	ddExten = 1;	}	//	MLT
-	else{				ddExten = 2;	}	//	TXT
+	if( isAST ){		idExten = 0;	}	//	AST
+	else if( isMLT ){	idExten = 1;	}	//	MLT
+	else{				idExten = 2;	}	//	TXT
 
 	GetLocalTime( &stSysTile );
 
@@ -411,7 +411,7 @@ HRESULT DocFileSave( HWND hWnd, UINT bStyle )
 		{	//	名無しのままエクスポートしようとしてたら無効
 			if( NULL == (*gitFileIt).atFileName[0] )
 			{
-				MessageBox( hWnd, TEXT("先に通常の保存をしておいて欲しいのです。"), NULL, MB_OK | MB_ICONINFORMATION );
+				MessageBox( hWnd, TEXT("先に通常の保存をしてからエクスポートしてね。"), TEXT("お燐からのお知らせ"), MB_OK | MB_ICONINFORMATION );
 				return E_FAIL;
 			}
 		}
@@ -424,7 +424,7 @@ HRESULT DocFileSave( HWND hWnd, UINT bStyle )
 	if( 0 == *ptExten )
 	{
 		//	拡張子指定がないならそのまま対応のをくっつける
-		StringCchCopy( ptExten, 5, aatExte[ddExten] );
+		StringCchCopy( ptExten, 5, aatExte[idExten] );
 		bExtChg = TRUE;
 	}
 	else	//	既存の拡張子があったら
@@ -436,7 +436,20 @@ HRESULT DocFileSave( HWND hWnd, UINT bStyle )
 		if( !( StrCmp( atExBuf, aatExte[0] ) ) )	//	ASTであるなら
 		{
 			//	AST形式を維持する
-			isAST = TRUE;	isMLT = FALSE;	ddExten = 0;
+			isAST = TRUE;	isMLT = FALSE;	idExten = 0;
+		}
+
+		//	保存する拡張子がMLTで、既存のASTからリネームなら確認
+		if( !( StrCmp( atExBuf, aatExte[1] ) ) )
+		{
+			if( isAST && (bStyle & D_RENAME) )	//	既存ASTかつリネームなら
+			{
+				mbRslt = MessageBox( hWnd, TEXT("MLTで保存すると頁名称がなくなっちゃうよ。\r\nそれでも良いかい？"), TEXT("お燐からの確認"), MB_OKCANCEL | MB_ICONQUESTION );
+				if( IDOK != mbRslt )	return E_ABORT;
+
+				isMLT = TRUE;	isAST = FALSE;	idExten = 1;
+				bForceMLT = TRUE;
+			}
 		}
 
 		if( isAST )	//	ASTは優先的に適用
@@ -512,7 +525,7 @@ HRESULT DocFileSave( HWND hWnd, UINT bStyle )
 		if( isAST )	//	ＡＳＴの場合は、頁先頭にタイトルが入ってる
 		{
 			//	返り値の確保バイト数にはＮＵＬＬターミネータ含んでるので注意
-			cbSplSz = DocAstSeparatorGetAlloc( i, bStyle, &pbSplit, gitFileIt );
+			cbSplSz = DocAstSeparatorGetAlloc( gitFileIt, i, bStyle, &pbSplit );
 
 			if( bUtf8 ){	cbSplSz = DocUnicode2UTF8( &pbSplit );	}
 			//	pbSplitの中身を付け替える
@@ -523,6 +536,7 @@ HRESULT DocFileSave( HWND hWnd, UINT bStyle )
 		else	//	MLTの場合は、二つ目以降で区切りが必要
 		{
 			if( 1 <= i ){	WriteFile( hFile , pbSplit, cbSplSz, &wrote, NULL );	}
+			if( bForceMLT ){	DocAstSeparatorGetAlloc( gitFileIt, i, 0, NULL );	}
 		}
 
 		iByteSize = DocPageTextGetAlloc( gitFileIt, i, bStyle, &pBuffer, TRUE );
@@ -550,7 +564,7 @@ HRESULT DocFileSave( HWND hWnd, UINT bStyle )
 		//InitLastOpen( INIT_SAVE, atFilePath );	//	ラストオーポンを書換
 		MultiFileTabRename( (*gitFileIt).dUnique, atFilePath );	//	タブ名称変更
 		AppTitleChange( atFilePath );
-		StringCchPrintf( atBuffer, MAX_STRING, TEXT("拡張子を %s にして保存したのです。あぅあぅ"), aatExte[ddExten] );
+		StringCchPrintf( atBuffer, MAX_STRING, TEXT("拡張子を %s にして保存したのです。あぅあぅ"), aatExte[idExten] );
 		NotifyBalloonExist( atBuffer, TEXT("拡張子を変更したのです"), NIIF_INFO );
 
 		OpenHistoryLogging( hWnd , atFilePath );	//	ファイル名変更したので記録取り直し
@@ -577,7 +591,10 @@ HRESULT DocFileSave( HWND hWnd, UINT bStyle )
 		}
 	}
 
-	return 0;
+	//	頁一覧の書き直し
+	if( bForceMLT ){	PageListViewRewrite( -1 );	}
+
+	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 
@@ -614,20 +631,26 @@ INT DocUnicode2UTF8( LPVOID *pText )
 	ページ名前をAST区切り付きで確保する・freeは呼んだ方でやる
 	@param[in]	dPage	確保する頁番号
 	@param[in]	bStyle	１ユニコードかシフトJISで、矩形かどうか
-	@param[out]	pText	確保した領域を返す・ワイド文字かマルチ文字になる・NULLだと必要バイト数を返すのみ
+	@param[out]	pText	確保した領域を返す・ワイド文字かマルチ文字になる・NULLなら頁名を削除する
 	@return				確保したバイト数・NULLターミネータ含む
 */
-INT DocAstSeparatorGetAlloc( INT dPage, UINT bStyle, LPVOID *pText, FILES_ITR itFile )
+INT DocAstSeparatorGetAlloc( FILES_ITR itFile, INT dPage, UINT bStyle, LPVOID *pText )
 {
 	UINT	cchSize, cbSize;
-	TCHAR	atBuffer[MAX_PATH];
+	TCHAR	atBuffer[MAX_STRING];
 
-	StringCchPrintf( atBuffer, MAX_PATH, TEXT("[AA][%s]\r\n"), itFile->vcCont.at( dPage ).atPageName );
-	StringCchLength( atBuffer, MAX_PATH, &cchSize );
+	StringCchPrintf( atBuffer, MAX_STRING, TEXT("[AA][%s]\r\n"), itFile->vcCont.at( dPage ).atPageName );
+	StringCchLength( atBuffer, MAX_STRING, &cchSize );
+
+	if( !(pText) )
+	{
+		ZeroMemory( itFile->vcCont.at( dPage ).atPageName, SUB_STRING * sizeof(TCHAR) );
+		return 0;
+	}
 
 	if( bStyle & D_UNI )
 	{
-		cbSize = (cchSize + 1) * sizeof(TCHAR);	//	NULLターミネータ
+		cbSize = (cchSize + 1) *  sizeof(TCHAR);	//	NULLターミネータ
 
 		*pText = (LPTSTR)malloc( cbSize );
 		ZeroMemory( *pText, cbSize );
