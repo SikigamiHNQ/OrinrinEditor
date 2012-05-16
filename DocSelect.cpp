@@ -97,10 +97,6 @@ HRESULT DocSelRangeReset( PINT pdTop, PINT pdBtm )
 
 				break;	//	ˆêŒÂ‚Å‚àƒqƒbƒg‚·‚ê‚ÎŠÖŒW‚È‚¢
 			}
-			else
-			{
-				if( 0 <= iTop )	break;
-			}
 		}
 	}
 
