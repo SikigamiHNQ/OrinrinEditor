@@ -140,12 +140,12 @@ VOID Evw_OnKey( HWND hWnd, UINT vk, BOOL fDown, INT cRepeat, UINT flags )
 
 			case VK_NEXT:	//	PageDown
 				gdDocLine += 10;
-				iLines = DocPageParamGet( NULL, NULL );
+				iLines = DocNowFilePageLineCount(  );//DocPageParamGet( NULL, NULL );	//	行数確保
 				if( iLines <= gdDocLine ){	gdDocLine =  iLines - 1;	}
 				break;
 
 			case VK_END:	//	Ctrl+Endで末尾へ
-				if( gbCtrlOn ){	gdDocLine = DocPageParamGet( NULL, NULL ) - 1;	}
+				if( gbCtrlOn ){	gdDocLine = DocNowFilePageLineCount(  ) - 1;	}	//	DocPageParamGet( NULL, NULL )	//	行数確保
 				gdDocXdot = DocLineParamGet( gdDocLine, &gdDocMozi, NULL );
 				bMemoryX = TRUE;
 				break;
@@ -158,7 +158,7 @@ VOID Evw_OnKey( HWND hWnd, UINT vk, BOOL fDown, INT cRepeat, UINT flags )
 
 			case VK_DELETE:	//	DELキー入力
 				bSelect = IsSelecting( &bSqSel );
-				iLines = DocPageParamGet( NULL, NULL );
+				iLines = DocNowFilePageLineCount(  );//DocPageParamGet( NULL, NULL );	//	行数確保
 				if( bSelect )	//	選択状態なら、そこだけ削除する
 				{
 					bCrLf = DocSelectedDelete( &gdDocXdot , &gdDocLine, bSqSel, TRUE );
@@ -191,8 +191,8 @@ VOID Evw_OnKey( HWND hWnd, UINT vk, BOOL fDown, INT cRepeat, UINT flags )
 		if( bMemoryX )	gdXmemory = gdDocXdot;
 		else			gdDocXdot = gdXmemory;
 
-		//	キャレット位置調整
-		DocLetterPosGetAdjust( &gdDocXdot, gdDocLine, 0 );
+	
+		DocLetterPosGetAdjust( &gdDocXdot, gdDocLine, 0 );	//	キャレット位置調整
 		//	ここで文字位置のインクリ・デクリの面倒みて、ドットと行位置を変更
 		dXwidth = DocLetterShiftPos( gdDocXdot, gdDocLine, bXdirect, NULL, &bJump );
 
@@ -225,7 +225,7 @@ VOID Evw_OnKey( HWND hWnd, UINT vk, BOOL fDown, INT cRepeat, UINT flags )
 			}
 		}
 
-		gdDocMozi = DocLetterPosGetAdjust( &gdDocXdot, gdDocLine, 0 );
+		gdDocMozi = DocLetterPosGetAdjust( &gdDocXdot, gdDocLine, 0 );	//	今の文字位置を確認
 
 		ViewSelMoveCheck( FALSE );	//	位置決まったら、選択状態をCheck
 
@@ -298,7 +298,7 @@ VOID Evw_OnChar( HWND hWnd, TCHAR ch, INT cRepeat )
 				ViewDrawCaret( gdDocXdot, gdDocLine, 1 );	//	位置を決める
 				gdXmemory = gdDocXdot;	//	最新位置記憶
 				//	改行した行以降全取っ替え
-				iLines = DocPageParamGet( NULL, NULL );
+				iLines = DocPageParamGet( NULL, NULL );	//	表示変更してるか
 				for( i = gdDocLine; iLines > i; i++ ){	ViewRedrawSetLine(  i );	}
 			}
 		}
@@ -306,7 +306,7 @@ VOID Evw_OnChar( HWND hWnd, TCHAR ch, INT cRepeat )
 		if( VK_BACK == ch )	//	BackSpace
 		{
 			TRACE( TEXT("BACKSP [%d][%d:%d]"), bSelect, gdDocXdot, gdDocLine );
-			iLines = DocPageParamGet( NULL, NULL );
+			iLines = DocNowFilePageLineCount(  );//DocPageParamGet( NULL, NULL );	//	行数確保
 			if( bSelect )	//	選択状態なら、そこだけ削除する
 			{
 				bCrLf = DocSelectedDelete( &gdDocXdot , &gdDocLine, bSqSel, TRUE );
@@ -337,7 +337,7 @@ VOID Evw_OnChar( HWND hWnd, TCHAR ch, INT cRepeat )
 		return;
 	}
 
-	iLines = DocPageParamGet( NULL, NULL );
+	iLines = DocPageParamGet( NULL, NULL );	//	再計算してるかも・・・
 	bCrLf = 0;
 	if( bSelect )	//	選択状態で有る場合・矩形なら塗り潰し、通常なら削除
 	{
@@ -355,7 +355,7 @@ VOID Evw_OnChar( HWND hWnd, TCHAR ch, INT cRepeat )
 
 	DocInsertLetter( &gdDocXdot, gdDocLine, ch );	//	行に追加
 	//	中でアンドゥバッファリング
-	gdDocMozi = DocLetterPosGetAdjust( &gdDocXdot, gdDocLine, 0 );
+	gdDocMozi = DocLetterPosGetAdjust( &gdDocXdot, gdDocLine, 0 );	//	今の文字位置を確認
 	ViewDrawCaret( gdDocXdot, gdDocLine, 1 );	//	位置移動
 
 	gdXmemory = gdDocXdot;	//	最新位置記憶
@@ -422,7 +422,7 @@ VOID Evw_OnLButtonDown( HWND hWnd, BOOL fDoubleClick, INT x, INT y, UINT keyFlag
 	//	有効な位置かどうか確認
 
 	//	行数確認して、はみ出してたら末端にしておく
-	iMaxLine = DocPageParamGet( NULL, NULL );
+	iMaxLine = DocNowFilePageLineCount(  );//DocPageParamGet( NULL, NULL );	//	行数確認かも・・・
 	if( iMaxLine <=dLine )	dLine = iMaxLine - 1;
 
 	//	その行のドット数を確認して、はみ出してたら末端にしておく
@@ -430,7 +430,7 @@ VOID Evw_OnLButtonDown( HWND hWnd, BOOL fDoubleClick, INT x, INT y, UINT keyFlag
 	if( dMaxDot <=dDot )	dDot = dMaxDot;
 
 	//	文字位置に合わせて調整
-	gdDocMozi = DocLetterPosGetAdjust( &dDot, dLine, 0 );
+	gdDocMozi = DocLetterPosGetAdjust( &dDot, dLine, 0 );	//	今の文字位置を確認
 	gdDocXdot = dDot;
 	gdDocLine = dLine;
 	//	この時点で移動は確定
@@ -502,7 +502,7 @@ VOID Evw_OnMouseMove( HWND hWnd, INT x, INT y, UINT keyFlags )
 	if( (keyFlags & MK_LBUTTON) )
 	{
 		//	行数確認して、はみ出してたら末端にしておく
-		iMaxLine = DocPageParamGet( NULL, NULL );
+		iMaxLine = DocNowFilePageLineCount(  );//DocPageParamGet( NULL, NULL );
 		if( iMaxLine <= dLine ){	dLine = iMaxLine - 1;	}
 
 		//	その行のドット数を確認して、はみ出してたら末端にしておく
@@ -510,7 +510,7 @@ VOID Evw_OnMouseMove( HWND hWnd, INT x, INT y, UINT keyFlags )
 		if( dMaxDot <=dDot )	dDot = dMaxDot;
 
 		//	文字位置に合わせて調整
-		gdDocMozi = DocLetterPosGetAdjust( &dDot, dLine, 0 );
+		gdDocMozi = DocLetterPosGetAdjust( &dDot, dLine, 0 );	//	今の文字位置を確認
 		gdDocXdot = dDot;
 		gdDocLine = dLine;
 
@@ -633,7 +633,7 @@ VOID Evw_OnRButtonDown( HWND hWnd, BOOL fDoubleClick, INT x, INT y, UINT keyFlag
 		//	有効な位置かどうか確認
 
 		//	行数確認して、はみ出してたら末端にしておく
-		iMaxLine = DocPageParamGet( NULL, NULL );
+		iMaxLine = DocNowFilePageLineCount(  );//DocPageParamGet( NULL, NULL );
 		if( iMaxLine <=dLine )	dLine = iMaxLine - 1;
 
 		//	その行のドット数を確認して、はみ出してたら末端にしておく
@@ -641,7 +641,7 @@ VOID Evw_OnRButtonDown( HWND hWnd, BOOL fDoubleClick, INT x, INT y, UINT keyFlag
 		if( dMaxDot <=dDot )	dDot = dMaxDot;
 
 		//	文字位置に合わせて調整
-		gdDocMozi = DocLetterPosGetAdjust( &dDot, dLine, 0 );
+		gdDocMozi = DocLetterPosGetAdjust( &dDot, dLine, 0 );	//	今の文字位置を確認
 		gdDocXdot = dDot;
 		gdDocLine = dLine;
 
@@ -753,7 +753,7 @@ HRESULT ViewScriptedLineFeed( VOID )
 	if( bIsSp ){	iTgtDot = gdDocXdot;	}
 	TRACE( TEXT("TEXT START D[%d] L[%d]"), iTgtDot, gdDocLine );
 
-	dLines = DocPageParamGet( NULL , NULL );	//	頁の行数確認
+	dLines = DocNowFilePageLineCount(  );//DocPageParamGet( NULL , NULL );	//	行数確保
 	if( (dLines - 1) <= gdDocLine )	//	最終行だったら
 	{
 		DocAdditionalLine( 1 , bFirst );	bFirst = FALSE;

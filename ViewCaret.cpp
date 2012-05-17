@@ -200,7 +200,7 @@ BOOLEAN ViewPosResetCaret( INT xDot, INT yLine )
 	if( 0 > yLine )	yLine = 0;
 
 	gdDocLine = yLine;
-	gdDocMozi = DocLetterPosGetAdjust( &xDot, yLine, 0 );
+	gdDocMozi = DocLetterPosGetAdjust( &xDot, yLine, 0 );	//	¡‚Ì•¶šˆÊ’u‚ğŠm”F
 	gdDocXdot = xDot;
 
 	return ViewDrawCaret( xDot, yLine, TRUE );

@@ -1894,7 +1894,7 @@ HRESULT LayerContentsImportable( HWND hWnd, UINT cmdID, LPINT pXdot, LPINT pYlin
 				{
 					//	その地点の状況を確認して、空白エリアなら埋めに使う
 					//	文字エリアなら、直近からパディングできるところまでを埋め直す
-					iMozi = DocLetterPosGetAdjust( &xDot, dWkLine, -1 );
+					iMozi = DocLetterPosGetAdjust( &xDot, dWkLine, -1 );	//	今の文字位置を確認
 
 					//	そこの文字が空白か、空白ならどこまで続いてるか確認
 					DocLineStateCheckWithDot( xDot, dWkLine, &dLeft, &dRight, &iStMozi, NULL, &bSpace );

@@ -1881,8 +1881,7 @@ VOID Cls_OnDrawItem( HWND hWnd, CONST DRAWITEMSTRUCT *pstDrawItem )
 */
 HRESULT MainStatusBarSetText( INT room, LPCTSTR ptText )
 {
-	if( SB_MODIFY == room )	StatusBar_SetText( ghStsBarWnd, (room | SBT_OWNERDRAW), ptText );
-	else	StatusBar_SetText( ghStsBarWnd, room , ptText );
+	StatusBar_SetText( ghStsBarWnd, room , ptText );
 
 	return S_OK;
 }

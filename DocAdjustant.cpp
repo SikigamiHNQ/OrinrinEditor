@@ -439,8 +439,7 @@ INT DocLineStateCheckWithDot( INT dDot, INT rdLine, PINT pLeft, PINT pRight, PIN
 	//	中身が無いならエラー
 	if( 0 >= iCount ){	*pIsSp =  FALSE;	*pLeft =  0;	*pRight = 0;	return 0;	}
 
-	dMozis = DocLetterPosGetAdjust( &dDot, rdLine, 0 );
-	//	現在位置の文字数
+	dMozis = DocLetterPosGetAdjust( &dDot, rdLine, 0 );	//	今の文字位置を確認
 
 	if( 1 <= dMozis ){	itMozi += (dMozis-1);	}	//	キャレットの位置の左文字で判定
 	//	最初から先頭ならなにもしなくておｋ
@@ -512,8 +511,9 @@ UINT DocSpaceDifference( UINT vk, PINT pXdot, INT dLine )
 	INT			dBgnCnt, dRngCnt;
 	UINT_PTR	cchSize;
 	BOOLEAN		bIsSpace;
-	LPTSTR		ptSpace, ptOldSp;
+	LPTSTR		ptSpace;//, ptOldSp;
 	INT			dZenSp, dHanSp, dUniSp;
+	INT			iDots, iBytes;
 
 	wstring		wsBuffer;
 	LETR_ITR	vcLtrBgn, vcLtrEnd, vcItr;
@@ -559,28 +559,34 @@ UINT DocSpaceDifference( UINT vk, PINT pXdot, INT dLine )
 	vcLtrEnd  = vcLtrBgn;
 	vcLtrEnd += dRngCnt;	//	そのエリアの終端も確認
 
+	iDots = 0;	iBytes = 0;
 	wsBuffer.clear();
 	for( vcItr = vcLtrBgn; vcLtrEnd != vcItr; vcItr++ )
 	{
 		wsBuffer += vcItr->cchMozi;
+		iDots    += vcItr->rdWidth;
+		iBytes   += vcItr->mzByte;
 	}
 
 	//	該当部分を一旦削除・アンドゥリドゥするなら内容を記録する必要がある
 	itLine->vcLine.erase( vcLtrBgn, vcLtrEnd );
+	itLine->iByteSz -= iBytes;	if( 0 > itLine->iByteSz ){	itLine->iByteSz = 0;	}
+	itLine->iDotCnt -= iDots;	if( 0 > itLine->iDotCnt ){	itLine->iDotCnt = 0;	}
+
 	//	Space文字列を追加
 	dNowDot = dBgnDot;
 	DocStringAdd( &dNowDot, &dLine, ptSpace, cchSize );
 
 	*pXdot = dNowDot;
 
-	cchSize = wsBuffer.size( ) + 1;
-	ptOldSp = (LPTSTR)malloc( cchSize * sizeof(TCHAR) );
-	StringCchCopy( ptOldSp, cchSize, wsBuffer.c_str( ) );
+//	cchSize = wsBuffer.size( ) + 1;
+//	ptOldSp = (LPTSTR)malloc( cchSize * sizeof(TCHAR) );
+//	StringCchCopy( ptOldSp, cchSize, wsBuffer.c_str( ) );
 
-	SqnAppendString( &((*gitFileIt).vcCont.at( gixFocusPage ).stUndoLog), DO_DELETE, ptOldSp, dBgnDot, dLine, TRUE );
+	SqnAppendString( &((*gitFileIt).vcCont.at( gixFocusPage ).stUndoLog), DO_DELETE, wsBuffer.c_str( ), dBgnDot, dLine, TRUE );
 	SqnAppendString( &((*gitFileIt).vcCont.at( gixFocusPage ).stUndoLog), DO_INSERT, ptSpace, dBgnDot, dLine, FALSE );
 
-	FREE( ptOldSp );
+//	FREE( ptOldSp );
 
 	FREE( ptSpace );
 
@@ -605,7 +611,7 @@ INT DocSpaceShiftProc( UINT vk, PINT pXdot, INT dLine )
 
 	dDot = DocSpaceDifference( vk, pXdot, dLine );
 
-	DocLetterPosGetAdjust( pXdot, dLine, 0 );
+	DocLetterPosGetAdjust( pXdot, dLine, 0 );	//	この中のDocLineParamGetでバイト数が計算されてる
 
 	ViewRedrawSetLine( dLine );
 
@@ -973,7 +979,7 @@ HRESULT DocTopLetterInsert( TCHAR ch, PINT pXdot, INT dLine )
 
 	//	キャレット位置ずれてたら適当に調整
 	*pXdot += xDot;
-	DocLetterPosGetAdjust( pXdot, dLine, 0 );
+	DocLetterPosGetAdjust( pXdot, dLine, 0 );	//	キャレット位置適当に調整
 	ViewDrawCaret( *pXdot, dLine, 1 );
 
 	DocPageInfoRenew( -1, 1 );
@@ -1044,7 +1050,7 @@ HRESULT DocTopSpaceErase( PINT pXdot, INT dLine )
 
 	//	キャレット位置ずれてたら適当に調整
 	*pXdot = 0;
-	DocLetterPosGetAdjust( pXdot, dLine, 0 );
+	DocLetterPosGetAdjust( pXdot, dLine, 0 );	//	キャレット位置適当に調整
 	ViewDrawCaret( *pXdot, dLine, 1 );
 
 
@@ -1126,7 +1132,7 @@ HRESULT DocLastLetterErase( PINT pXdot, INT dLine )
 
 	//	キャレット位置適当に調整
 	*pXdot = 0;
-	DocLetterPosGetAdjust( pXdot, dLine, 0 );
+	DocLetterPosGetAdjust( pXdot, dLine, 0 );	//	キャレット位置適当に調整
 	ViewDrawCaret( *pXdot, dLine, 1 );
 
 	DocPageInfoRenew( -1, 1 );
@@ -1192,7 +1198,7 @@ HRESULT DocLastSpaceErase( PINT pXdot, INT dLine )
 	}
 
 	//	キャレット位置ずれてたら適当に調整
-	DocLetterPosGetAdjust( pXdot, dLine, 0 );
+	DocLetterPosGetAdjust( pXdot, dLine, 0 );	//	キャレット位置適当に調整
 	ViewDrawCaret( *pXdot, dLine, 1 );
 
 	DocPageInfoRenew( -1, 1 );
@@ -1367,7 +1373,7 @@ HRESULT DocRightSlide( PINT pXdot, INT dLine )
 
 	//	キャレット位置適当に調整
 	*pXdot = 0;
-	DocLetterPosGetAdjust( pXdot, dLine, 0 );
+	DocLetterPosGetAdjust( pXdot, dLine, 0 );	//	キャレット位置適当に調整
 	ViewDrawCaret( *pXdot, dLine, 1 );
 
 	DocPageInfoRenew( -1, 1 );
@@ -1540,9 +1546,9 @@ HRESULT DocPositionShift( UINT vk, PINT pXdot, INT dLine )
 	}
 
 
-	//	キャレット位置適当に調整
+	//	キャレット位置調整
 	iDot = 0;
-	DocLetterPosGetAdjust( &iDot, dLine, 0 );
+	DocLetterPosGetAdjust( &iDot, dLine, 0 );	//	キャレット位置適当に調整
 	ViewDrawCaret( iDot, dLine, 1 );
 
 	DocPageByteCount( gitFileIt, gixFocusPage, NULL, NULL );

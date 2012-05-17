@@ -721,7 +721,6 @@ UINT CALLBACK DocPageLoad( LPTSTR ptName, LPCTSTR ptCont, INT cchSize )
 #endif
 
 	DocPageParamGet( NULL, NULL );	//	再計算しちゃう
-//	DocPageInfoRenew( -1, 0 );
 
 	return 1;
 }
@@ -1176,8 +1175,10 @@ HRESULT DocPageChange( INT dPageNum )
 			DocStringAdd( &dmyX, &dmyY, (*gitFileIt).vcCont.at( gixFocusPage ).ptRawData, cchSize );	//	この中で改行とか面倒見る
 		}
 
+		//	アンドゥは一旦リセットすべき＜頁開けただけなので
+		//	変更もONなってたら解除
+
 	//	DocPageParamGet( NULL, NULL );	//	再計算しちゃう＜文字追加でやってるので問題無い
-	//	DocPageInfoRenew( -1, 0 );
 
 		FREE( (*gitFileIt).vcCont.at( gixFocusPage ).ptRawData );
 	}
@@ -1756,11 +1757,10 @@ HRESULT DocPageDivide( HWND hWnd, HINSTANCE hInst, INT iNow )
 	mRslt = MessageBoxCheckBox( hWnd, hInst, 1 );
 	if( IDNO == mRslt ){	return  E_ABORT;	}
 
-//分割は、アンドゥをリセットすべし
+//分割は、アンドゥをリセットすべし＜要は削除なので、リセットしなくてもいいかもだ
 //今の頁の該当部分を削除しちゃう
 
-	//	必要なのは行数確認のみ
-	iLines = DocPageParamGet( NULL, NULL );
+	iLines = DocNowFilePageLineCount(  );//DocPageParamGet( NULL, NULL );	//	行数確保
 
 	if( iLines <= iDivLine )	return E_OUTOFMEMORY;
 

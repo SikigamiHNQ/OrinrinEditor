@@ -154,6 +154,8 @@ TCHAR UniRefCheck( LPSTR pcStr )
 
 		if( NULL == pcStr[i] )	return 0x0000;	//	ññí[ÇæÇ¡ÇΩèÍçá
 
+		if( 0 > (INT)(pcStr[i]) )	return 0x0000;	//	Ç∆Ç…Ç©Ç≠ä÷åWÇ»Ç©Ç¡ÇΩèÍçá
+
 		if( bXcode )
 		{
 			if( isxdigit( pcStr[i] ) ){	acValue[i] = pcStr[i];	}

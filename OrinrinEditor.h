@@ -255,7 +255,6 @@ typedef struct tagONELINE
 {
 	INT		iDotCnt;	//!<	ドット数
 	INT		iByteSz;	//!<	バイト数
-//	INT		dCaret;		//!<	キャレットの現在位置０インデックス
 	UINT	dStyle;		//!<	この行の特殊状態
 	BOOLEAN	bBadSpace;	//!<	警告付き空白があるか
 
@@ -264,7 +263,6 @@ typedef struct tagONELINE
 	//	レイヤボックス用
 	INT		dFrtSpDot;	//!<	前の空白ドット
 	INT		dFrtSpMozi;	//!<	前の空白文字数
-//	INT		dOffset;	//!<	矩形選択したときのズレ
 
 } ONELINE, *LPONELINE;
 typedef list<ONELINE>::iterator		LINE_ITR;

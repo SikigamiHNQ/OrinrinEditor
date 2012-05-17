@@ -579,7 +579,7 @@ VOID Aai_OnMouseMove( HWND hWnd, INT x, INT y, UINT keyFlags )
 
 	if( bReDraw && gbAAtipView )	SendMessage( ghToolTipWnd, TTM_UPDATE, 0, 0 );
 
-	TRACE( TEXT("MAA MOUSE [%d x %d] %d %u"), x, y, iItem, bReDraw );
+//	TRACE( TEXT("MAA MOUSE [%d x %d] %d %u"), x, y, iItem, bReDraw );
 
 	//	デバッグ用・あとで消すか内容変更
 	StringCchPrintf( atBuffer, MAX_STRING, TEXT("(%d x %d) %d"), x, y, iItem );
@@ -760,11 +760,11 @@ VOID Aai_OnContextMenu( HWND hWnd, HWND hWndContext, UINT xPos, UINT yPos )
 
 // _ORRVW
 //	hMenu = LoadMenu( GetModuleHandle(NULL), MAKEINTRESOURCE(IDM_AAVIEW_POPUP) );
-
+#pragma message ("Editorとviewerの、メニューリソースの整合性に注意セヨ")
 	hMenu = LoadMenu( GetModuleHandle(NULL), MAKEINTRESOURCE(IDM_AALIST_POPUP) );
 	hSubMenu = GetSubMenu( hMenu, 0 );
 
-	//	お気にリストのみ、削除を有効に、変更すること・標準で無効にしておく
+	//	使用リストのみ、削除を有効に、変更すること・標準で無効にしておく
 	if( ACT_FAVLIST == dOpen )
 	{	EnableMenuItem( hSubMenu, IDM_MAA_FAV_DELETE , MF_ENABLED );	}
 
@@ -774,6 +774,8 @@ VOID Aai_OnContextMenu( HWND hWnd, HWND hWndContext, UINT xPos, UINT yPos )
 	//	マルチモニタしてると、座標値がマイナスになることがある。
 	sx = (SHORT)xPos;
 	sy = (SHORT)yPos;
+
+	//	gixNowSelは、何も無いところだと－１になる
 
 	//	フラグにTPM_RETURNCMDを指定すると、WM_COMMANDが飛ばない
 	dRslt = TrackPopupMenu( hSubMenu, TPM_RETURNCMD, sx, sy, 0, hWnd, NULL );	//	TPM_CENTERALIGN | TPM_VCENTERALIGN | 
@@ -1063,10 +1065,6 @@ HRESULT AacItemAdding( HWND hWnd, LPTSTR ptFile )
 	//	拡張子確認
 	if( FileExtensionCheck( ptFile, TEXT(".ast") ) ){	stIaInfo.bType =  0;	}
 	else{	stIaInfo.bType =  1;	}
-	//ptExten = PathFindExtension( ptFile );	//	拡張子が無いならNULL、というか末端になる
-	//StringCchCopy( atExBuf, 10, ptExten );
-	//CharLower( atExBuf );	//	比較のために小文字にしちゃう
-	//stIaInfo.bType = StrCmp( atExBuf, TEXT(".ast") );	//	もしASTなら０になる
 
 	if( DialogBoxParam( GetModuleHandle(NULL), MAKEINTRESOURCE(IDD_MAA_IADD_DLG), hWnd, AaItemAddDlgProc, (LPARAM)(&stIaInfo) ) )
 	{
@@ -1103,6 +1101,8 @@ HRESULT AacItemAdding( HWND hWnd, LPTSTR ptFile )
 
 			FREE(stIaInfo.ptContent);
 		}
+
+		//	もしメインで開けていたらロード・ていうかツリー側で追加っておかしくね？
 	}
 
 	return S_OK;
@@ -1137,6 +1137,7 @@ INT_PTR CALLBACK AaItemAddDlgProc( HWND hDlg, UINT message, WPARAM wParam, LPARA
 			CreateWindowEx( 0, WC_EDIT,   TEXT(""),               WS_CHILD | WS_VISIBLE | WS_BORDER | ES_AUTOHSCROLL, 195, 0, rect.right-195-50, 23, hDlg, (HMENU)IDE_MAID_ITEMNAME, GetModuleHandle(NULL), NULL );
 			CreateWindowEx( 0, WC_BUTTON, TEXT("追加"),           WS_CHILD | WS_VISIBLE, rect.right-50, 0, 50, 23, hDlg, (HMENU)IDB_MAID_ADDGO, GetModuleHandle(NULL), NULL );
 			CreateWindowEx( 0, WC_EDIT,   TEXT(""),               WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | WS_HSCROLL | ES_MULTILINE | ES_READONLY, 0, 23, rect.right, rect.bottom-23, hDlg, (HMENU)IDE_MAID_CONTENTS, GetModuleHandle(NULL), NULL );
+			//	なんでわざわざこうやったのか思い出せない。
 
 			if( pstIaInfo->bType )
 			{
@@ -1147,7 +1148,6 @@ INT_PTR CALLBACK AaItemAddDlgProc( HWND hDlg, UINT message, WPARAM wParam, LPARA
 
 			//	とりあえずクリップボードの中身をとる
 			ptBuffer = DocClipboardDataGet( NULL );
-		//	if( !(ptBuffer) ){	DocPageTextAllGetAlloc( D_UNI , (LPVOID *)(&ptBuffer) );	}
 			if( !(ptBuffer) ){	DocPageGetAlloc( D_UNI , (LPVOID *)(&ptBuffer) );	}
 			//	使えないシロモノなら、今の頁の内容を持ってきて表示
 			SetDlgItemText( hDlg, IDE_MAID_CONTENTS, ptBuffer );
@@ -1188,7 +1188,6 @@ INT_PTR CALLBACK AaItemAddDlgProc( HWND hDlg, UINT message, WPARAM wParam, LPARA
 
 				case IDB_MAID_NOWPAGE:
 					FREE(ptBuffer);
-					//DocPageTextAllGetAlloc( D_UNI , (LPVOID *)(&ptBuffer) );
 					DocPageGetAlloc( D_UNI , (LPVOID *)(&ptBuffer) );
 					SetDlgItemText( hDlg, IDE_MAID_CONTENTS, ptBuffer );
 					return (INT_PTR)TRUE;

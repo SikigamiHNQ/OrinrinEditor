@@ -464,9 +464,8 @@ HRESULT ViewSqSelAdjust( INT dBaseLine )
 
 	for( i = gstSqSelBegin.y; gstSqSelEnd.y >= i; i++ )
 	{
-		//	各行のキャレット位置の調整
 		xDotBegin = gstSqSelBegin.x;
-		DocLetterPosGetAdjust( &xDotBegin, i, 0 );
+		DocLetterPosGetAdjust( &xDotBegin, i, 0 );	//	各行のキャレット位置の調整
 
 		//	20110720	終端位置どうにかなる？
 	//	xDotEnd = gstSqSelEnd.x;	//元

@@ -137,7 +137,7 @@ UINT DocLetterSelStateGet( INT nowDot, INT rdLine )
 	iLines = DocNowFilePageLineCount( );
 	if( iLines <= rdLine )	return 0;
 
-	iLetter = DocLetterPosGetAdjust( &nowDot, rdLine, 0 );
+	iLetter = DocLetterPosGetAdjust( &nowDot, rdLine, 0 );	//	今の文字位置を確認
 
 	//	直後の文字を確認
 	itLine = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.begin();
@@ -174,7 +174,7 @@ INT DocLetterSelStateToggle( INT nowDot, INT rdLine, INT dForce )
 	iLines = DocNowFilePageLineCount( );
 	if( iLines <= rdLine )	return 0;
 
-	iLetter = DocLetterPosGetAdjust( &nowDot, rdLine, 0 );
+	iLetter = DocLetterPosGetAdjust( &nowDot, rdLine, 0 );	//	今の文字位置を確認
 
 	//	直後の文字の幅を確認
 	itLine = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.begin();

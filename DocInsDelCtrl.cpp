@@ -160,8 +160,7 @@ HRESULT DocInputReturn( INT nowDot, INT rdLine )
 
 	ZeroONELINE( &stLine );
 
-	//	今の文字位置を確認・現在行なのでずれてはないはず
-	iLetter = DocLetterPosGetAdjust( &nowDot, rdLine, 0 );
+	iLetter = DocLetterPosGetAdjust( &nowDot, rdLine, 0 );	//	今の文字位置を確認
 
 	//	文字数確認
 	itLine = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.begin();
@@ -249,8 +248,7 @@ INT DocInputBkSpace( PINT pdDot, PINT pdLine )
 
 	if( iLines <=  dLine )	return 0;	//	はみ出してたらアウツ！
 
-	//	今の文字位置を確認・現在行なのでずれてはないはず
-	iLetter = DocLetterPosGetAdjust( pdDot, dLine, 0 );
+	iLetter = DocLetterPosGetAdjust( pdDot, dLine, 0 );	//	今の文字位置を確認
 	neDot = *pdDot;
 
 //	TRACE( TEXT("後空白[D%d C%d]"), neDot, iLetter );
@@ -309,8 +307,7 @@ INT DocInputDelete( INT xDot, INT yLine )
 	iLines = DocNowFilePageLineCount( );
 	if( iLines <= yLine )	return 0;	//	はみ出してたらアウツ！
 
-	//	今の文字位置を確認・現在行なのでずれてはないはず
-	iLetter = DocLetterPosGetAdjust( &xDot, yLine, 0 );
+	iLetter = DocLetterPosGetAdjust( &xDot, yLine, 0 );	//	今の文字位置を確認
 
 //	TRACE( TEXT("削除[D%d C%d]"), xDot, iLetter );
 
@@ -405,7 +402,7 @@ BOOLEAN DocLineErase( INT yLine, BOOLEAN bFirst )
 
 	wsString.clear( );
 
-	dLines = DocPageParamGet( NULL, NULL );
+	dLines = DocPageParamGet( NULL, NULL );	//	行数確認
 	if( dLines <= yLine )	return bFirst;	//	はみ出し確認
 
 	DocLineParamGet( yLine, &iMozis, NULL );	//	指定行の文字数確保
@@ -569,8 +566,7 @@ INT DocInputLetter( INT nowDot, INT rdLine, TCHAR ch )
 		return 0;
 	}
 
-	//	今の文字位置を確認・現在行なのでずれてはないはず
-	iLetter = DocLetterPosGetAdjust( &nowDot, rdLine, 0 );
+	iLetter = DocLetterPosGetAdjust( &nowDot, rdLine, 0 );	//	今の文字位置を確認
 
 	itLine = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.begin();
 	std::advance( itLine, rdLine );	//	対象行までイテレートする
@@ -631,7 +627,7 @@ INT DocStringErase( INT xDot, INT yLine, LPTSTR ptDummy, INT cchSize )
 	INT	i, iCrLf, iLetter, rdCnt;
 
 	//	今の文字位置・キャレットより末尾方向に削除するので、この位置は変わらない
-	iLetter = DocLetterPosGetAdjust( &xDot, yLine, 0 );
+	iLetter = DocLetterPosGetAdjust( &xDot, yLine, 0 );	//	今の文字位置を確認
 
 	rdCnt = 0;
 	for( i = 0; cchSize > i; i++ )	//	DEL連打ってこと
@@ -941,7 +937,7 @@ INT DocInsertString( PINT pNowDot, PINT pdLine, PINT pdMozi, LPCTSTR ptText, UIN
 		ViewRedrawSetLine( *pdLine );
 	}
 
-	if( pdMozi ){	*pdMozi = DocLetterPosGetAdjust( pNowDot, *pdLine , 0 );	}
+	if( pdMozi ){	*pdMozi = DocLetterPosGetAdjust( pNowDot, *pdLine , 0 );	}	//	今の文字位置を確認
 
 	//	ヤバイ状態のときは操作しないようにする
 	if( !(D_INVISI & dStyle) )	ViewDrawCaret( *pNowDot, *pdLine, TRUE );
@@ -1000,7 +996,7 @@ INT DocInputFromClipboard( PINT pNowDot, PINT pdLine, PINT pdMozi, UINT bSqMode 
 		dCrLf = DocSelectedDelete( pNowDot, pdLine, dSqSel, TRUE );
 		if( dCrLf  )	//	処理した行以降全取っ替え
 		{
-			iLines = DocPageParamGet( NULL, NULL );
+			iLines = DocPageParamGet( NULL, NULL );	//	再計算も要るかも・・・
 			for( i = *pdLine; iLines > i; i++ ){	ViewRedrawSetLine(  i );	}
 		}
 		else{	ViewRedrawSetLine( *pdLine );	}

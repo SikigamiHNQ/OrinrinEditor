@@ -596,7 +596,7 @@ HRESULT ViewScrollBarAdjust( LPVOID pVoid )
 	}
 
 //Ｙバー　現在行数をスクロールに使う
-	dLines = DocPageParamGet( NULL, NULL );
+	dLines = DocNowFilePageLineCount(  );//DocPageParamGet( NULL, NULL );	//	行数確保
 	dRange = dLines - gdDispingLine;	//	全行数ー表示数＝必要SCROLL段階
 
 //	TRACE( TEXT("SCL Y Line[%d] Range[%d] Top[%d]"), dLines, dRange, gdViewTopLine );
@@ -977,7 +977,7 @@ VOID Evw_OnVScroll( HWND hWnd, HWND hWndCtl, UINT code, INT pos )
 	//	posを、ホイールフラグにする
 
 	//	総行数より、表示領域のほうが大きかったら処理しない
-	iLines = DocPageParamGet( NULL, NULL );	//	要るのは行数
+	iLines = DocNowFilePageLineCount(  );//DocPageParamGet( NULL, NULL );	//	行数確保
 	if( gdDispingLine >= iLines )	return;
 
 	//	状態をくやしく
@@ -1284,7 +1284,7 @@ HRESULT ViewRedrawDo( HWND hWnd, HDC hdc )
 
 	hFtOld = SelectFont( hdc, ghAaFont );	//	フォントをくっつける
 
-	iLines = DocPageParamGet( NULL, NULL );	//	現在のページの総行数ゲット
+	iLines = DocPageParamGet( NULL, NULL );	//	行数確保・頁情報再描画
 
 	//	必要ないところの処理まではしなくていい
 	vwLines = gdDispingLine + 2 + gdViewTopLine;	//	余裕持たせて

@@ -437,9 +437,9 @@ INT DocLetterPosGetAdjust( PINT pNowDot, INT rdLine, INT round )
 #endif
 
 	//	もし範囲外なら、範囲内にいれておく
-	iMaxLine = DocPageParamGet( NULL, NULL );	//	行数のみ？
+	iMaxLine = DocNowFilePageLineCount(  );//DocPageParamGet( NULL, NULL );	//	行数のみ？
 	if( iMaxLine <= rdLine )	rdLine = iMaxLine - 1;
-
+#pragma message ("行数確認だけならDocPageParamGetは要らない？")
 
 
 	itLine = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.begin();
@@ -529,7 +529,7 @@ INT DocLetterShiftPos( INT nowDot, INT rdLine, INT bDirect, PINT pdAbsDot, PBOOL
 	iCount = itLine->vcLine.size( );	//	この行の文字数確認して
 
 	//	文字数カウント
-	iLetter = DocLetterPosGetAdjust( &nowDot, rdLine, 0 );
+	iLetter = DocLetterPosGetAdjust( &nowDot, rdLine, 0 );	//	今の文字位置を確認
 
 	//	左端で左へ移動、もしくは、右端で右へ移動ということは隣の行への移動になる
 	if( ((0 == iLetter) && (0 > bDirect)) || ((iCount <= iLetter) && (0 < bDirect)) )
