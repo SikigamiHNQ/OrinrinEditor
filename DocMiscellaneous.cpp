@@ -83,7 +83,7 @@ BOOLEAN DocBadSpaceIsExist( INT rdLine )
 	if( DocRangeIsError( gitFileIt, gixFocusPage, rdLine ) ){	return 0;	}
 	//	ここの範囲外発生は必然なので特に警告は不要
 
-	itLine = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.begin();
+	itLine = gitFileIt->vcCont.at( gixFocusPage ).ltPage.begin();
 	std::advance( itLine, rdLine );
 
 	return itLine->bBadSpace;
@@ -114,7 +114,7 @@ UINT DocBadSpaceCheck( INT rdLine )
 	}
 
 	//	文字数確認
-	itLine = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.begin();
+	itLine = gitFileIt->vcCont.at( gixFocusPage ).ltPage.begin();
 	std::advance( itLine, rdLine );
 
 	iCount = itLine->vcLine.size( );
@@ -206,7 +206,7 @@ UINT DocBadSpaceCheck( INT rdLine )
 */
 UINT_PTR DocNowFilePageCount( VOID )
 {
-	return (*gitFileIt).vcCont.size( );
+	return gitFileIt->vcCont.size( );
 }
 //-------------------------------------------------------------------------------------------------
 
@@ -216,17 +216,72 @@ UINT_PTR DocNowFilePageCount( VOID )
 */
 UINT_PTR DocNowFilePageLineCount( VOID )
 {
-	return (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.size( );
+	return gitFileIt->vcCont.at( gixFocusPage ).ltPage.size( );
 }
 //-------------------------------------------------------------------------------------------------
 
+#ifdef PAGE_DELAY_LOAD
 /*!
-	現在のページの総行数と文字数とバイト数を返す・ついでにバイト情報とか更新・ファイルコア函数
-	@param[out]	pdMozi	文字数入れるバッファへのポインタ・NULLでも可
-	@param[out]	pdByte	バイト数入れるバッファへのポインタ・NULLでも可
+	生データの、総行数と文字数とバイト数を返す
+	@param[out]	ptRaw	生データ
+	@param[out]	piMozi	文字数入れるバッファへのポインタ
+	@param[out]	piByte	バイト数入れるバッファへのポインタ
 	@return	UINT	行数
 */
-UINT DocPageParamGet( PINT pdMozi, PINT pdByte )
+UINT DocRawDataParamGet( LPCTSTR ptRaw, PINT piMozi, PINT piByte )
+{
+	UINT_PTR	cchSize, d;
+	INT			iMozis, iLines, iBytes, iBy;
+	LETTER	stLetter;
+
+	StringCchLength( ptRaw, STRSAFE_MAX_CCH, &cchSize );
+	//	改行を含むので、この時点では文字数ではない
+
+	iBytes = 0;
+	iMozis = 0;
+	iLines = 1;
+
+	for( d = 0; cchSize > d; d++ )
+	{
+		if( TEXT('\r') == ptRaw[d] && TEXT('\n') == ptRaw[d+1] )	//	改行にヒットしたら
+		{
+			iLines++;
+
+			//	改行のバイト数を増やして
+			if( gbCrLfCode )	iBytes += YY2_CRLF;
+			else				iBytes += STRB_CRLF;
+
+			d++;	//	0x0A分進める
+			continue;
+		}
+
+		//	その文字のバイト数を確認
+		ZeroMemory( &stLetter, sizeof(LETTER) );
+		stLetter.cchMozi = ptRaw[d];
+		if( !( DocIsSjisTrance( stLetter.cchMozi, stLetter.acSjis ) ) ){	stLetter.mzStyle |= CT_CANTSJIS;	}
+		//	非シフトJIS文字を確認
+		iBy = DocLetterByteCheck( &stLetter );	//	バイト数確認
+
+		iBytes += iBy;
+		iMozis++;
+	}
+
+	if( piMozi )	*piMozi = iMozis;
+	if( piByte )	*piByte = iBytes;
+
+	return iLines;
+}
+//-------------------------------------------------------------------------------------------------
+
+#endif
+
+/*!
+	現在のページの総行数と文字数とバイト数を返す・ついでにバイト情報とか更新・ファイルコア函数
+	@param[out]	piMozi	文字数入れるバッファへのポインタ・NULLでも可
+	@param[out]	piByte	バイト数入れるバッファへのポインタ・NULLでも可
+	@return	UINT	行数
+*/
+UINT DocPageParamGet( PINT piMozi, PINT piByte )
 {
 	INT_PTR	iLines, i, dMozis = 0;
 	INT		dBytes = 0;
@@ -234,33 +289,44 @@ UINT DocPageParamGet( PINT pdMozi, PINT pdByte )
 	LINE_ITR	itLine;
 
 #ifdef PAGE_DELAY_LOAD
-#error もし頁展開前に呼ばれてたら・しかしこの函数はファイル読込時も呼ばれる
+	//	もし頁展開前に呼ばれてたら
+	if( gitFileIt->vcCont.at( gixFocusPage ).ptRawData )
+	{
+		iLines = DocRawDataParamGet( gitFileIt->vcCont.at( gixFocusPage ).ptRawData, &dMozis, &dBytes );
+		gitFileIt->vcCont.at( gixFocusPage ).iLineCnt = iLines;
+		gitFileIt->vcCont.at( gixFocusPage ).iMoziCnt = dMozis;
+	}
+	else
+	{
 #endif
 
-	iLines = DocNowFilePageLineCount( );
+		iLines = DocNowFilePageLineCount( );
 
-	itLine = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.begin();
-	for( i = 0; iLines > i; i++, itLine++ )
-	{
-		//	改行のバイト数・2ch、YY＝6byte・したらば＝4byte
-		if( 1 <= i )	//	弐行目から改行分追加
+		//	行単位で見ていく
+		itLine = gitFileIt->vcCont.at( gixFocusPage ).ltPage.begin();
+		for( i = 0; iLines > i; i++, itLine++ )
 		{
-			if( gbCrLfCode )	dBytes += YY2_CRLF;
-			else				dBytes += STRB_CRLF;
+			//	改行のバイト数・2ch、YY＝6byte・したらば＝4byte
+			if( 1 <= i )	//	弐行目から改行分追加
+			{
+				if( gbCrLfCode )	dBytes += YY2_CRLF;
+				else				dBytes += STRB_CRLF;
+			}
+
+			dMozis += itLine->vcLine.size( );	//	文字数に改行は含まない
+			dBytes += itLine->iByteSz;
 		}
 
-		dMozis += itLine->vcLine.size( );
-		dBytes += itLine->iByteSz;
+#ifdef PAGE_DELAY_LOAD
 	}
+#endif
 
-	if( pdMozi )	*pdMozi = dMozis;
-	if( pdByte )	*pdByte = dBytes;
+	if( piMozi )	*piMozi = dMozis;
+	if( piByte )	*piByte = dBytes;
 
-	(*gitFileIt).vcCont.at( gixFocusPage ).dByteSz = dBytes;
+	gitFileIt->vcCont.at( gixFocusPage ).dByteSz = dBytes;
 
-
-
-	DocPageInfoRenew( -1, 1 );
+	DocPageInfoRenew( -1, 1 );	//	頁内容を一覧に飛ばす
 
 	return iLines;
 }
@@ -276,7 +342,7 @@ UINT DocPageParamGet( PINT pdMozi, PINT pdByte )
 */
 UINT DocPageByteCount( FILES_ITR itFile, INT dPage, PINT pMozi, PINT pByte )
 {
-	INT		iBytes, iMozis, i, iLnBy;
+	INT		iBytes, iMozis, i, iLnBy, iDots;
 	UINT	dLines;
 	LINE_ITR	itLine, endLine;
 	LETR_ITR	itMozi, endMozi;
@@ -285,7 +351,11 @@ UINT DocPageByteCount( FILES_ITR itFile, INT dPage, PINT pMozi, PINT pByte )
 	if( 0 > dPage ){	dPage = gixFocusPage;	}
 
 #ifdef PAGE_DELAY_LOAD
-#error もし頁展開前に呼ばれてたら
+	//	もし頁展開前に呼ばれてたら
+	if( !(itFile->vcCont.at( dPage ).ptRawData) )
+	{
+		MessageBox( NULL, TEXT("DocPageByteCount"), NULL, MB_OK );
+	}
 #endif
 
 	iBytes = 0;
@@ -303,14 +373,16 @@ UINT DocPageByteCount( FILES_ITR itFile, INT dPage, PINT pMozi, PINT pByte )
 		itMozi  = itLine->vcLine.begin();
 		endMozi = itLine->vcLine.end();
 
-		//	この行の文字数とバイト数
-		iLnBy = 0;
+		//	この行の文字数とバイト数とドット数
+		iLnBy = 0;	iDots = 0;
 		for( ; itMozi != endMozi; itMozi++ )
 		{
-			iLnBy  += itMozi->mzByte;
+			iDots += itMozi->rdWidth;
+			iLnBy += itMozi->mzByte;
 			iMozis++;
 		}
-		itLine->iByteSz = iLnBy;
+		itLine->iByteSz = iLnBy;	//	各行の数値
+		itLine->iDotCnt = iDots;	//	
 
 		//	全体のバイト数
 		iBytes += iLnBy;
@@ -350,7 +422,7 @@ INT DocPageMaxDotGet( INT dTop, INT dBottom )
 	if( 0 > dTop )		dTop = 0;
 	if( 0 > dBottom )	dBottom = iLines - 1;
 
-	itLine = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.begin();
+	itLine = gitFileIt->vcCont.at( gixFocusPage ).ltPage.begin();
 	std::advance( itLine, dTop );
 
 	for( i = dTop; dBottom >= i; i++, itLine++ )
@@ -384,7 +456,7 @@ INT DocLineParamGet( INT rdLine, PINT pdMozi, PINT pdByte )
 	iLines = DocNowFilePageLineCount( );
 	if( iLines <= rdLine )	return -1;
 
-	itLine = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.begin();
+	itLine = gitFileIt->vcCont.at( gixFocusPage ).ltPage.begin();
 	std::advance( itLine, rdLine );
 
 	iCount = itLine->vcLine.size( );
@@ -439,10 +511,9 @@ INT DocLetterPosGetAdjust( PINT pNowDot, INT rdLine, INT round )
 	//	もし範囲外なら、範囲内にいれておく
 	iMaxLine = DocNowFilePageLineCount(  );//DocPageParamGet( NULL, NULL );	//	行数のみ？
 	if( iMaxLine <= rdLine )	rdLine = iMaxLine - 1;
-#pragma message ("行数確認だけならDocPageParamGetは要らない？")
 
 
-	itLine = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.begin();
+	itLine = gitFileIt->vcCont.at( gixFocusPage ).ltPage.begin();
 	std::advance( itLine, rdLine );
 
 	assert( pNowDot );
@@ -450,6 +521,7 @@ INT DocLetterPosGetAdjust( PINT pNowDot, INT rdLine, INT round )
 	//	行のはみ出しと文字数確認
 	iLines = DocLineParamGet( rdLine, &iCount, NULL );
 	if( 0 > iLines )	return 0;
+#pragma message ("行数確認だけならDocLineParamGetで再計算にヒットしてるのでは")
 
 	for( i = 0, iLetter = 0; iCount > i; i++, iLetter++ )
 	{
@@ -523,7 +595,7 @@ INT DocLetterShiftPos( INT nowDot, INT rdLine, INT bDirect, PINT pdAbsDot, PBOOL
 		return nowDot;	//	移動方向無しでは意味が無い
 	}
 
-	itLine = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.begin();
+	itLine = gitFileIt->vcCont.at( gixFocusPage ).ltPage.begin();
 	std::advance( itLine, rdLine );
 
 	iCount = itLine->vcLine.size( );	//	この行の文字数確認して
@@ -611,7 +683,65 @@ INT DocStringInfoCount( LPCTSTR ptStr, UINT_PTR cchSize, PINT pMaxDot, PINT pMax
 }
 //-------------------------------------------------------------------------------------------------
 
+/*!
+	今のファイルの、指定した頁の情報を確保する
+	@param[in]	iTgtPage	欲しい頁番号・０インデックス
+	@param[in]	pstInfo		情報入れる構造体ポインタ
+	@return		BOOLEAN	ディレイしてたら非０
+*/
+BOOLEAN NowPageInfoGet( UINT iTgtPage, LPPAGEINFOS pstInfo )
+{
+	LINE_ITR	itLine;
+	INT_PTR		iMozis;
+	UINT	dMasqus;
 
+	//	データやばかったら弾く
+	if( gitFileIt->vcCont.size(  ) <= iTgtPage )	return 0;
+
+	if( pstInfo )
+	{
+		dMasqus = pstInfo->dMasqus;
+		ZeroMemory( pstInfo, sizeof(PAGEINFOS) );
+
+		if( PI_RECALC & dMasqus )
+		{
+			DocPageByteCount( gitFileIt, iTgtPage, NULL, NULL );
+		}
+
+		if( PI_LINES & dMasqus )
+		{
+			pstInfo->iLines = gitFileIt->vcCont.at( iTgtPage ).ltPage.size( );
+		}
+
+		if( PI_BYTES & dMasqus )
+		{
+			pstInfo->iBytes = gitFileIt->vcCont.at( iTgtPage ).dByteSz;
+		}
+
+		if( PI_MOZIS & dMasqus )
+		{
+			iMozis = 0;
+			for( itLine = gitFileIt->vcCont.at( iTgtPage ).ltPage.begin(); gitFileIt->vcCont.at( iTgtPage ).ltPage.end() != itLine; itLine++ )
+			{
+				iMozis += itLine->vcLine.size();
+			}
+			pstInfo->iMozis = iMozis;
+		}
+
+		if( PI_NAME & dMasqus )
+		{
+			StringCchCopy( pstInfo->atPageName, SUB_STRING, gitFileIt->vcCont.at( iTgtPage ).atPageName );
+		}
+	}
+
+#ifdef PAGE_DELAY_LOAD
+	//	この情報は常に返す
+	return (gitFileIt->vcCont.at( iTgtPage ).ptRawData ? TRUE : FALSE);
+#else
+	return FALSE;
+#endif
+}
+//-------------------------------------------------------------------------------------------------
 
 /*!
 	ONLINE構造体をクルヤーする

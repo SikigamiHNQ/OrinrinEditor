@@ -105,24 +105,23 @@ static CONST GUID gcstGUID = { 0x66D3E881, 0x972B, 0x458B, { 0x93, 0x5E, 0x9E, 0
 //	行の保持をリストにしてみる
 //	ファイル開いた履歴
 //	プロフ開いた履歴
-
-//#define WORK_LOG_OUT	
-
-#define USE_NOTIFYICON	//	タスクトレイアイコンを有効
-
-//#define PLUGIN_ENABLE
+#define  FRAME_MLINE	//	枠パーツ複数行
+#define AA_INVERSE		//	上下左右反転機能
+#define ACCELERATOR_EDIT//	キーのアレ編集
 
 //	作成中の機能
 //#define FIND_STRINGS	//	文字列検索機能
 //#define PAGE_MULTISELECT//	頁一覧の複数選択
-//#define PAGE_DELAY_LOAD	//	ファイル読み込んだ時は頁展開しない、ひつようになったら開く
+#define PAGE_DELAY_LOAD	//	ファイル読み込んだ時は頁展開しない、ひつようになったら開く
+//#define PLUGIN_ENABLE	//	プラグイン機能
 
-#define  FRAME_MLINE	//	枠パーツ複数行
-#define AA_INVERSE		//	上下左右反転機能
-#define ACCELERATOR_EDIT//	キーのアレ編集
-//#define COPY_SWAP
+#define MAA_IADD_PLUS	//	MAAへのアイテム追加機能拡張
+//	リソースの IDM_MAA_IADD_OPEN IDM_MAA_ITEM_INSERT に注意
+
+//#define WORK_LOG_OUT	
 
 #define DO_TRY_CATCH	//	例外対策してみる
+#define USE_NOTIFYICON	//	タスクトレイアイコンを有効
 //-------------------------------------------------------------------------------------------------
 
 //	単なる識別名　externで外部参照されてる変数にくっつけておく
@@ -205,6 +204,8 @@ LRESULT	ExceptionMessage( LPCSTR, LPCSTR, UINT, LPARAM );
 #define TEMPLATE_DIR	TEXT("Templates")
 #define BACKUP_DIR		TEXT("BackUp")
 #define PROFILE_DIR		TEXT("Profile")
+
+#define DROP_OBJ_NAME	TEXT("[*DROP_OBJECT*]")
 //-------------------------------------------------------------------------------------------------
 
 //	枠の数	20110707	枠を１０個に増やした

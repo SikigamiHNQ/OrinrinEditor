@@ -15,28 +15,63 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with this program.
 If not, see <http://www.gnu.org/licenses/>.
 */
+//	大日本帝国公用語は↓を見られたい
 //-------------------------------------------------------------------------------------------------
 
-//	大日本帝国公用語は↓を見られたい
+//	TODO:	最終行の枠いれると落ちる
 
+//	TODO:	枠作るときはピリヲド幅を使う＜ＯＫ？
+//	TODO:	最大化から戻したら、MAAが非表示でも表示になる＜ＯＫ？
+
+//	TODO:	ツールチップ、マウスカーソルが重なるとちらつくのは仕様。自作しかないか。
+
+//	TODO:	ドラフトボード・サムネイル・移動出来るように
+
+//	TODO:	ドラッグ移動させた後、キャレットの位置がおかしい
+
+//	TODO:	個別枠やユーザアイテムにキーバインド付いたらソレを表示出来るように
+//	TODO:	右クリメニューの個別枠やユーザアイテムに各個の名前を付けるように
 
 //	TODO:	メインのファイルタブに、このファイル意外を閉じる機能をつける
+//	TODO:	頁一覧、選択が移動したら表示頁も追随する＜複数選択つくってから
+//	TODO:	全ピリヲドを消去する機能・ピリヲドの前後を確認して、空白であれば幅に合わせて置き換え・単独なら3dotユニコードで置き換える
+//	TODO:	合成するとき、上絵の周囲を白ヌキする機能・前後や透過領域に合わせた処理が必要・幅指定もできるといい？
+
+//	TODO:	MAAの一コマの編集機能
 
 //	TODO:	ページリストも、ばらしたとき閉じられるように
 
-//	TODO:	矩形選択範囲バイトカウントが遅い
+//	TODO:	挿入にある色指定を自分でカスタマイズ出来るように
+//	TODO:	もしくはユーザー定義をアクセラキーで設定出来るように
+//	TODO:	セリフ改行、文章の途中で半角全角スペース一個あった場合、ソコは無視して文章の先端に行頭を揃える
 
-//非ユニコードの埋めパターン、半角空白気にしない用にする？＜ちゅっと変更してみた
+/*
+ツールチップのサブクラスできないか？
 
-//	頁ListやMAAでのツールチップが何度も描画される。
+ツールチップビューを作るには
+基本的にマウスムーブで発生するはず
+制御用のハンドルつくるか？
+TrackMouseEvent WM_MOUSEHOVER WM_MOUSELEAVE をつかう
+WM_MOUSEHOVERが来たら、リストビューとかのハンドル渡してツールチップポッパップをコールする。
+コールされたら、そのハンドルに対してDISPINFO的なmessageを送る
+もしくはコールバック函数を指定するとか。
+内容ゲットしたら、作成して表示。単体しかあり得ないので、
+前のがあったら破壊するように。
+非表示のままWM_MOUSELEAVEが来たらキャンセルか？
 
-//	最大化したり画面サイズかえると、右の頁一覧が見えなくなる
+スタティックで枠つくって、サブクラスとオーナードローで対応
+表示枠の親はデスクトップか無しでいい。
+マウスクルックで閉じる・３０秒経過で閉じる
+数pixelのマウスムーブを検知して閉じる
 
-//	MAAviewerのほう、ドラッグンドロッペを受けたあとの処理がない・そのファイルを開くこと
+ポップアップのサイズは、文字列で決める。縁取り２ｐｘくらいで。
+背景と文字色は GetSysColor でとれるが、Win7のようなグラデーションは？
 
+SystemParametersInfo  SPI_GETMOUSEHOVERTIME  SPI_GETMOUSEHOVERWIDTH で調整出来る
+
+*/
 
 //考え中
-//	頁一覧、選択が移動したら表示頁も追随するか
 
 //	頁削除メッセージの確認無しは、起動中だけにしたほうがいい？
 //	キーバインド・メニューに入ってない機能に注意
@@ -44,8 +79,14 @@ If not, see <http://www.gnu.org/licenses/>.
 //	ドッキングテンプレ、左に置けないか
 //	セーブ時メッセージON/OFFできるように
 //	ファイル履歴は、いじった順番になるようにすべき
-//プレビューの更新ボタンつける
-//プレビュー開いてる時に、開く操作したら閉じる？
+//	プレビューの更新ボタンつける
+//	プレビュー開いてる時に、開く操作したら閉じる？
+
+//	デカいファイル開こうとしたときはメッセージ出すとか
+//	SQLのINSERT、prepareは重い。クエリつくって、resetしながら回すのがいいんじゃ
+//	IEプレビュー、CSSでフォント表示を正規化する http://b4t.jp/823
+
+
 
 //ファイル開くとき、ページデータは生のテキストデータだけゲットしておいて、メモリ展開はしない
 //ページが選択されたら、本体に展開して、生データは消しておく・これをフラグにする
@@ -53,58 +94,41 @@ If not, see <http://www.gnu.org/licenses/>.
 //頁表示のステータスのほうは？バイト数計算だけならそんなに重くない？
 
 //頁番号挿入みたいに、複数頁にわたる処理がヤバイ
+//全プレビューもヤバイ
 
+//	ファイルオーポン時にプログレス的なものを。バイト数表示のやつ。ディレイロードできれば要らないか
+
+
+//確認：Viewer側、↑↓PageUpDownつかえてるか
 
 
 
 
 //バグ
+//	TODO:	頁ListやMAAでのツールチップが何度も描画される。
+//	TODO:	最大化したり画面サイズかえると、右の頁一覧が見えなくなる
+//	TODO:	矩形選択範囲バイトカウントが遅い
 //	TODO:	描画更新タイミングがおかしい場合が多々ある
-//	TODO:	MLTに右クリからアイテム追加して、そのAAを連続で貼り付けると落ちる
-//	TODO:	追加したAAの最後にステルス空白がある？
-//	TODO:	「矩形選択」と「部分抽出」の両方にチェックを入れた状態でドラッグすると範囲がおかしい
-
-//	TODO:	使用のアレ、別MLTに同じAAが有ったらハッシュが同じってことでラリってまう。ベースネーム書換で対処するか
-
+//	TODO:	「矩形選択」と「部分抽出」の両方にチェックを入れた状態でドラッグするとエラー
 //	TODO:	最大化して終わる＞起動して、最大化解除すると、メインスプリットバーが見えなくなる//右にイッちゃってるまま
-
-//直した？
-//	TODO:	枠編集のサンプルがおかしいときがある・描画ルーチン治すか＜複数行対応にする
-//	TODO:	イケない空白の行番号表示の赤が、解消しても消えない時がある・多分Drawかチェック忘れ
-
-//確認：Viewer側、↑↓PageUpDownつかえてるか
-
-//影響ないようにした
-//選択範囲がある状態でCtrlU＞アンドゥ＞選択範囲がおかしくなる。さらに切り取りとかすると落ちる
-//アンドゥリドゥしたら、選択範囲解除する・DocInsDelCtrl.cpp:559あたりでおかしい？
-
-
-//変更・修正
 //	TODO:	サムネ表示、ポップアップで落ちやすい？メモリの扱いを考える必要がある・NULLチェキとか
 //	文字数とバイト数の計算間違っていた所をなおした
-
-//	TODO:	頁の複数選択して移動、Ｄ＆Ｄも
-//	TODO:	Viewer側、Ctrl↑↓で、MLTのセクション間移動する
-//	TODO:	履歴から開こうとしたファイル・プロフが無かったらリストから消すべき
 
 //	TODO:	複数行テンプレ窓の主タブでホイールスクロールが効かない？
 //			メイン窓の編集スペース、Page List、複数行テンプレ窓のAA一覧ツリーなど、他の場所では問題ない
 
-//	TODO:	デカいファイル開こうとしたときはメッセージ出すとか
 //	TODO:	Viewer、右クリメニューからのドラフトボードが開かない？・追加されない？
-//	TODO:	メインスプリットバーの位置情報リセットが居るかも
-//	TODO:	位置情報のリセット機能・システムメニューに搭載する
-//	TODO:	SQLのINSERT、prepareは重い。クエリつくって、resetしながら回すのがいいんじゃ
-//	TODO:	トレス機能、点滅コントラスト？と輝度調整の幅が狭いのがちょいと苦しいらしい
-//	TODO:	トレスモード窓に、グリッドON/OFFを付ける
-//	TODO:	トレスモード、各入力値は直入力できるように
-//	TODO:	トレスモードボタンは、TOGGLEできるようにする
-//	TODO:	DocBadSpaceCheck内の更新指令の最適化が必要
-//	TODO:	ファイルタブの[変更]が重い？変更したら、弐回目以降は書かないように//みてるファイル変えたときのステータスバーの書き直しに注意
-//	TODO:	テンプレの「常に最前面に表示」Orinrinediterを表示している時だけ最前面に来るように//もしくは、メイン窓に統合とか
 
-//機能追加
-//	TODO:	MAAのアイテム追加、カーソル位置のAAの手前に入るように
+
+
+
+//機能追加・変更
+//	TODO:	DocBadSpaceCheck内の更新指令の最適化が必要
+//	TODO:	View部分をサムネ表示できるように
+//	TODO:	テンプレの「常に最前面に表示」Orinrinediterを表示している時だけ最前面に来るように//もしくは、メイン窓に統合とか
+//	TODO:	頁の複数選択して移動、Ｄ＆Ｄも
+//	TODO:	Viewer側、Ctrl↑↓で、MLTのセクション間移動する
+//	TODO:	履歴から開こうとしたファイル・プロフが無かったらリストから消すべき
 //	TODO:	viewerの主タブをマウスとスクロールバーだけでなく、ホウィール、キーボードの矢印やPageUp,PageDnキーで操作出来る様にならない？
 //	TODO:	Viewer側、ポップアップで、容量も出せないか
 //	TODO:	右揃え線消し
@@ -114,7 +138,6 @@ If not, see <http://www.gnu.org/licenses/>.
 //	TODO:	Viewの右クリメニューも編集出来るように
 //	TODO:	スペース文字が二個以上連続しているところをAAと台詞の区切りだと認識するようなロジックは？
 //	TODO:	フリーカーソルモード
-//	TODO:	View部分をサムネ表示できるように
 //	TODO:	頁一覧を、複数選択して一発削除できるように
 //	TODO:	レイヤボックス自体の操作、上書き実行とかもキボドショトカトで出来るように
 //	TODO:	ドラフトボード・サムネ、サイズ変更できるように
@@ -124,8 +147,7 @@ If not, see <http://www.gnu.org/licenses/>.
 //	TODO:	バックアップ機能の強化・上書き保存したらバックアップとか・頁新規作成したら保存
 //	TODO:	保存するとき、同名ファイルがあったら、日時くっつけてバックアップとか
 //	TODO:	ファイル内容統計機能が欲しい。全バイト数、頁数とか
-//	TODO:	Ctrl+Kの統計機能・PageListの項目増やして対処・Ctrl+Kでリフレッシュとか
-//			連続半角とか、行末空白とか・いろんな情報をだす・リヤルタイムだと重いので操作でリフレッシュ
+//	TODO:	Ctrl+Kの統計機能・PageListの項目増やして対処・Ctrl+Kでリフレッシュとか・連続半角とか、行末空白とか・いろんな情報をだす・リヤルタイムだと重いので操作でリフレッシュ
 //	TODO:	ツールチップ付けたい
 //	TODO:	文字の検索・痴漢機能	ユニコード空白一括検索とか
 //	TODO:	切り抜きリファレンスAAを使って、文字のとこだけ切り抜き、ないところだけ切り抜き、とかできるようにしたい
@@ -139,27 +161,26 @@ If not, see <http://www.gnu.org/licenses/>.
 //	TODO:	トレスの１画面、２画面切り替えモード
 //	TODO:	トレスの２画面だと、背景絵はどっちのペインでも表示出来るようにしたい
 //	TODO:	トレスで、画像をつまんで直接移動できるように
+//	TODO:	トレス機能、点滅コントラスト？と輝度調整の幅が狭いのがちょいと苦しいらしい
+//	TODO:	トレスモード窓に、グリッドON/OFFを付ける
+//	TODO:	トレスモード、各入力値は直入力できるように
+//	TODO:	トレスモードボタンは、TOGGLEできるようにする
 //	TODO:	プレビューをリヤルタイムに変更する
 //	TODO:	プロファイルのツリーの編集、もっと手軽にできないか
 //	TODO:	MAA窓も統合できないか
 //	TODO:	ミニ複数行テンプレ・壱行ブラシのサブダイヤログに増やすか
+//	TODO:	メインスプリットバーの位置情報リセットが居るかも
+//	TODO:	位置情報のリセット機能・システムメニューに搭載する
 
 
 
 
 
 
-//外部スクリプトはどのように実現するか。Rubyの組込とかつかえない？
-//(д)EditはFreePascal？
 
 
-//	メニューのコレ外した
-//        MENUITEM SEPARATOR
-//        MENUITEM "塗り潰し（ブラシ）モード(&M)\tCtrl + T",  IDM_BRUSH_STYLE
-//    "T",            IDM_BRUSH_STYLE,        VIRTKEY, CONTROL, NOINVERT
 
 
-//	スクロールが発生した場合、画面全体書換必要か
 
 
 //	ツールチップのポップディレイは、TTM_SETDELAYTIME で調整出来る
@@ -169,26 +190,26 @@ If not, see <http://www.gnu.org/licenses/>.
 
 
 //	ファイルを読み込むとランタイムエラーでることがある・なんか変更してから？
+//	スクロールが発生した場合、画面全体書換必要か
+
+//影響ないようにした
+//選択範囲がある状態でCtrlU＞アンドゥ＞選択範囲がおかしくなる。さらに切り取りとかすると落ちる
+//アンドゥリドゥしたら、選択範囲解除する・DocInsDelCtrl.cpp:559あたりでおかしい？
+
+//非ユニコードの埋めパターン、半角空白気にしない用にする？＜ちゅっと変更してみた
 
 
 //OK?
-//	TODO:	新規で開いて、それを名づけ保存したファイルは、履歴に入いってない
-//	TODO:	頁削除のAlt+D付ける。注意ダイヤログ出す。
-//	TODO:	サムネからだと使用履歴に反映されない
-//	TODO:	IEプレビュー、CSSでフォント表示を正規化する http://b4t.jp/823
-//	TODO:	文字ＡＡの入力とか、レイヤボックスの編集とかで、キーボードショートカット使えるように
-//	一行ラインテンプレートをレイヤボックスに貼り付け・中クルックとかで
+//	新規で開いて、それを名づけ保存したファイルは、履歴に入いってない
+//	頁削除のAlt+D付ける。注意ダイヤログ出す。
+//	サムネからだと使用履歴に反映されない
+//	文字ＡＡの入力とか、レイヤボックスの編集とかで、キーボードショートカット使えるように
 //	トレス窓が、最大化してると隠れてしまう
-//	矩形モードにしたら、マウスカーソルの形変えられないか
-//	TODO:	CtrlF4で、Viewer側なら副タブ閉じる
-//	TODO:	ページ分割処理、容量表示、改行の数とかおかしい？
-//	TODO:	選択範囲をマウスドラッグで移動したときのアンドゥリドゥがおかしい・描画か？
-//	TODO:	複数行移動させたら元の位置に内容が残る・描画か？データ狂ってる？
+//	頁挿入ダイヤログのチェックボックス覚えておくように
 
-//	TODO:	MAAで、ファイルクルックしたら、自動で副タブ開く機能・選択式がよい・もしくは中クルックで対応
-//	TODO:	頁挿入ダイヤログのチェックボックス覚えておくように
-//	TODO:	カーソル位置で強制矩形挿入が欲しい＜上書きは意味が無いかも・・・
-//	TODO:	カーソルのところに上書き挿入、的な機能・レイヤボックス介さずに直で。
+//	TODO:	使用のアレ、別MLTに同じAAが有ったらハッシュが同じってことでラリってまう。ベースネーム書換で対処するか
+//	TODO:	枠挿入BOX、縦幅がパーツ全体の高さに足りなくなると落ちる・横幅もか？
+
 
 /*
 
@@ -405,6 +426,14 @@ ASDファイル　　壱行が壱コンテンツ
 					壱行テンプレで中クルックしたらレイヤボックスが開く
 					MAAツリーでファイル名を中クリックしたら、副タブに追加できる
 					バグ修正いろいろ
+2012/05/31	0.31	MAAに、ファイルの途中にアイテムを追加できるようにした
+					MAAの内容表示側にＤ＆Ｄすると、そのファイルを副タブするようにした（Viewer込み）
+					※使用には入らないし復元もされない。要検討
+					MAAツリーにＤ＆Ｄすると、追加アイテムとして保持できるようにした（Viewer込み）
+					※再構築すると消える
+					MAAの使用で、複数のMLTに同じAAが有る場合にキョドるのを修正（Viewer込み）
+					枠挿入BOXを縮めすぎるとエラーになるのを修正
+
 
 更新日時注意
 
@@ -494,10 +523,6 @@ static   UINT		gdBUInterval;	//!<	バックアップ感覚・デフォ３分くらい？
 EXTERNED UINT		gbAutoBUmsg;	//!<	自動バックアップメッセージ出すか？
 EXTERNED UINT		gbCrLfCode;		//!<	改行コード：０したらば・非０ＹＹ 
 
-//@@コピー処理
-#ifdef COPY_SWAP
-EXTERNED UINT		gbCpModSwap;	//!<	SJISとユニコードコピーを入れ替える
-#endif
 static TCHAR		gatExePath[MAX_PATH];	//!<	実行ファイルの位置
 static TCHAR		gatIniPath[MAX_PATH];	//!<	ＩＮＩファイルの位置
 
@@ -645,10 +670,11 @@ INT APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 	FrameInitialise( gatExePath, hInstance );
 	MoziInitialise( gatExePath, hInstance );
 
+	AacBackupDirectoryInit( gatExePath );
+
 	gbUniPad = 0;
 
 	gbDockTmplView = TRUE;
-
 
 #ifdef WORK_LOG_OUT
 	iCode = InitParamValue( INIT_LOAD, VL_WORKLOG, 0 );
@@ -874,10 +900,6 @@ BOOL InitInstance( HINSTANCE hInstance, INT nCmdShow, LPTSTR ptArgv )
 
 	gbTmpltDock   = InitParamValue( INIT_LOAD, VL_PLS_LN_DOCK,  1 );	//	０独立　１くっつける
 
-#ifdef COPY_SWAP
-	gbCpModSwap   = InitParamValue( INIT_LOAD, VL_SWAP_COPY, 0 );		//	０ユニコード　１SJIS
-#endif
-
 	ghMainWnd = hWnd;
 
 	//	機能チェック
@@ -895,13 +917,6 @@ BOOL InitInstance( HINSTANCE hInstance, INT nCmdShow, LPTSTR ptArgv )
 #endif
 
 	hSubMenu = GetSubMenu( ghMenu , 1 );	//	編集
-#ifdef COPY_SWAP
-	if( gbCpModSwap )
-	{
-		ModifyMenu( hSubMenu, IDM_COPY,     MF_BYCOMMAND | MFT_STRING, IDM_COPY,     TEXT("SJISコピ－(&C)\tCtrl + C") );
-		ModifyMenu( hSubMenu, IDM_SJISCOPY, MF_BYCOMMAND | MFT_STRING, IDM_SJISCOPY, TEXT("Unicodeコピ－(&J)") );
-	}
-#endif
 #ifndef FIND_STRINGS
 	DeleteMenu( hSubMenu, IDM_FIND_DLG_OPEN, MF_BYCOMMAND );
 	DeleteMenu( hSubMenu, IDM_FIND_HIGHLIGHT_OFF, MF_BYCOMMAND );
@@ -1221,6 +1236,7 @@ VOID Cls_OnActivate( HWND hWnd, UINT state, HWND hWndActDeact, BOOL fMinimized )
 {
 	LONG_PTR	rdExStyle;
 	HWND		hWorkWnd;
+//	BOOLEAN		bRslt;
 
 /*
 WA_INACTIVE		0	ウィンドウが非アクティブになります。
@@ -1239,10 +1255,13 @@ WA_CLICKACTIVE	2	マウスクリックによって、ウィンドウがアクティブになります。
 		else							hWorkWnd = hWnd;
 		SetWindowPos( ghPgVwWnd, hWorkWnd, 0, 0, 0, 0, SWP_NOACTIVATE | SWP_NOMOVE | SWP_NOSIZE );
 
-		rdExStyle = GetWindowLongPtr( ghMaaWnd, GWL_EXSTYLE );
-		if( WS_EX_TOPMOST & rdExStyle )	hWorkWnd = HWND_TOPMOST;
-		else							hWorkWnd = hWnd;
-		SetWindowPos( ghMaaWnd, hWorkWnd, 0, 0, 0, 0, SWP_NOACTIVATE | SWP_NOMOVE | SWP_NOSIZE );
+		if( InitParamValue( INIT_LOAD, VL_MAA_TOPMOST, 1 ) )	//	
+		{
+			rdExStyle = GetWindowLongPtr( ghMaaWnd, GWL_EXSTYLE );
+			if( WS_EX_TOPMOST & rdExStyle )	hWorkWnd = HWND_TOPMOST;
+			else							hWorkWnd = hWnd;
+			SetWindowPos( ghMaaWnd, hWorkWnd, 0, 0, 0, 0, SWP_NOACTIVATE | SWP_NOMOVE | SWP_NOSIZE );
+		}
 
 		if( IsWindowVisible(ghLnTmplWnd ) )
 		{
@@ -2599,10 +2618,6 @@ HRESULT OpenHistoryLogging( HWND hWnd, LPTSTR ptFile )
 HRESULT OptionDialogueOpen( VOID )
 {
 	UINT	bURHbuff, bABUIbuff;
-#ifdef COPY_SWAP
-	HMENU	hSubMenu;
-	UINT	bCpNodBuf;
-#endif
 	TCHAR	atFontName[LF_FACESIZE];	//	フォント名変更に備える
 	//	項目増えたら、構造体にしちゃう
 
@@ -2610,9 +2625,6 @@ HRESULT OptionDialogueOpen( VOID )
 
 	bURHbuff  = gbUniRadixHex;
 	bABUIbuff = gdBUInterval;
-#ifdef COPY_SWAP
-	bCpNodBuf = gbCpModSwap;
-#endif
 	//	改行コード変更ならバイト数再計算が必要か
 	DialogBoxParam( ghInst, MAKEINTRESOURCE(IDD_GENERAL_OPTION_DLG), ghMainWnd, OptionDlgProc, (LPARAM)atFontName );
 
@@ -2634,25 +2646,6 @@ HRESULT OptionDialogueOpen( VOID )
 		//	記録する・書換はあとで
 	}
 
-//@@コピー処理
-#ifdef COPY_SWAP
-	if( bCpNodBuf != gbCpModSwap )	//	コピーモード入替
-	{
-		hSubMenu = GetSubMenu( ghMenu, 1 );
-		if( gbCpModSwap )
-		{
-			ModifyMenu( hSubMenu, IDM_COPY,     MF_BYCOMMAND | MFT_STRING, IDM_COPY,     TEXT("SJISコピ－(&C)\tCtrl + C") );
-			ModifyMenu( hSubMenu, IDM_SJISCOPY, MF_BYCOMMAND | MFT_STRING, IDM_SJISCOPY, TEXT("Unicodeコピ－(&J)") );
-		}
-		else	//	通常
-		{
-			ModifyMenu( hSubMenu, IDM_COPY,     MF_BYCOMMAND | MFT_STRING, IDM_COPY,     TEXT("Unicodeコピー(&C)\tCtrl + C") );
-			ModifyMenu( hSubMenu, IDM_SJISCOPY, MF_BYCOMMAND | MFT_STRING, IDM_SJISCOPY, TEXT("SJISコピ－(&J)") );
-		}
-
-		CntxMenuCopySwap(  );
-	}
-#endif
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
@@ -2738,12 +2731,8 @@ INT_PTR CALLBACK OptionDlgProc( HWND hDlg, UINT message, WPARAM wParam, LPARAM l
 			dValue = InitParamValue( INIT_LOAD, VL_GROUP_UNDO, 1 );
 			CheckDlgButton( hDlg, IDCB_GROUPUNDO_SET, dValue ? BST_CHECKED : BST_UNCHECKED );
 
-#ifdef COPY_SWAP
-			//	コピー標準スタイル	//	０ユニコード　１SJIS
-			CheckDlgButton( hDlg, IDCB_COPY_STYLE_SWAP, gbCpModSwap ? BST_CHECKED : BST_UNCHECKED );
-#else
 			EnableWindow( GetDlgItem(hDlg,IDCB_COPY_STYLE_SWAP), FALSE );
-#endif
+
 			//	ドッキングスタイル
 			dValue = InitParamValue( INIT_LOAD, VL_PLS_LN_DOCK, 1 );
 			CheckDlgButton( hDlg, IDCB_DOCKING_STYLE, dValue ? BST_CHECKED : BST_UNCHECKED );
@@ -2884,12 +2873,6 @@ INT_PTR CALLBACK OptionDlgProc( HWND hDlg, UINT message, WPARAM wParam, LPARAM l
 					dValue = IsDlgButtonChecked( hDlg, IDCB_GROUPUNDO_SET );
 					InitParamValue( INIT_SAVE, VL_GROUP_UNDO, dValue ? 1 : 0 );
 
-#ifdef COPY_SWAP
-					//	コピー標準スタイル
-					dValue = IsDlgButtonChecked( hDlg, IDCB_COPY_STYLE_SWAP );
-					gbCpModSwap = dValue ? 1 : 0;
-					InitParamValue( INIT_SAVE, VL_SWAP_COPY, gbCpModSwap );
-#endif
 					//	ドッキングスタイル・変更しても、再起動するまでは無効
 					dValue = IsDlgButtonChecked( hDlg, IDCB_DOCKING_STYLE );
 					InitParamValue( INIT_SAVE, VL_PLS_LN_DOCK, dValue ? 1 : 0 );

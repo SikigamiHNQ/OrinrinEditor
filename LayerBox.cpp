@@ -77,10 +77,6 @@ extern HFONT	ghAaFont;		//!<	AA用フォント
 
 extern  HWND	ghViewWnd;		//!<	ビューウインドウハンドル
 
-//@@コピー処理
-#ifdef COPY_SWAP
-extern  UINT	gbCpModSwap;	//	SJISとユニコードコピーを入れ替える
-#endif
 static POINT	gstViewOrigin;	//!<	ビューの左上ウインドウ位置・
 
 static  ATOM	gLyrBoxAtom;	//!<	
@@ -579,11 +575,7 @@ VOID Lyb_OnCommand( HWND hWnd, INT id, HWND hWndCtl, UINT codeNotify )
 			break;
 
 		case IDM_LYB_COPY:	//	クルップボードへ
-#ifdef COPY_SWAP
-			LayerForClipboard( hWnd, gbCpModSwap ? D_SJIS : D_UNI );	//@@コピー処理
-#else
 			LayerForClipboard( hWnd, D_UNI );
-#endif
 			break;
 
 		case IDM_LYB_DO_EDIT:	//	文字列を編集
@@ -1076,6 +1068,7 @@ HRESULT LayerTransparentToggle( HWND hWnd, UINT bMode )
 
 /*!
 	行数とドット値を受け取って、その場所の
+	@param[in]	itLyr	対象レイヤボックスのイテレータ
 	@param[in]	dNowDot	今のキャレット・
 	@param[in]	rdLine	対象の行番号・絶対０インデックスか
 	@return		文字数
@@ -1805,13 +1798,13 @@ HRESULT LayerContentsImportable( HWND hWnd, UINT cmdID, LPINT pXdot, LPINT pYlin
 	if( !(ptStr) )	dNeedLine--;	//	最後空白なら使わない
 	FREE(ptStr);
 
-	iPageLine = DocPageParamGet( NULL, NULL );	//	この頁の行数確認
+	iPageLine = DocPageParamGet( NULL, NULL );	//	この頁の行数確認・入れ替えていけるか
 
 	//	全体行数より、追加行数が多かったら、改行増やす
 	if( iPageLine < (dNeedLine + yTgLine) )
 	{
 		iMinus = ( dNeedLine + yTgLine ) - iPageLine;	//	追加する行数
-		DocAdditionalLine( iMinus, TRUE );	bFirst = FALSE;
+		DocAdditionalLine( iMinus, &bFirst );//	bFirst = FALSE;
 		TRACE( TEXT("ADD LINE[%d]"), iMinus );
 	}
 

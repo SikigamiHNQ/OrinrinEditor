@@ -389,10 +389,10 @@ INT DocLetterErase( INT xDot, INT yLine, INT iLetter )
 /*!
 	指定行の内容を削除する・改行はそのまま
 	@param[in]	yLine	対象の行番号
-	@param[in]	bFirst	アンドゥの非０初めてのグループ　０続きの処理
-	@return		アンドゥ状況：削除してたらFALSE、ナニもしなかったら受けたのスルー
+	@param[in]	pFirst	アンドゥの非０初めてのグループ　０続きの処理
+	@return	HRESULT	終了状態コード
 */
-BOOLEAN DocLineErase( INT yLine, BOOLEAN bFirst )
+HRESULT DocLineErase( INT yLine, PBOOLEAN pFirst )
 {
 	INT		dLines, iMozis, i;
 	INT_PTR	cbSize, cchSize;
@@ -402,12 +402,12 @@ BOOLEAN DocLineErase( INT yLine, BOOLEAN bFirst )
 
 	wsString.clear( );
 
-	dLines = DocPageParamGet( NULL, NULL );	//	行数確認
-	if( dLines <= yLine )	return bFirst;	//	はみ出し確認
+	dLines = DocNowFilePageLineCount(  );//DocPageParamGet( NULL, NULL );	//	行数確認
+	if( dLines <= yLine )	return E_OUTOFMEMORY;	//	はみ出し確認
 
 	DocLineParamGet( yLine, &iMozis, NULL );	//	指定行の文字数確保
 
-	if( 0 >= iMozis )	return bFirst;	//	文字がないならすること無い
+	if( 0 >= iMozis )	return  E_ABORT;	//	文字がないならすること無い
 
 	itLine = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.begin();
 	std::advance( itLine, yLine );
@@ -423,19 +423,19 @@ BOOLEAN DocLineErase( INT yLine, BOOLEAN bFirst )
 	ptBuffer = (LPTSTR)malloc( cbSize );
 	ZeroMemory( ptBuffer, cbSize );
 	StringCchCopy( ptBuffer, cchSize, wsString.c_str(  ) );
-	SqnAppendString( &((*gitFileIt).vcCont.at( gixFocusPage ).stUndoLog), DO_DELETE, ptBuffer, 0, yLine, bFirst );
-	bFirst = FALSE;
+	SqnAppendString( &((*gitFileIt).vcCont.at( gixFocusPage ).stUndoLog), DO_DELETE, ptBuffer, 0, yLine, *pFirst );
+	*pFirst = FALSE;
 
 	//	削除処理
 	itLine->vcLine.clear();
 
-	DocLineParamGet( yLine, NULL, NULL );	//	再計算
-//	DocPageParamGet( NULL, NULL );	//	再計算
-	DocPageByteCount( gitFileIt, gixFocusPage, NULL, NULL );	//	再計算
+	DocLineParamGet( yLine, NULL, NULL );	//	行内容の再計算
+	DocPageParamGet( NULL, NULL );	//	再計算
+
 	DocBadSpaceCheck( yLine );	//	リセットに必要
 	ViewRedrawSetLine( yLine );	//	要らないかも
 
-	return bFirst;
+	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 
@@ -774,10 +774,10 @@ INT DocSquareAdd( PINT pNowDot, PINT pdLine, LPCTSTR ptStr, INT cchSize, LPPOINT
 /*!
 	現在頁の末端に改行を追加する
 	@param[in]	addLine	追加する行数
-	@param[in]	bFirst	アンドゥの非０初めてのグループ　０続きの処理
+	@param[in]	pFirst	アンドゥの非０初めてのグループ　０続きの処理
 	@return		全体の行数
 */
-INT DocAdditionalLine( INT addLine, BOOLEAN bFirst )
+INT DocAdditionalLine( INT addLine, PBOOLEAN pFirst )
 {
 	UINT_PTR	iLines;
 	INT			cbSize, cchMozi, i;
@@ -802,10 +802,12 @@ INT DocAdditionalLine( INT addLine, BOOLEAN bFirst )
 	}
 
 	dBaseDot = DocLineParamGet( dBaseLine, NULL, NULL );
-	SqnAppendString( &((*gitFileIt).vcCont.at( gixFocusPage ).stUndoLog), DO_INSERT, ptBuffer, dBaseDot, dBaseLine, bFirst );
+	SqnAppendString( &(gitFileIt->vcCont.at( gixFocusPage ).stUndoLog), DO_INSERT, ptBuffer, dBaseDot, dBaseLine, *pFirst );
 	DocStringAdd( &dBaseDot, &dBaseLine, ptBuffer, cchMozi );
 
 	FREE( ptBuffer );
+
+	*pFirst = FALSE;
 
 	return iLines;
 }
@@ -836,7 +838,7 @@ INT DocSquareAddPreMod( INT xDot, INT yLine, INT dNeedLine, BOOLEAN bFirst )
 	{
 		iMinus = (dNeedLine + yLine) - iLines;	//	追加する行数
 
-		DocAdditionalLine( iMinus, bFirst );	bFirst = FALSE;
+		DocAdditionalLine( iMinus, &bFirst );//	bFirst = FALSE;
 
 		//	この頁の行数取り直し
 		iLines = DocNowFilePageLineCount( );
@@ -1284,7 +1286,7 @@ HRESULT DocScreenFill( LPTSTR ptFill )
 		remain = 40 - dLines;	//	とりあえず４０行とする
 		if( 0 < remain )	//	足りないなら
 		{
-			DocAdditionalLine( remain, bFirst );	//	とりあえず改行して
+			DocAdditionalLine( remain, &bFirst );	//	とりあえず改行して
 			dLines = DocNowFilePageLineCount( );
 			iUnt  = (dRiDot / mDot) + 1;	//	埋める分・はみ出し・適当で良い
 
@@ -1388,24 +1390,27 @@ HRESULT DocPageNumInsert( HINSTANCE hInst, HWND hWnd )
 	//	今の頁を待避
 	dNowPageBuffer = gixFocusPage;
 
-	maxPage = DocNowFilePageCount(  );
+	maxPage = DocNowFilePageCount(  );	//	頁数を確認
 
 	ZeroMemory( &stInfo, sizeof(PAGENUMINFO) );
 	stInfo.dStartNum = 1;
 
-	stInfo.bInUnder  = InitParamValue( INIT_LOAD, VL_PAGE_UNDER,   BST_UNCHECKED );
-	stInfo.bOverride = InitParamValue( INIT_LOAD, VL_PAGE_OVWRITE, BST_UNCHECKED );
+	//	設定を確認
+	stInfo.bInUnder  = InitParamValue( INIT_LOAD, VL_PAGE_UNDER,   BST_UNCHECKED );	//	頁番号を最下行に挿入するか
+	stInfo.bOverride = InitParamValue( INIT_LOAD, VL_PAGE_OVWRITE, BST_UNCHECKED );	//	該当行の内容を削除して上書するか
 
-	StringCchCopy( stInfo.atStyle, MAX_PATH, TEXT("%u") );	//	初期値
+	//	文字列フォーマット
+	StringCchCopy( stInfo.atStyle, MAX_PATH, TEXT("%u") );	//	デフォ設定
 	InitParamString( INIT_LOAD, VS_PAGE_FORMAT, stInfo.atStyle );
 
 	iRslt = DialogBoxParam( hInst, MAKEINTRESOURCE(IDD_PAGENUMBER_DLG), hWnd, PageNumDlgProc, (LPARAM)(&stInfo) );
-	if( IDOK == iRslt )
+	if( IDOK == iRslt )	//	挿入する
 	{
-		ixNumber = stInfo.dStartNum;
+#pragma message("ディレイロードしたら、頁番号挿入がおかしくなるはず")
+		ixNumber = stInfo.dStartNum;	//	開始番号について
 
 		InitParamString( INIT_SAVE, VS_PAGE_FORMAT, stInfo.atStyle );
-
+		//	設定を保存
 		InitParamValue( INIT_SAVE, VL_PAGE_UNDER,   stInfo.bInUnder );
 		InitParamValue( INIT_SAVE, VL_PAGE_OVWRITE, stInfo.bOverride );
 
@@ -1413,27 +1418,34 @@ HRESULT DocPageNumInsert( HINSTANCE hInst, HWND hWnd )
 		{
 			StringCchPrintf( atText, MAX_PATH, stInfo.atStyle, ixNumber );
 
-			gixFocusPage = iNow;	//	内部操作
-#pragma message("ディレイロードしたら、頁番号挿入がおかしくなるはず")
-			if( stInfo.bInUnder )
+#ifdef PAGE_DELAY_LOAD
+			if( NowPageInfoGet( iNow, NULL ) )	//	ディレってないなら０
 			{
-				if( stInfo.bOverride )
+				//	展開する・頁が多いと重い
+				DocDelayPageLoad( gitFileIt, iNow );
+			}
+#endif
+
+			gixFocusPage = iNow;	//	内部操作
+			if( stInfo.bInUnder )	//	頁最下部に挿入
+			{
+				if( stInfo.bOverride )	//	該当行消して挿入である
 				{
 					iLine = DocPageParamGet( NULL, NULL );
 					iLine--;	if( 0 > iLine ){	iLine = 0;	}
-					bFirst = DocLineErase( iLine, bFirst );
+					DocLineErase( iLine , &bFirst );	//	中でアンドゥ操作変換
 				}
 				else
 				{
-					iLine = DocAdditionalLine( 1 , bFirst );	bFirst =  FALSE;
+					iLine = DocAdditionalLine( 1, &bFirst );//	bFirst =  FALSE;
 				}
 			}
-			else
+			else	//	壱行目に挿入
 			{
 				iDot = 0;	iLine = 0;
-				if( stInfo.bOverride )
+				if( stInfo.bOverride )	//	該当行消して挿入である
 				{
-					bFirst = DocLineErase( 0, bFirst );
+					DocLineErase( 0 , &bFirst );	//	中でアンドゥ操作変換
 				}
 				else
 				{
@@ -1443,6 +1455,7 @@ HRESULT DocPageNumInsert( HINSTANCE hInst, HWND hWnd )
 			}
 			iDot = 0;
 
+			//	頁番号の内容挿入
 			DocInsertString( &iDot, &iLine, NULL, atText, 0, bFirst );	bFirst = FALSE;
 		}
 

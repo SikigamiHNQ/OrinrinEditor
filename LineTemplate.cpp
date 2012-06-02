@@ -247,6 +247,7 @@ HWND LineTmpleInitialise( HINSTANCE hInstance, HWND hParentWnd, LPRECT pstFrame 
 
 /*!
 	ドッキング状態で発生・ドッキングしてる内容切換タブ
+	@param[in]	hInst	実存ハンドル
 	@param[in]	hPrWnd	親ウインドウハンドル
 	@param[in]	pstRect	使えるサイズ・これの上部にくっつける
 */

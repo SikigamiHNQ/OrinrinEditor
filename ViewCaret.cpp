@@ -172,8 +172,8 @@ VOID ViewHideCaret( VOID )
 
 /*!
 	Caretを、色を変えて再構築する
-	@param[in]	xDot	描画位置の横ドット数
-	@return		HRESULT	終了状態コード
+	@param[in]	crtColour	変更する色
+	@return		HRESULT		終了状態コード
 */
 HRESULT ViewCaretReColour( COLORREF crtColour )
 {

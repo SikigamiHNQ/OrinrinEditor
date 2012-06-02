@@ -1056,8 +1056,10 @@ HRESULT DraughtItemUse( HWND hWnd, INT id )
 		if( id != IDM_THUMB_DRAUGHT_ADD )
 		{
 			//	ここでお気に入りに入れる・大丈夫か？
-			AaItemsFavUpload( pcAaItem, cbSize );
-			FavContsRedrawRequest( hWnd );
+			if( SUCCEEDED( AaItemsFavUpload( pcAaItem, cbSize ) ) )
+			{
+				FavContsRedrawRequest( hWnd );
+			}
 		}
 
 		FREE(pcAaItem);
@@ -1130,7 +1132,7 @@ INT DraughtItemDelete( CONST INT iTarget )
 
 /*!
 	クライヤント座標を受け取って、ターゲットアイテム通し番号を出す
-	@param[in]	ptPos	クライヤント座標が入った構造体ポインター
+	@param[in]	pstPos	クライヤント座標が入った構造体ポインター
 	@return		左上から、→に通し番号０インデックス　無効で－１
 */
 INT DraughtTargetItemSet( LPPOINT pstPos )
@@ -1276,6 +1278,7 @@ INT TextViewSizeGet( LPCTSTR ptText, PINT piLine )
 /*!
 	ドラフトボードの内容をファイルに書き出す
 	@param[in]	hWnd	ウインドウハンドル
+	@param[in]	ptPath	未使用
 */
 HRESULT DraughtItemExport( HWND hWnd, LPTSTR ptPath )
 {

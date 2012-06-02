@@ -86,31 +86,28 @@ END_OBJECT_MAP( )
 
 //-------------------------------------------------------------------------------------------------
 
-#define DOC_PREVIEW_CLASS	TEXT("PREVIEW_CLASS")
+#define DOC_PREVIEW_CLASS	TEXT("PREVIEW_CLASS")	//!<	プレビュー窓のクラス名
 
-#define PVW_WIDTH	820
-#define PVW_HEIGHT	480
+#define PVW_WIDTH	 820	//!<	デフォルト画面幅
+#define PVW_HEIGHT	 480	//!<	デフォルト画面高さ
 //-------------------------------------------------------------------------------------------------
 
-static CComQIPtr<IHTMLDocument2>	gpDocument;
-static CComQIPtr<IWebBrowser2>		gpWebBrowser2;
-static  HWND	ghIEwnd;
+static CComQIPtr<IHTMLDocument2>	gpDocument;		//!<	ＩＥコンポーネントのなにか
+static CComQIPtr<IWebBrowser2>		gpWebBrowser2;	//!<	ＩＥコンポーネントのナニカ
+static  HWND	ghIEwnd;							//!<	ＩＥコンポーネントのハンドル
 
 
-extern  HWND	ghPrntWnd;		//!<	親ウインドウハンドル
 
-static  HWND	ghPrevWnd;		//!<	このウインドウのハンドル
-static HINSTANCE	ghInst;		//!<	現在のインターフェイス
+static  HWND	ghPrevWnd;			//!<	このウインドウのハンドル
+static HINSTANCE	ghInst;			//!<	現在のインターフェイス
 
-static  HWND	ghToolWnd;		//!<	ツールバー
+static  HWND	ghToolWnd;			//!<	ツールバー
+static HIMAGELIST ghPrevwImgLst;	//!<	ツールバーアイコンのイメージリスト
 
-static HIMAGELIST ghPrevwImgLst;
-
-extern list<ONEFILE>	gltMultiFiles;	//!<	複数ファイル保持
-
-extern FILES_ITR	gitFileIt;	//!<	今見てるファイルの本体
-
-extern INT		gixFocusPage;	//!<	注目中のページ・とりあえず０・０インデックス
+extern  HWND	ghPrntWnd;				//	親ウインドウハンドル
+extern list<ONEFILE>	gltMultiFiles;	//	複数ファイル保持
+extern FILES_ITR	gitFileIt;			//	今見てるファイルの本体
+extern INT		gixFocusPage;			//	注目中のページ・とりあえず０・０インデックス
 //-------------------------------------------------------------------------------------------------
 
 #define TB_ITEMS	1
@@ -135,15 +132,15 @@ static LPSTR	gpcHtmlFtr;
 //-------------------------------------------------------------------------------------------------
 
 
-LRESULT	CALLBACK PreviewWndProc( HWND, UINT, WPARAM, LPARAM );
+LRESULT	CALLBACK PreviewWndProc( HWND, UINT, WPARAM, LPARAM );	//!<	
 VOID	Pvw_OnCommand( HWND , INT, HWND, UINT );	//!<	WM_COMMAND の処理
-VOID	Pvw_OnSize( HWND , UINT, INT, INT );		
+VOID	Pvw_OnSize( HWND , UINT, INT, INT );		//!<	
 VOID	Pvw_OnPaint( HWND );						//!<	WM_PAINT の処理・枠線描画とか
 VOID	Pvw_OnDestroy( HWND );						//!<	WM_DESTROY の処理・BRUSHとかのオブジェクトの破壊を忘れないように
 
-HRESULT	PreviewHeaderGet( VOID );
+HRESULT	PreviewHeaderGet( VOID );	//!<	
 
-HRESULT	PreviewPageWrite( INT );
+HRESULT	PreviewPageWrite( INT );	//!<	
 //-------------------------------------------------------------------------------------------------
 
 /*!

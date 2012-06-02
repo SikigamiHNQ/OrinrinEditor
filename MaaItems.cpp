@@ -162,9 +162,8 @@ HRESULT AaItemsInitialise( HWND hWnd, HINSTANCE hInst, LPRECT ptRect )
 	gpfOrgAaTitleCbxProc = SubclassWindow( ghComboxWnd, gpfAaTitleCbxProc );
 
 	//	AA一覧のスタティックつくる・オーナードローで描画
-	ghItemsWnd = CreateWindowEx( WS_EX_CLIENTEDGE, WC_STATIC, TEXT(""), WS_VISIBLE | WS_CHILD | SS_OWNERDRAW | SS_NOTIFY, TREE_WIDTH + SPLITBAR_WIDTH, rect.bottom, ptRect->right - TREE_WIDTH - LSSCL_WIDTH, ptRect->bottom - rect.bottom, hWnd, (HMENU)IDSO_AAITEMS, hInst, NULL );
-
-	DragAcceptFiles( ghItemsWnd, TRUE );
+	ghItemsWnd = CreateWindowEx( WS_EX_CLIENTEDGE | WS_EX_ACCEPTFILES, WC_STATIC, TEXT(""), WS_VISIBLE | WS_CHILD | SS_OWNERDRAW | SS_NOTIFY, TREE_WIDTH + SPLITBAR_WIDTH, rect.bottom, ptRect->right - TREE_WIDTH - LSSCL_WIDTH, ptRect->bottom - rect.bottom, hWnd, (HMENU)IDSO_AAITEMS, hInst, NULL );
+	//DragAcceptFiles( ghItemsWnd, TRUE );	WS_EX_ACCEPTFILESでおｋ
 
 	//	サブクラス化
 	gpfOrgAaItemsProc = SubclassWindow( ghItemsWnd, gpfAaItemsProc );
@@ -200,8 +199,6 @@ HRESULT AaItemsInitialise( HWND hWnd, HINSTANCE hInst, LPRECT ptRect )
 	SendMessage( ghToolTipWnd, TTM_ADDTOOL, 0, (LPARAM)&stToolInfo );
 	SendMessage( ghToolTipWnd, TTM_SETMAXTIPWIDTH, 0, 0 );	//	チップの幅。０設定でいい。これしとかないと改行されない
 
-
-
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
@@ -232,6 +229,8 @@ LRESULT	CALLBACK gpfAaTitleCbxProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM l
 */
 VOID AaTitleClear( VOID )
 {
+	ComboBox_SetCurSel( ghComboxWnd, -1 );
+
 	while( ComboBox_GetCount( ghComboxWnd ) ){	ComboBox_DeleteString( ghComboxWnd, 0 );	}
 	gvcAaTitle.clear( );
 
@@ -242,7 +241,7 @@ VOID AaTitleClear( VOID )
 /*!
 	見出しコンボックスに内容追加
 	@param[in]	number	通し番号
-	@param[in]	ptTitle	入れ込む文字列
+	@param[in]	pcTitle	入れ込む文字列
 	@return	継ぎ足したあとの項目数
 */
 INT AaTitleAddString( UINT number, LPSTR pcTitle )
@@ -755,7 +754,7 @@ VOID Aai_OnContextMenu( HWND hWnd, HWND hWndContext, UINT xPos, UINT yPos )
 	UINT_PTR	rdLength;
 	INT		sx, sy;
 
-	dOpen = TreeFavWhichOpen(  );	//	開いてるので処理かえる
+	dOpen = TabMultipleNowSel(  );	//	開いてるので処理かえる
 	//	ACT_ALLTREE	ACT_FAVLIST
 
 // _ORRVW
@@ -816,6 +815,13 @@ VOID Aai_OnContextMenu( HWND hWnd, HWND hWndContext, UINT xPos, UINT yPos )
 			break;
 
 		case IDM_MAA_THUMBNAIL_OPEN:	Maa_OnCommand( hWnd , IDM_MAA_THUMBNAIL_OPEN, NULL, 0 );	break;
+
+#ifndef _ORRVW
+  #ifdef MAA_IADD_PLUS
+		//	途中追加
+		case IDM_MAA_ITEM_INSERT:		AacItemInsert( hWnd, gixNowSel );	break;
+  #endif
+#endif
 	}
 
 	return;
@@ -824,7 +830,7 @@ VOID Aai_OnContextMenu( HWND hWnd, HWND hWndContext, UINT xPos, UINT yPos )
 
 /*!
 	ドラッグンドロップの受け入れ
-	@param[in]	hWnd	親ウインドウのハンドル
+	@param[in]	hWnd	表示スタティックのハンドル
 	@param[in]	hDrop	ドロッピンオブジェクトハンドゥ
 */
 VOID Aai_OnDropFiles( HWND hWnd, HDROP hDrop )
@@ -837,9 +843,10 @@ VOID Aai_OnDropFiles( HWND hWnd, HDROP hDrop )
 	DragQueryFile( hDrop, 0, atFileName, MAX_PATH );
 	DragFinish( hDrop );
 
-	TRACE( TEXT("MAA DROP[%s]"), atFileName );
+	TRACE( TEXT("AAI DROP[%s]"), atFileName );
 
-#pragma message ("ドラッグンドロッペした後の処理がない")
+	//	ドロッペされたファイルを副タブに展開しちゃう
+	TabMultipleDropAdd( GetParent( hWnd ), atFileName );
 
 	return;
 }
@@ -862,12 +869,14 @@ HRESULT AaItemsDoShow( HWND hWnd, LPTSTR ptFileName, UINT type )
 	//	描画位置を最初からにして、再描画状態にする
 	gixTopItem = 0;
 
+	AaTitleClear(  );	//	ここでクルヤーしてみる
+
 	//	開く
 	switch( type )
 	{
 		case ACT_ALLTREE:	gixMaxItem = AacAssembleFile( hWnd, ptFileName );	break;
 		case ACT_FAVLIST:	gixMaxItem = AacAssembleSql( hWnd, ptFileName );	break;
-		default:
+		default:	//	副タブ
 			gixMaxItem = AacAssembleFile( hWnd, ptFileName );
 			//	ラストメモリー・ここで描画位置を復元する
 			gixTopItem = TabMultipleTopMemory( -1 );
@@ -908,6 +917,9 @@ HRESULT AaItemsFavUpload( LPSTR pcConts, UINT rdLength )
 	DWORD	dHash;
 
 	ptBaseName = TreeBaseNameGet(  );	//	一覧ベース名取得して
+
+	//	ドロッピンオブジェクトなら無視するので？
+	if( !( StrCmp( DROP_OBJ_NAME, ptBaseName ) ) )	return E_ABORT;
 
 	//	そのＡＡのハッシュ値を求めて
 	HashData( (LPBYTE)pcConts, rdLength, (LPBYTE)(&(dHash)), 4 );
@@ -992,8 +1004,10 @@ UINT AaItemsDoSelect( HWND hWnd, UINT dMode, UINT dDirct )
 	uRslt = ViewMaaMaterialise( pcConts , rdLength, dMode );	//	本体に飛ばす
 
 	//	ここでお気に入りに入れる
-	AaItemsFavUpload( pcConts, rdLength );
-	FavContsRedrawRequest( hWnd );
+	if( SUCCEEDED( AaItemsFavUpload( pcConts, rdLength ) ) )
+	{
+		FavContsRedrawRequest( hWnd );
+	}
 
 	free( pcConts );
 
@@ -1028,9 +1042,9 @@ HRESULT AaItemsTipSizeChange( INT ttSize, UINT bView )
 }
 //-------------------------------------------------------------------------------------------------
 
+#ifndef MAA_IADD_PLUS
 
 #ifndef _ORRVW
-
 
 typedef struct tagITEMADDINFO
 {
@@ -1085,7 +1099,7 @@ HRESULT AacItemAdding( HWND hWnd, LPTSTR ptFile )
 
 				StringCchLength( stIaInfo.atSep, MAX_PATH, &cchSep );
 				StringCchLength( stIaInfo.ptContent, STRSAFE_MAX_CCH, &cchSize );
-				cchSize += (cchSep+2);
+				cchSize += (cchSep+6);
 				ptBuffer = (LPTSTR)malloc( cchSize * sizeof(TCHAR) );
 				ZeroMemory( ptBuffer, cchSize * sizeof(TCHAR) );
 
@@ -1210,3 +1224,6 @@ INT_PTR CALLBACK AaItemAddDlgProc( HWND hDlg, UINT message, WPARAM wParam, LPARA
 	
 	
 #endif
+
+#endif	//	MAA_IADD_PLUS
+

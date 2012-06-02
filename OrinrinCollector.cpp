@@ -298,7 +298,7 @@ HRESULT FileListViewInit( HWND hWnd )
 
 /*!
 	リストビューにファイル名を追加する
-	@param[in]	hLvWnd	ウインドウハンドル
+	@param[in]	hWnd	ウインドウハンドル
 	@param[in]	ptPath	ファイルフルパス
 	@return		追加後のアイテム数
 */
@@ -339,7 +339,7 @@ INT FileListViewAdd( HWND hWnd, LPTSTR ptPath )
 	リストビューからファイル名を確保
 	@param[in]	hWnd	親ウインドウのハンドル
 	@param[in]	iNumber	リスト上の番号
-	@param[in]	ptPath	ファイルフルパス・MAX_PATHであること
+	@param[in]	ptFile	ファイルフルパス・MAX_PATHであること
 */
 HRESULT FileListViewGet( HWND hWnd, INT iNumber, LPTSTR ptFile )
 {
@@ -438,6 +438,7 @@ HRESULT InitSettingSave( HWND hWnd, UINT bActOn )
 /*!
 	コピペ保存用ファイルのセーブロード
 	@param[in]	dMode	非０ロード　０セーブ
+	@param[in]	dNumber	保存ファイルの番号
 	@param[out]	ptFile	フルパス・MAX_PATHであること
 	@return		HRESULT	終了状態コード
 */
@@ -779,9 +780,14 @@ VOID Cls_OnDestroy( HWND hWnd )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-
+	コントロールの色変え
+	@param[in]	hWnd		親ウインドウのハンドル
+	@param[in]	hdc			色を塗るデバイスコンテキスト
+	@param[in]	hWndChild	発生したコントロールのハンドル
+	@param[in]	type		発生したコントロールのタイプ
+	@return		その色のブラシ
 */
-HBRUSH Cls_OnCtlColor( HWND hWnd, HDC hdc, HWND hwndChild, INT type )
+HBRUSH Cls_OnCtlColor( HWND hWnd, HDC hdc, HWND hWndChild, INT type )
 {
 	SetBkColor( hdc, BASIC_COLOUR );
 
@@ -817,11 +823,10 @@ VOID Cls_OnHotKey( HWND hWnd, INT idHotKey, UINT fuModifiers, UINT vk )
 }
 //-------------------------------------------------------------------------------------------------
 
-
 /*!
 	ファイル選択ダイヤログの表示
 	@param[in]	hWnd		親ウインドウハンドル
-	@param[in]	ptSelDir	ファイル名を入れるバッファへのポインター
+	@param[in]	ptSelFile	ファイル名を入れるバッファへのポインター
 	@param[in]	cchLen		バッファの文字数。バイト数じゃないぞ
 	@return		非０：ファイルとった　０：キャンセルした
 */

@@ -33,8 +33,15 @@ LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
 
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
-IDI_ORINRINEDITOR       ICON                    "OrinrinEditor.ico"
-IDI_SMALL               ICON                    "OrinrinEditor.ico"
+IDI_ORINRINEDITOR       ICON	"OrinrinEditor.ico"
+IDI_SMALL               ICON	"OrinrinEditor.ico"
+
+IDI_TREE_DIR_CLOSE		ICON	"resource\\directory.ico"
+IDI_TREE_DIR_OPEN		ICON	"resource\\dir_open.ico"
+IDI_TREE_DIR_EXTRA		ICON	"resource\\dir_extra.ico"
+IDI_TREE_FILE_AST		ICON	"resource\\file_ast.ico"
+IDI_TREE_FILE_MLT		ICON	"resource\\file_mlt.ico"
+IDI_TREE_FILE_ETC		ICON	"resource\\file_etc.ico"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -242,6 +249,8 @@ BEGIN
         MENUITEM SEPARATOR
         MENUITEM "ＡＡポップアップ表示(&T)",              IDM_MAA_AATIP_TOGGLE
         MENUITEM "ＡＡ区切りスタイル切換",                 IDM_MAA_SEP_STYLE_TOGGLE
+        MENUITEM SEPARATOR
+        MENUITEM "ここにアイテム追加(&A)",                  IDM_MAA_ITEM_INSERT
     END
 END
 
@@ -249,18 +258,18 @@ IDM_AATREE_POPUP MENU
 BEGIN
     POPUP "複数行テンプレツリーのアレ"
     BEGIN
-        MENUITEM "プロファイル作成／開く(&N)",             IDM_MAA_PROFILE_MAKE
-        MENUITEM "AA一覧ツリーを再構築(&T)",             IDM_TREE_RECONSTRUCT
-        MENUITEM "プロファイル使用履歴(&H)",              IDM_OPEN_HISTORY
+        MENUITEM "プロファイル作成／開く(&N)",	IDM_MAA_PROFILE_MAKE
+        MENUITEM "AA一覧ツリーを再構築(&T)",	IDM_TREE_RECONSTRUCT
+        MENUITEM "プロファイル使用履歴(&H)",	IDM_OPEN_HISTORY
         MENUITEM SEPARATOR
-        MENUITEM "ファイル名で検索(&F)",                IDM_FINDMAA_DLG_OPEN
+        MENUITEM "ファイル名で検索(&F)",		IDM_FINDMAA_DLG_OPEN
         MENUITEM SEPARATOR
-        MENUITEM "（名称未設定）",                     IDM_DUMMY, GRAYED
-        MENUITEM "主タブで開く(&M)",                  IDM_AATREE_MAINOPEN
-        MENUITEM "副タブを追加(&S)",                  IDM_AATREE_SUBADD
-        MENUITEM "編集ビューに開く(&E)",                IDM_AATREE_GOEDIT
+        MENUITEM "（名称未設定）",				IDM_DUMMY, GRAYED
+        MENUITEM "主タブで開く(&M)",			IDM_AATREE_MAINOPEN
+        MENUITEM "副タブを追加(&S)",			IDM_AATREE_SUBADD
+        MENUITEM "編集ビューに開く(&E)",		IDM_AATREE_GOEDIT
         MENUITEM SEPARATOR
-        MENUITEM "末尾にアイテム追加(&A)",                  IDM_MAA_IADD_OPEN
+        MENUITEM "このアイテムを削除(&D)",		IDM_MAA_ITEM_DELETE, GRAYED
     END
 END
 
@@ -268,10 +277,10 @@ IDM_AATABS_POPUP MENU
 BEGIN
     POPUP "複数行テンプレタブのアレ"
     BEGIN
-        MENUITEM "このタブを閉じる(&Q)",                IDM_AATABS_DELETE
-        MENUITEM "全ての副タブを閉じる(&A)",              IDM_AATABS_ALLDELETE
+        MENUITEM "このタブを閉じる(&Q)",		IDM_AATABS_DELETE
+        MENUITEM "全ての副タブを閉じる(&A)",	IDM_AATABS_ALLDELETE
         MENUITEM SEPARATOR
-        MENUITEM "編集ビューに開く(&E)",                IDM_AATREE_GOEDIT
+        MENUITEM "編集ビューに開く(&E)",		IDM_AATREE_GOEDIT
     END
 END
 
@@ -279,10 +288,10 @@ IDM_LAYERBOX_POPUP MENU
 BEGIN
     POPUP "レイヤボックスのアレ"
     BEGIN
-        MENUITEM "コピー(&C)",                     IDM_LYB_COPY
+        MENUITEM "コピー(&C)",						IDM_LYB_COPY
         MENUITEM SEPARATOR
-        MENUITEM "透過領域設定をリセット(&R)",             IDM_LYB_TRANCE_RELEASE
-        MENUITEM "全ての空白を透過領域に設定(&T)",           IDM_LYB_TRANCE_ALL
+        MENUITEM "透過領域設定をリセット(&R)",		IDM_LYB_TRANCE_RELEASE
+        MENUITEM "全ての空白を透過領域に設定(&T)",	IDM_LYB_TRANCE_ALL
     END
 END
 
@@ -301,8 +310,8 @@ IDM_TEMPLATE_POPUP MENU
 BEGIN
     POPUP "テンプレウインドウのアレ"
     BEGIN
-        MENUITEM "常に手前に表示(&Z)",                 IDM_TOPMOST_TOGGLE
-        MENUITEM "テンプレート再読込(&R)",               IDM_TMPLT_RELOAD
+        MENUITEM "常に手前に表示(&Z)",		IDM_TOPMOST_TOGGLE
+        MENUITEM "テンプレート再読込(&R)",	IDM_TMPLT_RELOAD
     END
 END
 
@@ -404,7 +413,7 @@ CAPTION "バージョン情報 - Orinrin Editor"
 FONT 9, "MS UI Gothic"
 BEGIN
     ICON            IDI_ORINRINEDITOR,IDC_MYICON,6,6,20,20
-    LTEXT           "Orinrin Editor, Version 0.30 Aurora (2012.517.2200.920)",IDC_STATIC,36,6,168,8,SS_NOPREFIX
+    LTEXT           "Orinrin Editor, Version 0.31 Aurora (2012.531.2200.920)",IDC_STATIC,36,6,168,8,SS_NOPREFIX
     LTEXT           "Copyright (C) 2011 - 2012 Orinrin/SikigamiHNQ",IDC_STATIC,36,18,168,8
     LTEXT           "Site ： お燐ちゃんは俺の嫁．ｃｏｍ",IDC_STATIC,36,30,168,8
     DEFPUSHBUTTON   "OK",IDOK,84,180,48,12,WS_GROUP
@@ -839,8 +848,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 2012,517,2200,920
- PRODUCTVERSION 0,30,0,920
+ FILEVERSION 2012,531,2200,920
+ PRODUCTVERSION 0,31,0,920
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -865,8 +874,8 @@ BEGIN
             VALUE "LegalTrademarks", "License : GPLv3"
             VALUE "PrivateBuild", "Build by Visual C++ 2008 Express"
             VALUE "SpecialBuild", "Not Speciality"
-            VALUE "FileVersion", "2012.517.2200.920"
-            VALUE "ProductVersion", "0.30.0.920"
+            VALUE "FileVersion", "2012.531.2200.920"
+            VALUE "ProductVersion", "0.31.0.920"
             VALUE "FileDescription", "AsciiArt Story Editor by Orinrin!"
             VALUE "OriginalFilename", "OrinrinEditor.exe"
             VALUE "InternalName", "Orinrin Editor"

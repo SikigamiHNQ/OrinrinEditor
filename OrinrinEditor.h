@@ -27,45 +27,45 @@ If not, see <http://www.gnu.org/licenses/>.
 #include "SplitBar.h"
 //-------------------------------------------------------------------------------------------------
 
-//	MLT‚Ì‹æØ‚è•¶š—ñ
+//!	MLT‚Ì‹æØ‚è•¶š—ñ
 #define MLT_SEPARATERW	TEXT("[SPLIT]")
 #define MLT_SEPARATERA	("[SPLIT]")
 #define MLT_SPRT_CCH	7
 
-//	AST‚Ì‹æØ‚è•¶š—ñ
+//!	AST‚Ì‹æØ‚è•¶š—ñ
 #define AST_SEPARATERW	TEXT("[AA]")
 #define AST_SEPARATERA	("[AA]")
 #define AST_SPRT_CCH	4
 
-//	ƒeƒ“ƒvƒŒ‚ÌƒAƒŒ
+//!	ƒeƒ“ƒvƒŒ‚ÌƒAƒŒ
 #define TMPLE_BEGINW	TEXT("[ListName=")
 #define TMPLE_ENDW		TEXT("[end]")
 
-//	‰üs
+//!	‰üs
 #define CH_CRLFW	TEXT("\r\n")
 #define CH_CRLFA	("\r\n")
 #define CH_CRLF_CCH	2
 
-//	EOFƒ}[ƒN
+//!	EOFƒ}[ƒN
 #define EOF_SIZE	5
 CONST  TCHAR	gatEOF[] = TEXT("[EOF]");
 #define EOF_WIDTH	39
 
-//	‰üsƒoƒCƒg”
-#define YY2_CRLF	6
-#define STRB_CRLF	4
 
-#define PAGE_BYTE_MAX	4096
+#define YY2_CRLF	6	//!<	‚x‚xƒJƒLƒR‚Ì‰üsƒoƒCƒg”
+#define STRB_CRLF	4	//!<	‚µ‚½‚ç‚Î”Â‚Ì‰üsƒoƒCƒg”
+
+#define PAGE_BYTE_MAX	4096	//!<	‚P•Å‚ÌÅ‘åƒoƒCƒg”E‚½‚¾‚µ”Â‚É‚æ‚é
 
 #define MODIFY_MSG	TEXT("[•ÏX]")
 //-------------------------------------------------------------------------------------------------
 
 //	‚µ‚½‚ç‚Î—pFw’èƒ^ƒO
-#define COLOUR_TAG_WHITE	TEXT("<jbbs fontcolor=\"#ffffff\">")
-#define COLOUR_TAG_BLUE		TEXT("<jbbs fontcolor=\"#0000ff\">")
-#define COLOUR_TAG_BLACK	TEXT("<jbbs fontcolor=\"#000000\">")
-#define COLOUR_TAG_RED		TEXT("<jbbs fontcolor=\"#ff0000\">")
-#define COLOUR_TAG_GREEN	TEXT("<jbbs fontcolor=\"#00ff00\">")
+#define COLOUR_TAG_WHITE	TEXT("<jbbs fontcolor=\"#ffffff\">")	//!<	‚µ‚½‚ç‚ÎFw’èF”’
+#define COLOUR_TAG_BLUE		TEXT("<jbbs fontcolor=\"#0000ff\">")	//!<	‚µ‚½‚ç‚ÎFw’èF‘“
+#define COLOUR_TAG_BLACK	TEXT("<jbbs fontcolor=\"#000000\">")	//!<	‚µ‚½‚ç‚ÎFw’èF•
+#define COLOUR_TAG_RED		TEXT("<jbbs fontcolor=\"#ff0000\">")	//!<	‚µ‚½‚ç‚ÎFw’èFg
+#define COLOUR_TAG_GREEN	TEXT("<jbbs fontcolor=\"#00ff00\">")	//!<	‚µ‚½‚ç‚ÎFw’èF‰
 
 //-------------------------------------------------------------------------------------------------
 
@@ -78,25 +78,25 @@ CONST  TCHAR	gatEOF[] = TEXT("[EOF]");
 //-----------------------------------------------------------------------------------------------------------------------------------------
 
 //ƒAƒ“ƒhƒD—pCOMMANDO
-#define DO_INSERT	1	//	•¶š“ü—ÍEƒy[ƒXƒg‚Æ‚©
-#define DO_DELETE	2	//	•¶šíœEØ‚èæ‚è‚Æ‚©
+#define DO_INSERT	1	//!<	ƒAƒ“ƒhƒD—pCOMMANDO@•¶š“ü—ÍEƒy[ƒXƒg‚Æ‚©
+#define DO_DELETE	2	//!<	ƒAƒ“ƒhƒD—pCOMMANDO@•¶šíœEØ‚èæ‚è‚Æ‚©
 
 //-----------------------------------------------------------------------------------------------------------------------------------------
 
 
-#define LINE_HEIGHT	18
+#define LINE_HEIGHT	18	//!<	‚`‚`‚Ìˆës‚Ì‚‚³ƒhƒbƒg
 
-#define RULER_AREA	13
+#define RULER_AREA	13	//!<	•ÒW‘‹‚Ìƒ‹[ƒ‰[ƒGƒŠƒA‚‚³
 
-#define LINENUM_WID	37
-#define LINENUM_COLOUR		0xFF8000
+#define LINENUM_WID	37	//!<	•ÒW‘‹‚Ìs”Ô†•\¦ƒGƒŠƒA‚Ì•
+#define LINENUM_COLOUR		0xFF8000	//!<	•ÒW‘‹‚Ìs”Ô†•\¦ƒGƒŠƒA‚ÌF
 
 #define RUL_LNNUM_COLOURBK	0xC0C0C0
 //-------------------------------------------------------------------------------------------------
 
 //	ƒXƒy[ƒX‚Ì•
-#define SPACE_HAN	5
-#define SPACE_ZEN	11
+#define SPACE_HAN	5	//!<	”¼ŠpƒXƒy[ƒX‚Ì•ƒhƒbƒg
+#define SPACE_ZEN	11	//!<	‘SŠpƒXƒy[ƒX‚Ì•ƒhƒbƒg
 //-------------------------------------------------------------------------------------------------
 
 #define CLR_BLACK	0x000000
@@ -119,29 +119,29 @@ CONST  TCHAR	gatEOF[] = TEXT("[EOF]");
 //-------------------------------------------------------------------------------------------------
 
 //	•`‰æ•¶š‚ÌƒAƒŒ
-#define CT_NORMAL	0x0000	//	•’Ê‚Ì•¶š—ñ
-#define CT_WARNING	0x0001	//	˜A‘±”¼Šp‹ó”’‚Ì‚æ‚¤‚ÈŒx
-#define CT_SPACE	0x0002	//	‹ó”’
-#define CT_SELECT	0x0004	//	‘I‘ğó‘Ô‚Å‚ ‚é
-#define CT_CANTSJIS	0x0008	//	ƒVƒtƒgJIS‚É•ÏŠ·‚Å‚«‚È‚¢•¶š
-#define CT_LYR_TRNC	0x0010	//	ƒŒƒCƒ„ƒ{ƒbƒNƒX‚Å“§‰ß”ÍˆÍ
-#define CT_FINDED	0x0020	//	ŒŸõƒqƒbƒg•¶š—ñ
+#define CT_NORMAL	0x0000	//!<	•’Ê‚Ì•¶š—ñ
+#define CT_WARNING	0x0001	//!<	˜A‘±”¼Šp‹ó”’‚Ì‚æ‚¤‚ÈŒx
+#define CT_SPACE	0x0002	//!<	‹ó”’
+#define CT_SELECT	0x0004	//!<	‘I‘ğó‘Ô‚Å‚ ‚é
+#define CT_CANTSJIS	0x0008	//!<	ƒVƒtƒgJIS‚É•ÏŠ·‚Å‚«‚È‚¢•¶š
+#define CT_LYR_TRNC	0x0010	//!<	ƒŒƒCƒ„ƒ{ƒbƒNƒX‚Å“§‰ß”ÍˆÍ
+#define CT_FINDED	0x0020	//!<	ŒŸõƒqƒbƒg•¶š—ñ
 
-#define CT_SELRTN	0x0100	//	s––‰üs‚à‘I‘ğó‘Ô
-#define CT_LASTSP	0x0200	//	s––‚ª‹ó”’‚Å‚ ‚é
-#define CT_RETURN	0x0400	//	‰üs‚ª•K—v
-#define CT_EOF		0x0800	//	––’[‚Å‚ ‚é
-#define CT_FINDRTN	0x1000	//	s––‰üs‚ªŒŸõƒqƒbƒg
+#define CT_SELRTN	0x0100	//!<	s––‰üs‚à‘I‘ğó‘Ô
+#define CT_LASTSP	0x0200	//!<	s––‚ª‹ó”’‚Å‚ ‚é
+#define CT_RETURN	0x0400	//!<	‰üs‚ª•K—v
+#define CT_EOF		0x0800	//!<	––’[‚Å‚ ‚é
+#define CT_FINDRTN	0x1000	//!<	s––‰üs‚ªŒŸõƒqƒbƒg
 //-------------------------------------------------------------------------------------------------
 
 
 
-//ŠJ‚¢‚½—š—ğ—pEƒvƒƒtƒ@ƒCƒ‹‚É‚àg‚¤
 #define OPENHIST_MAX	12
+//!	ŠJ‚¢‚½—š—ğ—pEƒvƒƒtƒ@ƒCƒ‹‚É‚àg‚¤
 typedef struct tagOPENHISTORY
 {
-	TCHAR	atFile[MAX_PATH];	//	ƒtƒ@ƒCƒ‹ƒpƒX
-	DWORD	dMenuNumber;		//	ƒƒjƒ…[”Ô†‚ÌŠ„“–
+	TCHAR	atFile[MAX_PATH];	//!<	ƒtƒ@ƒCƒ‹ƒpƒX
+	DWORD	dMenuNumber;		//!<	ƒƒjƒ…[”Ô†‚ÌŠ„“–
 
 } OPENHIST, *LPOPENHIST;
 typedef list<OPENHIST>::iterator	OPHIS_ITR;
@@ -150,12 +150,12 @@ typedef list<OPENHIST>::iterator	OPHIS_ITR;
 
 #ifndef _ORRVW
 
-//	˜gƒp[ƒcƒf[ƒ^	20120105	•¡”s‚ÉŒü‚¯‚Ä’²®
 #ifdef FRAME_MLINE
 #define PARTS_CCH	130
 #else
 #define PARTS_CCH	32
 #endif
+//!	˜gƒp[ƒcƒf[ƒ^	20120105	•¡”s‚ÉŒü‚¯‚Ä’²®
 typedef struct tagFRAMEITEM
 {
 	TCHAR	atParts[PARTS_CCH];	//!<	ƒp[ƒc•¶š—ñE‚Xš‚Ü‚Å
@@ -166,7 +166,7 @@ typedef struct tagFRAMEITEM
 #endif
 } FRAMEITEM, *LPFRAMEITEM;
 //----------------
-//	˜gˆ——p
+//!	˜gˆ——p
 typedef struct tagFRAMEINFO
 {
 	TCHAR	atFrameName[MAX_STRING];	//!<	–¼‘OE–¢g—p
@@ -188,7 +188,7 @@ typedef struct tagFRAMEINFO
 } FRAMEINFO, *LPFRAMEINFO;
 //-----------------------------
 
-//	ƒgƒŒƒXƒ‚[ƒh—pParameter•Û
+//!	ƒgƒŒƒXƒ‚[ƒh—pParameter•Û
 typedef struct tagTRACEPARAM
 {
 	POINT	stOffsetPt;	//!<	ˆÊ’u‡‚í‚¹
@@ -225,6 +225,7 @@ typedef struct tagOPERATELOG
 typedef vector<OPERATELOG>::iterator	OPSQ_ITR;
 //-----------------------------
 
+//!	ƒAƒ“ƒhƒDƒoƒbƒtƒ@
 typedef struct tagUNDOBUFF
 {
 	UINT_PTR	dNowSqn;	//!<	QÍ’†‚Ì‘€ìˆÊ’uH
@@ -237,7 +238,7 @@ typedef struct tagUNDOBUFF
 //-----------------------------
 
 
-//	ˆë•¶š‚Ìî•ñEó‚¯“n‚µ‚É‚àg‚¤
+//!	ˆë•¶š‚Ìî•ñEó‚¯“n‚µ‚É‚àg‚¤
 typedef struct tagLETTER
 {
 	TCHAR	cchMozi;	//!<	•¶š
@@ -250,25 +251,25 @@ typedef struct tagLETTER
 typedef vector<LETTER>::iterator	LETR_ITR;
 //-----------------------------
 
-//	ˆës‚ÌŠÇ—
+//!	ˆës‚ÌŠÇ—
 typedef struct tagONELINE
 {
-	INT		iDotCnt;	//!<	ƒhƒbƒg”
-	INT		iByteSz;	//!<	ƒoƒCƒg”
-	UINT	dStyle;		//!<	‚±‚Ìs‚Ì“Áêó‘Ô
-	BOOLEAN	bBadSpace;	//!<	Œx•t‚«‹ó”’‚ª‚ ‚é‚©
+	INT		iDotCnt;		//!<	ƒhƒbƒg”
+	INT		iByteSz;		//!<	ƒoƒCƒg”
+	UINT	dStyle;			//!<	‚±‚Ìs‚Ì“Áêó‘Ô
+	BOOLEAN	bBadSpace;		//!<	Œx•t‚«‹ó”’‚ª‚ ‚é‚©
 
 	vector<LETTER>	vcLine;	//!<	‚±‚Ìs‚Ì“à—eE‰üs‚ÍŠÜ‚Ü‚È‚¢
 
 	//	ƒŒƒCƒ„ƒ{ƒbƒNƒX—p
-	INT		dFrtSpDot;	//!<	‘O‚Ì‹ó”’ƒhƒbƒg
-	INT		dFrtSpMozi;	//!<	‘O‚Ì‹ó”’•¶š”
+	INT		dFrtSpDot;		//!<	‘O‚Ì‹ó”’ƒhƒbƒg
+	INT		dFrtSpMozi;		//!<	‘O‚Ì‹ó”’•¶š”
 
 } ONELINE, *LPONELINE;
 typedef list<ONELINE>::iterator		LINE_ITR;
 //-----------------------------
 
-//	SPLITƒy[ƒWˆë•ª
+//!	SPLITƒy[ƒWˆë•ª
 typedef struct tagONEPAGE
 {
 	TCHAR	atPageName[SUB_STRING];	//!<	
@@ -284,13 +285,15 @@ typedef struct tagONEPAGE
 
 #ifdef PAGE_DELAY_LOAD
 	LPTSTR	ptRawData;		//!<	•Å‚Ì¶ƒf[ƒ^
+	INT		iLineCnt;		//!<	s”E¶ƒf[ƒ^—p
+	INT		iMoziCnt;		//!<	•¶š”E¶ƒf[ƒ^—p
 #endif
 
 } ONEPAGE, *LPONEPAGE;
 typedef vector<ONEPAGE>::iterator	PAGE_ITR;
 //-----------------------------
 
-//	ˆê‚Â‚Ìƒtƒ@ƒCƒ‹•Û
+//!	ˆê‚Â‚Ìƒtƒ@ƒCƒ‹•Û
 typedef struct tagONEFILE
 {
 	TCHAR	atFileName[MAX_PATH];	//!<	ƒtƒ@ƒCƒ‹–¼
@@ -313,7 +316,7 @@ typedef list<ONEFILE>::iterator	FILES_ITR;
 
 //	•¡”ƒtƒ@ƒCƒ‹ˆµ‚¤‚È‚çA‚³‚ç‚ÉƒRƒŒ‚ğ•ïŠÜ‚·‚ê‚Î‚¢‚¢H
 
-//	ˆësEƒuƒ‰ƒVƒeƒ“ƒvƒŒ—p
+//!	ˆësEƒuƒ‰ƒVƒeƒ“ƒvƒŒ—p
 typedef struct tagAATEMPLATE
 {
 	TCHAR	atCtgryName[SUB_STRING];	//!<	ƒZƒbƒg‚Ì–¼‘O
@@ -324,7 +327,7 @@ typedef struct tagAATEMPLATE
 typedef vector<AATEMPLATE>::iterator	TEMPL_ITR;	
 //-----------------------------
 
-//	ƒŠƒo[‚ÌˆÊ’uŠm’è—p
+//!	ƒŠƒo[‚ÌˆÊ’uŠm’è—p
 typedef struct tagREBARLAYOUTINFO
 {
 	UINT	wID;
@@ -332,10 +335,31 @@ typedef struct tagREBARLAYOUTINFO
 	UINT	fStyle;
 
 } REBARLAYOUTINFO, *LPREBARLAYOUTINFO;
+//-----------------------------
+
+
+//!	•Åî•ñŠm•Û—p
+typedef struct tagPAGEINFOS
+{
+	UINT	dMasqus;	//!<	•K—v‚Èî•ñ‚ÌƒAƒŒ
+
+	INT_PTR	iLines;	//!<	s”
+	INT_PTR	iBytes;	//!<	g—pƒoƒCƒg”
+	INT_PTR	iMozis;	//!<	g—p•¶š”
+
+	TCHAR	atPageName[SUB_STRING];	//!<	
+
+} PAGEINFOS, *LPPAGEINFOS;
+#define PI_LINES	0x01
+#define PI_BYTES	0x02
+#define PI_MOZIS	0x04
+#define PI_NAME		0x08
+#define PI_RECALC	0x80000000
+//-----------------------------
 
 //-------------------------------------------------------------------------------------------------
 
-typedef UINT (CALLBACK* PAGELOAD)(LPTSTR, LPCTSTR, INT);
+typedef UINT (CALLBACK* PAGELOAD)(LPTSTR, LPCTSTR, INT);	//!<	•Åƒ[ƒh—pƒR[ƒ‹ƒoƒbƒNŠÖ”‚ÌŒ^éŒ¾
 
 #endif	//	NOT _ORRVW
 
@@ -347,7 +371,7 @@ typedef struct tagAAMATRIX
 	CHAR	acAstName[MAX_STRING];	//!<	AST‚Ìê‡A•Å–¼Ì‚ğ‚Á‚Ä‚¨‚­
 
 	UINT	ixNum;	//!<	’Ê‚µ”Ô†‚OƒCƒ“ƒfƒbƒNƒX
-	DWORD	cbItem;	//!<	AA‚ÌƒoƒCƒg”
+	DWORD	cbItem;	//!<	AA‚Ì•¶šƒoƒCƒg”E
 
 	LPSTR	pcItem;	//!<	“Ç‚İ‚ñ‚¾AA‚ğ•Û‚µ‚Ä‚¨‚­ƒ|ƒCƒ“ƒ^ESJISŒ`®‚Ì‚Ü‚Ü‚Å‚¢‚¢‚©H
 
@@ -366,154 +390,155 @@ typedef vector<AAMATRIX>::iterator	MAAM_ITR;
 
 
 //	‚±‚ÌƒR[ƒh ƒ‚ƒWƒ…[ƒ‹‚ÉŠÜ‚Ü‚ê‚éŠÖ”‚ÌéŒ¾
-INT_PTR		CALLBACK About( HWND, UINT, WPARAM, LPARAM );
+INT_PTR		CALLBACK About( HWND, UINT, WPARAM, LPARAM );	//!<	
 
-INT_PTR		MessageBoxCheckBox( HWND, HINSTANCE, UINT );
+INT_PTR		MessageBoxCheckBox( HWND, HINSTANCE, UINT );	//!<	
 
-VOID		WndTagSet( HWND, LONG_PTR );
-LONG_PTR	WndTagGet( HWND );
+VOID		WndTagSet( HWND, LONG_PTR );	//!<	
+LONG_PTR	WndTagGet( HWND );	//!<	
 
-HRESULT		InitWindowPos( UINT, UINT, LPRECT );
-INT			InitParamValue( UINT, UINT, INT );
-HRESULT		InitParamString( UINT, UINT, LPTSTR );
+HRESULT		InitWindowPos( UINT, UINT, LPRECT );	//!<	
+INT			InitParamValue( UINT, UINT, INT );		//!<	
+HRESULT		InitParamString( UINT, UINT, LPTSTR );	//!<	
 
 HRESULT		OpenProfileInitialise( HWND );	//!<	
-HRESULT		InitProfHistory( UINT, UINT, LPTSTR );
+HRESULT		InitProfHistory( UINT, UINT, LPTSTR );	//!<	
   #ifdef _ORRVW
-HRESULT		OpenProfMenuModify( HWND );
+HRESULT		OpenProfMenuModify( HWND );	//!<	
   #endif
 
-BOOLEAN		SelectDirectoryDlg( HWND, LPTSTR, UINT_PTR );
+BOOLEAN		SelectDirectoryDlg( HWND, LPTSTR, UINT_PTR );	//!<	
 
-UINT		ViewMaaMaterialise( LPSTR, UINT, UINT );
-INT			ViewStringWidthGet( LPCTSTR );
+UINT		ViewMaaMaterialise( LPSTR, UINT, UINT );	//!<	
+INT			ViewStringWidthGet( LPCTSTR );	//!<	
 
 UINT		ViewMaaItemsModeGet( PUINT );	//!<	
 
-LPTSTR		SjisDecodeAlloc( LPSTR );
-LPSTR		SjisEntityExchange( LPCSTR );
-BOOLEAN		HtmlEntityCheck( TCHAR, LPSTR, UINT_PTR );
+LPTSTR		SjisDecodeAlloc( LPSTR );	//!<	
+LPSTR		SjisEntityExchange( LPCSTR );	//!<	
+BOOLEAN		HtmlEntityCheckA( TCHAR, LPSTR , UINT_PTR );	//!<	
+BOOLEAN		HtmlEntityCheckW( TCHAR, LPTSTR, UINT_PTR );	//!<	
 
-BOOLEAN		FileExtensionCheck( LPTSTR, LPTSTR );
+BOOLEAN		FileExtensionCheck( LPTSTR, LPTSTR );	//!<	
 
-HWND		MaaTmpltInitialise( HINSTANCE, HWND, LPRECT );
+HWND		MaaTmpltInitialise( HINSTANCE, HWND, LPRECT );	//!<	
 VOID		MaaTabBarSizeGet( LPRECT  );	//!<	
 
-HRESULT		AaItemsTipSizeChange( INT, UINT );
+HRESULT		AaItemsTipSizeChange( INT, UINT );	//!<	
 
 HRESULT		ViewingFontGet( LPLOGFONT );	//!<	
 
 #ifndef _ORRVW
-BOOLEAN		MaaViewToggle( UINT );
 
-UINT		UnicodeUseToggle( LPVOID );
+VOID		AacBackupDirectoryInit( LPTSTR );	//!<	
 
-LPSTR		SjisEncodeAlloc( LPCTSTR );
+BOOLEAN		MaaViewToggle( UINT );	//!<	
 
-ATOM		InitWndwClass( HINSTANCE );
-BOOL		InitInstance( HINSTANCE, INT, LPTSTR );
-LRESULT		CALLBACK WndProc( HWND, UINT, WPARAM, LPARAM );
+UINT		UnicodeUseToggle( LPVOID );	//!<	
 
-HRESULT		MainStatusBarSetText( INT, LPCTSTR );
-HRESULT		MainSttBarSetByteCount( UINT );
+LPSTR		SjisEncodeAlloc( LPCTSTR );	//!<	
 
-HRESULT		MenuItemCheckOnOff( UINT, UINT );
-HRESULT		NotifyBalloonExist( LPTSTR, LPTSTR, DWORD );
+ATOM		InitWndwClass( HINSTANCE );	//!<	
+BOOL		InitInstance( HINSTANCE, INT, LPTSTR );	//!<	
+LRESULT		CALLBACK WndProc( HWND, UINT, WPARAM, LPARAM );	//!<	
 
-HRESULT		BrushModeToggle( VOID );
+HRESULT		MainStatusBarSetText( INT, LPCTSTR );	//!<	
+HRESULT		MainSttBarSetByteCount( UINT );	//!<	
 
-HRESULT		WindowFocusChange( INT, INT );
+HRESULT		MenuItemCheckOnOff( UINT, UINT );	//!<	
+HRESULT		NotifyBalloonExist( LPTSTR, LPTSTR, DWORD );	//!<	
 
-HRESULT		OptionDialogueOpen( VOID );
+HRESULT		BrushModeToggle( VOID );	//!<	
 
-COLORREF	InitColourValue( UINT, UINT, COLORREF );
-INT			InitTraceValue( UINT, LPTRACEPARAM );
-//HRESULT	InitLastOpen( UINT, LPTSTR );
-INT			InitWindowTopMost( UINT, UINT, INT );
-HRESULT		InitToolBarLayout( UINT, INT, LPREBARLAYOUTINFO );
+HRESULT		WindowFocusChange( INT, INT );	//!<	
+
+HRESULT		OptionDialogueOpen( VOID );	//!<	
+
+COLORREF	InitColourValue( UINT, UINT, COLORREF );	//!<	
+INT			InitTraceValue( UINT, LPTRACEPARAM );	//!<	
+//HRESULT	InitLastOpen( UINT, LPTSTR );	//	
+INT			InitWindowTopMost( UINT, UINT, INT );	//!<	
+HRESULT		InitToolBarLayout( UINT, INT, LPREBARLAYOUTINFO );	//!<	
 
 #ifdef ACCELERATOR_EDIT
-LPACCEL		AccelKeyTableGetAlloc( LPINT );
-LPACCEL		AccelKeyTableLoadAlloc( LPINT );
-HRESULT		AccelKeyDlgOpen( HWND );
-HACCEL		AccelKeyHandleGet( HINSTANCE );
+LPACCEL		AccelKeyTableGetAlloc( LPINT );	//!<	
+LPACCEL		AccelKeyTableLoadAlloc( LPINT );	//!<	
+HRESULT		AccelKeyDlgOpen( HWND );	//!<	
+HACCEL		AccelKeyHandleGet( HINSTANCE );	//!<	
 
-HACCEL		AccelKeyTableCreate( LPACCEL, INT );
-HRESULT		AccelKeyMenuRewrite( HWND, LPACCEL, CONST INT );
+HACCEL		AccelKeyTableCreate( LPACCEL, INT );	//!<	
+HRESULT		AccelKeyMenuRewrite( HWND, LPACCEL, CONST INT );	//!<	
 #endif
 
-HRESULT		OpenHistoryInitialise( HWND );
-HRESULT		OpenHistoryLogging( HWND, LPTSTR );
-HRESULT		OpenHistoryLoad( HWND, INT );
+HRESULT		OpenHistoryInitialise( HWND );	//!<	
+HRESULT		OpenHistoryLogging( HWND , LPTSTR );	//!<	
+HRESULT		OpenHistoryLoad( HWND, INT );	//!<	
 
-VOID		ToolBarCreate( HWND, HINSTANCE );
-VOID		ToolBarDestroy( VOID );
-HRESULT		ToolBarSizeGet( LPRECT );
-HRESULT		ToolBarCheckOnOff( UINT, UINT );
-HRESULT		ToolBarOnSize( HWND, UINT, INT, INT );
-LRESULT		ToolBarOnNotify( HWND, INT, LPNMHDR );
-LRESULT		ToolBarOnContextMenu( HWND, HWND, LONG, LONG );
-VOID		ToolBarPseudoDropDown( HWND, INT );
-UINT		ToolBarBandInfoGet( LPVOID );
-HRESULT		ToolBarBandReset( HWND );
+VOID		ToolBarCreate( HWND, HINSTANCE );	//!<	
+VOID		ToolBarDestroy( VOID  );	//!<	
+HRESULT		ToolBarSizeGet( LPRECT );	//!<	
+HRESULT		ToolBarCheckOnOff( UINT, UINT );	//!<	
+HRESULT		ToolBarOnSize( HWND, UINT, INT, INT );	//!<	
+LRESULT		ToolBarOnNotify( HWND, INT, LPNMHDR );	//!<	
+LRESULT		ToolBarOnContextMenu( HWND , HWND, LONG, LONG );	//!<	
+VOID		ToolBarPseudoDropDown( HWND , INT );	//!<	
+UINT		ToolBarBandInfoGet( LPVOID );	//!<	
+HRESULT		ToolBarBandReset( HWND );	//!<	
 
-UINT		AppClientAreaCalc( LPRECT );
+UINT		AppClientAreaCalc( LPRECT );	//!<	
 
-HRESULT		AppTitleChange( LPTSTR );
-HRESULT		AppTitleTrace( UINT );
+HRESULT		AppTitleChange( LPTSTR );	//!<	
+HRESULT		AppTitleTrace( UINT );	//!<	
 
-LPTSTR		ExePathGet( VOID );
+LPTSTR		ExePathGet( VOID );	//!<	
 
-HRESULT		UniDialogueEntry( HINSTANCE, HWND );
+HRESULT		UniDialogueEntry( HINSTANCE, HWND );	//!<	
 
-HRESULT		FrameInitialise( LPTSTR, HINSTANCE );
-HRESULT		FrameNameModifyPopUp( HMENU, UINT );
-INT_PTR		FrameEditDialogue( HINSTANCE, HWND, UINT );
+HRESULT		FrameInitialise( LPTSTR, HINSTANCE );	//!<	
+HRESULT		FrameNameModifyPopUp( HMENU, UINT );	//!<	
+INT_PTR		FrameEditDialogue( HINSTANCE, HWND, UINT );	//!<	
 
-HWND		FrameInsBoxCreate( HINSTANCE, HWND );
-HRESULT		FrameMoveFromView( HWND, UINT );
+HWND		FrameInsBoxCreate( HINSTANCE, HWND );	//!<	
+HRESULT		FrameMoveFromView( HWND, UINT );	//!<	
 
-HRESULT		CntxEditInitialise( LPTSTR, HINSTANCE );
-HRESULT		CntxEditDlgOpen( HWND );
-HMENU		CntxMenuGet( VOID );
-#ifdef COPY_SWAP
-HRESULT		CntxMenuCopySwap( VOID );
-#endif
+HRESULT		CntxEditInitialise( LPTSTR, HINSTANCE );	//!<	
+HRESULT		CntxEditDlgOpen( HWND );	//!<	
+HMENU		CntxMenuGet( VOID );	//!<	
 
-HRESULT		MultiFileTabFirst( LPTSTR );
-HRESULT		MultiFileTabAppend( LPARAM, LPTSTR );
-HRESULT		MultiFileTabSelect( LPARAM );
-HRESULT		MultiFileTabSlide( INT );
-HRESULT		MultiFileTabRename( LPARAM, LPTSTR );
-HRESULT		MultiFileTabClose( VOID );
-INT			MultiFileTabSearch( LPARAM );
-INT			InitMultiFileTabOpen( UINT, INT, LPTSTR );
+HRESULT		MultiFileTabFirst( LPTSTR );	//!<	
+HRESULT		MultiFileTabAppend( LPARAM, LPTSTR );	//!<	
+HRESULT		MultiFileTabSelect( LPARAM );	//!<	
+HRESULT		MultiFileTabSlide( INT );	//!<	
+HRESULT		MultiFileTabRename( LPARAM, LPTSTR );	//!<	
+HRESULT		MultiFileTabClose( VOID );	//!<	
+INT			MultiFileTabSearch( LPARAM );	//!<	
+INT			InitMultiFileTabOpen( UINT, INT, LPTSTR );	//!<	
 
-VOID		OperationOnCommand( HWND, INT, HWND, UINT );
+VOID		OperationOnCommand( HWND, INT, HWND, UINT );	//!<	
 
-VOID		AaFontCreate( UINT );
+VOID		AaFontCreate( UINT );	//!<	
 
-HWND		ViewInitialise( HINSTANCE, HWND, LPRECT, LPTSTR );
-HRESULT		ViewSizeMove( HWND, LPRECT );
-HRESULT		ViewFocusSet( VOID );
+HWND		ViewInitialise( HINSTANCE, HWND, LPRECT, LPTSTR );	//!<	
+HRESULT		ViewSizeMove( HWND, LPRECT );	//!<	
+HRESULT		ViewFocusSet( VOID );	//!<	
 
 BOOL		ViewShowCaret( VOID );			//!<	
-VOID		ViewHideCaret( VOID );
+VOID		ViewHideCaret( VOID );	//!<	
 
-HRESULT		ViewFrameInsert( INT );
-HRESULT		ViewMaaItemsModeSet( UINT, UINT );
+HRESULT		ViewFrameInsert( INT );	//!<	
+HRESULT		ViewMaaItemsModeSet( UINT, UINT );	//!<	
 
-INT			ViewLetterWidthGet( TCHAR );
-HRESULT		ViewNowPosStatus( VOID );
+INT			ViewLetterWidthGet( TCHAR );	//!<	
+HRESULT		ViewNowPosStatus( VOID );	//!<	
 
-HRESULT		ViewRedrawSetLine( INT );
-HRESULT		ViewRedrawSetRect( LPRECT );
-HRESULT		ViewRedrawSetVartRuler( INT );
-HRESULT		ViewRulerRedraw( INT, INT );
-HRESULT		ViewEditReset( VOID );
+HRESULT		ViewRedrawSetLine( INT );	//!<	
+HRESULT		ViewRedrawSetRect( LPRECT );	//!<	
+HRESULT		ViewRedrawSetVartRuler( INT );	//!<	
+HRESULT		ViewRulerRedraw( INT, INT );	//!<	
+HRESULT		ViewEditReset( VOID );	//!<	
 
-COLORREF	ViewMoziColourGet( LPCOLORREF );
-COLORREF	ViewBackColourGet( LPVOID );
+COLORREF	ViewMoziColourGet( LPCOLORREF );	//!<	
+COLORREF	ViewBackColourGet( LPVOID );	//!<	
 
 HRESULT		ViewCaretCreate( HWND, COLORREF, COLORREF );	//!<	
 HRESULT		ViewCaretDelete( VOID );		//!<	
@@ -521,7 +546,7 @@ BOOLEAN		ViewDrawCaret( INT, INT , BOOLEAN );	//!<	–{“–‚Íƒhƒ[‚¶‚á‚È‚­‚Äƒ|ƒWƒVƒ
 BOOLEAN		ViewPosResetCaret( INT, INT );	//!<	
 HRESULT		ViewCaretReColour( COLORREF );	//!<	
 
-HRESULT		ViewPositionTransform( PINT, PINT, BOOLEAN );
+HRESULT		ViewPositionTransform( PINT, PINT, BOOLEAN );	//!<	
 BOOLEAN		ViewIsPosOnFrame( INT, INT );	//!<	
 INT			ViewAreaSizeGet( PINT );
 
@@ -533,290 +558,296 @@ INT			ViewSelPageAll( INT );			//!<
 UINT		ViewSqSelModeToggle( UINT, LPVOID );	//!<	
 HRESULT		ViewSelAreaSelect( LPVOID );	//!<	
 
-INT			ViewInsertUniSpace( UINT );
-INT			ViewInsertColourTag( UINT );
-INT			ViewInsertTmpleString( LPCTSTR );
+INT			ViewInsertUniSpace( UINT );	//!<	
+INT			ViewInsertColourTag( UINT );	//!<	
+INT			ViewInsertTmpleString( LPCTSTR );	//!<	
 
-HRESULT		ViewBrushStyleSetting( UINT, LPTSTR );
+HRESULT		ViewBrushStyleSetting( UINT, LPTSTR );	//!<	
 
-VOID		Evw_OnMouseMove( HWND, INT, INT, UINT );
-VOID		Evw_OnLButtonDown( HWND, BOOL, INT, INT, UINT );
-VOID		Evw_OnLButtonUp( HWND, INT, INT, UINT );
-VOID		Evw_OnRButtonDown( HWND, BOOL, INT, INT, UINT );
+VOID		Evw_OnMouseMove( HWND, INT, INT, UINT );	//!<	
+VOID		Evw_OnLButtonDown( HWND, BOOL, INT, INT, UINT );	//!<	
+VOID		Evw_OnLButtonUp( HWND, INT, INT, UINT );	//!<	
+VOID		Evw_OnRButtonDown( HWND, BOOL, INT, INT, UINT );	//!<	
 
 VOID		Evw_OnKey( HWND, UINT, BOOL, INT, UINT );	//!<	
 VOID		Evw_OnChar( HWND, TCHAR, INT );				//!<	
-VOID		Evw_OnMouseWheel( HWND, INT, INT, INT, UINT );
+VOID		Evw_OnMouseWheel( HWND, INT, INT, INT, UINT );	//!<	
 
-VOID		Evw_OnImeComposition( HWND, WPARAM, LPARAM );
+VOID		Evw_OnImeComposition( HWND, WPARAM, LPARAM );	//!<	
 
-BOOLEAN		IsSelecting( PUINT );
+BOOLEAN		IsSelecting( PUINT );	//!<	
 
-HRESULT		OperationOnStatusBar( VOID );
+HRESULT		OperationOnStatusBar( VOID );	//!<	
 
-HWND		PageListInitialise( HINSTANCE, HWND, LPRECT );
-VOID		PageListResize( HWND, LPRECT );
-HRESULT		PageListClear( VOID );
-HRESULT		PageListInsert( INT );
-HRESULT		PageListDelete( INT );
-HRESULT		PageListViewChange( INT, INT );
-HRESULT		PageListInfoSet( INT, INT, INT );
-HRESULT		PageListNameSet( INT, LPTSTR );
-INT			PageListIsNamed( FILES_ITR );
+HWND		PageListInitialise( HINSTANCE, HWND, LPRECT );	//!<	
+VOID		PageListResize( HWND , LPRECT );	//!<	
+HRESULT		PageListClear( VOID );	//!<	
+HRESULT		PageListInsert( INT );	//!<	
+HRESULT		PageListDelete( INT );	//!<	
+HRESULT		PageListViewChange( INT , INT );	//!<	
+HRESULT		PageListInfoSet( INT, INT, INT );	//!<	
+HRESULT		PageListNameSet( INT , LPTSTR );	//!<	
+INT			PageListIsNamed( FILES_ITR );	//!<	
 
-HRESULT		PageListViewRewrite( INT );
-HRESULT		PageListBuild( LPVOID );
+HRESULT		PageListViewRewrite( INT  );	//!<	
+HRESULT		PageListBuild( LPVOID );	//!<	
 
 
-HRESULT		TemplateItemLoad( LPTSTR, PAGELOAD );
-UINT		TemplateGridFluctuate( HWND, INT );
+HRESULT		TemplateItemLoad( LPTSTR, PAGELOAD );	//!<	
+UINT		TemplateGridFluctuate( HWND , INT );	//!<	
 
-HWND		LineTmpleInitialise( HINSTANCE, HWND, LPRECT );
-VOID		LineTmpleResize( HWND, LPRECT );
+HWND		LineTmpleInitialise( HINSTANCE , HWND, LPRECT );	//!<	
+VOID		LineTmpleResize( HWND, LPRECT );	//!<	
 
-VOID		DockingTabSizeGet( LPRECT );
-HRESULT		DockingTabContextMenu( HWND, HWND, LONG, LONG );
-HWND		DockingTabGet( VOID );
+VOID		DockingTabSizeGet( LPRECT );	//!<	
+HRESULT		DockingTabContextMenu( HWND, HWND, LONG, LONG );	//!<	
+HWND		DockingTabGet( VOID );	//!<	
 HRESULT		DockingTmplViewToggle( UINT );	//	”Ÿ”‚ÌêŠˆá‚¤‚©‚ç’ˆÓ
 
-HWND		BrushTmpleInitialise( HINSTANCE, HWND, LPRECT, HWND );
-LPTSTR		BrushStringMake( INT, LPTSTR );
-VOID		BrushTmpleResize( HWND, LPRECT );
+HWND		BrushTmpleInitialise( HINSTANCE, HWND, LPRECT, HWND );	//!<	
+LPTSTR		BrushStringMake( INT , LPTSTR );	//!<	
+VOID		BrushTmpleResize( HWND, LPRECT );	//!<	
 
-INT			UserDefInitialise( HWND, UINT );
-HRESULT		UserDefItemInsert( HWND, UINT );
-HRESULT		UserDefMenuWrite( HMENU );
+INT			UserDefInitialise( HWND, UINT );	//!<	
+HRESULT		UserDefItemInsert( HWND, UINT );	//!<	
+HRESULT		UserDefMenuWrite( HMENU );	//!<	
 HRESULT		UserDefSetString( vector<ONELINE> *, LPCTSTR, UINT );	//!<	
 
-HRESULT		FrameNameModifyMenu( HWND );
+HRESULT		FrameNameModifyMenu( HWND );	//!<	
 
-VOID		PreviewInitialise( HINSTANCE, HWND );
-HRESULT		PreviewVisibalise( INT, BOOLEAN );
+VOID		PreviewInitialise( HINSTANCE, HWND );	//!<	
+HRESULT		PreviewVisibalise( INT, BOOLEAN );	//!<	
 
-INT			TraceInitialise( HWND, UINT );
-HRESULT		TraceDialogueOpen( HINSTANCE, HWND );
-HRESULT		TraceImgViewTglExt( VOID );
-UINT		TraceImageAppear( HDC, INT, INT );
-UINT		TraceMoziColourGet( LPCOLORREF );
+INT			TraceInitialise( HWND, UINT );	//!<	
+HRESULT		TraceDialogueOpen( HINSTANCE, HWND );	//!<	
+HRESULT		TraceImgViewTglExt( VOID );	//!<	
+UINT		TraceImageAppear( HDC, INT, INT );	//!<	
+UINT		TraceMoziColourGet( LPCOLORREF );	//!<	
 
-HRESULT		ImageFileSaveDC( HDC, LPTSTR, INT );
+HRESULT		ImageFileSaveDC( HDC, LPTSTR, INT );	//!<	
 
 
-VOID		LayerBoxInitialise( HINSTANCE, LPRECT );
-HRESULT		LayerBoxAlphaSet( UINT );
-HRESULT		LayerMoveFromView( HWND, UINT );
-HWND		LayerBoxVisibalise( HINSTANCE, LPCTSTR, UINT );
+VOID		LayerBoxInitialise( HINSTANCE, LPRECT );	//!<	
+HRESULT		LayerBoxAlphaSet( UINT );	//!<	
+HRESULT		LayerMoveFromView( HWND, UINT );	//!<	
+HWND		LayerBoxVisibalise( HINSTANCE, LPCTSTR, UINT );	//!<	
 INT			LayerHeadSpaceCheck( vector<LETTER> *, PINT );	//!<	
 HRESULT		LayerTransparentToggle( HWND, UINT );			//!<	
 HRESULT		LayerContentsImportable( HWND, UINT, LPINT, LPINT, UINT );	//!<	
-HRESULT		LayerBoxPositionChange( HWND, LONG, LONG );
-HRESULT		LayerStringReplace( HWND, LPTSTR );
+HRESULT		LayerBoxPositionChange( HWND , LONG, LONG );	//!<	
+HRESULT		LayerStringReplace( HWND , LPTSTR );	//!<	
 
 
 
-HRESULT		DocInitialise( UINT );
+HRESULT		DocInitialise( UINT );	//!<	
 
-BOOLEAN		DocRangeIsError( FILES_ITR, INT, INT );
+BOOLEAN		DocRangeIsError( FILES_ITR , INT, INT );	//!<	
 
-UINT_PTR	DocNowFilePageCount( VOID );
-UINT_PTR	DocNowFilePageLineCount( VOID );
+UINT_PTR	DocNowFilePageCount( VOID );	//!<	
+UINT_PTR	DocNowFilePageLineCount( VOID );	//!<	
 
-VOID		DocCaretPosMemory( UINT, LPPOINT );
+VOID		DocCaretPosMemory( UINT , LPPOINT );	//!<	
 
-HRESULT		DocOpenFromNull( HWND );
+HRESULT		DocOpenFromNull( HWND );	//!<	
 
-UINT		DocPageParamGet( PINT, PINT );
-UINT		DocPageByteCount( FILES_ITR, INT, PINT, PINT );
-HRESULT		DocPageInfoRenew( INT, UINT );
-INT			DocPageMaxDotGet( INT, INT );
-HRESULT		DocPageNameSet( LPTSTR );
+UINT		DocPageParamGet( PINT, PINT );	//!<	
+UINT		DocPageByteCount( FILES_ITR , INT, PINT, PINT );	//!<	
+HRESULT		DocPageInfoRenew( INT, UINT );	//!<	
+INT			DocPageMaxDotGet( INT, INT );	//!<	
+HRESULT		DocPageNameSet( LPTSTR );	//!<	
 
-INT			DocPageCreate( INT );
-HRESULT		DocPageDelete( INT, INT );
-HRESULT		DocPageChange( INT );
+INT			DocPageCreate( INT );	//!<	
+HRESULT		DocPageDelete( INT, INT );	//!<	
+HRESULT		DocPageChange( INT );	//!<	
 
-HRESULT		DocModifyContent( UINT );
-
-LPARAM		DocMultiFileCreate( LPTSTR );
-HRESULT		DocActivateEmptyCreate( LPTSTR );
-
-INT			DocLineParamGet( INT, PINT, PINT );
-
-UINT		DocBadSpaceCheck( INT );
-BOOLEAN		DocBadSpaceIsExist( INT );
-
-HRESULT		DocPageDivide( HWND, HINSTANCE, INT );
-
-BOOLEAN		DocIsSjisTrance( TCHAR, LPSTR );
-INT_PTR		DocLetterByteCheck( LPLETTER );
-
-INT			DocInputLetter( INT, INT, TCHAR );
-INT			DocInputBkSpace( PINT, PINT );
-INT			DocInputDelete( INT, INT );
-INT			DocInputFromClipboard( PINT, PINT, PINT, UINT );
-
-INT			DocAdditionalLine( INT, BOOLEAN );
-
-INT			DocStringAdd( PINT, PINT, LPCTSTR, INT );
-HRESULT		DocCrLfAdd( INT, INT, BOOLEAN );
-INT			DocSquareAdd( PINT, PINT, LPCTSTR, INT, LPPOINT * );
-INT			DocStringErase( INT, INT, LPTSTR, INT );
-
-INT			DocInsertLetter( PINT, INT, TCHAR );
-INT			DocInsertString( PINT, PINT, PINT, LPCTSTR, UINT, BOOLEAN );
-
-INT			DocIterateDelete( LETR_ITR, INT );
-HRESULT		DocLineCombine( INT );
-
-BOOLEAN		DocLineErase( INT, BOOLEAN );
-
-
-HRESULT		DocFrameInsert( INT, INT );
-HRESULT		DocScreenFill( LPTSTR );
-
-HRESULT		DocPageNumInsert( HINSTANCE, HWND );
-
-INT			DocExClipSelect( UINT );
-HRESULT		DocPageAllCopy( UINT );
-
-INT			DocLetterShiftPos( INT, INT, INT, PINT, PBOOLEAN );
-INT			DocLetterPosGetAdjust( PINT, INT, INT );
-
-HRESULT		DocReturnSelStateToggle( INT, INT );
-INT			DocRangeSelStateToggle( INT, INT, INT, INT );
-UINT		DocLetterSelStateGet( INT, INT );
-INT			DocPageSelStateToggle( INT );
-HRESULT		DocSelRangeSet( INT, INT );
-HRESULT		DocSelRangeGet( PINT, PINT );
-HRESULT		DocSelRangeReset( PINT, PINT );
-VOID		DocSelByteSet( INT );
-//BOOLEAN		DocIsSelecting( VOID );
-
-LPTSTR		DocClipboardDataGet( PUINT );
-HRESULT		DocClipboardDataSet( LPVOID, INT, UINT );
-
-INT			DocLineDataGetAlloc( INT, INT, LPLETTER *, PINT, PUINT );
-LPSTR		DocPageTextPreviewAlloc( INT, PINT );
-
-HRESULT		DocThreadDropCopy( VOID );
-
-INT			DocPageTextGetAlloc( FILES_ITR, INT, UINT, LPVOID *, BOOLEAN );
-INT			DocPageGetAlloc( UINT, LPVOID * );
-
-INT			DocLineTextGetAlloc( FILES_ITR, INT, UINT, UINT, LPVOID * );
-
-INT			DocSelectedDelete( PINT, PINT, UINT, BOOLEAN );
-INT			DocSelectedBrushFilling( LPTSTR, PINT, PINT );
-INT			DocSelectTextGetAlloc( UINT, LPVOID *, LPPOINT * );
-
-HRESULT		DocExtractExecute( HINSTANCE );
-
-LPARAM		DocOpendFileCheck( LPTSTR );
-HRESULT		DocFileSave( HWND, UINT );
-HRESULT		DocFileOpen( HWND );
-HRESULT		DocDoOpenFile( HWND, LPTSTR );
-HRESULT		DocImageSave( HWND, UINT, HFONT );
-
-UINT		DocStringSplitMLT( LPTSTR, INT, PAGELOAD );
-UINT		DocStringSplitAST( LPTSTR, INT, PAGELOAD );
-
-UINT		DocImportSplitASD( LPSTR, INT, PAGELOAD );
-
-INT			DocLineStateCheckWithDot( INT, INT, PINT, PINT, PINT, PINT, PBOOLEAN );
-HRESULT		DocRightGuideline( LPVOID );
-INT			DocSpaceShiftProc( UINT, PINT, INT );
-LPTSTR		DocPaddingSpaceMake( INT );
-LPTSTR		DocPaddingSpaceUni( INT, PINT, PINT, PINT );
-LPTSTR		DocPaddingSpaceWithGap( INT, PINT, PINT );
-LPTSTR		DocPaddingSpaceWithPeriod( INT, PINT, PINT, PINT, BOOLEAN );
-HRESULT		DocLastSpaceErase( PINT, INT );
-HRESULT		DocTopLetterInsert( TCHAR, PINT, INT );
-HRESULT		DocLastLetterErase( PINT, INT );
-HRESULT		DocTopSpaceErase( PINT, INT );
-HRESULT		DocRightSlide( PINT, INT );
-
-HRESULT		DocPositionShift( UINT, PINT, INT );
-
-HRESULT		DocHeadHalfSpaceExchange( HWND );
-
-LPTSTR		DocLastSpDel( vector<LETTER> * );
-
-INT			DocDiffAdjBaseSet( INT );
-INT			DocDiffAdjExec( PINT, INT );
-
-VOID		ZeroONELINE( LPONELINE );
-INT			DocStringInfoCount( LPCTSTR, UINT_PTR, PINT, PINT );
-
-UINT		DocRangeDeleteByMozi( INT, INT, INT, INT, PBOOLEAN );
-
-INT			DocUndoExecute( PINT, PINT );
-INT			DocRedoExecute( PINT, PINT );
-
-LPARAM		DocFileInflate( LPTSTR );
-INT			DocFileCloseCheck( HWND, UINT );
-HRESULT		DocClipLetter( TCHAR );
-VOID		DocBackupDirectoryInit( LPTSTR );
-HRESULT		DocFileBackup( HWND );
-
-HRESULT		DocMultiFileDeleteAll( VOID );
-LPARAM		DocMultiFileDelete( HWND, LPARAM );
-HRESULT		DocMultiFileSelect( LPARAM );
-HRESULT		DocMultiFileModify( UINT );
-HRESULT		DocMultiFileStore( LPTSTR );
-INT			DocMultiFileFetch( INT, LPTSTR, LPTSTR );
-LPTSTR		DocMultiFileNameGet( INT );
-
-#ifdef AA_INVERSE
-HRESULT		DocInverseInit( UINT );
-HRESULT		DocInverseTransform( UINT, UINT, PINT, INT );
+#ifdef PAGE_DELAY_LOAD
+UINT		DocDelayPageLoad( FILES_ITR , INT );	//!<	ƒfƒBƒŒƒC•Å‚Ìƒ[ƒh
 #endif
 
-HRESULT		SqnInitialise( LPUNDOBUFF );
-HRESULT		SqnFreeAll( LPUNDOBUFF );
-HRESULT		SqnSetting( VOID );
-UINT		SqnAppendLetter( LPUNDOBUFF, UINT, TCHAR, INT, INT, UINT );
-UINT		SqnAppendString( LPUNDOBUFF, UINT, LPCTSTR, INT, INT, UINT );
-UINT		SqnAppendSquare( LPUNDOBUFF, UINT, LPCTSTR, LPPOINT, INT, UINT );
+HRESULT		DocModifyContent( UINT );	//!<	
 
-HRESULT		UnicodeRadixExchange( LPVOID );
+LPARAM		DocMultiFileCreate( LPTSTR );	//!<	
+HRESULT		DocActivateEmptyCreate( LPTSTR );	//!<	
 
-INT			MoziInitialise( LPTSTR, HINSTANCE );
-HWND		MoziScripterCreate( HINSTANCE, HWND );
-HRESULT		MoziMoveFromView( HWND, UINT );
+INT			DocLineParamGet( INT , PINT, PINT );	//!<	
 
-INT			VertInitialise( LPTSTR, HINSTANCE );
-HWND		VertScripterCreate( HINSTANCE, HWND );
-HRESULT		VertMoveFromView( HWND, UINT );
+UINT		DocBadSpaceCheck( INT );	//!<	
+BOOLEAN		DocBadSpaceIsExist( INT );	//!<	
+
+HRESULT		DocPageDivide( HWND, HINSTANCE, INT );	//!<	
+
+BOOLEAN		DocIsSjisTrance( TCHAR, LPSTR );	//!<	
+INT_PTR		DocLetterByteCheck( LPLETTER );	//!<	
+
+INT			DocInputLetter( INT, INT, TCHAR );	//!<	
+INT			DocInputBkSpace( PINT, PINT );	//!<	
+INT			DocInputDelete( INT , INT );	//!<	
+INT			DocInputFromClipboard( PINT, PINT, PINT, UINT );	//!<	
+
+INT			DocAdditionalLine( INT, PBOOLEAN );	//!<	
+
+INT			DocStringAdd( PINT, PINT, LPCTSTR, INT );	//!<	
+HRESULT		DocCrLfAdd( INT, INT, BOOLEAN );	//!<	
+INT			DocSquareAdd( PINT, PINT, LPCTSTR, INT, LPPOINT * );	//!<	
+INT			DocStringErase( INT, INT, LPTSTR, INT );	//!<	
+
+INT			DocInsertLetter( PINT, INT, TCHAR );	//!<	
+INT			DocInsertString( PINT, PINT, PINT, LPCTSTR, UINT, BOOLEAN );	//!<	
+
+INT			DocIterateDelete( LETR_ITR, INT );	//!<	
+HRESULT		DocLineCombine( INT );	//!<	
+
+HRESULT		DocLineErase( INT, PBOOLEAN );	//!<	
+
+
+HRESULT		DocFrameInsert( INT, INT );	//!<	
+HRESULT		DocScreenFill( LPTSTR );	//!<	
+
+HRESULT		DocPageNumInsert( HINSTANCE, HWND );	//!<	
+
+INT			DocExClipSelect( UINT );	//!<	
+HRESULT		DocPageAllCopy( UINT );	//!<	
+
+INT			DocLetterShiftPos( INT, INT, INT, PINT, PBOOLEAN );	//!<	
+INT			DocLetterPosGetAdjust( PINT, INT, INT );	//!<	
+
+HRESULT		DocReturnSelStateToggle( INT, INT );	//!<	
+INT			DocRangeSelStateToggle( INT, INT, INT, INT );	//!<	
+UINT		DocLetterSelStateGet( INT, INT );	//!<	
+INT			DocPageSelStateToggle( INT );	//!<	
+HRESULT		DocSelRangeSet( INT, INT );	//!<	
+HRESULT		DocSelRangeGet( PINT, PINT );	//!<	
+HRESULT		DocSelRangeReset( PINT, PINT );	//!<	
+VOID		DocSelByteSet( INT );	//!<	
+//BOOLEAN		DocIsSelecting( VOID );
+
+LPTSTR		DocClipboardDataGet( PUINT );	//!<	
+HRESULT		DocClipboardDataSet( LPVOID, INT, UINT );	//!<	
+
+INT			DocLineDataGetAlloc( INT, INT, LPLETTER *, PINT, PUINT );	//!<	
+LPSTR		DocPageTextPreviewAlloc( INT, PINT );	//!<	
+
+HRESULT		DocThreadDropCopy( VOID );	//!<	
+
+INT			DocPageTextGetAlloc( FILES_ITR, INT, UINT, LPVOID *, BOOLEAN );	//!<	
+INT			DocPageGetAlloc( UINT, LPVOID * );	//!<	
+
+INT			DocLineTextGetAlloc( FILES_ITR, INT, UINT, UINT, LPVOID * );	//!<	
+
+INT			DocSelectedDelete( PINT, PINT, UINT, BOOLEAN );	//!<	
+INT			DocSelectedBrushFilling( LPTSTR, PINT, PINT );	//!<	
+INT			DocSelectTextGetAlloc( UINT, LPVOID *, LPPOINT * );	//!<	
+
+HRESULT		DocExtractExecute( HINSTANCE );	//!<	
+
+LPARAM		DocOpendFileCheck( LPTSTR );	//!<	
+HRESULT		DocFileSave( HWND, UINT );	//!<	
+HRESULT		DocFileOpen( HWND );	//!<	
+HRESULT		DocDoOpenFile( HWND, LPTSTR );	//!<	
+HRESULT		DocImageSave( HWND, UINT, HFONT );	//!<	
+
+UINT		DocStringSplitMLT( LPTSTR, INT, PAGELOAD );	//!<	
+UINT		DocStringSplitAST( LPTSTR, INT, PAGELOAD );	//!<	
+
+UINT		DocImportSplitASD( LPSTR, INT, PAGELOAD );	//!<	
+
+INT			DocLineStateCheckWithDot( INT, INT, PINT, PINT, PINT, PINT, PBOOLEAN );	//!<	
+HRESULT		DocRightGuideline( LPVOID );	//!<	
+INT			DocSpaceShiftProc( UINT, PINT, INT );	//!<	
+LPTSTR		DocPaddingSpaceMake( INT );	//!<	
+LPTSTR		DocPaddingSpaceUni( INT, PINT, PINT, PINT );	//!<	
+LPTSTR		DocPaddingSpaceWithGap( INT, PINT, PINT );	//!<	
+LPTSTR		DocPaddingSpaceWithPeriod( INT, PINT, PINT, PINT, BOOLEAN );	//!<	
+HRESULT		DocLastSpaceErase( PINT, INT );	//!<	
+HRESULT		DocTopLetterInsert( TCHAR, PINT, INT );	//!<	
+HRESULT		DocLastLetterErase( PINT, INT );	//!<	
+HRESULT		DocTopSpaceErase( PINT, INT );	//!<	
+HRESULT		DocRightSlide( PINT, INT );	//!<	
+
+HRESULT		DocPositionShift( UINT, PINT, INT );	//!<	
+
+HRESULT		DocHeadHalfSpaceExchange( HWND );	//!<	
+
+LPTSTR		DocLastSpDel( vector<LETTER> * );	//!<	
+
+INT			DocDiffAdjBaseSet( INT );	//!<	
+INT			DocDiffAdjExec( PINT, INT );	//!<	
+
+VOID		ZeroONELINE( LPONELINE );	//!<	
+INT			DocStringInfoCount( LPCTSTR, UINT_PTR, PINT, PINT );	//!<	
+
+BOOLEAN		NowPageInfoGet( UINT, LPPAGEINFOS );	//!<	
+
+UINT		DocRangeDeleteByMozi( INT, INT, INT, INT, PBOOLEAN );	//!<	
+
+INT			DocUndoExecute( PINT, PINT );	//!<	
+INT			DocRedoExecute( PINT, PINT );	//!<	
+
+LPARAM		DocFileInflate( LPTSTR );	//!<	
+INT			DocFileCloseCheck( HWND, UINT );	//!<	
+HRESULT		DocClipLetter( TCHAR );	//!<	
+VOID		DocBackupDirectoryInit( LPTSTR );	//!<	
+HRESULT		DocFileBackup( HWND );	//!<	
+
+HRESULT		DocMultiFileDeleteAll( VOID );	//!<	
+LPARAM		DocMultiFileDelete( HWND, LPARAM );	//!<	
+HRESULT		DocMultiFileSelect( LPARAM );	//!<	
+HRESULT		DocMultiFileModify( UINT );	//!<	
+HRESULT		DocMultiFileStore( LPTSTR );	//!<	
+INT			DocMultiFileFetch( INT, LPTSTR, LPTSTR );	//!<	
+LPTSTR		DocMultiFileNameGet( INT );	//!<	
+
+#ifdef AA_INVERSE
+HRESULT		DocInverseInit( UINT );	//!<	
+HRESULT		DocInverseTransform( UINT, UINT, PINT, INT );	//!<	
+#endif
+
+HRESULT		SqnInitialise( LPUNDOBUFF );	//!<	
+HRESULT		SqnFreeAll( LPUNDOBUFF );	//!<	
+HRESULT		SqnSetting( VOID );	//!<	
+UINT		SqnAppendLetter( LPUNDOBUFF, UINT, TCHAR, INT, INT, UINT );	//!<	
+UINT		SqnAppendString( LPUNDOBUFF, UINT, LPCTSTR, INT, INT, UINT );	//!<	
+UINT		SqnAppendSquare( LPUNDOBUFF, UINT, LPCTSTR, LPPOINT, INT, UINT );	//!<	
+
+HRESULT		UnicodeRadixExchange( LPVOID );	//!<	
+
+INT			MoziInitialise( LPTSTR, HINSTANCE );	//!<	
+HWND		MoziScripterCreate( HINSTANCE, HWND );	//!<	
+HRESULT		MoziMoveFromView( HWND , UINT );	//!<	
+
+INT			VertInitialise( LPTSTR, HINSTANCE );	//!<	
+HWND		VertScripterCreate( HINSTANCE, HWND );	//!<	
+HRESULT		VertMoveFromView( HWND , UINT );	//!<	
 
 #ifdef FIND_STRINGS
-HRESULT		FindDialogueOpen( HINSTANCE, HWND );
-HRESULT		FindHighlightOff( VOID );
-HRESULT		FindStringJump( UINT );
+HRESULT		FindDialogueOpen( HINSTANCE, HWND );	//!<	
+HRESULT		FindHighlightOff( VOID );	//!<	
+HRESULT		FindStringJump( UINT );	//!<	
 
 #endif
 
 #endif	//	NOT _ORRVW
 
-LPCTSTR		NextLineW( LPCTSTR );
-LPTSTR		NextLineW( LPTSTR );
+LPCTSTR		NextLineW( LPCTSTR );	//!<	
+LPTSTR		NextLineW( LPTSTR );	//!<	
 
-LPSTR		NextLineA( LPSTR );
+LPSTR		NextLineA( LPSTR );	//!<	
 
 
 //Viewer‚à—L‚è
-HRESULT	DraughtInitialise( HINSTANCE, HWND );
-HWND	DraughtWindowCreate( HINSTANCE, HWND, UINT );
+HRESULT	DraughtInitialise( HINSTANCE, HWND );	//!<	
+HWND	DraughtWindowCreate( HINSTANCE, HWND, UINT );	//!<	
 
-UINT	DraughtItemAddFromSelect( UINT );
-UINT	DraughtItemAdding( LPSTR );
+UINT	DraughtItemAddFromSelect( UINT );	//!<	
+UINT	DraughtItemAdding( LPSTR );	//!<	
 
-UINT	DraughtAaImageing( LPAAMATRIX );
+UINT	DraughtAaImageing( LPAAMATRIX );	//!<	
 
 
-INT		TextViewSizeGet( LPCTSTR, PINT );
+INT		TextViewSizeGet( LPCTSTR, PINT );	//!<	
 
-INT_PTR	AacItemCount( UINT );
-HBITMAP	AacArtImageGet( INT, LPSIZE, LPSIZE );
+INT_PTR	AacItemCount( UINT );	//!<	
+HBITMAP	AacArtImageGet( INT, LPSIZE, LPSIZE );	//!<	
 
 LPSTR	AacAsciiArtGet( DWORD );			//!<	
 

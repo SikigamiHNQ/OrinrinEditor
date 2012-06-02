@@ -21,8 +21,6 @@ If not, see <http://www.gnu.org/licenses/>.
 #include "OrinrinEditor.h"
 //-------------------------------------------------------------------------------------------------
 
-//	ユーザ定義、実は要らない？ＭＬＴ一覧のほうで問題無いのでは
-
 //	ユーザ定義壱個分
 typedef struct tagUSERITEMS
 {
@@ -38,14 +36,14 @@ extern INT		gdDocLine;		//!<	キャレットのＹ行数・ドキュメント位置
 
 static TCHAR	gatUsDfPath[MAX_PATH];	//!<	
 
-static  UINT	gdItemCnt;	//!<	
+static  UINT	gdItemCnt;	//!<	登録されているアイテム数
 
-static USERITEMS	gstUserItem[USER_ITEM_MAX];	//	固定でいいかな
+static USERITEMS	gstUserItem[USER_ITEM_MAX];	//!<	ユーザアイテムの保持
 //-------------------------------------------------------------------------------------------------
 
-UINT	CALLBACK UserDefItemLoad( LPTSTR, LPCTSTR, INT );	//!<	
+UINT	CALLBACK UserDefItemLoad( LPTSTR, LPCTSTR, INT );	//!<	ユーザ定義の内容をぶち込む
 
-HRESULT	UserDefAppendMenu( HWND );	//!<	
+HRESULT	UserDefAppendMenu( HWND );	//!<	ユーザ定義の内容をメニューに追加
 //-------------------------------------------------------------------------------------------------
 
 
@@ -257,7 +255,7 @@ HRESULT UserDefAppendMenu( HWND hWnd )
 {
 	HMENU	hMenu, hSubMenu;
 
-	//	メニュー構造変わったらここも変更・どうにかならんのか
+#pragma message("メニュー構造変わったらユーザ定義の位置であるここも変更")
 	hMenu = GetMenu( hWnd );
 	hSubMenu = GetSubMenu( hMenu, 2 );
 	hMenu = hSubMenu;
@@ -338,6 +336,7 @@ HRESULT UserDefItemInsert( HWND hWnd, UINT idNum )
 	BOOLEAN	bFirst = TRUE;
 
 
+	//	はみ出したらアウツ！
 	if( gdItemCnt <= idNum )	return E_OUTOFMEMORY;
 
 	//	今のカーソル行から、行先頭に、各行の内容を挿入していく
@@ -346,17 +345,16 @@ HRESULT UserDefItemInsert( HWND hWnd, UINT idNum )
 	dNeedLine = gstUserItem[idNum].vcUnits.size( );
 
 	//	まずは頁行数かくぬん
-	iLines = DocPageParamGet( NULL, NULL );
+	iLines = DocPageParamGet( NULL , NULL );	//	行数確認・入れ替えていけるか
 	//	全体行数より、追加行数が多かったら、改行増やす
 	if( iLines < (dNeedLine + yLine) )
 	{
 		iMinus = (dNeedLine + yLine) - iLines;	//	追加する行数
 
-		DocAdditionalLine( iMinus, TRUE );
-		bFirst = FALSE;
+		DocAdditionalLine( iMinus, &bFirst );//	bFirst = FALSE;
 
 		//	この頁の行数取り直し
-		iLines = DocPageParamGet( NULL, NULL );	//	再計算いるか？
+		iLines = DocPageParamGet( NULL , NULL );	//	再計算いるか？
 	}
 
 	for( i = 0; dNeedLine > i; i++, yLine++ )

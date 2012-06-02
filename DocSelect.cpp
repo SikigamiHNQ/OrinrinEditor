@@ -27,9 +27,6 @@ extern INT		gixFocusPage;	//	注目中のページ・とりあえず０・０インデックス
 extern  UINT	gbUniPad;		//	パディングにユニコードをつかって、ドットを見せないようにする
 extern  UINT	gbCrLfCode;		//	改行コード：０したらば・非０ＹＹ 
 
-#ifdef COPY_SWAP
-extern  UINT	gbCpModSwap;	//	SJISとユニコードコピーを入れ替える	//@@コピー処理
-#endif
 static INT		gdSelByte;		//!<	選択範囲のバイト数
 //-------------------------------------------------------------------------------------------------
 
@@ -950,12 +947,7 @@ HRESULT DocExtractExecute( HINSTANCE hInst )
 	}
 	else	//	ないならクルッペボード
 	{
-//@@コピー処理
-#ifdef COPY_SWAP
-		DocClipboardDataSet( ptString, cch * sizeof(TCHAR), gbCpModSwap ? D_SJIS : D_UNI );
-#else
 		DocClipboardDataSet( ptString, cch * sizeof(TCHAR), D_UNI );
-#endif
 	}
 
 

@@ -125,10 +125,6 @@ extern INT		gixFocusPage;	//	注目中のページ・とりあえず０・０インデックス
 
 extern INT		gbTmpltDock;	//	ページ窓のドッキング
 
-//@@コピー処理
-#ifdef COPY_SWAP
-extern  UINT	gbCpModSwap;	//	SJISとユニコードコピーを入れ替える
-#endif
 extern  HWND	ghMainSplitWnd;	//	メインのスプリットバーハンドル
 extern  LONG	grdSplitPos;	//	スプリットバーの、左側の、画面右からのオフセット
 
@@ -1612,6 +1608,7 @@ HRESULT ViewDrawMetricLine( HDC hdc, UINT bUpper )
 	@param[in]	hdc		デバイスコンテキスト
 	@param[in]	dDot	描画開始するドット値
 	@param[in]	rdLine	描画する行
+	@param[in]	dFlag	描画必要なフラグ
 	@return		HRESULT	終了状態コード
 */
 HRESULT ViewDrawReturnMark( HDC hdc, INT dDot, INT rdLine, UINT dFlag )
@@ -1697,7 +1694,12 @@ INT ViewDrawEOFMark( HDC hdc, INT dDot, INT rdLine, UINT dFlag )
 	ViewPositionTransform( &dX, &dY, 1 );
 
 	clrTextOld = SetTextColor( hdc , gaColourTable[CLRT_EOF_MARK] );	//	EOFの色
-	if( dFlag & CT_LASTSP )	clrBackOld = SetBkColor(   hdc , gaColourTable[CLRT_LASTSPWARN] );	//	背景の色
+	if( dFlag & CT_LASTSP )
+	{
+		clrBackOld = SetBkColor(   hdc , gaColourTable[CLRT_LASTSPWARN] );	//	背景の色
+		SetBkMode( hdc, OPAQUE );
+	}
+
 
 	GetTextExtentPoint32( hdc, gatEOF, EOF_SIZE, &stSize );
 
@@ -1712,7 +1714,8 @@ INT ViewDrawEOFMark( HDC hdc, INT dDot, INT rdLine, UINT dFlag )
 	ExtTextOut( hdc, stClip.left, stClip.top, 0, &stClip, gatEOF, EOF_SIZE, NULL );
 
 	SetTextColor( hdc, clrTextOld );
-	if( dFlag & CT_LASTSP )	SetBkColor( hdc, clrBackOld );
+	if( dFlag & CT_LASTSP ){	SetBkColor( hdc, clrBackOld );	SetBkMode( hdc, TRANSPARENT );	}
+
 
 	return stSize.cx;
 }
@@ -2234,13 +2237,7 @@ VOID OperationOnCommand( HWND hWnd, INT id, HWND hWndCtl, UINT codeNotify )
 
 		//	切り取り
 		case IDM_CUT:
-//@@コピー処理
-#ifdef COPY_SWAP
-			bMode = gbCpModSwap ? D_SJIS : D_UNI;
-			DocExClipSelect( bMode | gbSqSelect );	//	コピーして削除すればおｋ
-#else
 			DocExClipSelect( D_UNI | gbSqSelect );	//	コピーして削除すればおｋ
-#endif
 			if( IsSelecting( NULL ) ){	Evw_OnKey( hWnd, VK_DELETE, TRUE, 0, 0 );	}
 			break;
 
@@ -2257,25 +2254,13 @@ VOID OperationOnCommand( HWND hWnd, INT id, HWND hWndCtl, UINT codeNotify )
 			}
 			else
 			{
-//@@コピー処理
-#ifdef COPY_SWAP
-				bMode = gbCpModSwap ? D_SJIS : D_UNI;
-				DocExClipSelect( bMode | gbSqSelect );
-#else
 				DocExClipSelect( D_UNI | gbSqSelect );
-#endif
 			}
 			break;
 
 		//	SJISコピー
-//@@コピー処理
 		case IDM_SJISCOPY:
-#ifdef COPY_SWAP
-			bMode = gbCpModSwap ? D_UNI : D_SJIS;	//	ここは逆にする必要が有る
-			DocExClipSelect( bMode | gbSqSelect  );
-#else
 			DocExClipSelect( D_SJIS | gbSqSelect  );
-#endif
 			break;
 
 		//	全SJISコピー
@@ -2307,7 +2292,10 @@ VOID OperationOnCommand( HWND hWnd, INT id, HWND hWndCtl, UINT codeNotify )
 			break;
 
 		//	画面の再描画
-		case IDM_NOW_PAGE_REFRESH:	ViewRedrawSetLine( -1 );	PreviewVisibalise( gixFocusPage, FALSE );	break;
+		case IDM_NOW_PAGE_REFRESH:
+			ViewRedrawSetLine( -1 );
+			PreviewVisibalise( gixFocusPage, FALSE );
+			break;
 
 		//	800Dｘ40Lくらいまでを全角スペースで埋めちゃう
 		case IDM_FILL_ZENSP:	DocScreenFill( TEXT("　") );	break;

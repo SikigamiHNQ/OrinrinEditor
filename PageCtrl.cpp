@@ -53,6 +53,7 @@ static LPTSTR	gptPgTipBuf;	//!<
 static INT		gixPreviSel;	//!<	直前まで選択してた頁
 
 static INT		gixMouseSel;	//!<	マウスカーソル下のアレ
+static INT		gixPreSel;		//!<	マウスカーソル下のアレ
 
 static BOOLEAN	gbPgTipView;	//!<	頁ツールティップ表示ON/OFF
 
@@ -157,6 +158,7 @@ HWND PageListInitialise( HINSTANCE hInstance, HWND hParentWnd, LPRECT pstFrame )
 	ghInst = hInstance;
 
 	gixMouseSel = -1;
+	gixPreSel = -1;
 
 	gixPreviSel = -1;
 
@@ -271,6 +273,8 @@ HWND PageListInitialise( HINSTANCE hInstance, HWND hParentWnd, LPRECT pstFrame )
 //ツールチップ
 	ghPageTipWnd = CreateWindowEx( WS_EX_TOPMOST, TOOLTIPS_CLASS, NULL, TTS_NOPREFIX | TTS_ALWAYSTIP,
 		CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, ghPageWnd, NULL, hInstance, NULL );
+
+	SetClassLongPtr( ghPageTipWnd, GCLP_HCURSOR, (LONG_PTR)(LoadCursor( NULL, IDC_IBEAM ) ) );
 
 
 	ViewingFontGet( &stFont );
@@ -701,6 +705,8 @@ LRESULT PageListNotify( HWND hWnd, LPNMLISTVIEW pstLv )
 	INT		lvLine;
 	LPNMLVCUSTOMDRAW	pstDraw;
 
+	PAGEINFOS	stInfo;
+
 	hLvWnd = pstLv->hdr.hwndFrom;
 	nmCode = pstLv->hdr.code;
 	//	なんらかのアクションの起こったROW位置をゲットする 
@@ -752,7 +758,7 @@ LRESULT PageListNotify( HWND hWnd, LPNMLISTVIEW pstLv )
 
 		if( pstDraw->nmcd.dwDrawStage == (CDDS_ITEMPREPAINT|CDDS_SUBITEM) )//(CDDS_ITEMPREPAINT|CDDS_SUBITEM)
 		{
-			lvLine = pstDraw->nmcd.dwItemSpec;	//	行
+			lvLine = pstDraw->nmcd.dwItemSpec;	//	行・頁番号になる
 			lvClmn = pstDraw->iSubItem;			//	カラム
 
 			if( gixFocusPage == lvLine )	//	今の行・とりあえず青
@@ -768,13 +774,28 @@ LRESULT PageListNotify( HWND hWnd, LPNMLISTVIEW pstLv )
 				pstDraw->clrTextBk = 0xFF000000;	//	これでデフォ色指定・多分
 			}
 
+#ifdef PAGE_DELAY_LOAD
+			if( 0 == lvClmn )
+			{
+				if( NowPageInfoGet( lvLine, NULL ) )
+				{
+					pstDraw->clrTextBk = 0x00C0C0C0;
+				}
+				//else
+				//{
+				//	pstDraw->clrTextBk = 0xFF000000;
+				//}
+			}
+#endif
+
 			//	再描画せずともリヤルに変わる・バイト数計算のところで再描画してる？
 			if( 2 == lvClmn )
 			{
-				if( PAGE_BYTE_MAX < (*gitFileIt).vcCont.at( lvLine ).dByteSz )
-					pstDraw->clrTextBk = 0x000000FF;
-				//else
-				//	pstDraw->clrTextBk = 0xFF000000;
+				stInfo.dMasqus = PI_BYTES;
+				NowPageInfoGet( lvLine, &stInfo );
+
+				if( PAGE_BYTE_MAX <  stInfo.iBytes )	pstDraw->clrTextBk = 0x000000FF;
+				//else	pstDraw->clrTextBk = 0xFF000000;
 			}
 			//else
 			//{
@@ -1248,6 +1269,8 @@ HRESULT PageListDuplicate( HWND hWnd, INT iNowPage )
 				(*gitFileIt).vcCont.at( iNowPage ).ltPage.end(),
 				back_inserter( (*gitFileIt).vcCont.at( iNewPage ).ltPage ) );
 
+#pragma message ("PageListDuplicate 作った頁の内容の再計算いるか？")
+
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
@@ -1367,31 +1390,44 @@ LRESULT Plv_OnNotify( HWND hWnd, INT idFrom, LPNMHDR pstNmhdr )
 		{
 			pstDispInfo = (LPNMTTDISPINFO)pstNmhdr;
 
-			ZeroMemory( pstDispInfo->szText, sizeof(pstDispInfo->szText) );
-			pstDispInfo->lpszText = NULL;
-
-			FREE( gptPgTipBuf );
-
-			if( !(gbPgTipView) ){	return 0;	}	//	非表示なら何もしないでおｋ
-
-			if( 0 > gixMouseSel ){	return 0;	}
-
-			TRACE( TEXT("TTN_GETDISPINFO %d"), gixMouseSel );
-			//	該当ページから引っ張る
-			dBytes = DocPageTextGetAlloc( gitFileIt, gixMouseSel, D_UNI, (LPVOID *)(&gptPgTipBuf), FALSE );
-
-			if( gptPgTipBuf )
+			if( gixPreSel != gixMouseSel )
 			{
-				StringCchLength( gptPgTipBuf, STRSAFE_MAX_CCH, &rdLength );
-				//if( 2 <= rdLength )
-				//{
-				//	//	末端に余計な改行があるので消しておく
-				//	gptPgTipBuf[rdLength-1] = NULL;
-				//	gptPgTipBuf[rdLength-2] = NULL;
-				//	rdLength -= 2;
-				//}
-				//	余計な改行は無くなった
 
+				ZeroMemory( pstDispInfo->szText, sizeof(pstDispInfo->szText) );
+				pstDispInfo->lpszText = NULL;
+
+				FREE( gptPgTipBuf );
+
+				if( !(gbPgTipView) ){	return 0;	}	//	非表示なら何もしないでおｋ
+
+				if( 0 > gixMouseSel ){	return 0;	}
+
+				TRACE( TEXT("1 TTN_GETDISPINFO %d  %X"), gixMouseSel, pstDispInfo->uFlags );
+				gixPreSel = gixMouseSel;
+
+				//	該当ページから引っ張る
+				dBytes = DocPageTextGetAlloc( gitFileIt, gixMouseSel, D_UNI, (LPVOID *)(&gptPgTipBuf), FALSE );
+
+				if( gptPgTipBuf )
+				{
+					StringCchLength( gptPgTipBuf, STRSAFE_MAX_CCH, &rdLength );
+					//if( 2 <= rdLength )
+					//{
+					//	//	末端に余計な改行があるので消しておく
+					//	gptPgTipBuf[rdLength-1] = NULL;
+					//	gptPgTipBuf[rdLength-2] = NULL;
+					//	rdLength -= 2;
+					//}
+					//	余計な改行は無くなった
+
+					pstDispInfo->lpszText = gptPgTipBuf;
+				}
+			}
+			else
+			{
+				TRACE( TEXT("2 TTN_GETDISPINFO %d  %X"), gixMouseSel, pstDispInfo->uFlags );
+
+				ZeroMemory( pstDispInfo->szText, sizeof(pstDispInfo->szText) );
 				pstDispInfo->lpszText = gptPgTipBuf;
 			}
 

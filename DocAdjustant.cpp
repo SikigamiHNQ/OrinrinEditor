@@ -573,6 +573,9 @@ UINT DocSpaceDifference( UINT vk, PINT pXdot, INT dLine )
 	itLine->iByteSz -= iBytes;	if( 0 > itLine->iByteSz ){	itLine->iByteSz = 0;	}
 	itLine->iDotCnt -= iDots;	if( 0 > itLine->iDotCnt ){	itLine->iDotCnt = 0;	}
 
+//	DocLineParamGet( yLine, NULL, NULL );	//	行内容の再計算
+//あとの函数内で呼ばれまくってる
+
 	//	Space文字列を追加
 	dNowDot = dBgnDot;
 	DocStringAdd( &dNowDot, &dLine, ptSpace, cchSize );
@@ -847,7 +850,6 @@ INT DocDiffAdjExec( PINT pxDot, INT yLine )
 	return iSabun;
 }
 //-------------------------------------------------------------------------------------------------
-
 
 /*!
 	指定されたドット幅を、ピリオドも使って綺麗に確保する・１９幅までなら調整できる・これはこれで必要

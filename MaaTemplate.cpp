@@ -503,6 +503,9 @@ VOID Maa_OnDestroy( HWND hWnd )
 /*!
 	ウインドウのサイズ変更
 	@param[in]	hWnd	ウインドウハンドル
+	@param[in]	state	ウインドウの状態フラグ
+	@param[in]	cx		クライヤントＸ幅
+	@param[in]	cy		クライヤントＹ高さ
 */
 VOID Maa_OnSize( HWND hWnd, UINT state, INT cx, INT cy )
 {
@@ -870,7 +873,7 @@ INT_PTR CALLBACK TreeProfileDlgProc( HWND hDlg, UINT message, WPARAM wParam, LPA
 					if( NULL != atTgtDir[0] )
 					{
 						TreeView_DeleteAllItems( chTvWnd  );	//	一旦全破壊してルート作り直し
-						SqlTreeNodeDelete(  0 );	//	キャッシュも破壊
+						SqlTreeNodeAllDelete( 0 );	//	キャッシュも破壊
 						chTreeRoot = TreeView_InsertItem( chTvWnd, &cstRootIns );	//	ルート作成
 #ifndef TREEPROF_AUTOCHECK
 						TreeView_SetCheckState( chTvWnd , chTreeRoot, TRUE );	//	チェキマーク？
@@ -989,6 +992,7 @@ VOID TreeProfProgressUp( HWND hDlg )
 #ifdef TREEPROF_AUTOCHECK
 /*!
 	既存のプロフの内容チェキを再現する・再帰
+	@param[in]	hDlg	ダイヤログハンドル
 	@param[in]	ptTgDir	選択してるディレクトリ・プロフのと違うなら何もしない・NULLなら確認しない
 	@param[in]	hTvWnd	ツリービューハンドル
 	@param[in]	hNode	確認するノード
@@ -1088,6 +1092,7 @@ VOID TreeProfCheckState( HWND hTvWnd, HTREEITEM hNode, UINT bCheck )
 
 /*!
 	リストアップ処理
+	@param[in]	hDlg	ダイヤログハンドル
 	@param[in]	hTvWnd	ツリービューハンドル
 	@param[in]	ptRoot	MLTルートディレクトリ
 	@param[in]	hTreePr	対象ディレクトリのツリーアイテム・こいつにぶら下げていく
@@ -1221,7 +1226,7 @@ HRESULT TreeLoadDirCheck( HWND hDlg, HWND hTvWnd )
 	SqlTransactionOnOff( TRUE );	//	トランザクション開始
 
 	SqlTreeProfUpdate( NULL, atTgtDir );	//	ルートパスを変更
-	SqlTreeNodeDelete(  1 );	//	ファイルから構築する場合、本体SQLの中身を空にしてから
+	SqlTreeNodeAllDelete( 1 );	//	ファイルから構築する場合、本体SQLの中身を空にしてから
 
 	dCacheCnt = SqlTreeCount( 3, &dCacheMax );
 	index = 0;
@@ -1247,6 +1252,7 @@ HRESULT TreeLoadDirCheck( HWND hDlg, HWND hTvWnd )
 
 /*!
 	再帰検索で、ツリーのチェック状況を調べてキャッシュを操作
+	@param[in]	hDlg	ダイヤログハンドル
 	@param[in]	hTvWnd	ツリーハンドル
 	@param[in]	hNode	チェキる基点ノード
 	@param[in]	bFixe	非０実際に操作　０Check状況の確認
@@ -1309,7 +1315,7 @@ UINT TreeLoadNodeProc( HWND hDlg, HWND hTvWnd, HTREEITEM hNode, UINT bFixe )
 	@param[in]	ptSplits	先頭パスをコピーするバッファ・MAX_PATHであること
 	@return		元パスの、次のディレクトリ位置
 */
-LPTSTR PathSplitFirstPath( LPTSTR ptSource, LPTSTR ptSplit )
+LPTSTR PathSplitFirstPath( LPTSTR ptSource, LPTSTR ptSplits )
 {
 	UINT	d;
 
@@ -1318,9 +1324,9 @@ LPTSTR PathSplitFirstPath( LPTSTR ptSource, LPTSTR ptSplit )
 
 	for( d = 0; MAX_PATH > d; d++ )
 	{
-		if( TEXT('\\') == ptSource[d] ){	ptSplit[d] = NULL;	d++;	break;	}
-		else if( NULL ==  ptSource[d] ){	ptSplit[d] = NULL;	break;	}
-		else{	ptSplit[d] = ptSource[d];	}
+		if( TEXT('\\') == ptSource[d] ){	ptSplits[d] =  NULL;	d++;	break;	}
+		else if( NULL ==  ptSource[d] ){	ptSplits[d] =  NULL;	break;	}
+		else{	ptSplits[d] = ptSource[d];	}
 	}
 
 	return &(ptSource[d]);

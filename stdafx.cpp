@@ -94,13 +94,13 @@ BOOLEAN FileExtensionCheck( LPTSTR ptFile, LPTSTR ptExte )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	プレビュ用に、HTML的にヤバイ文字をエンティティする
+	プレビュ用に、HTML的にヤバイ文字をエンティティする・SJIS用
 	@param[in]	adMozi	チェキりたいユニコード文字
 	@param[out]	pcStr	エンティティした場合は、その文字列を入れる
 	@param[in]	cbSize	文字列バッファの文字数（バイト数）
 	@return		BOOLEAN	非０エンティティした　０問題無い
 */
-BOOLEAN HtmlEntityCheck( TCHAR adMozi, LPSTR pcStr, UINT_PTR cbSize )
+BOOLEAN HtmlEntityCheckA( TCHAR adMozi, LPSTR pcStr, UINT_PTR cbSize )
 {
 	INT	i;
 
@@ -122,8 +122,36 @@ BOOLEAN HtmlEntityCheck( TCHAR adMozi, LPSTR pcStr, UINT_PTR cbSize )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	SJISから&#0000;を考慮してユニコードに変換
-	&#から始まる部分が実体参照かどうかチェック・１０文字みる、ヌルターミネータまで
+	プレビュ用に、HTML的にヤバイ文字をエンティティする・Unicode用
+	@param[in]	adMozi	チェキりたいユニコード文字
+	@param[out]	ptStr	エンティティした場合は、その文字列を入れる
+	@param[in]	cchSize	文字列バッファの文字数
+	@return		BOOLEAN	非０エンティティした　０問題無い
+*/
+BOOLEAN HtmlEntityCheckW( TCHAR adMozi, LPTSTR ptStr, UINT_PTR cchSize )
+{
+	INT	i;
+
+	ZeroMemory( ptStr, cchSize * sizeof(TCHAR) );
+
+	for( i = 0; 4 > i; i++ )
+	{
+		if( 0 == gstEttySP[i].dUniCode )	break;
+
+		if( gstEttySP[i].dUniCode == adMozi )
+		{
+			StringCchCopy( ptStr, cchSize, gstEttySP[i].atCodeW );
+			return TRUE;
+		}
+	}
+
+	return FALSE;
+}
+//-------------------------------------------------------------------------------------------------
+
+/*!
+	SJISから"&#0000;"を考慮してユニコードに変換
+	"&#"から始まる部分が実体参照かどうかチェック・１０文字みる、ヌルターミネータまで
 	@param[in]	pcStr	確認する文字列の先頭
 	@return		TCHAR	ユニコード文字（数値の部分そのまま）
 */
@@ -284,8 +312,9 @@ LPTSTR SjisDecodeAlloc( LPSTR pcBuff )
 	cchSize = MultiByteToWideChar( CP_ACP, MB_PRECOMPOSED, pcBuff, -1, NULL, 0 );
 
 	//	出力用ユニコードバッファ
-	ptBuffer = (LPTSTR)malloc( (cchSize+1) * sizeof(TCHAR) );
-	ZeroMemory( ptBuffer, (cchSize+1) * sizeof(TCHAR) );
+	cchSize += 2;	//	バッファ自体の量なのでここで変更しておｋ
+	ptBuffer = (LPTSTR)malloc( cchSize * sizeof(TCHAR) );
+	ZeroMemory( ptBuffer, cchSize * sizeof(TCHAR) );
 
 	dStart = 0;
 	dEnd   = 0;

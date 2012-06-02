@@ -953,7 +953,7 @@ UINT FrameMakeMultiSubLine( CONST BOOLEAN bEnable, LPFRAMEITEM pstItem, LPTSTR p
 	}
 	else	//	空白である
 	{
-		ptBufStr = DocPaddingSpaceMake( pstItem->dDot );
+		ptBufStr = DocPaddingSpaceWithPeriod( pstItem->dDot, NULL, NULL, NULL, TRUE );//DocPaddingSpaceMake( pstItem->dDot );
 		StringCchCopy( ptDest, cchSz, ptBufStr );
 		FREE( ptBufStr );
 	}
@@ -1005,7 +1005,7 @@ UINT StringWidthAdjust( CONST UINT iFwOffs, LPTSTR ptStr, CONST UINT_PTR cchSz, 
 
 	if( 1 <= iFwOffs )
 	{
-		ptBufStr = DocPaddingSpaceMake( iFwOffs );
+		ptBufStr = DocPaddingSpaceWithPeriod( iFwOffs, NULL, NULL, NULL, TRUE );//DocPaddingSpaceMake( iFwOffs );
 		if( ptBufStr )
 		{
 			StringCchCopy( atWork, MAX_PATH, ptBufStr );
@@ -1021,7 +1021,7 @@ UINT StringWidthAdjust( CONST UINT iFwOffs, LPTSTR ptStr, CONST UINT_PTR cchSz, 
 		if( iDot < iMaxDot )	//	指定幅のほうが広いならパディングー
 		{
 			iPadd = iMaxDot - iDot;
-			ptBufStr = DocPaddingSpaceMake( iPadd );
+			ptBufStr = DocPaddingSpaceWithPeriod( iPadd, NULL, NULL, NULL, TRUE );//DocPaddingSpaceMake( iPadd );
 			if( ptBufStr )
 			{
 				StringCchCat( atWork, MAX_PATH, ptBufStr );
@@ -1041,7 +1041,7 @@ UINT StringWidthAdjust( CONST UINT iFwOffs, LPTSTR ptStr, CONST UINT_PTR cchSz, 
 					iBuf = iMaxDot - iDotCnt;
 					if( 0 < iBuf )
 					{
-						ptBufStr = DocPaddingSpaceMake( iBuf );
+						ptBufStr = DocPaddingSpaceWithPeriod( iBuf, NULL, NULL, NULL, TRUE );//DocPaddingSpaceMake( iBuf );
 						if( ptBufStr )
 						{
 							StringCchCat( atWork, MAX_PATH, ptBufStr );
@@ -1108,11 +1108,6 @@ LPTSTR FrameMakeOutsideBoundary( CONST INT iWidth, CONST INT iHeight, LPFRAMEINF
 	iLines =  iHeight / LINE_HEIGHT;	//	切り捨てでおｋ
 	TRACE( TEXT("MF LINE %d"), iLines );
 
-	for( i = 0; iLines > i; i++ )
-	{
-		vcString.push_back( wsWorkStr );	//	先に確保
-	}
-
 	bMultiPadd = pstInfo->dRestPadd;	//	パディングするかどうか
 
 	//	行数の確認
@@ -1120,6 +1115,16 @@ LPTSTR FrameMakeOutsideBoundary( CONST INT iWidth, CONST INT iHeight, LPFRAMEINF
 
 	iMdLine = iLines - (iUpLine + iDnLine);	//	柱
 	TRACE( TEXT("MF R[%d] P[%d] F[%d]"), iUpLine, iMdLine, iDnLine );
+	//	もし iMdLine がマイナスになったら？　中が作られなくなるだけ
+	if( 0 > iMdLine ){	iLines -= iMdLine;	iMdLine = 0;	}	//	符号に注意セヨ
+	//	はみ出すとバグるので、はみ出した分は無かったことにする
+
+	for( i = 0; iLines > i; i++ )
+	{
+		vcString.push_back( wsWorkStr );	//	先に確保
+	}
+
+
 
 	iRealWid = iWidth;
 
@@ -1660,8 +1665,8 @@ HRESULT DocFrameInsert( INT dMode, INT dStyle )
 	iLines = DocNowFilePageLineCount( );	//	ページ全体の行数
 
 	//	開始地点から開始	//	D_SQUARE
-	iTop = (*gitFileIt).vcCont.at( gixFocusPage ).dSelLineTop;
-	iBtm = (*gitFileIt).vcCont.at( gixFocusPage ).dSelLineBottom;
+	iTop = gitFileIt->vcCont.at( gixFocusPage ).dSelLineTop;
+	iBtm = gitFileIt->vcCont.at( gixFocusPage ).dSelLineBottom;
 	if( 0 >  iTop ){	iTop = 0;	}
 	if( 0 >  iBtm ){	iBtm = iLines - 1;	}
 
@@ -1712,7 +1717,7 @@ HRESULT DocFrameInsert( INT dMode, INT dStyle )
 		//	右
 		iEndot = DocLineParamGet( iLns, NULL, NULL );	//	この行の末端
 		iPadding = xMidLen - iEndot;	//	埋め量確認
-		ptPadding = DocPaddingSpaceMake( iPadding );
+		ptPadding = DocPaddingSpaceWithPeriod( iPadding, NULL, NULL, NULL, TRUE );//DocPaddingSpaceMake( iPadding );
 		if( ptPadding )
 		{
 			DocInsertString( &iEndot, &iLns, NULL, ptPadding, 0, FALSE );
@@ -1964,7 +1969,7 @@ UINT FrameMultiSubstring( LPCTSTR ptSrc, CONST UINT dLine, LPTSTR ptDest, CONST 
 	iPaDot = iUseDot - iStrDot;
 	if( 1 <= iPaDot )
 	{
-		ptPadding = DocPaddingSpaceMake( iPaDot );
+		ptPadding = DocPaddingSpaceWithPeriod( iPaDot, NULL, NULL, NULL, TRUE );//DocPaddingSpaceMake( iPaDot );
 		StringCchCat( ptDest, cchSz, ptPadding );
 		FREE( ptPadding );
 	}
@@ -1981,6 +1986,7 @@ UINT FrameMultiSubstring( LPCTSTR ptSrc, CONST UINT dLine, LPTSTR ptDest, CONST 
 
 /*!
 	挿入用ウインドウ作る
+	@param[in]	hInst	実存ハンドル
 	@param[in]	hPrWnd	メインのウインドウハンドル
 */
 HWND FrameInsBoxCreate( HINSTANCE hInst, HWND hPrWnd )

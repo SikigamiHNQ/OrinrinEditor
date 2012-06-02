@@ -24,7 +24,10 @@ If not, see <http://www.gnu.org/licenses/>.
 #include "resource.h"
 //-------------------------------------------------------------------------------------------------
 
-#define MAA_VIRTUAL_TREE
+#define EXTRA_NODE_STYLE
+//	追加ノード機能
+
+#define EXTRA_NODE	TEXT("[*追加項目*]")
 
 #define WMP_PROF_ACT	(WM_APP+100)	
 
@@ -62,21 +65,22 @@ HRESULT		TreeConstruct( HWND, LPCTSTR, BOOLEAN );	//!<
 LRESULT		TreeNotify( HWND, LPNMTREEVIEW );	//!<	
 LPTSTR		TreeBaseNameGet( VOID );			//!<	
 UINT		TreeFavIsUnderCursor( HWND, HWND, INT, INT, INT, UINT );	//!<	
-INT			TreeFavWhichOpen( VOID );			//!<	
 LPARAM		TreeItemInfoGet( HTREEITEM, LPTSTR, size_t );	//!<	
 INT			TreeSelItemProc( HWND, HTREEITEM, UINT );	//!<	
 UINT		TreeNodePathGet( HTREEITEM, LPTSTR );	//!<	
 
-HRESULT		TreeMaaFileFind( HWND );
+HRESULT		TreeMaaFileFind( HWND );	//!<	
 
 LRESULT		CALLBACK FavListFolderNameBack( UINT, UINT, UINT, LPCVOID );	//!<	
 HRESULT		FavListSelected( HWND, UINT );		//!<	
 HRESULT		FavContsRedrawRequest( HWND );		//!<	
 
-HRESULT		TabMultipleSelDelete( HWND );
-HRESULT		TabMultipleDeleteAll( HWND );
-HRESULT		TabMultipleStore( HWND );
-INT			TabMultipleTopMemory( INT );
+HRESULT		TabMultipleSelDelete( HWND );		//!<	
+HRESULT		TabMultipleDeleteAll( HWND );		//!<	
+HRESULT		TabMultipleStore( HWND );			//!<	
+INT			TabMultipleTopMemory( INT );		//!<	
+INT			TabMultipleNowSel( VOID );			//!<	
+HRESULT		TabMultipleDropAdd( HWND, LPCTSTR );	//!<	
 
 HRESULT		TabMultipleCtrlFromFind( HWND );
 
@@ -104,7 +108,11 @@ HRESULT		OpenProfileLoad( HWND, INT );	//!<
 HRESULT		OpenProfileLogging( HWND, LPCTSTR );	//!<	
 
 #ifndef _ORRVW
+  #ifdef MAA_IADD_PLUS
+HRESULT		AacItemInsert( HWND, LONG );
+  #else
 HRESULT		AacItemAdding( HWND, LPTSTR );
+  #endif
 #endif
 
 HRESULT		SqlDatabaseOpenClose( BYTE, LPCTSTR );	//!<	
@@ -135,7 +143,7 @@ HRESULT		SqlTreeProfUpdate( LPCTSTR, LPCTSTR );
 HRESULT		SqlTreeProfSelect( LPTSTR, UINT, LPTSTR, UINT );
 
 UINT		SqlTreeNodeInsert( UINT, UINT, UINT, LPTSTR );
-HRESULT		SqlTreeNodeDelete( UINT );
+HRESULT		SqlTreeNodeAllDelete( UINT );
 //HRESULT		SqlTreeNodeEnum( UINT, BUFFERBACK );
 UINT		SqlTreeNodePickUpID( UINT, PUINT, PUINT, LPTSTR, UINT );
 //UINT		SqlTreeNodeRootSearch( LPTSTR );
@@ -153,5 +161,11 @@ UINT		SqlMultiTabInsert( LPTSTR, LPTSTR );
 UINT		SqlMultiTabSelect( INT, LPTSTR, LPTSTR );
 HRESULT		SqlMultiTabDelete( VOID );
 
+#ifdef EXTRA_NODE_STYLE
+UINT		SqlTreeNodeExtraInsert( UINT, LPCTSTR );
+UINT		SqlTreeNodeExtraDelete( UINT );
+UINT		SqlTreeNodeExtraSelect( UINT, UINT, LPTSTR );
+UINT		SqlTreeNodeExtraIsFileExist( LPCTSTR );
 
+#endif
 

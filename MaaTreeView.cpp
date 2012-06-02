@@ -19,12 +19,48 @@ If not, see <http://www.gnu.org/licenses/>.
 
 //	タブにお気に入りを登録するには
 
+/*
+Ｄ＆Ｄによるツリー追加。
+追加ディレクトリを用意。ファイルのフルパスの保持は？
+別Table用意するとして、lParamに２や－１を？
+lParamとるところでの整合性注意
+
+簡易追加したとき、再構築したら？＜この時は消えても良いか？
+簡易追加を纏めておくディレクトリを用意。テーブル増やすか？別個で持っておけば
+構築時に無くならない・選択したときのファイルサーチどうする・ノードのlParamになにか？できたっけ？
+
+ツリー右クリの 末尾にアイテム追加 を、エキストラファイル用の削除に変更する
+IDM_MAA_IADD_OPEN
+*/
+
+
+//	TODO:	ディレクトリの閉じたり開いたりのアイコン調整
+
+#ifdef EXTRA_NODE_STYLE
+//エキストラファイルの使用追加の挙動がおかしい
+//エキストラファイル追加したとき、ツリーへの追加が出来てない・描画？追加自体？
+//エキストラファイルの削除 末尾にアイテム追加 を変更してやればいいだろう
+#endif
+
 #include "stdafx.h"
 #include "OrinrinEditor.h"
 #include "MaaTemplate.h"
 //-------------------------------------------------------------------------------------------------
 
-//	複数ファイル保持のアレ
+#define NODE_DIR	1		//!<	ノードで、ディレクトリを示す
+#define NODE_FILE	0		//!<	ノードで、ファイルを示す
+#define NODE_EXTRA	(-1)	//!<	ノードで、追加用ディレクトリを示す
+
+#define TICO_DIR_CLOSE	0	//!<	ツリーアイコン：閉じたディレクトリ
+#define TICO_DIR_OPEN	1	//!<	ツリーアイコン：開いたディレクトリ
+#define TICO_DIR_EXTRA	2	//!<	ツリーアイコン：追加ディレクトリ
+#define TICO_FILE_AST	3	//!<	ツリーアイコン：ＡＳＴファイル
+#define TICO_FILE_MLT	4	//!<	ツリーアイコン：ＭＬＴファイル
+#define TICO_FILE_ETC	5	//!<	ツリーアイコン：その他ファイル
+
+
+
+//!	副タブの内容保持
 typedef struct tagMULTIPLEMAA
 {
 	INT		dTabNum;				//!<	タブの番号・２インデックス
@@ -41,7 +77,7 @@ extern  HWND		ghSplitaWnd;	//	スプリットバーハンドル
 
 extern HMENU		ghProfHisMenu;	//	履歴表示する部分・動的に内容作成せないかん
 
-static HFONT		ghTabFont;
+static HFONT		ghTabFont;		//!<	タブ用のフォント・ちっちゃめの字
 
 static  HWND		ghTabWnd;		//!<	選択タブのハンドル
 
@@ -50,7 +86,7 @@ static  HWND		ghFavLtWnd;		//!<	よく使う奴を登録するリストボックス
 static  HWND		ghTreeWnd;		//!<	ツリーのハンドル
 static HTREEITEM	ghTreeRoot;		//!<	ツリーのルートアイテム
 
-static HIMAGELIST	ghImageList, ghOldIL;	//!<	ツリービューにくっつけるイメージリスト
+//static HIMAGELIST	ghImageList;	//!<	ツリービューにくっつけるイメージリスト
 
 static TCHAR		gatAARoot[MAX_PATH];	//!<	ＡＡディレクトリのカレント
 static TCHAR		gatBaseName[MAX_PATH];	//!<	使用リストに入れる時のグループ名
@@ -58,34 +94,36 @@ static TCHAR		gatBaseName[MAX_PATH];	//!<	使用リストに入れる時のグループ名
 static INT			gixUseTab;	//!<	今開いてるの・０ツリー　１お気に入り　２～複数ファイル
 //	タブ番号であることに注意・複数ファイルリストの割当番号ではない
 
-static WNDPROC	gpfOriginFavListProc;	
-static WNDPROC	gpfOriginTreeViewProc;	
-static WNDPROC	gpfOriginTabMultiProc;	
+static WNDPROC	gpfOriginFavListProc;	//!<	使用リストの元プロシージャ
+static WNDPROC	gpfOriginTreeViewProc;	//!<	ツリービューの元プロシージャ
+static WNDPROC	gpfOriginTabMultiProc;	//!<	タブの元プロシージャ
 
 
-static list<MULTIPLEMAA>	gltMultiFiles;	//!<	複数ファイルの保持
-typedef  list<MULTIPLEMAA>::iterator	MLTT_ITR;
+static list<MULTIPLEMAA>	gltMultiFiles;	//!<	副タブで開いているファイルの保持
+typedef  list<MULTIPLEMAA>::iterator	MLTT_ITR;	//!<	副タブリストのイテレータ
 //-------------------------------------------------------------------------------------------------
 
-#ifdef MAA_VIRTUAL_TREE
-HRESULT	TreeItemFromSqlII( HTREEITEM );
-#else
-UINT	TreeItemFromSql( LPCTSTR, HTREEITEM, UINT );
+HRESULT	TreeItemFromSqlII( HTREEITEM  );	//!<	ディレクトリとファイルをＳＱＬからツリービューに展開
+
+#ifdef EXTRA_NODE_STYLE
+UINT	TreeNodeExtraAdding( LPCTSTR  );	//!<	エキストラファイルを追加する
+HRESULT	TreeExtraItemFromSql( HTREEITEM, UINT );	//!<	エキストラファイルをＳＱＬからツリービューに展開
 #endif
 
-VOID	Mtv_OnMButtonUp( HWND, INT, INT, UINT );
+VOID	Mtv_OnMButtonUp( HWND, INT, INT, UINT );	//!<	ツリービューでマウスの中バラァンがうｐされた時の処理
+VOID	Mtv_OnDropFiles( HWND , HDROP );			//!<	ツリービューにドラッグンドロップされたときの処理
 
-HRESULT	TabMultipleRestore( HWND );
-INT		TabMultipleSelect( HWND, INT, UINT );	//!<	
-//INT	TabMultipleOpen( HWND , HTREEITEM );	//!<	
-HRESULT	TabMultipleAppend( HWND );				//!<	
-HRESULT	TabMultipleDelete( HWND, CONST INT );	//!<	
+HRESULT	TabMultipleRestore( HWND  );			//!<	複数ファイルをINIから読み込んで再展開する
+INT		TabMultipleSelect( HWND, INT, UINT );	//!<	副タブから選択した場合
+//INT	TabMultipleOpen( HWND , HTREEITEM );	//
+HRESULT	TabMultipleDelete( HWND, CONST INT );	//!<	指定のタブを閉じる
+INT		TabMultipleAppend( HWND );				//!<	タブを増やす
 
-UINT	TabMultipleIsFavTab( INT, LPTSTR, UINT_PTR );
+UINT	TabMultipleIsFavTab( INT, LPTSTR, UINT_PTR );	//!<	副タブはお気にリストのであるか
 
-LRESULT	CALLBACK gpfFavListProc( HWND, UINT, WPARAM, LPARAM );	//	
-LRESULT	CALLBACK gpfTreeViewProc( HWND, UINT, WPARAM, LPARAM );	//	
-LRESULT	CALLBACK gpfTabMultiProc( HWND, UINT, WPARAM, LPARAM );	//	
+LRESULT	CALLBACK gpfFavListProc(  HWND , UINT, WPARAM, LPARAM );	//!<	使用リストのサブクラスプロシージャ
+LRESULT	CALLBACK gpfTreeViewProc( HWND , UINT, WPARAM, LPARAM );	//!<	ツリービューのサブクラスプロシージャ
+LRESULT	CALLBACK gpfTabMultiProc( HWND , UINT, WPARAM, LPARAM );	//!<	タブのサブクラスプロシージャ
 //-------------------------------------------------------------------------------------------------
 
 /*!
@@ -100,7 +138,11 @@ HRESULT TreeInitialise( HWND hWnd, HINSTANCE hInst, LPRECT ptRect )
 	TCITEM		stTcItem;
 	RECT		itRect, clRect;
 
-	SHFILEINFO	stShFileInfo;
+//	SHFILEINFO	stShFileInfo;
+
+	HIMAGELIST	hTreeImgList;				//!<	
+	HICON	hIcon;
+
 
 	//	破壊するとき
 	if( !(hWnd) )
@@ -163,15 +205,26 @@ HRESULT TreeInitialise( HWND hWnd, HINSTANCE hInst, LPRECT ptRect )
 
 
 //全ＡＡリストツリー
-	ghImageList = (HIMAGELIST)SHGetFileInfo( TEXT(""), 0, &stShFileInfo, sizeof(SHFILEINFO), (SHGFI_SYSICONINDEX|SHGFI_SMALLICON) );
+//	ghImageList = (HIMAGELIST)SHGetFileInfo( TEXT(""), 0, &stShFileInfo, sizeof(SHFILEINFO), (SHGFI_SYSICONINDEX|SHGFI_SMALLICON) );
 
-	ghTreeWnd = CreateWindowEx( WS_EX_CLIENTEDGE, WC_TREEVIEW, TEXT("itemtree"),
+	ghTreeWnd = CreateWindowEx( WS_EX_CLIENTEDGE | WS_EX_ACCEPTFILES, WC_TREEVIEW, TEXT("itemtree"),
 		WS_VISIBLE | WS_CHILD | TVS_DISABLEDRAGDROP | TVS_HASBUTTONS | TVS_HASLINES | TVS_LINESATROOT | TVS_SHOWSELALWAYS,
 		0, itRect.bottom, TREE_WIDTH, ptRect->bottom-itRect.bottom-1, hWnd, (HMENU)IDTV_ITEMTREE, hInst, NULL );
-	TreeView_SetImageList( ghTreeWnd, ghImageList, TVSIL_NORMAL );
+//	TreeView_SetImageList( ghTreeWnd, ghImageList, TVSIL_NORMAL );
 
 	//	サブクラス化
 	gpfOriginTreeViewProc = SubclassWindow( ghTreeWnd, gpfTreeViewProc );
+
+	//	アイコンくっつける
+	hTreeImgList = ImageList_Create( 16, 16, ILC_COLOR24 | ILC_MASK, 6, 0 );
+	hIcon = LoadIcon( hInst , MAKEINTRESOURCE(IDI_TREE_DIR_CLOSE) );	ImageList_AddIcon( hTreeImgList, hIcon );	DeleteObject( hIcon );
+	hIcon = LoadIcon( hInst , MAKEINTRESOURCE(IDI_TREE_DIR_OPEN)  );	ImageList_AddIcon( hTreeImgList, hIcon );	DeleteObject( hIcon );
+	hIcon = LoadIcon( hInst , MAKEINTRESOURCE(IDI_TREE_DIR_EXTRA) );	ImageList_AddIcon( hTreeImgList, hIcon );	DeleteObject( hIcon );
+	hIcon = LoadIcon( hInst , MAKEINTRESOURCE(IDI_TREE_FILE_AST)  );	ImageList_AddIcon( hTreeImgList, hIcon );	DeleteObject( hIcon );
+	hIcon = LoadIcon( hInst , MAKEINTRESOURCE(IDI_TREE_FILE_MLT)  );	ImageList_AddIcon( hTreeImgList, hIcon );	DeleteObject( hIcon );
+	hIcon = LoadIcon( hInst , MAKEINTRESOURCE(IDI_TREE_FILE_ETC)  );	ImageList_AddIcon( hTreeImgList, hIcon );	DeleteObject( hIcon );
+	TreeView_SetImageList( ghTreeWnd, hTreeImgList, TVSIL_NORMAL );
+
 
 	return S_OK;
 }
@@ -224,13 +277,14 @@ LRESULT CALLBACK gpfTreeViewProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPa
 
 	switch( msg )
 	{
-		HANDLE_MSG( hWnd, WM_CHAR,    Maa_OnChar  );	//	
-		HANDLE_MSG( hWnd, WM_COMMAND, Maa_OnCommand );	//	アクセロリータ用
+		HANDLE_MSG( hWnd, WM_CHAR,      Maa_OnChar  );		//	
+		HANDLE_MSG( hWnd, WM_COMMAND,   Maa_OnCommand );	//	アクセロリータ用
 
-		HANDLE_MSG( hWnd, WM_KEYDOWN, Aai_OnKey );			//	20120221
-		HANDLE_MSG( hWnd, WM_KEYUP,   Aai_OnKey );			//	
+		HANDLE_MSG( hWnd, WM_KEYDOWN,   Aai_OnKey );		//	20120221
+		HANDLE_MSG( hWnd, WM_KEYUP,     Aai_OnKey );		//	
 
-		HANDLE_MSG( hWnd, WM_MBUTTONUP, Mtv_OnMButtonUp );	
+		HANDLE_MSG( hWnd, WM_MBUTTONUP, Mtv_OnMButtonUp );	//	
+		HANDLE_MSG( hWnd, WM_DROPFILES, Mtv_OnDropFiles );	//	ドラグンドロップの受付
 
 		case WM_MOUSEWHEEL:
 			ulRslt = Maa_OnMouseWheel( hWnd, (int)(short)LOWORD(lParam), (int)(short)HIWORD(lParam), (int)(short)HIWORD(wParam), (UINT)(short)LOWORD(wParam) );
@@ -273,6 +327,41 @@ VOID Mtv_OnMButtonUp( HWND hWnd, INT x, INT y, UINT flags )
 	return;
 }
 //-------------------------------------------------------------------------------------------------
+
+/*!
+	ドラッグンドロップの受け入れ
+	@param[in]	hWnd	親ウインドウのハンドル
+	@param[in]	hDrop	ドロッピンオブジェクトハンドゥ
+*/
+VOID Mtv_OnDropFiles( HWND hWnd, HDROP hDrop )
+{
+	TCHAR	atFileName[MAX_PATH];
+//	LPARAM	dNumber;
+	BOOL	bRslt;
+
+	ZeroMemory( atFileName, sizeof(atFileName) );
+
+	DragQueryFile( hDrop, 0, atFileName, MAX_PATH );
+	DragFinish( hDrop );
+
+	bRslt = PathIsDirectory( atFileName );
+
+	TRACE( TEXT("MTV DROP[%u][%s]"), bRslt, atFileName );
+
+	if( bRslt ){	 return;	}	//	ファイルで無いのなら何もしない
+
+#ifdef EXTRA_NODE_STYLE
+
+	//	SQLに追加して、ツリーに追加する
+	TreeNodeExtraAdding( atFileName );
+
+#endif
+
+	return;
+}
+//-------------------------------------------------------------------------------------------------
+
+
 
 /*!
 	マルチプルタブのサブクラスプロシージャ
@@ -364,6 +453,9 @@ VOID Maa_OnContextMenu( HWND hWnd, HWND hWndContext, UINT xPos, UINT yPos )
 	INT		curSel, iRslt;
 	TCHAR	atText[MAX_PATH], atName[MAX_PATH];
 	LPARAM	lPrm;
+#ifdef EXTRA_NODE_STYLE
+	LPARAM	iSelID = 0;
+#endif
 	UINT_PTR	cchSize;
 #ifndef _ORRVW
 	LONG_PTR	rdExStyle;
@@ -376,7 +468,6 @@ VOID Maa_OnContextMenu( HWND hWnd, HWND hWndContext, UINT xPos, UINT yPos )
 	TCITEM			stTcItem;
 	MENUITEMINFO	stMenuItemInfo;
 	HTREEITEM		hTvHitItem;
-
 
 	stPost.x = (SHORT)xPos;	//	画面座標はマイナスもありうる
 	stPost.y = (SHORT)yPos;
@@ -442,17 +533,30 @@ VOID Maa_OnContextMenu( HWND hWnd, HWND hWndContext, UINT xPos, UINT yPos )
 
 		//	選択されたやつのファイル名、もしくはディレクトリ名確保
 		lPrm = TreeItemInfoGet( hTvHitItem, atName, MAX_PATH );
+		//＠＠	lParamの判断
+
+#ifdef EXTRA_NODE_STYLE
+		//	どれでもないのなら、エキストラファイルなので、ファイルにしておく・書換注意
+		if( NODE_DIR != lPrm && NODE_FILE != lPrm && NODE_EXTRA != lPrm )
+		{
+			iSelID = lPrm;
+			lPrm = NODE_FILE;
+			EnableMenuItem( hSubMenu, IDM_MAA_ITEM_DELETE, MF_ENABLED );
+		}
+#endif
+
 		StringCchCat( atName, MAX_PATH, TEXT(" の操作") );
 		//	名称を明示しておく
 		ModifyMenu( hSubMenu, IDM_DUMMY, MF_BYCOMMAND | MF_STRING | MF_GRAYED, IDM_DUMMY, atName );
-//		EnableMenuItem( hSubMenu, IDM_DUMMY, MF_GRAYED );
-		if( lPrm )	//	Directoryなら
+
+		if( NODE_FILE != lPrm )	//	ファイルでないなら
 		{
 			EnableMenuItem( hSubMenu, IDM_AATREE_MAINOPEN, MF_GRAYED );
-			EnableMenuItem( hSubMenu, IDM_AATREE_SUBADD, MF_GRAYED );
-			EnableMenuItem( hSubMenu, IDM_AATREE_GOEDIT, MF_GRAYED );
-			EnableMenuItem( hSubMenu, IDM_MAA_IADD_OPEN, MF_GRAYED );
+			EnableMenuItem( hSubMenu, IDM_AATREE_SUBADD,   MF_GRAYED );
+			EnableMenuItem( hSubMenu, IDM_AATREE_GOEDIT,   MF_GRAYED );
+		//	EnableMenuItem( hSubMenu, IDM_MAA_IADD_OPEN,   MF_GRAYED );	//	キャンセルされた
 		}
+		//	プロフ内のファイルも削除出来るようにしておくか？
 
 		//	プロフ履歴入替
 	//	ModifyMenu( hSubMenu, IDM_OPEN_HISTORY, MF_BYCOMMAND | MF_POPUP, (UINT_PTR)ghProfHisMenu, TEXT("ファイル使用履歴(&H)") );
@@ -472,14 +576,21 @@ VOID Maa_OnContextMenu( HWND hWnd, HWND hWndContext, UINT xPos, UINT yPos )
 			case IDM_TREE_RECONSTRUCT:	TreeProfileRebuild( hWnd  );	break;
 
 			case IDM_FINDMAA_DLG_OPEN:	TreeMaaFileFind( hWnd );	break;
+
+			case  IDM_AATREE_GOEDIT:	TreeSelItemProc( hWnd, hTvHitItem , 2 );	break;
+  #ifndef MAA_IADD_PLUS
+		//	case  IDM_MAA_IADD_OPEN:	TreeSelItemProc( hWnd, hTvHitItem , 3 );	break;
+			//キャンセルされた
+  #endif
 #endif
 			case IDM_AATREE_MAINOPEN:	TreeSelItemProc( hWnd, hTvHitItem , 0 );	break;
-			case  IDM_AATREE_SUBADD:	TreeSelItemProc( hWnd, hTvHitItem , 1 );	break;
-#ifndef _ORRVW
-			case  IDM_AATREE_GOEDIT:	TreeSelItemProc( hWnd, hTvHitItem , 2 );	break;
-#endif
-			case  IDM_MAA_IADD_OPEN:	TreeSelItemProc( hWnd, hTvHitItem , 3 );	break;
 
+			case  IDM_AATREE_SUBADD:	TreeSelItemProc( hWnd, hTvHitItem , 1 );	break;
+
+#ifdef EXTRA_NODE_STYLE
+			case IDM_MAA_ITEM_DELETE:	TreeSelItemProc( hWnd, hTvHitItem , 4 );	break;
+#endif
+			//	ファイルオーポン履歴クルヤー
 			case IDM_OPEN_HIS_CLEAR:	OpenProfileLogging( hWnd, NULL );	break;
 
 			default:
@@ -487,10 +598,7 @@ VOID Maa_OnContextMenu( HWND hWnd, HWND hWndContext, UINT xPos, UINT yPos )
 				{
 					OpenProfileLoad( hWnd, dRslt );
 				}
-				else if( IDM_OPEN_HIS_CLEAR == dRslt )	//	ファイルオーポン履歴クルヤー
-				{
-					OpenProfileLogging( hWnd, NULL );
-				}
+				//else if( IDM_OPEN_HIS_CLEAR == dRslt ){	OpenProfileLogging( hWnd, NULL );	}	//	ファイルオーポン履歴クルヤー
 				break;
 		}
 
@@ -600,7 +708,7 @@ HRESULT TreeResize( HWND hWnd, LPRECT ptRect )
 HRESULT TreeConstruct( HWND hWnd, LPCTSTR ptCurrent, BOOLEAN bSubTabReb )
 {
 	TVINSERTSTRUCT	stTreeIns;
-	SHFILEINFO	stShFileInfo;
+//	SHFILEINFO	stShFileInfo;
 	TCHAR	atRoote[MAX_PATH];
 
 	ZeroMemory( gatAARoot, sizeof(gatAARoot) );
@@ -617,13 +725,14 @@ HRESULT TreeConstruct( HWND hWnd, LPCTSTR ptCurrent, BOOLEAN bSubTabReb )
 	stTreeIns.hInsertAfter   = TVI_SORT;
 	stTreeIns.item.mask      = TVIF_TEXT | TVIF_PARAM | TVIF_IMAGE | TVIF_SELECTEDIMAGE | TVIF_CHILDREN;
 	stTreeIns.item.pszText   = atRoote;//TEXT("ROOT");
-	stTreeIns.item.lParam    = 1;
+	stTreeIns.item.lParam    = NODE_DIR;	//	１ディレクトリ　０ファイル
 	stTreeIns.item.cChildren = 1;
+	//	ルートのＩＤは０
 
-	SHGetFileInfo( TEXT(""), 0, &stShFileInfo, sizeof(SHFILEINFO), (SHGFI_SYSICONINDEX|SHGFI_SMALLICON) );
-	stTreeIns.item.iImage = stShFileInfo.iIcon;
-	SHGetFileInfo( TEXT(""), 0, &stShFileInfo, sizeof(SHFILEINFO), (SHGFI_SYSICONINDEX|SHGFI_SMALLICON|SHGFI_OPENICON) );
-	stTreeIns.item.iSelectedImage = stShFileInfo.iIcon;
+	//SHGetFileInfo( TEXT(""), 0, &stShFileInfo, sizeof(SHFILEINFO), (SHGFI_SYSICONINDEX|SHGFI_SMALLICON) );
+	stTreeIns.item.iImage = I_IMAGECALLBACK;//stShFileInfo.iIcon;
+	//SHGetFileInfo( TEXT(""), 0, &stShFileInfo, sizeof(SHFILEINFO), (SHGFI_SYSICONINDEX|SHGFI_SMALLICON|SHGFI_OPENICON) );
+	stTreeIns.item.iSelectedImage = I_IMAGECALLBACK;//stShFileInfo.iIcon;
 
 	ghTreeRoot = TreeView_InsertItem( ghTreeWnd, &stTreeIns );
 
@@ -638,12 +747,7 @@ HRESULT TreeConstruct( HWND hWnd, LPCTSTR ptCurrent, BOOLEAN bSubTabReb )
 
 	//	プロファイルモードなら、常にSQLからでおｋ
 
-	//	SQLから展開
-#ifdef MAA_VIRTUAL_TREE
-	//ここでは展開しない
-#else
-	TreeItemFromSql( ptCurrent, ghTreeRoot, 0 );
-#endif
+	//	SQLから展開　ここでは展開しない
 
 	StatusBarMsgSet( 2, TEXT("") );
 	TreeView_Expand( ghTreeWnd, ghTreeRoot, TVE_EXPAND );
@@ -702,20 +806,132 @@ UINT TreeNodePathGet( HTREEITEM hNode, LPTSTR ptPath )
 }
 //-------------------------------------------------------------------------------------------------
 
-#ifdef MAA_VIRTUAL_TREE
+#ifdef EXTRA_NODE_STYLE
+
+/*!
+	エキストラファイルを追加する
+	@param[out]	ptPath	対象ファイルのフルパス
+	@return	追加したファイルのSqlID・登録出来なかったら０
+*/
+UINT TreeNodeExtraAdding( LPCTSTR ptPath )
+{
+	UINT	id;
+	LPARAM	lParam;
+	HTREEITEM	hTreeRoot, hChildItem, hNextItem;
+
+	//	追加済ならメッセージ出して終了セヨ
+	id = SqlTreeNodeExtraIsFileExist( ptPath );
+	if( 0 < id )
+	{
+		MessageBox( GetDesktopWindow( ), TEXT("已に登録してあるみたいだよ。"), TEXT("お燐からのお知らせ"), MB_OK | MB_ICONINFORMATION );
+		return id;
+	}
+
+	//	ルート確保
+	hTreeRoot = TreeView_GetRoot( ghTreeWnd );
+
+	//	その子ノードである追加用ノードを探す
+	hChildItem = TreeView_GetChild( ghTreeWnd, hTreeRoot );
+	hNextItem = NULL;
+
+	do{
+		//	ノードlParamをひっぱる・－１が該当ブツである
+		lParam = TreeItemInfoGet( hChildItem, NULL, 0 );
+
+		//	ヒットしたら終わり
+		if( NODE_EXTRA == lParam  ){	break;	}
+
+		//	なかったらその次を探す。
+		hNextItem = TreeView_GetNextSibling( ghTreeWnd, hChildItem );
+		if( hNextItem == hChildItem ){	hNextItem = NULL;	}	//	全部廻ったら同じ物が戻るらしい？
+		hChildItem = hNextItem;
+
+	}while( hChildItem );
+
+	if( !(hChildItem) )	return 0;	//	ヒットしなかった
+	//	ヒットしたのが追加用ノードである
+
+	//	開けば、既存のブツも展開される
+	TreeView_Expand( ghTreeWnd, hChildItem, TVE_EXPAND );
+
+	//	展開してから開かないと多重にツリーに出てくる
+	id = SqlTreeNodeExtraInsert( 0, ptPath );	//	SQLに登録
+	if( 0 >= id )	return 0;	//	失敗
+
+	TreeExtraItemFromSql( hChildItem, id-1 );	//	該当ＩＤの次から探すので注意
+
+	return id;
+}
+//-------------------------------------------------------------------------------------------------
+
+
+/*!
+	エキストラファイルをＳＱＬからツリービューに展開
+	@param[in]	hTreeParent	対象ディレクトリのツリーアイテム・こいつにぶら下げていく
+	@param[in]	dFinID		このＩＤ以降のアイテムをツリーに追加する。通常０、追加時に注意セヨ
+	@return	HRESULT	終了状態コード
+*/
+HRESULT TreeExtraItemFromSql( HTREEITEM hTreeParent, UINT dFinID )
+{
+	TCHAR	atPath[MAX_PATH], atNodeName[MAX_PATH];
+	UINT	tgtID;
+	INT		iFileType;
+
+	HTREEITEM	hNewParent;
+	TVINSERTSTRUCT	stTreeIns;
+//	SHFILEINFO	stShFileInfo;
+
+	ZeroMemory( &stTreeIns, sizeof(TVINSERTSTRUCT) );
+	stTreeIns.hParent      = hTreeParent;
+	stTreeIns.hInsertAfter = TVI_LAST;
+	stTreeIns.item.mask    = TVIF_TEXT | TVIF_PARAM | TVIF_IMAGE | TVIF_SELECTEDIMAGE | TVIF_CHILDREN;
+
+	tgtID = dFinID;
+
+	do{
+		ZeroMemory( atPath, sizeof(atPath) );
+		ZeroMemory( atNodeName, sizeof(atNodeName) );
+
+		tgtID = SqlTreeNodeExtraSelect( 0, tgtID, atPath );
+		if( 0 == tgtID )	break;
+
+		if( FileExtensionCheck( atPath, TEXT(".ast") ) ){	iFileType = TICO_FILE_AST;	}
+		else if( FileExtensionCheck( atPath, TEXT(".mlt") ) ){	iFileType = TICO_FILE_MLT;	}
+		else{	iFileType = TICO_FILE_ETC;	}
+		//SHGetFileInfo( atPath, 0, &stShFileInfo, sizeof(SHFILEINFO), (SHGFI_SYSICONINDEX|SHGFI_SMALLICON) );
+		stTreeIns.item.iImage = iFileType;//stShFileInfo.iIcon;
+		//SHGetFileInfo( atPath, 0, &stShFileInfo, sizeof(SHFILEINFO), (SHGFI_SYSICONINDEX|SHGFI_SMALLICON|SHGFI_OPENICON) );
+		stTreeIns.item.iSelectedImage = iFileType;//stShFileInfo.iIcon;
+		stTreeIns.item.pszText = PathFindFileName( atPath );	//	ファイル名ブッコ抜く
+
+		stTreeIns.item.lParam    = tgtID;	//	ここは特殊なので注意
+		stTreeIns.item.cChildren = 0;	//	子ノードなし
+		stTreeIns.hInsertAfter   = TVI_LAST;
+		hNewParent = TreeView_InsertItem( ghTreeWnd, &stTreeIns );
+
+	}while( tgtID );
+
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+
+#endif
+
 /*!
 	ディレクトリとファイルをＳＱＬからツリービューに展開・再帰するわけではない
 	@param[in]	hTreeParent	対象ディレクトリのツリーアイテム・こいつにぶら下げていく
-	@return		UINT		最後のID
+	@return		HRESULT		終了状態コード
 */
 HRESULT TreeItemFromSqlII( HTREEITEM hTreeParent )
 {
 	TCHAR	atPath[MAX_PATH], atCurrent[MAX_PATH], atNodeName[MAX_PATH];
 	UINT	dPrntID, tgtID, type;
+	INT		iFileType;
 
 	HTREEITEM	hNewParent, hLastDir = TVI_FIRST;
 	TVINSERTSTRUCT	stTreeIns;
-	SHFILEINFO	stShFileInfo;
+//	SHFILEINFO	stShFileInfo;
 
 	ZeroMemory( &stTreeIns, sizeof(TVINSERTSTRUCT) );
 	stTreeIns.hParent      = hTreeParent;
@@ -725,9 +941,29 @@ HRESULT TreeItemFromSqlII( HTREEITEM hTreeParent )
 	ZeroMemory( atCurrent, sizeof(atCurrent) );
 	TreeNodePathGet( hTreeParent, atCurrent );
 
-	dPrntID = MaaSearchTreeID( hTreeParent );	//	こいつのＩＤがパレントになる
-
+	dPrntID = MaaSearchTreeID( hTreeParent );	//	こいつのＩＤが、これから展開するノードの親になる
+	//	ＩＤ０はルートノード
 	tgtID = 0;
+
+	//	ルートのときのみ、[*追加項目*]  みたいなのを付け加える。lParamは２とか？
+#ifdef EXTRA_NODE_STYLE
+	//最前列に追加
+	if( 0 == dPrntID )
+	{
+		StringCchCopy( atNodeName, MAX_PATH, EXTRA_NODE );
+		//	とりやえずカレントディレクトリのアイコンで良いはず	
+		//SHGetFileInfo( atCurrent, 0, &stShFileInfo, sizeof(SHFILEINFO), (SHGFI_SYSICONINDEX|SHGFI_SMALLICON) );
+		stTreeIns.item.iImage = TICO_DIR_EXTRA;//stShFileInfo.iIcon;
+		//SHGetFileInfo( atCurrent, 0, &stShFileInfo, sizeof(SHFILEINFO), (SHGFI_SYSICONINDEX|SHGFI_SMALLICON|SHGFI_OPENICON) );
+		stTreeIns.item.iSelectedImage = TICO_DIR_EXTRA;//stShFileInfo.iIcon;
+		stTreeIns.item.pszText = atNodeName;
+		stTreeIns.item.lParam    = NODE_EXTRA;
+		stTreeIns.item.cChildren = 1;	//	子ノードアリ
+		stTreeIns.hInsertAfter   = hLastDir;
+		hNewParent = TreeView_InsertItem( ghTreeWnd, &stTreeIns );
+		hLastDir = hNewParent;	//	ディレクトリ位置の最終・ファイルの手前	I_IMAGECALLBACK
+	}
+#endif
 
 	do{
 		ZeroMemory( atNodeName, sizeof(atNodeName) );
@@ -737,24 +973,32 @@ HRESULT TreeItemFromSqlII( HTREEITEM hTreeParent )
 		StringCchCopy( atPath, MAX_PATH, atCurrent );
 		PathAppend( atPath, atNodeName );
 
-		SHGetFileInfo( atPath, 0, &stShFileInfo, sizeof(SHFILEINFO), (SHGFI_SYSICONINDEX|SHGFI_SMALLICON) );
-		stTreeIns.item.iImage = stShFileInfo.iIcon;
-		SHGetFileInfo( atPath, 0, &stShFileInfo, sizeof(SHFILEINFO), (SHGFI_SYSICONINDEX|SHGFI_SMALLICON|SHGFI_OPENICON) );
-		stTreeIns.item.iSelectedImage = stShFileInfo.iIcon;
+		//SHGetFileInfo( atPath, 0, &stShFileInfo, sizeof(SHFILEINFO), (SHGFI_SYSICONINDEX|SHGFI_SMALLICON) );
+		//stTreeIns.item.iImage = stShFileInfo.iIcon;
+		//SHGetFileInfo( atPath, 0, &stShFileInfo, sizeof(SHFILEINFO), (SHGFI_SYSICONINDEX|SHGFI_SMALLICON|SHGFI_OPENICON) );
+		//stTreeIns.item.iSelectedImage = stShFileInfo.iIcon;
 		stTreeIns.item.pszText = atNodeName;
 
 		if( FILE_ATTRIBUTE_DIRECTORY == type )	//	ディレクトリの場合
 		{
-			stTreeIns.item.lParam    = 1;
-			stTreeIns.item.cChildren = 1;
+			stTreeIns.item.iImage         = I_IMAGECALLBACK;//TICO_DIR_CLOSE;
+			stTreeIns.item.iSelectedImage = I_IMAGECALLBACK;//TICO_DIR_OPEN;
+			stTreeIns.item.lParam    = NODE_DIR;
+			stTreeIns.item.cChildren = 1;	//	子ノードあり
 			stTreeIns.hInsertAfter   = hLastDir;
 			hNewParent = TreeView_InsertItem( ghTreeWnd, &stTreeIns );
-			hLastDir = hNewParent;
+			hLastDir = hNewParent;	//	ディレクトリ位置の最終・ファイルの手前
 		}
 		else	//	ファイルの場合
 		{
-			stTreeIns.item.lParam    = 0;
-			stTreeIns.item.cChildren = 0;
+			if( FileExtensionCheck( atNodeName, TEXT(".ast") ) ){	iFileType = TICO_FILE_AST;	}
+			else if( FileExtensionCheck( atNodeName, TEXT(".mlt") ) ){	iFileType = TICO_FILE_MLT;	}
+			else{	iFileType = TICO_FILE_ETC;	}
+
+			stTreeIns.item.iImage = iFileType;
+			stTreeIns.item.iSelectedImage = iFileType;
+			stTreeIns.item.lParam    = NODE_FILE;
+			stTreeIns.item.cChildren = 0;	//	子ノードなし
 			stTreeIns.hInsertAfter   = TVI_LAST;
 			hNewParent = TreeView_InsertItem( ghTreeWnd, &stTreeIns );
 		}
@@ -765,88 +1009,6 @@ HRESULT TreeItemFromSqlII( HTREEITEM hTreeParent )
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-
-#else
-
-/*!
-	ディレクトリとファイルをＳＱＬからツリービューに展開・再帰に注意セヨ
-	@param[in]	ptRootName	検索するディレクトリ名
-	@param[in]	hTreeParent	対象ディレクトリのツリーアイテム・こいつにぶら下げていく
-	@param[in]	dPrntID		SQLのID・ディレクトリ番号
-	@return		UINT		最後のID
-*/
-UINT TreeItemFromSql( LPCTSTR ptRootName, HTREEITEM hTreeParent, UINT dPrntID )
-{
-	TCHAR	atPath[MAX_PATH], atNewTop[MAX_PATH], atTarget[MAX_PATH];
-	BOOL	bLooping;
-	UINT	dPnID, dTgtID, type, dPrvID;
-
-	HTREEITEM	hNewParent, hLastDir = TVI_FIRST;
-	TVINSERTSTRUCT	stTreeIns;
-	SHFILEINFO	stShFileInfo;
-
-	ZeroMemory( &stTreeIns, sizeof(TVINSERTSTRUCT) );
-	stTreeIns.hParent      = hTreeParent;
-	stTreeIns.hInsertAfter = TVI_LAST;
-	stTreeIns.item.mask    = TVIF_TEXT | TVIF_PARAM | TVIF_IMAGE | TVIF_SELECTEDIMAGE;
-
-	ZeroMemory( atTarget, sizeof(atTarget) );
-	dTgtID = SqlTreeNodePickUpID( dPrntID, &type, &dPnID, atTarget, 0x01 );
-	//	無くなったら終わり
-	if( 0 == dTgtID )	return 0;
-	//	この時点でＩＤが異なるのは、ディレクトリ指定だけがあって、中身が無い場合
-	if( dPrntID != dPnID )	return dPrntID;
-
-	bLooping = TRUE;
-	do
-	{
-		StringCchCopy( atPath, MAX_PATH, ptRootName );
-		PathAppend( atPath, atTarget );
-
-		SHGetFileInfo( atPath, 0, &stShFileInfo, sizeof(SHFILEINFO), (SHGFI_SYSICONINDEX|SHGFI_SMALLICON) );
-		stTreeIns.item.iImage = stShFileInfo.iIcon;
-		SHGetFileInfo( atPath, 0, &stShFileInfo, sizeof(SHFILEINFO), (SHGFI_SYSICONINDEX|SHGFI_SMALLICON|SHGFI_OPENICON) );
-		stTreeIns.item.iSelectedImage = stShFileInfo.iIcon;
-		stTreeIns.item.pszText = atTarget;
-
-		if( FILE_ATTRIBUTE_DIRECTORY == type )	//	ディレクトリの場合
-		{
-			stTreeIns.item.lParam  = 1;
-			stTreeIns.hInsertAfter = hLastDir;
-			hNewParent = TreeView_InsertItem( ghTreeWnd, &stTreeIns );
-			hLastDir = hNewParent;
-
-			StringCchCopy( atNewTop, MAX_PATH, ptRootName );
-			PathAppend( atNewTop, atTarget );
-
-			dTgtID = TreeItemFromSql( atNewTop, hNewParent, dTgtID );	//	該当ディレクトリ内を再帰検索
-		}
-		else	//	ファイルの場合
-		{
-			stTreeIns.item.lParam  = 0;
-			stTreeIns.hInsertAfter = TVI_LAST;
-			hNewParent = TreeView_InsertItem( ghTreeWnd, &stTreeIns );
-		}
-
-		//	この時点でdTgtIDが０になることはない？
-
-		dPrvID = dTgtID;
-		ZeroMemory( atTarget, sizeof(atTarget) );
-//		SetLastError(0);
-		dTgtID = SqlTreeNodePickUpID( dTgtID, &type, &dPnID, atTarget, 0x01 );
-//中でエラー
-		TRACE( TEXT("%4u\t%4u\t%4u\t%s"), dTgtID, type, dPnID, atTarget );
-
-		if( 0 == dTgtID )	bLooping = FALSE;
-		if( dPrntID != dPnID )	bLooping = FALSE;
-	}
-	while( bLooping );
-
-	return dPrvID;
-}
-//-------------------------------------------------------------------------------------------------
-
-#endif
 
 /*!
 	ツリーノードハンドルを渡して、該当するSqlIDを引っ張る・再帰
@@ -952,7 +1114,7 @@ HTREEITEM MaaSelectIDfile( HWND hDlg, INT tgtID )
 	@param[in]	hTrItem	アイテムハンドル
 	@param[out]	ptName	名前を入れるバッファへのポインタ・NULLでも良い
 	@param[in]	cchName	バッファサイズ
-	@return		LPARAM	ＰＡＲＡＭ情報
+	@return		LPARAM	１ディレクトリ　０ファイル
 */
 LPARAM TreeItemInfoGet( HTREEITEM hTrItem, LPTSTR ptName, size_t cchName )
 {
@@ -989,8 +1151,13 @@ LRESULT TreeNotify( HWND hWnd, LPNMTREEVIEW pstNmTrView )
 {
 	INT		nmCode;
 
-	HTREEITEM	hSelItem;
-	LPTVITEM	pstTvItem;
+#ifdef EXTRA_NODE_STYLE
+	LPARAM	lParam;
+#endif
+
+	HTREEITEM		hSelItem;
+	LPTVITEM		pstTvItem;
+	LPNMTVDISPINFO	pstDispInfo;
 
 	nmCode = pstNmTrView->hdr.code;
 
@@ -999,27 +1166,68 @@ LRESULT TreeNotify( HWND hWnd, LPNMTREEVIEW pstNmTrView )
 	if( TVN_SELCHANGED == nmCode )	//	選択した後
 	{
 		hSelItem = TreeView_GetSelection( ghTreeWnd );	//	選択されてるアイテム
-
-		AaTitleClear(  );	//	ここでクルヤーせないかん
-
+		//	コンボックスクルヤー位置変更してみる
 		TreeSelItemProc( hWnd, hSelItem, 0 );
 	}
 
 
-#ifdef MAA_VIRTUAL_TREE
-	if( TVN_ITEMEXPANDING == nmCode )
+	if( TVN_ITEMEXPANDING == nmCode )	//	子ノードを展開または閉じるとき
 	{
-		TRACE( TEXT("TVN_ITEMEXPANDING[%u]"), pstNmTrView->action );
+		TRACE( TEXT("TVN_ITEMEXPANDING[%X]"), pstNmTrView->action );
 
-		if( pstNmTrView->action & TVE_EXPAND )
+		if( pstNmTrView->action & TVE_EXPAND )	//	展開する
 		{
 			pstTvItem = &(pstNmTrView->itemNew);
-			if( pstTvItem->state & TVIS_EXPANDEDONCE )	return 0;
 
-			TreeItemFromSqlII( pstTvItem->hItem );
+			if( pstTvItem->state & TVIS_EXPANDEDONCE )	return 0;
+			//	展開済なら何もしないでおｋ
+
+#ifdef EXTRA_NODE_STYLE
+			//	もしlPmaramが-1なら
+			lParam = TreeItemInfoGet( pstTvItem->hItem, NULL, 0 );
+			if( NODE_EXTRA == lParam )	//	追加分である
+			{
+				TRACE( TEXT("TREE EX DIR") );
+				TreeExtraItemFromSql( pstTvItem->hItem, 0 );
+			}
+			else
+			{
+#endif
+				TreeItemFromSqlII( pstTvItem->hItem );
+#ifdef EXTRA_NODE_STYLE
+			}
+#endif
+		}
+
+		if( pstNmTrView->action & TVE_COLLAPSE )	//	閉じる
+		{
+			pstTvItem = &(pstNmTrView->itemNew);
+			TRACE( TEXT("TVE_COLLAPSE[%d, %d]"), pstTvItem->iImage, pstTvItem->iSelectedImage );
 		}
 	}
-#endif
+
+
+	//	特異なアイコン追加するなら
+	if( TVN_GETDISPINFO == nmCode )	//	なんか画像情報が居るとき
+	{
+		pstDispInfo = (LPNMTVDISPINFO)pstNmTrView;
+		TRACE( TEXT("TVN_GETDISPINFO[%X]"), pstDispInfo->item.mask );
+
+		if(pstDispInfo->item.mask & TVIF_IMAGE || pstDispInfo->item.mask & TVIF_SELECTEDIMAGE)
+		{
+			if( pstDispInfo->item.state & TVIS_EXPANDED )
+			{
+				pstDispInfo->item.iImage         = TICO_DIR_OPEN;
+				pstDispInfo->item.iSelectedImage = TICO_DIR_OPEN;
+			}
+			else
+			{
+				pstDispInfo->item.iImage         = TICO_DIR_CLOSE;
+				pstDispInfo->item.iSelectedImage = TICO_DIR_CLOSE;
+			}
+		}
+	}
+
 
 	return 0;
 }
@@ -1028,8 +1236,8 @@ LRESULT TreeNotify( HWND hWnd, LPNMTREEVIEW pstNmTrView )
 /*!
 	ツリーの選択したアイテムからの処理のチェイン・操作を統合
 	@param[in]	hWnd		親ウインドウのハンドル
-	@param[in]	hSelItem	選択してるアイテム
-	@param[in]	dMode		０主タブで　１副タブで　２編集ビューで　開く　３アイテム追加
+	@param[in]	hSelItem	選択してるノードのハンドル
+	@param[in]	dMode		０主タブで開く　１副タブ追加　２編集ビューで開く　３アイテム追加　４ノード削除
 	@return		非０処理した　０してない
 */
 INT TreeSelItemProc( HWND hWnd, HTREEITEM hSelItem, UINT dMode )
@@ -1037,58 +1245,85 @@ INT TreeSelItemProc( HWND hWnd, HTREEITEM hSelItem, UINT dMode )
 	UINT	i;
 	TCHAR	atName[MAX_PATH], atPath[MAX_PATH], atBaseName[MAX_PATH];
 	LPARAM	lParam;
-#ifndef _ORRVW
-//	LPARAM	dNumber;
-#endif
 	HTREEITEM	hParentItem;
-
 	MULTIPLEMAA	stMulti;
+
+#ifdef EXTRA_NODE_STYLE
+	UINT	id = 0;
+#endif
+
+	//	右クリ・ツリー選択から合流
 
 	if( !(hSelItem) ){	return 0;	}	//	なんか無効なら何もしない
 
-	//	選択されたやつのファイル名、もしくはディレクトリ名確保
-	lParam = TreeItemInfoGet( hSelItem, atName, MAX_PATH );
-
-	if( lParam ){	return 0;	}	//	ディレクトリなら何もしない
-
-	//	選択した名前を確保・ルートにある場合これで適用される
-	if( 0 == dMode )
+	//	選択されたのがエキストラファイルであれば？親ノードのlParam見ればわかる
+	//	エキストラなら、フルパス確保せないかん　ベース名とか注意セヨ
+#ifdef EXTRA_NODE_STYLE
+	hParentItem = TreeView_GetParent( ghTreeWnd, hSelItem );
+	lParam = TreeItemInfoGet( hParentItem, NULL, 0 );
+	if( NODE_EXTRA == lParam )
 	{
-		StringCchCopy( gatBaseName, MAX_PATH, atName );
-		StatusBarMsgSet( 2, atName );	//	ステータスバーにファイル名表示
+		//	選択されたやつには該当アイテムのsqlIDが入ってる
+		lParam = TreeItemInfoGet( hSelItem, NULL, 0 );
+		//	該当のアイテムを確保
+		id = SqlTreeNodeExtraSelect( lParam, 0, atPath );
+		if( 0 == id )	return 0;	//	なんかおかしいなら何もしない
+
+		//	ファイル名をベース名にしておく
+		if( 0 == dMode )
+		{
+			StringCchCopy( gatBaseName, MAX_PATH, PathFindFileName( atPath ) );
+			StatusBarMsgSet( 2, atName );	//	ステータスバーにファイル名表示
+		}
+		StringCchCopy( atBaseName, MAX_PATH, PathFindFileName( atPath ) );	//	いつでも記録で大丈夫か	20120530
 	}
 	else
 	{
-		StringCchCopy( atBaseName, MAX_PATH, atName );
-	}
+#endif
+		//	選択されたやつのファイル名、もしくはディレクトリ名確保
+		lParam = TreeItemInfoGet( hSelItem, atName, MAX_PATH );
+		//＠＠	lParamの判断
+		if( NODE_FILE != lParam ){	return 0;	}	//	ファイルで無いなら何もしない
 
-	//	ベース名を、所属するディレクトリ名にする。ルートのファイルならそのまま
-
-	//	上に辿って、ファイルパスを作る
-	for( i = 0; 12 > i; i++ )	//	１２より腐海階層はたどれない
-	{
-		hParentItem = TreeView_GetParent( ghTreeWnd, hSelItem );
-		if( !(hParentItem) )	return 0;	//	ルートの上はない・そして選択もされない
-		if( ghTreeRoot == hParentItem ){	break;	}	//	検索がルートまでイッたら終わり
-
-		TreeItemInfoGet( hParentItem, atPath, MAX_PATH );
-
-		if( 0 == i )	//	初回のみなら、所属するディレクトリ名になる	20110928
+		//	選択した名前を確保・ルートにある場合これで適用される
+		if( 0 == dMode )
 		{
-			if( 0 == dMode ){	StringCchCopy( gatBaseName, MAX_PATH, atPath );	}
-			else{				StringCchCopy( atBaseName, MAX_PATH, atPath );	}
+			StringCchCopy( gatBaseName, MAX_PATH, atName );
+			StatusBarMsgSet( 2, atName );	//	ステータスバーにファイル名表示
+		}
+		StringCchCopy( atBaseName, MAX_PATH, atName );	//	いつでも記録で大丈夫か	20120530
+
+		//	ベース名を、所属するディレクトリ名にする。ルートのファイルならそのまま
+
+		//	上に辿って、ファイルパスを作る
+		for( i = 0; 12 > i; i++ )	//	１２より腐海階層はたどれない
+		{
+			hParentItem = TreeView_GetParent( ghTreeWnd, hSelItem );
+			if( !(hParentItem) )	return 0;	//	ルートの上はない・そして選択もされない
+			if( ghTreeRoot == hParentItem ){	break;	}	//	検索がルートまでイッたら終わり
+
+			TreeItemInfoGet( hParentItem, atPath, MAX_PATH );
+
+			if( 0 == i )	//	初回のみなら、所属するディレクトリ名になる	20110928
+			{
+				if( 0 == dMode ){	StringCchCopy( gatBaseName, MAX_PATH, atPath );	}
+				else{				StringCchCopy( atBaseName, MAX_PATH, atPath );	}
+			}
+
+			//	今のパスを記録していくと、最終的にルート直下のディレクトリ名になる
+			PathAppend( atPath, atName );
+			StringCchCopy( atName, MAX_PATH, atPath );
+
+			hSelItem = hParentItem;
 		}
 
-		//	今のパスを記録していくと、最終的にルート直下のディレクトリ名になる
+		//	ルート位置をくっつけてフルパスにする
+		StringCchCopy( atPath, MAX_PATH, gatAARoot );
 		PathAppend( atPath, atName );
-		StringCchCopy( atName, MAX_PATH, atPath );
 
-		hSelItem = hParentItem;
+#ifdef EXTRA_NODE_STYLE
 	}
-
-	//	ルート位置をくっつけてフルパスにする
-	StringCchCopy( atPath, MAX_PATH, gatAARoot );
-	PathAppend( atPath, atName );
+#endif
 
 	switch( dMode )
 	{
@@ -1109,8 +1344,20 @@ INT TreeSelItemProc( HWND hWnd, HTREEITEM hSelItem, UINT dMode )
 			DocDoOpenFile( hWnd , atPath );	//	開いて中身展開
 			break;
 
-		//	アイテム追加
-		case  3:	AacItemAdding( hWnd, atPath );	break;
+  #ifndef MAA_IADD_PLUS
+		//	アイテム追加・キャンセル
+		//case  3:	AacItemAdding( hWnd, atPath );	break;
+  #endif
+#endif	//	_ORRVW
+
+#ifdef EXTRA_NODE_STYLE
+		case  4:	//	ノード削除・とりやえずエキストラファイル
+			if( 0 < id )	//	有効な場合
+			{
+				TreeView_DeleteItem( ghTreeWnd , hSelItem );	//	ツリーから削除して
+				SqlTreeNodeExtraDelete( id );	//	リストからも削除
+			}
+			break;
 #endif
 	}
 
@@ -1167,6 +1414,11 @@ VOID MaaTabBarSizeGet( LPRECT pstRect )
 }
 //-------------------------------------------------------------------------------------------------
 
+/*!
+	タブのサイズ変更
+	@param[in]	hWnd	親ウインドウのハンドル
+	@param[in]	pstRect	
+*/
 VOID TabBarResize( HWND hWnd, LPRECT pstRect )
 {
 	RECT	tbRect;
@@ -1206,7 +1458,6 @@ LRESULT TabBarNotify( HWND hWnd, LPNMHDR pstNmhdr )
 		ShowWindow( ghTreeWnd,  SW_HIDE );
 		ShowWindow( ghFavLtWnd, SW_HIDE );
 
-		AaTitleClear(  );	//	ここで変換して問題ないはず
 
 		if( ACT_ALLTREE == curSel )
 		{
@@ -1233,6 +1484,7 @@ LRESULT TabBarNotify( HWND hWnd, LPNMHDR pstNmhdr )
 		}
 		else
 		{
+			AaTitleClear(  );	//	中身のある時に書換を
 			TabMultipleSelect( hWnd, curSel, 0 );
 		}
 	}
@@ -1367,11 +1619,16 @@ HRESULT TabMultipleStore( HWND hWnd )
 {
 	MLTT_ITR	itNulti;
 
-	//	一旦全消しして書き直ししてる
-	SqlMultiTabDelete(  );
+
+	SqlMultiTabDelete(  );	//	一旦SQLの内容全消しして書き直ししてる
+
 	for( itNulti = gltMultiFiles.begin( ); gltMultiFiles.end( ) != itNulti; itNulti++ )
 	{
-		SqlMultiTabInsert( itNulti->atFilePath, itNulti->atBase );
+		//	記録しないでよろしいか？
+		if( StrCmp( DROP_OBJ_NAME, itNulti->atBase ) )
+		{
+			SqlMultiTabInsert( itNulti->atFilePath, itNulti->atBase );
+		}
 	}
 
 	return S_OK;
@@ -1407,11 +1664,39 @@ HRESULT TabMultipleRestore( HWND hWnd )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	タブを増やす・保持リストにファイル名ぶち込んだら直ちに呼ぶべし
-	@param[in]	hWnd	親ウインドウのハンドル
+	ドラッグンドロッペされたファイルを副タブにしちゃう
+	@param[in]	hWnd	元ウインドウハンドル
+	@param[in]	ptFile	ドロップされたファイルのパス
 	@return		HRESULT	終了状態コード
 */
-HRESULT TabMultipleAppend( HWND hWnd )
+HRESULT TabMultipleDropAdd( HWND hWnd, LPCTSTR ptFile )
+{
+	MULTIPLEMAA		stMulti;
+	INT		iTabNum;
+
+
+	ZeroMemory( &stMulti, sizeof(MULTIPLEMAA) );
+	StringCchCopy( stMulti.atFilePath, MAX_PATH, ptFile );
+	StringCchCopy( stMulti.atBase, MAX_PATH, DROP_OBJ_NAME );	//	特殊名称・大丈夫か
+	stMulti.dTabNum = 0;	//	初期化・割当は２以降
+
+	gltMultiFiles.push_back( stMulti );
+	iTabNum = TabMultipleAppend( hWnd );
+
+	//	その他武を開いちゃう？
+	TabCtrl_SetCurSel( ghTabWnd, iTabNum );
+	TabMultipleSelect( hWnd, iTabNum, 0 );
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+
+/*!
+	タブを増やす・保持リストにファイル名ぶち込んだら直ちに呼ぶべし
+	@param[in]	hWnd	親ウインドウのハンドル
+	@return	INT	開いたタブの番号
+*/
+INT TabMultipleAppend( HWND hWnd )
 {
 	TCHAR	atName[MAX_PATH];
 	LONG	tCount;
@@ -1424,9 +1709,9 @@ HRESULT TabMultipleAppend( HWND hWnd )
 	itNulti = gltMultiFiles.end( );
 	itNulti--;	//	新しく開くのは末端にあるはず
 	StringCchCopy( atName, MAX_PATH, itNulti->atFilePath );
-	if( NULL !=  atName[0] )	//	ツリービューからなら
+	if( NULL !=  atName[0] )	//	ツリーもしくはドラッグンドロッペ
 	{
-		PathStripPath( atName );
+		PathStripPath( atName );	//	ファイル名だけにして
 		PathRemoveExtension( atName );	//	拡張子を外す
 	}
 	else	//	お気にリストから追加する
@@ -1448,7 +1733,17 @@ HRESULT TabMultipleAppend( HWND hWnd )
 
 	Maa_OnSize( hWnd, 0, 0, 0 );	//	引数は使ってなかったか
 
-	return S_OK;
+	return tCount;
+}
+//-------------------------------------------------------------------------------------------------
+
+/*!
+	開いてるヤツの番号を返す。主タブ・使用・副タブ
+	@return	INT	開いてる奴の番号
+*/
+INT TabMultipleNowSel( VOID )
+{
+	return gixUseTab;	//	ACT_ALLTREE	ACT_FAVLIST
 }
 //-------------------------------------------------------------------------------------------------
 
@@ -1635,16 +1930,6 @@ HRESULT FavContsRedrawRequest( HWND hWnd )
 	}
 
 	return S_OK;
-}
-//-------------------------------------------------------------------------------------------------
-
-/*!
-	全体ツリー、お気に入りリスト、複数ファイル、開いてるヤツを返す
-	@return	INT	開いてる奴の番号
-*/
-INT TreeFavWhichOpen( VOID )
-{
-	return gixUseTab;	//	ACT_ALLTREE	ACT_FAVLIST
 }
 //-------------------------------------------------------------------------------------------------
 

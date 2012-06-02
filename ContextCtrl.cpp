@@ -99,72 +99,89 @@ CONST static CONTEXTITEM	gstContextItem[] =
 		{  TEXT("枠挿入ボックス"),					IDM_FRMINSBOX_OPEN		},
 /*60*/	{  TEXT("文字ＡＡ変換ボックス"),			IDM_MOZI_SCR_OPEN		},
 		{  TEXT("縦書き変換ボックス"),				IDM_VERT_SCRIPT_OPEN	},
-		{  TEXT("ユーザ定義"),						IDM_MN_USER_REFS		},//サブメニューダミー
+		{  TEXT("ユーザ定義アイテム"),				IDM_MN_USER_REFS		},//サブメニューダミー
+		{  TEXT("ユーザアイテム（１）"),			IDM_USER_ITEM_ALPHA		},
+		{  TEXT("ユーザアイテム（２）"),			IDM_USER_ITEM_BRAVO		},
+/*65*/	{  TEXT("ユーザアイテム（３）"),			IDM_USER_ITEM_CHARLIE	},
+		{  TEXT("ユーザアイテム（４）"),			IDM_USER_ITEM_DELTA		},
+		{  TEXT("ユーザアイテム（５）"),			IDM_USER_ITEM_ECHO		},
+		{  TEXT("ユーザアイテム（６）"),			IDM_USER_ITEM_FOXTROT	},
+		{  TEXT("ユーザアイテム（７）"),			IDM_USER_ITEM_GOLF		},
+/*70*/	{  TEXT("ユーザアイテム（８）"),			IDM_USER_ITEM_HOTEL		},
+		{  TEXT("ユーザアイテム（９）"),			IDM_USER_ITEM_INDIA		},
+		{  TEXT("ユーザアイテム（１０）"),			IDM_USER_ITEM_JULIETTE	},
+		{  TEXT("ユーザアイテム（１１）"),			IDM_USER_ITEM_KILO		},
+		{  TEXT("ユーザアイテム（１２）"),			IDM_USER_ITEM_LIMA		},
+/*75*/	{  TEXT("ユーザアイテム（１３）"),			IDM_USER_ITEM_MIKE		},
+		{  TEXT("ユーザアイテム（１４）"),			IDM_USER_ITEM_NOVEMBER	},
+		{  TEXT("ユーザアイテム（１５）"),			IDM_USER_ITEM_OSCAR		},
+		{  TEXT("ユーザアイテム（１６）"),			IDM_USER_ITEM_POPPA		},
 		{  TEXT("各頁に通し番号を入れる"),			IDM_PAGENUM_DLG_OPEN	},
-		{  TEXT("（セパレータ）"),					0						},
-/*65*/	{  TEXT("右揃え線"),	/*整形*/			IDM_RIGHT_GUIDE_SET		},
+/*80*/	{  TEXT("（セパレータ）"),					0						},
+		{  TEXT("右揃え線"),	/*整形*/			IDM_RIGHT_GUIDE_SET		},
 		{  TEXT("行頭に全角空白追加"),				IDM_INS_TOPSPACE		},
 		{  TEXT("行頭空白削除"),					IDM_DEL_TOPSPACE		},
 		{  TEXT("行末空白削除"),					IDM_DEL_LASTSPACE		},
-		{  TEXT("行末文字削除"),					IDM_DEL_LASTLETTER		},
-/*70*/	{  TEXT("選択範囲を空白にする"),			IDM_FILL_SPACE			},
+/*85*/	{  TEXT("行末文字削除"),					IDM_DEL_LASTLETTER		},
+		{  TEXT("選択範囲を空白にする"),			IDM_FILL_SPACE			},
 		{  TEXT("頁全体を空白で埋める"),			IDM_FILL_ZENSP			},
 		{  TEXT("行頭半角空白をユニコードに変換"),	IDM_HEADHALF_EXCHANGE	},
 		{  TEXT("左右反転"),						IDM_MIRROR_INVERSE		},
-		{  TEXT("上下反転"),						IDM_UPSET_INVERSE		},
-/*75*/	{  TEXT("右に寄せる"),						IDM_RIGHT_SLIDE			},
+/*90*/	{  TEXT("上下反転"),						IDM_UPSET_INVERSE		},
+		{  TEXT("右に寄せる"),						IDM_RIGHT_SLIDE			},
 		{  TEXT("１ドット増やす"),					IDM_INCREMENT_DOT		},
 		{  TEXT("１ドット減らす"),					IDM_DECREMENT_DOT		},
 		{  TEXT("全体を１ドット右へ"),				IDM_INCR_DOT_LINES		},
-		{  TEXT("全体を１ドット左へ"),				IDM_DECR_DOT_LINES		},
-/*80*/	{  TEXT("調整基準ロック"),					IDM_DOTDIFF_LOCK		},
+/*95*/	{  TEXT("全体を１ドット左へ"),				IDM_DECR_DOT_LINES		},
+		{  TEXT("調整基準ロック"),					IDM_DOTDIFF_LOCK		},
 		{  TEXT("カーソル位置で調整"),				IDM_DOTDIFF_ADJT		},
 		{  TEXT("（セパレータ）"),					0						},
 		{  TEXT("空白を表示"),	/*表示*/			IDM_SPACE_VIEW_TOGGLE	},
-		{  TEXT("グリッド線を表示"),				IDM_GRID_VIEW_TOGGLE	},
-/*85*/	{  TEXT("右ガイド線を表示"),				IDM_RIGHT_RULER_TOGGLE	},
+/*100*/	{  TEXT("グリッド線を表示"),				IDM_GRID_VIEW_TOGGLE	},
+		{  TEXT("右ガイド線を表示"),				IDM_RIGHT_RULER_TOGGLE	},
 		{  TEXT("複数行テンプレート表示"),			IDM_MAATMPLE_VIEW		},
 		{  TEXT("頁一覧表示"),						IDM_PAGELIST_VIEW		},
 		{  TEXT("壱行テンプレート表示"),			IDM_LINE_TEMPLATE		},
-		{  TEXT("塗り潰しブラシ表示"),				IDM_BRUSH_PALETTE		},
-/*90*/	{  TEXT("ユニコード表を開く"),				IDM_UNI_PALETTE			},
+/*105*/	{  TEXT("塗り潰しブラシ表示"),				IDM_BRUSH_PALETTE		},
+		{  TEXT("ユニコード表を開く"),				IDM_UNI_PALETTE			},
 		{  TEXT("トレスモード"),					IDM_TRACE_MODE_ON		},
 		{  TEXT("プレビュー"),						IDM_ON_PREVIEW			},
 		{  TEXT("ドラフトボードを開く"),			IDM_DRAUGHT_OPEN		},
-		{  TEXT("サムネイルを表示"),				IDM_MAA_THUMBNAIL_OPEN	},
-/*95*/	{  TEXT("（セパレータ）"),					0						},
+/*110*/	{  TEXT("サムネイルを表示"),				IDM_MAA_THUMBNAIL_OPEN	},
+		{  TEXT("（セパレータ）"),					0						},
 		{  TEXT("選択範囲をドラフトボードへ"),		IDM_COPY_TO_DRAUGHT		},
 		{  TEXT("（セパレータ）"),	0	/*以下、内容固定？の特殊コマンド*/	},
 		{  TEXT("選択頁を複製"),					IDM_PAGEL_DUPLICATE		},
-		{  TEXT("選択頁を削除"),					IDM_PAGEL_DELETE		},
-/*100*/	{  TEXT("次の頁と統合"),					IDM_PAGEL_COMBINE		},
+/*115*/	{  TEXT("選択頁を削除"),					IDM_PAGEL_DELETE		},
+		{  TEXT("次の頁と統合"),					IDM_PAGEL_COMBINE		},
 		{  TEXT("選択頁の次に新規作成"),			IDM_PAGEL_INSERT		},
 		{  TEXT("末尾に頁を新規作成"),				IDM_PAGEL_ADD			},
 		{  TEXT("頁を下へ移動"),					IDM_PAGEL_DOWNSINK		},
-		{  TEXT("頁を上へ移動"),					IDM_PAGEL_UPFLOW		},
-/*105*/	{  TEXT("頁名称の変更"),					IDM_PAGEL_RENAME		},
+/*120*/	{  TEXT("頁を上へ移動"),					IDM_PAGEL_UPFLOW		},
+		{  TEXT("頁名称の変更"),					IDM_PAGEL_RENAME		},
 		{  TEXT("トレス画像表示/非表示"),			IDM_TRC_VIEWTOGGLE		},
 		{  TEXT("テンプレグループ切替↑"),			IDM_TMPLT_GROUP_PREV	},
 		{  TEXT("テンプレグループ切替↓"),			IDM_TMPLT_GROUP_NEXT	},
-		{  TEXT("窓フォーカス切替↑"),				IDM_WINDOW_CHANGE		},
-/*110*/	{  TEXT("窓フォーカス切替↓"),				IDM_WINDOW_CHG_RVRS		},
+/*125*/	{  TEXT("窓フォーカス切替↑"),				IDM_WINDOW_CHANGE		},
+		{  TEXT("窓フォーカス切替↓"),				IDM_WINDOW_CHG_RVRS		},
 		{  TEXT("ファイルを閉じる"),				IDM_FILE_CLOSE			},
 		{  TEXT("ファイル切替↑"),					IDM_FILE_PREV			},
 		{  TEXT("ファイル切替↓"),					IDM_FILE_NEXT			},
-		{  TEXT("前の頁へ移動"),					IDM_PAGE_PREV			},
-/*115*/	{  TEXT("次の頁へ移動"),					IDM_PAGE_NEXT			},
+/*130*/	{  TEXT("前の頁へ移動"),					IDM_PAGE_PREV			},
+		{  TEXT("次の頁へ移動"),					IDM_PAGE_NEXT			},
 		{  TEXT("テンプレグリッド増加"),			IDM_TMPL_GRID_INCREASE	},
 		{  TEXT("テンプレグリッド減少"),			IDM_TMPL_GRID_DECREASE	},
 		{  TEXT("表示画面再描画"),					IDM_NOW_PAGE_REFRESH	},
-		{  TEXT("（未実装）文字列検索"),			IDM_FIND_DLG_OPEN		},
-/*120*/	{  TEXT("（未実装）検索ハイライト解除"),	IDM_FIND_HIGHLIGHT_OFF	},
+/*135*/	{  TEXT("（未実装）文字列検索"),			IDM_FIND_DLG_OPEN		},
+		{  TEXT("（未実装）検索ハイライト解除"),	IDM_FIND_HIGHLIGHT_OFF	},
 		{  TEXT("（未実装）次の検索位置"),			IDM_FIND_JUMP_NEXT		},
 		{  TEXT("（未実装）前の検索位置"),			IDM_FIND_JUMP_PREV		},
 		{  TEXT("（未実装）新しい文字列を検索"),	IDM_FIND_TARGET_SET		},
-		{  TEXT("（セパレータ）"),					0						}
+/*140*/	{  TEXT("（セパレータ）"),					0						}
 };
-#define ALL_ITEMS	97	//	右クリ用　０インデックス
-#define FULL_ITEMS	125	//	全アイテム
+
+#define ALL_ITEMS	113	//	右クリ用　０インデックス
+#define FULL_ITEMS	141	//	全アイテム
 
 //	右クリ用サブアイテム
 #define CTS_UNISPACE	22
@@ -221,9 +238,6 @@ const static UINT	gadDefItem[] =
 
 
 
-#ifdef COPY_SWAP
-extern  UINT	gbCpModSwap;	//!<	SJISとユニコードコピーを入れ替える
-#endif
 
 static HINSTANCE	ghInst;
 static TCHAR		gatCntxIni[MAX_PATH];	//!<	
@@ -383,13 +397,6 @@ VOID CntxEditBuild( VOID )
 		{
 			StringCchCopy( atItem, SUB_STRING, itMnItm->atString );
 
-#ifdef COPY_SWAP
-			if( gbCpModSwap )	//	コピーモード入替
-			{
-				if( IDM_COPY == itMnItm->dCommandoID )		StringCchCopy( atItem, SUB_STRING, TEXT("SJISコピ－") );
-				if( IDM_SJISCOPY == itMnItm->dCommandoID )	StringCchCopy( atItem, SUB_STRING, TEXT("Unicodeコピ－") );
-			}
-#endif
 			if( 26 > e )
 			{
 				StringCchPrintf( atKey, MIN_STRING, TEXT("(&%c)"), 'A' + e );
@@ -431,19 +438,6 @@ VOID CntxEditBuild( VOID )
 	return;
 }
 //-------------------------------------------------------------------------------------------------
-
-#ifdef COPY_SWAP
-/*!
-	コンテキストメニューのSJISとユニコードのアレを入れ替える
-*/
-HRESULT CntxMenuCopySwap( VOID )
-{
-	CntxEditBuild(  );	//	ていうかBuildし直しでいい
-
-	return S_OK;
-}
-//-------------------------------------------------------------------------------------------------
-#endif
 
 /*!
 	編集ダイヤログ開く
@@ -607,13 +601,6 @@ VOID CntxDlgAllListUp( HWND hDlg )
 			StringCchCat( atItem, SUB_STRING, TEXT("（サブメニュー展開）") );
 		}
 
-#ifdef COPY_SWAP
-		if( gbCpModSwap )	//	コピーモード入替
-		{
-			if( IDM_COPY     ==  gstContextItem[d].dCommandoID )	StringCchCopy( atItem, SUB_STRING, TEXT("SJISコピ－") );
-			if( IDM_SJISCOPY ==  gstContextItem[d].dCommandoID )	StringCchCopy( atItem, SUB_STRING, TEXT("Unicodeコピ－") );
-		}
-#endif
 		stLvi.iItem = d;
 		ListView_InsertItem( hLvWnd, &stLvi );
 	}
@@ -661,13 +648,6 @@ VOID CntxDlgBuildListUp( HWND hDlg )
 				StringCchCat( atItem, SUB_STRING, TEXT("　　[＞") );
 			}
 
-#ifdef COPY_SWAP
-			if( gbCpModSwap )	//	コピーモード入替
-			{
-				if( IDM_COPY     == itMnItm->dCommandoID )	StringCchCopy( atItem, SUB_STRING, TEXT("SJISコピ－") );
-				if( IDM_SJISCOPY == itMnItm->dCommandoID )	StringCchCopy( atItem, SUB_STRING, TEXT("Unicodeコピ－") );
-			}
-#endif
 		}
 
 		ListView_InsertItem( hLvWnd, &stLvi );
@@ -1627,6 +1607,7 @@ HRESULT AccelKeyMenuRewrite( HWND hWnd, LPACCEL pstAccel, CONST INT iEntry )
 	HMENU		hMenu;
 	WORD		dCmd;
 	INT			i, j, iRslt;
+	UINT		mRslt;
 	UINT_PTR	d, cchSz;
 	BOOLEAN		bModify;
 	TCHAR		atBuffer[MAX_STRING], atBind[SUB_STRING];
@@ -1673,7 +1654,14 @@ HRESULT AccelKeyMenuRewrite( HWND hWnd, LPACCEL pstAccel, CONST INT iEntry )
 			}
 		}
 
-		if( bModify ){	ModifyMenu( hMenu, dCmd, MF_BYCOMMAND | MFT_STRING, dCmd, atBuffer );	}
+		if( bModify )
+		{
+			//	必要に応じてチェック状態を確保する
+			mRslt = GetMenuState( hMenu, dCmd, MF_BYCOMMAND );
+
+			ModifyMenu( hMenu, dCmd, (MF_CHECKED & mRslt), dCmd, atBuffer );
+			//	MF_BYCOMMAND | MF_STRING は両方０なので、必要なのはチェックの是非だけ
+		}
 	}
 
 	DrawMenuBar( hWnd );

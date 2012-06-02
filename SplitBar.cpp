@@ -61,7 +61,7 @@ ATOM SplitBarClass( HINSTANCE hInst )
 /*!
 	スプリットバーを作る
 	@param[in]	hInst	このモジュールのインスタンスハンドル
-	@param[in]	hPrtWnd	親ウインドウハンドル
+	@param[in]	hPrWnd	親ウインドウハンドル
 	@param[in]	x		クライヤント的な左座標
 	@param[in]	y		クライヤント的な上座標
 	@param[in]	dHeight	高さ

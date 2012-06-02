@@ -107,6 +107,7 @@ HRESULT DocFileOpen( HWND hWnd )
 
 /*!
 	ファイル名を受けて、オーポン処理する
+	@param[in]	hWnd	親にするウインドウハンドル
 	@param[in]	ptFile	開くファイルフルパス
 	@return	HRESULT	終了状態コード
 */
@@ -187,9 +188,9 @@ HRESULT DocFileBackup( HWND hWnd )
 
 	FILES_ITR	itFile;
 
-	ZeroMemory( atFilePath,  sizeof(atFilePath) );
-	ZeroMemory( atFileName,  sizeof(atFileName) );
-	ZeroMemory( atBuffer,  sizeof(atBuffer) );
+	ZeroMemory( atFilePath, sizeof(atFilePath) );
+	ZeroMemory( atFileName, sizeof(atFileName) );
+	ZeroMemory( atBuffer,   sizeof(atBuffer) );
 
 //複数ファイル、各ファイルをセーブするには？
 	for( itFile = gltMultiFiles.begin(); itFile != gltMultiFiles.end(); itFile++ )
@@ -246,7 +247,7 @@ HRESULT DocFileBackup( HWND hWnd )
 			//	一枚なら、TXTでもMLTでも気にしなくてよかばい
 		}
 
-		StringCchCopy( atFilePath, MAX_STRING, gatBackUpDirty );
+		StringCchCopy( atFilePath, MAX_PATH, gatBackUpDirty );
 		PathAppend( atFilePath, atFileName );	//	Backupファイル名
 
 
@@ -629,6 +630,7 @@ INT DocUnicode2UTF8( LPVOID *pText )
 
 /*!
 	ページ名前をAST区切り付きで確保する・freeは呼んだ方でやる
+	@param[in]	itFile	確保する頁番号
 	@param[in]	dPage	確保する頁番号
 	@param[in]	bStyle	１ユニコードかシフトJISで、矩形かどうか
 	@param[out]	pText	確保した領域を返す・ワイド文字かマルチ文字になる・NULLなら頁名を削除する
@@ -735,7 +737,7 @@ HRESULT DocImageSave( HWND hWnd, UINT bStyle, HFONT hFont )
 		case  2:	bType = ISAVE_PNG;	break;
 	}
 
-	dLines = DocPageParamGet( NULL, NULL );	//	要るのは行数
+	dLines = DocNowFilePageLineCount(  );//DocPageParamGet( NULL , NULL );	//	要るのは行数
 	iDotX  = DocPageMaxDotGet( -1, -1 );
 	iDotY  = dLines * LINE_HEIGHT;
 	//	ちゅっと余裕いれとく

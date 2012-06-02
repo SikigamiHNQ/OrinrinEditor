@@ -58,7 +58,6 @@ EXTERNED list<ONEFILE>	gltMultiFiles;	//!<	複数ファイル保持
 static LPARAM	gdNextNumber;		//!<	開いたファイルの通し番号・常にインクリ
 
 EXTERNED FILES_ITR	gitFileIt;		//!<	今見てるファイルの本体
-//#define gstFile	(*gitFileIt)	//!<	イテレータを構造体と見なす
 
 EXTERNED INT		gixFocusPage;	//!<	注目中のページ・とりあえず０・０インデックス
 
@@ -445,7 +444,6 @@ HRESULT DocMultiFileStore( LPTSTR ptIniPath )
 /*!
 	対象ファイルの名前をゲッツ！する
 	@param[in]	tabNum	名前を知りたいヤツのタブ番号
-	@param[out]	pIsDmy	名無しであるかどうかを返す・名無しなら非０
 	@return		LPTSTR	名前バッファのポインター・無効ならNULLを返す
 */
 LPTSTR DocMultiFileNameGet( INT tabNum )
@@ -627,8 +625,8 @@ LPARAM DocFileInflate( LPTSTR ptFileName )
 	if( 0 >= dNumber )	return 0;
 
 	iByteSize = GetFileSize( hFile, NULL );
-	pBuffer = malloc( iByteSize + 2 );
-	ZeroMemory( pBuffer, iByteSize + 2 );
+	pBuffer = malloc( iByteSize + 4 );
+	ZeroMemory( pBuffer, iByteSize + 4 );
 
 	SetFilePointer( hFile, 0, NULL, FILE_BEGIN );
 	ReadFile( hFile, pBuffer, iByteSize, &readed, NULL );
@@ -711,8 +709,10 @@ UINT CALLBACK DocPageLoad( LPTSTR ptName, LPCTSTR ptCont, INT cchSize )
 	(*gitFileIt).vcCont.at( gixFocusPage ).ptRawData = (LPTSTR)malloc( (cchSize+2) * sizeof(TCHAR) );
 	ZeroMemory( (*gitFileIt).vcCont.at( gixFocusPage ).ptRawData, (cchSize+2) * sizeof(TCHAR) );
 
-	HRESULT hRslt = StringCchCopy( (*gitFileIt).vcCont.at( gixFocusPage ).ptRawData, (cchSize+2), ptCont );
+	//HRESULT hRslt = 
+	StringCchCopy( (*gitFileIt).vcCont.at( gixFocusPage ).ptRawData, (cchSize+2), ptCont );
 
+	//	バッファに文字列を保存だけしておく
 #else
 	if( 0 < cchSize )	//	空行でないのなら
 	{
@@ -720,7 +720,7 @@ UINT CALLBACK DocPageLoad( LPTSTR ptName, LPCTSTR ptCont, INT cchSize )
 	}
 #endif
 
-	DocPageParamGet( NULL, NULL );	//	再計算しちゃう
+	DocPageParamGet( NULL, NULL );	//	再計算しちゃう・遅延読込ヒット
 
 	return 1;
 }
@@ -899,7 +899,7 @@ UINT DocStringSplitAST( LPTSTR ptStr, INT cchSize, PAGELOAD pfPageLoad )
 /*!
 	ＡＳＤなＳＪＩＳ文字列を受け取って分解しつつページに入れる
 	@param[in]	pcStr		分解対象SJIS文字列へのポインター
-	@param[in]	cchSize		その文字列の文字数
+	@param[in]	cbSize		その文字列の文字数
 	@param[in]	pfPageLoad	内容を入れるコールバック函数のアレ
 	@return		UINT		作成した頁数
 */
@@ -1136,6 +1136,50 @@ HRESULT DocPageDelete( INT iPage, INT iBack )
 }
 //-------------------------------------------------------------------------------------------------
 
+#ifdef PAGE_DELAY_LOAD
+
+/*!
+	ディレイしてる頁の読込
+	@param[in]	itFile	対象のファイル
+	@param[in]	iPage	そのファイルの頁
+	@return		非０ロードした　０ロード済であった
+*/
+UINT DocDelayPageLoad( FILES_ITR itFile, INT iPage )
+{
+	INT	dmyX = 0, dmyY = 0;
+	UINT_PTR	cchSize;
+
+
+	if( itFile->vcCont.at( iPage ).ptRawData )
+	{
+		TRACE( TEXT("PAGE DELAY LOAD [%d]"), iPage );
+
+		StringCchLength( itFile->vcCont.at( iPage ).ptRawData, STRSAFE_MAX_CCH, &cchSize );
+
+		//	ここで、本文を読み込む
+		if( 0 < cchSize )	//	空行でないのなら
+		{
+			DocStringAdd( &dmyX, &dmyY, itFile->vcCont.at( iPage ).ptRawData, cchSize );	//	この中で改行とか面倒見る
+		}
+
+		//	アンドゥは一旦リセットすべき＜頁開けただけなので
+		//	変更もONなってたら解除
+
+	//	DocPageParamGet( NULL, NULL );	//	再計算しちゃう＜文字追加でやってるので問題無い
+
+		FREE( itFile->vcCont.at( iPage ).ptRawData  );	//	NULLか否かを見るので注意
+	}
+	else
+	{
+		return 0;
+	}
+
+	return 1;
+}
+//-------------------------------------------------------------------------------------------------
+
+#endif
+
 /*!
 	ページを変更・ファイルコア函数
 	@param[in]	dPageNum	変更したい頁番号
@@ -1145,10 +1189,10 @@ HRESULT DocPageChange( INT dPageNum )
 {
 	INT	iPrePage;
 
-#ifdef PAGE_DELAY_LOAD
-	INT	dmyX = 0, dmyY = 0;
-	UINT_PTR	cchSize;
-#endif
+//#ifdef PAGE_DELAY_LOAD
+//	INT	dmyX = 0, dmyY = 0;
+//	UINT_PTR	cchSize;
+//#endif
 
 	//	今の表示内容破棄とかいろいろある
 #ifdef DO_TRY_CATCH
@@ -1163,25 +1207,27 @@ HRESULT DocPageChange( INT dPageNum )
 	(*gitFileIt).dNowPage = dPageNum;	//	記録
 
 #ifdef PAGE_DELAY_LOAD
-	if( (*gitFileIt).vcCont.at( gixFocusPage ).ptRawData )
-	{
-		TRACE( TEXT("PAGE DELAY LOAD [%d]"), dPageNum );
+	//	まだ展開されてないなら
+	DocDelayPageLoad( gitFileIt, dPageNum );
+	//if( gitFileIt->vcCont.at( dPageNum ).ptRawData )
+	//{
+	//	TRACE( TEXT("PAGE DELAY LOAD [%d]"), dPageNum );
 
-		StringCchLength( (*gitFileIt).vcCont.at( gixFocusPage ).ptRawData, STRSAFE_MAX_CCH, &cchSize );
+	//	StringCchLength( gitFileIt->vcCont.at( dPageNum ).ptRawData, STRSAFE_MAX_CCH, &cchSize );
 
-		//	ここで、本文を読み込む
-		if( 0 < cchSize )	//	空行でないのなら
-		{
-			DocStringAdd( &dmyX, &dmyY, (*gitFileIt).vcCont.at( gixFocusPage ).ptRawData, cchSize );	//	この中で改行とか面倒見る
-		}
+	//	//	ここで、本文を読み込む
+	//	if( 0 < cchSize )	//	空行でないのなら
+	//	{
+	//		DocStringAdd( &dmyX, &dmyY, gitFileIt->vcCont.at( dPageNum ).ptRawData, cchSize );	//	この中で改行とか面倒見る
+	//	}
 
-		//	アンドゥは一旦リセットすべき＜頁開けただけなので
-		//	変更もONなってたら解除
+	//	//	アンドゥは一旦リセットすべき＜頁開けただけなので
+	//	//	変更もONなってたら解除
 
-	//	DocPageParamGet( NULL, NULL );	//	再計算しちゃう＜文字追加でやってるので問題無い
+	////	DocPageParamGet( NULL, NULL );	//	再計算しちゃう＜文字追加でやってるので問題無い
 
-		FREE( (*gitFileIt).vcCont.at( gixFocusPage ).ptRawData );
-	}
+	//	FREE( gitFileIt->vcCont.at( dPageNum ).ptRawData  );	//	NULLか否かを見るので注意
+	//}
 #endif
 
 	PageListViewChange( dPageNum, iPrePage );
@@ -1211,16 +1257,25 @@ HRESULT DocPageInfoRenew( INT dPage, UINT bMode )
 	if( 0 > dPage ){	dPage = gixFocusPage;	}
 
 
-	dBytes = (*gitFileIt).vcCont.at( dPage ).dByteSz;
+	dBytes = gitFileIt->vcCont.at( dPage ).dByteSz;
 	
 	if( bMode )	//	ステータスバーにバイト数を表示する
 	{
-		//StringCchPrintf( atBuff, SUB_STRING, TEXT("%d Bytes"), dBytes );
-		//MainStatusBarSetText( SB_BYTECNT, atBuff );
 		MainSttBarSetByteCount( dBytes );
 	}
 
-	dLines = (*gitFileIt).vcCont.at( dPage ).ltPage.size( );
+#ifdef PAGE_DELAY_LOAD
+	if( gitFileIt->vcCont.at( dPage ).ptRawData )
+	{
+		dLines = gitFileIt->vcCont.at( dPage ).iLineCnt;
+	}
+	else
+	{
+#endif
+		dLines = gitFileIt->vcCont.at( dPage ).ltPage.size( );
+#ifdef PAGE_DELAY_LOAD
+	}
+#endif
 
 	PageListInfoSet( dPage, dBytes, dLines );
 
@@ -1251,7 +1306,7 @@ INT DocLineDataGetAlloc( INT rdLine, INT iStart, LPLETTER *pstTexts, PINT pchLen
 	if( iLines <=  rdLine )	return -1;
 
 
-	itLine = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.begin();
+	itLine = gitFileIt->vcCont.at( gixFocusPage ).ltPage.begin();
 	std::advance( itLine, rdLine );
 
 	iCount = itLine->vcLine.size( );
@@ -1535,7 +1590,7 @@ INT DocPageTextAllGetAlloc( UINT bStyle, LPVOID *pText )
 	wsString.clear( );
 
 #ifdef PAGE_DELAY_LOAD
-	if( (*gitFileIt).vcCont.at( gixFocusPage ).ptRawData )	//	生データ状態なら
+	if( gitFileIt->vcCont.at( gixFocusPage ).ptRawData )	//	生データ状態なら
 	{
 		ptData = (*gitFileIt).vcCont.at( gixFocusPage ).ptRawData;
 		StringCchLength( ptData, STRSAFE_MAX_CCH, &cchSize );
@@ -1633,7 +1688,7 @@ INT DocPageTextAllGetAlloc( UINT bStyle, LPVOID *pText )
 	指定されたページ全体をプレビュー用にSJISで確保する・freeは呼んだ方でやる
 	@param[in]	iPage	ターゲット頁番号
 	@param[out]	pdBytes	確保したバイト数返す・NULLターミネータも含む
-	@return				確保した領域・マルチ文字になる
+	@return				確保した領域・SJIS文字列である
 */
 LPSTR DocPageTextPreviewAlloc( INT iPage, PINT pdBytes )
 {
@@ -1648,45 +1703,89 @@ LPSTR DocPageTextPreviewAlloc( INT iPage, PINT pdBytes )
 	LINE_ITR	itLine, itLineEnd;
 	LETR_ITR	itLtr;
 
+#ifdef PAGE_DELAY_LOAD
+	TCHAR	atEntity[10];
+	wstring	widString;
+	LPTSTR	ptCaret;
+#endif
+
 	srString.clear( );
 
 	if( pdBytes )	*pdBytes = 0;
 
 	if( DocRangeIsError( gitFileIt, iPage, 0 ) )	return NULL;
 
-	//	ページ全体の行数
-	iLines    = (*gitFileIt).vcCont.at( iPage ).ltPage.size( );
+#ifdef PAGE_DELAY_LOAD
+	widString.clear();
 
-	itLine    = (*gitFileIt).vcCont.at( iPage ).ltPage.begin( );
-	itLineEnd = (*gitFileIt).vcCont.at( iPage ).ltPage.end( );
-
-	for( i = 0; itLine != itLineEnd; i++, itLine++ )
+	if(  (*gitFileIt).vcCont.at( iPage ).ptRawData )	//	生データ状態なら
 	{
-		//	各行の文字数
-		iLetters = itLine->vcLine.size( );
+		ptCaret = (*gitFileIt).vcCont.at( iPage ).ptRawData;
+		StringCchLength( ptCaret, STRSAFE_MAX_CCH, &iLetters );
 
-		for( itLtr = itLine->vcLine.begin(); itLtr != itLine->vcLine.end(); itLtr++ )
+		for( i = 0; iLetters > i; i++ )
 		{
-			//	HTML的にヤバイ文字をエンティティする
-			if( HtmlEntityCheck( itLtr->cchMozi, acEntity, 10 ) )
+			if( HtmlEntityCheckW( ptCaret[i], atEntity, 10 ) )
 			{
-				srString +=  string( acEntity );
+				widString += wstring( atEntity );
+			}
+			else if( TEXT('\r') == ptCaret[i] )
+			{
+				widString += wstring( TEXT("<br>") );
+				i++;	//	0x0A分進める
 			}
 			else
 			{
-				srString +=  string( itLtr->acSjis );
+				srString += ptCaret[i];
 			}
 		}
 
-//全行に改行あってかまわない？
-		srString +=  string( "<br>" );
+		widString += wstring( TEXT("<br>") );	//	末尾に改行あっておｋ？
+
+		pcText = SjisEncodeAlloc( widString.c_str() );
+		iSize = strlen( pcText );
 	}
+	else
+	{
+#endif
 
-	iSize = srString.size( ) + 1;	//	NULLターミネータ分足す
+		//	ページ全体の行数
+		iLines    = (*gitFileIt).vcCont.at( iPage ).ltPage.size( );
 
-	pcText = (LPSTR)malloc( iSize );
-	ZeroMemory( pcText, iSize );
-	StringCchCopyA( pcText, iSize, srString.c_str( ) );
+		itLine    = (*gitFileIt).vcCont.at( iPage ).ltPage.begin( );
+		itLineEnd = (*gitFileIt).vcCont.at( iPage ).ltPage.end( );
+
+		for( i = 0; itLine != itLineEnd; i++, itLine++ )
+		{
+			//	各行の文字数
+			iLetters = itLine->vcLine.size( );
+
+			for( itLtr = itLine->vcLine.begin(); itLtr != itLine->vcLine.end(); itLtr++ )
+			{
+				//	HTML的にヤバイ文字をエンティティする
+				if( HtmlEntityCheckA( itLtr->cchMozi, acEntity, 10 ) )
+				{
+					srString +=  string( acEntity );
+				}
+				else
+				{
+					srString +=  string( itLtr->acSjis );
+				}
+			}
+
+	//全行に改行あってかまわない？
+			srString +=  string( "<br>" );
+		}
+
+		iSize = srString.size( ) + 1;	//	NULLターミネータ分足す
+
+		pcText = (LPSTR)malloc( iSize );
+		ZeroMemory( pcText, iSize );
+		StringCchCopyA( pcText, iSize, srString.c_str( ) );
+
+#ifdef PAGE_DELAY_LOAD
+	}
+#endif
 
 	if( pdBytes )	*pdBytes = iSize;
 
@@ -1740,6 +1839,7 @@ HRESULT UnicodeRadixExchange( LPVOID pVoid )
 /*!
 	ページ分割処理・カーソル位置の次の行から終わりまでを次の頁へ
 	@param[in]	hWnd	ウインドウハンドル
+	@param[in]	hInst	実存ハンドル
 	@param[in]	iNow	今の行
 	@return		HRESULT	終了状態コード
 */

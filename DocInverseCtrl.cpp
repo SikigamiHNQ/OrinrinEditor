@@ -428,7 +428,7 @@ HRESULT DocMirrorTranceLine( INT iTop, INT iBtm )
 		ptInvStr = (LPTSTR)malloc( cchSz * sizeof(TCHAR) );
 		StringCchCopy( ptInvStr, cchSz, wsInvBuff.c_str() );
 
-		bFirst = DocLineErase( iLns, bFirst );	//	先ずその行の内容を削除して
+		DocLineErase( iLns, &bFirst );	//	先ずその行の内容を削除して
 		iDot = 0;	iGyou = iLns;
 		if( ptPadd ){	DocInsertString( &iDot, &iGyou, NULL, ptPadd, 0, bFirst );	bFirst  = FALSE;	}
 		DocInsertString( &iDot, &iGyou, NULL, ptInvStr, 0, bFirst );	bFirst  = FALSE;
@@ -593,7 +593,7 @@ HRESULT DocUpsetTranceLine( INT iTop, INT iBtm )
 
 	for( iLns = iTop, dL = vcUpset.size()-1; iBtm >= iLns; iLns++, dL-- )
 	{
-		bFirst = DocLineErase( iLns, bFirst );	//	先ずその行の内容を削除して
+		DocLineErase( iLns, &bFirst );	//	先ずその行の内容を削除して
 
 		cchSz = vcUpset.at( dL ).size( );	//	内容があれば処理する
 		if( 0 < cchSz )

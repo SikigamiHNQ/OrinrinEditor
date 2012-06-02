@@ -756,7 +756,7 @@ HRESULT ViewScriptedLineFeed( VOID )
 	dLines = DocNowFilePageLineCount(  );//DocPageParamGet( NULL , NULL );	//	行数確保
 	if( (dLines - 1) <= gdDocLine )	//	最終行だったら
 	{
-		DocAdditionalLine( 1 , bFirst );	bFirst = FALSE;
+		DocAdditionalLine( 1, &bFirst );//	bFirst = FALSE;
 		ViewRedrawSetLine( gdDocLine );
 	}//末端に壱行追加
 
