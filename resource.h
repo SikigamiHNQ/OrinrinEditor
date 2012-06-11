@@ -451,6 +451,7 @@
 #define IDM_MAA_PROFILE_MAKE            32730
 #define IDM_MAA_SEP_STYLE_TOGGLE        32731
 #define IDM_MAA_FAVFLDR_DELETE          32732
+#define IDM_MAA_RETURN_FOCUS			32733
 #define IDM_COLOUR_EDIT_OPEN            32735
 #define IDM_UNICODE_TOGGLE				32739
 #define IDM_DUMMY                       32768
@@ -531,10 +532,11 @@
 #define IDM_FIND_JUMP_NEXT              32863
 #define IDM_FIND_JUMP_PREV              32864
 #define IDM_FIND_TARGET_SET             32865
-#define IDM_PAGELIST_VIEW               32871
-#define IDM_LINE_BRUSH_TMPL_VIEW        32872
-#define IDM_ON_PREVIEW                  32873
-#define IDM_FILL_ZENSP                  32874
+
+
+
+
+#define IDM_PAGEL_RETURN_FOCUS			32899
 #define IDM_PAGEL_DETAIL                32900
 #define IDM_PAGEL_ADD                   32901
 #define IDM_PAGEL_INSERT                32902
@@ -587,20 +589,19 @@
 #define IDM_INSFRAME_MIKE				32953
 #define IDM_INSFRAME_NOVEMBER			32954
 #define IDM_INSFRAME_OSCAR				32955
-#define IDM_INSFRAME_POPPA				32956
+#define IDM_INSFRAME_PAPA				32956
 #define IDM_INSFRAME_QUEBEC				32957
 #define IDM_INSFRAME_ROMEO				32958
 #define IDM_INSFRAME_SIERRA				32959
 #define IDM_INSFRAME_TANGO				32960
-#define IDM_INSFRAME_UNIFORM			32961
-#define IDM_INSFRAME_VICTOR				32962
-#define IDM_INSFRAME_WHISKEY			32963
-#define IDM_INSFRAME_XRAY				32964
-#define IDM_INSFRAME_YANKEE				32965
-#define IDM_INSFRAME_ZULU				32966
-#define IDM_FRMINSBOX_QCLOSE			32967
-#define IDM_FRAME_INS_DECIDE			32968
-#define IDM_FRMINSBOX_OPEN				32969
+#define IDM_PAGELIST_VIEW               32961
+#define IDM_ON_PREVIEW                  32962
+#define IDM_FILL_ZENSP                  32963
+#define IDM_FRMINSBOX_QCLOSE            32964
+#define IDM_FRAME_INS_DECIDE            32965
+#define IDM_FRMINSBOX_OPEN              32966
+#define IDM_LINE_BRUSH_TMPL_VIEW        32967
+#define IDM_FRMINSBOX_PADDING			32968
 #define IDM_USERINS_NA					32970
 #define IDM_USERINS_ITEM_FIRST          32971
 #define IDM_USER_ITEM_ALPHA				32971
@@ -618,9 +619,8 @@
 #define IDM_USER_ITEM_MIKE				32983
 #define IDM_USER_ITEM_NOVEMBER			32984
 #define IDM_USER_ITEM_OSCAR				32985
-#define IDM_USER_ITEM_POPPA				32986
+#define IDM_USER_ITEM_PAPA				32986
 #define IDM_USERINS_ITEM_LAST           32986
-#define IDM_FRMINSBOX_PADDING			32989
 #define IDM_LYB_INSERT                  32991
 #define IDM_LYB_OVERRIDE                32992
 #define IDM_LYB_DO_EDIT                 32994

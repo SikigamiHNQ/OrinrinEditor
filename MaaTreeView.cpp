@@ -457,9 +457,7 @@ VOID Maa_OnContextMenu( HWND hWnd, HWND hWndContext, UINT xPos, UINT yPos )
 	LPARAM	iSelID = 0;
 #endif
 	UINT_PTR	cchSize;
-#ifndef _ORRVW
 	LONG_PTR	rdExStyle;
-#endif
 	TCHAR	atSelName[MAX_PATH], atMenuStr[MAX_PATH], atMenuStr2[MAX_PATH];
 	MULTIPLEMAA		stMulti;
 	POINT			stPost;
@@ -531,25 +529,29 @@ VOID Maa_OnContextMenu( HWND hWnd, HWND hWndContext, UINT xPos, UINT yPos )
 		ScreenToClient( ghTreeWnd, &(stTvHitInfo.pt) );
 		hTvHitItem = TreeView_HitTest( ghTreeWnd, &stTvHitInfo );
 
-		//	選択されたやつのファイル名、もしくはディレクトリ名確保
-		lPrm = TreeItemInfoGet( hTvHitItem, atName, MAX_PATH );
-		//＠＠	lParamの判断
+		if( hTvHitItem )
+		{
+			//	選択されたやつのファイル名、もしくはディレクトリ名確保
+			lPrm = TreeItemInfoGet( hTvHitItem, atName, MAX_PATH );
+			//＠＠	lParamの判断
 
 #ifdef EXTRA_NODE_STYLE
-		//	どれでもないのなら、エキストラファイルなので、ファイルにしておく・書換注意
-		if( NODE_DIR != lPrm && NODE_FILE != lPrm && NODE_EXTRA != lPrm )
-		{
-			iSelID = lPrm;
-			lPrm = NODE_FILE;
-			EnableMenuItem( hSubMenu, IDM_MAA_ITEM_DELETE, MF_ENABLED );
-		}
+			//	どれでもないのなら、エキストラファイルなので、ファイルにしておく・書換注意
+			if( NODE_DIR != lPrm && NODE_FILE != lPrm && NODE_EXTRA != lPrm )
+			{
+				iSelID = lPrm;
+				lPrm = NODE_FILE;
+				EnableMenuItem( hSubMenu, IDM_MAA_ITEM_DELETE, MF_ENABLED );
+				//	エキストラファイルの削除を有効にする
+			}
 #endif
 
-		StringCchCat( atName, MAX_PATH, TEXT(" の操作") );
-		//	名称を明示しておく
-		ModifyMenu( hSubMenu, IDM_DUMMY, MF_BYCOMMAND | MF_STRING | MF_GRAYED, IDM_DUMMY, atName );
+			StringCchCat( atName, MAX_PATH, TEXT(" の操作") );
+			//	名称を明示しておく
+			ModifyMenu( hSubMenu, IDM_DUMMY, MF_BYCOMMAND | MF_STRING | MF_GRAYED, IDM_DUMMY, atName );
+		}
 
-		if( NODE_FILE != lPrm )	//	ファイルでないなら
+		if( NODE_FILE != lPrm || !(hTvHitItem) )	//	ファイルでないか、未選択なら
 		{
 			EnableMenuItem( hSubMenu, IDM_AATREE_MAINOPEN, MF_GRAYED );
 			EnableMenuItem( hSubMenu, IDM_AATREE_SUBADD,   MF_GRAYED );
@@ -559,16 +561,23 @@ VOID Maa_OnContextMenu( HWND hWnd, HWND hWndContext, UINT xPos, UINT yPos )
 		//	プロフ内のファイルも削除出来るようにしておくか？
 
 		//	プロフ履歴入替
-	//	ModifyMenu( hSubMenu, IDM_OPEN_HISTORY, MF_BYCOMMAND | MF_POPUP, (UINT_PTR)ghProfHisMenu, TEXT("ファイル使用履歴(&H)") );
-		ModifyMenu( hSubMenu, 2, MF_BYPOSITION | MF_POPUP, (UINT_PTR)ghProfHisMenu, TEXT("ファイル使用履歴(&H)") );
+		ModifyMenu( hSubMenu, IDM_OPEN_HISTORY, MF_BYCOMMAND | MF_POPUP, (UINT_PTR)ghProfHisMenu, TEXT("ファイル使用履歴(&H)") );
+	//	ModifyMenu( hSubMenu, 2, MF_BYPOSITION | MF_POPUP, (UINT_PTR)ghProfHisMenu, TEXT("ファイル使用履歴(&H)") );
 		//	ポップアップへの変更は、Position指定でないと出来ない？
+
+#ifdef _ORRVW
+		rdExStyle = GetWindowLongPtr( hWnd, GWL_EXSTYLE );
+		if( WS_EX_TOPMOST & rdExStyle ){	CheckMenuItem( hSubMenu , IDM_TOPMOST_TOGGLE, MF_BYCOMMAND | MF_CHECKED );	}
+#endif
+
 
 		//	右クリではノード選択されないようだ
 		dRslt = TrackPopupMenu( hSubMenu, TPM_RETURNCMD, stPost.x, stPost.y, 0, hWnd, NULL );	//	TPM_CENTERALIGN | TPM_VCENTERALIGN | 
-		DestroyMenu( hMenu );
+		RemoveMenu( hSubMenu, 2, MF_BYPOSITION );
+		DestroyMenu( hMenu );	//このデストロイでポップアップまで破棄されるので、removeしておく
+	
 		switch( dRslt )
 		{
-#ifndef _ORRVW
 			//	プロフファイル開く
 			case IDM_MAA_PROFILE_MAKE:	TreeProfileOpen( hWnd );	break;
 
@@ -577,16 +586,17 @@ VOID Maa_OnContextMenu( HWND hWnd, HWND hWndContext, UINT xPos, UINT yPos )
 
 			case IDM_FINDMAA_DLG_OPEN:	TreeMaaFileFind( hWnd );	break;
 
+			case IDM_AATREE_MAINOPEN:	TreeSelItemProc( hWnd, hTvHitItem , 0 );	break;
+
+			case  IDM_AATREE_SUBADD:	TreeSelItemProc( hWnd, hTvHitItem , 1 );	break;
+
+#ifndef _ORRVW
 			case  IDM_AATREE_GOEDIT:	TreeSelItemProc( hWnd, hTvHitItem , 2 );	break;
   #ifndef MAA_IADD_PLUS
 		//	case  IDM_MAA_IADD_OPEN:	TreeSelItemProc( hWnd, hTvHitItem , 3 );	break;
 			//キャンセルされた
   #endif
 #endif
-			case IDM_AATREE_MAINOPEN:	TreeSelItemProc( hWnd, hTvHitItem , 0 );	break;
-
-			case  IDM_AATREE_SUBADD:	TreeSelItemProc( hWnd, hTvHitItem , 1 );	break;
-
 #ifdef EXTRA_NODE_STYLE
 			case IDM_MAA_ITEM_DELETE:	TreeSelItemProc( hWnd, hTvHitItem , 4 );	break;
 #endif
@@ -594,11 +604,17 @@ VOID Maa_OnContextMenu( HWND hWnd, HWND hWndContext, UINT xPos, UINT yPos )
 			case IDM_OPEN_HIS_CLEAR:	OpenProfileLogging( hWnd, NULL );	break;
 
 			default:
+				//	ファイルオーポン履歴
 				if( IDM_OPEN_HIS_FIRST <= dRslt && dRslt <= IDM_OPEN_HIS_LAST )
 				{
 					OpenProfileLoad( hWnd, dRslt );
 				}
-				//else if( IDM_OPEN_HIS_CLEAR == dRslt ){	OpenProfileLogging( hWnd, NULL );	}	//	ファイルオーポン履歴クルヤー
+#ifdef _ORRVW	//	その他はメインコマンドに回す
+				else
+				{
+					Maa_OnCommand( hWnd, dRslt, hWndContext, 0 );
+				}
+#endif
 				break;
 		}
 
@@ -817,7 +833,7 @@ UINT TreeNodeExtraAdding( LPCTSTR ptPath )
 {
 	UINT	id;
 	LPARAM	lParam;
-	HTREEITEM	hTreeRoot, hChildItem, hNextItem;
+	HTREEITEM	hTreeRoot, hChildItem, hNextItem, hBuffItem;
 
 	//	追加済ならメッセージ出して終了セヨ
 	id = SqlTreeNodeExtraIsFileExist( ptPath );
@@ -853,12 +869,17 @@ UINT TreeNodeExtraAdding( LPCTSTR ptPath )
 
 	//	開けば、既存のブツも展開される
 	TreeView_Expand( ghTreeWnd, hChildItem, TVE_EXPAND );
+	//最初の１個目だった場合、展開されないので展開済フラグが立たない
+	hBuffItem = TreeView_GetChild( ghTreeWnd, hChildItem );
 
 	//	展開してから開かないと多重にツリーに出てくる
 	id = SqlTreeNodeExtraInsert( 0, ptPath );	//	SQLに登録
 	if( 0 >= id )	return 0;	//	失敗
 
-	TreeExtraItemFromSql( hChildItem, id-1 );	//	該当ＩＤの次から探すので注意
+	if( hBuffItem ){	TreeExtraItemFromSql( hChildItem, id-1 );	}	//	該当ＩＤの次から探すので注意
+	else{	TreeView_Expand( ghTreeWnd, hChildItem, TVE_EXPAND );	}
+	//	最初の一個の場合は、追加してから開くよろし
+
 
 	return id;
 }

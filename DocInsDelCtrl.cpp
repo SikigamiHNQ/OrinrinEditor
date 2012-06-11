@@ -896,7 +896,7 @@ INT DocInsertString( PINT pNowDot, PINT pdLine, PINT pdMozi, LPCTSTR ptText, UIN
 	dBaseLine = *pdLine;
 	dLastLine = *pdLine;
 
-	if( !(ptText)  )	return 0;
+	if( !(ptText)  )	return 0;	//	‘}“ü•¶š—ñ‚ª‚È‚¢‚È‚ç’¼‚®I‚í‚Á‚Ä‚æ‚¢
 
 	StringCchLength( ptText, STRSAFE_MAX_CCH, &cchSize );
 

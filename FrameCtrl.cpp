@@ -80,7 +80,7 @@ static  TBBUTTON	gstFIBTBInfo[] = {
 	{ 12,	IDM_INSFRAME_MIKE,		TBSTATE_ENABLED,	TBSTYLE_CHECKGROUP | TBSTYLE_AUTOSIZE,	{0, 0}, 0, 0  },	//	
 	{ 13,	IDM_INSFRAME_NOVEMBER,	TBSTATE_ENABLED,	TBSTYLE_CHECKGROUP | TBSTYLE_AUTOSIZE,	{0, 0}, 0, 0  },	//	
 	{ 14,	IDM_INSFRAME_OSCAR,		TBSTATE_ENABLED,	TBSTYLE_CHECKGROUP | TBSTYLE_AUTOSIZE,	{0, 0}, 0, 0  },	//	
-	{ 15,	IDM_INSFRAME_POPPA,		TBSTATE_ENABLED,	TBSTYLE_CHECKGROUP | TBSTYLE_AUTOSIZE,	{0, 0}, 0, 0  },	//	
+	{ 15,	IDM_INSFRAME_PAPA,		TBSTATE_ENABLED,	TBSTYLE_CHECKGROUP | TBSTYLE_AUTOSIZE,	{0, 0}, 0, 0  },	//	
 	{ 16,	IDM_INSFRAME_QUEBEC,	TBSTATE_ENABLED,	TBSTYLE_CHECKGROUP | TBSTYLE_AUTOSIZE,	{0, 0}, 0, 0  },	//	
 	{ 17,	IDM_INSFRAME_ROMEO,		TBSTATE_ENABLED,	TBSTYLE_CHECKGROUP | TBSTYLE_AUTOSIZE,	{0, 0}, 0, 0  },	//	
 	{ 18,	IDM_INSFRAME_SIERRA,	TBSTATE_ENABLED,	TBSTYLE_CHECKGROUP | TBSTYLE_AUTOSIZE,	{0, 0}, 0, 0  },	//	
@@ -152,31 +152,29 @@ static  UINT		gbMultiPaddTemp;	//!<	外周に沿うようにパディングするか・挿入BOX用
 static FRAMEINFO	gstFrameInfo[FRAME_MAX];	//!<	配列で必要数確保でいいか
 //-------------------------------------------------------------------------------------------------
 
-INT_PTR	CALLBACK FrameEditDlgProc( HWND, UINT, WPARAM, LPARAM );
+INT_PTR	CALLBACK FrameEditDlgProc( HWND, UINT, WPARAM, LPARAM );	//!<	
 
-INT_PTR	Frm_OnInitDialog( HWND, HWND, LPARAM );
-INT_PTR	Frm_OnCommand( HWND, INT, HWND, UINT );
-INT_PTR	Frm_OnDrawItem( HWND, CONST LPDRAWITEMSTRUCT );
-INT_PTR	Frm_OnNotify( HWND, INT, LPNMHDR );
+INT_PTR	Frm_OnInitDialog( HWND , HWND, LPARAM );	//!<	
+INT_PTR	Frm_OnCommand( HWND , INT, HWND, UINT );	//!<	
+INT_PTR	Frm_OnDrawItem( HWND , CONST LPDRAWITEMSTRUCT );	//!<	
+INT_PTR	Frm_OnNotify( HWND , INT, LPNMHDR );	//!<	
 
-HRESULT	InitFrameItem( UINT, UINT, LPFRAMEINFO );
+HRESULT	InitFrameItem( UINT, UINT, LPFRAMEINFO );	//!<	
 
-HRESULT	FrameNameLoad( UINT, LPTSTR, UINT_PTR );
+HRESULT	FramePartsUpdate( HWND, HWND, LPFRAMEITEM );	//!<	
 
-HRESULT	FramePartsUpdate( HWND, HWND, LPFRAMEITEM );
-
-HRESULT	FrameDataGet( UINT, LPFRAMEINFO );
-HRESULT	FrameInfoDisp( HWND );
+HRESULT	FrameDataGet( UINT, LPFRAMEINFO );	//!<	
+HRESULT	FrameInfoDisp( HWND );	//!<	
 
 #ifdef FRAME_MLINE
-VOID	FrameDataTranslate( LPTSTR, UINT );
+VOID	FrameDataTranslate( LPTSTR, UINT );	//!<	
 //INT		FramePartsSizeCalc( LPTSTR, PINT );
 
-UINT	FrameMultiSubstring( LPCTSTR, CONST UINT, LPTSTR, CONST UINT_PTR, CONST INT );
+UINT	FrameMultiSubstring( LPCTSTR, CONST UINT, LPTSTR, CONST UINT_PTR, CONST INT );	//!<	
 
-INT		FrameMultiSizeGet( LPFRAMEINFO, PINT, PINT );
-LPTSTR	FrameMakeOutsideBoundary( CONST INT, CONST INT, LPFRAMEINFO );
-LPTSTR	FrameMakeInsideBoundary( UINT, PINT, LPFRAMEINFO );
+INT		FrameMultiSizeGet( LPFRAMEINFO, PINT, PINT );	//!<	
+LPTSTR	FrameMakeOutsideBoundary( CONST INT, CONST INT, LPFRAMEINFO );	//!<	
+LPTSTR	FrameMakeInsideBoundary( UINT , PINT, LPFRAMEINFO );	//!<	
 
 #endif
 
@@ -317,7 +315,7 @@ HRESULT FrameNameModifyMenu( HWND hWnd )
 		if(  9 >= j ){		k = j + '0';	}
 		else if( 10 == j ){	k = '0';	}
 		else{		k = 'A' + j - 11;	}
-		StringCchPrintf( atBuffer, MAX_PATH, TEXT("枠：(&%c)%s"), k, atName );
+		StringCchPrintf( atBuffer, MAX_PATH, TEXT("%s(&%c)"), atName, k );
 		ModifyMenu( hSubMenu, IDM_INSFRAME_ALPHA+i, MF_BYCOMMAND | MFT_STRING, IDM_INSFRAME_ALPHA+i, atBuffer );
 		//	メニューリソース番号の連番に注意
 	}
@@ -331,7 +329,7 @@ HRESULT FrameNameModifyMenu( HWND hWnd )
 /*!
 	ポッパップメニュー用に名前をずっこんばっこん
 	@param[in]	hPopMenu	対象のポッパップメニューハンドル
-	@param[in]	bMode		非０アクセラレータ付ける　０付けない
+	@param[in]	bMode		非０メニューキー付ける　０付けない
 	@return		HRESULT	終了状態コード
 */
 HRESULT FrameNameModifyPopUp( HMENU hPopMenu, UINT bMode )
@@ -348,11 +346,11 @@ HRESULT FrameNameModifyPopUp( HMENU hPopMenu, UINT bMode )
 			if(  9 >= j ){		k = j + '0';	}
 			else if( 10 == j ){	k = '0';	}
 			else{		k = 'A' + j - 11;	}
-			StringCchPrintf( atBuffer, MAX_PATH, TEXT("枠：(&%c)%s"), k, atName );
+			StringCchPrintf( atBuffer, MAX_PATH, TEXT("%s(&%c)"), atName, k );
 		}
 		else
 		{
-			StringCchPrintf( atBuffer, MAX_PATH, TEXT("枠：%s"), atName );
+			StringCchPrintf( atBuffer, MAX_PATH, TEXT("%s"), atName );
 		}
 		ModifyMenu( hPopMenu, IDM_INSFRAME_ALPHA+i, MF_BYCOMMAND | MFT_STRING, IDM_INSFRAME_ALPHA+i, atBuffer );
 		//	メニューリソース番号の連番に注意
@@ -374,6 +372,8 @@ HRESULT FrameNameLoad( UINT dNumber, LPTSTR ptNamed, UINT_PTR cchSize )
 	TCHAR	atAppName[MIN_STRING];
 
 	if( !(ptNamed) || 0 >= cchSize )	return E_INVALIDARG;
+
+	if( FRAME_MAX <= dNumber )	return E_OUTOFMEMORY;
 
 	//	所定のAPP名を作る
 	StringCchPrintf( atAppName, MIN_STRING, TEXT("Frame%u"), dNumber );
@@ -2349,7 +2349,7 @@ VOID Fib_OnCommand( HWND hWnd, INT id, HWND hWndCtl, UINT codeNotify )
 		case IDM_INSFRAME_MIKE:		gdSelect = 12;	break;
 		case IDM_INSFRAME_NOVEMBER:	gdSelect = 13;	break;
 		case IDM_INSFRAME_OSCAR:	gdSelect = 14;	break;
-		case IDM_INSFRAME_POPPA:	gdSelect = 15;	break;
+		case IDM_INSFRAME_PAPA:		gdSelect = 15;	break;
 		case IDM_INSFRAME_QUEBEC:	gdSelect = 16;	break;
 		case IDM_INSFRAME_ROMEO:	gdSelect = 17;	break;
 		case IDM_INSFRAME_SIERRA:	gdSelect = 18;	break;

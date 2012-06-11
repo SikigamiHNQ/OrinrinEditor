@@ -114,6 +114,7 @@ static CONST GUID gcstGUID = { 0x66D3E881, 0x972B, 0x458B, { 0x93, 0x5E, 0x9E, 0
 //#define PAGE_MULTISELECT//	頁一覧の複数選択
 #define PAGE_DELAY_LOAD	//	ファイル読み込んだ時は頁展開しない、ひつようになったら開く
 //#define PLUGIN_ENABLE	//	プラグイン機能
+#define USE_HOVERTIP
 
 #define MAA_IADD_PLUS	//	MAAへのアイテム追加機能拡張
 //	リソースの IDM_MAA_IADD_OPEN IDM_MAA_ITEM_INSERT に注意
@@ -231,55 +232,57 @@ LRESULT	ExceptionMessage( LPCSTR, LPCSTR, UINT, LPARAM );
 #define FONTSZ_NORMAL	16
 #define FONTSZ_REDUCE	12
 
-#define VL_CLASHCOVER	0	//	起動したら１、閉じるときに０にして、CLASHを検知
-#define VL_GROUP_UNDO	1	//	グループアンドゥ
-#define VL_USE_UNICODE	2	//	ユニコードパディング
-#define VL_LAYER_TRANS	3	//	レイヤボックス透明度
-#define VL_RIGHT_SLIDE	4	//	右寄せる位置
-#define VL_MAA_SPLIT	5	//	ＭＡＡのスプリットバーの位置
-#define VL_MAA_LCLICK	6	//	ＭＡＡ一覧でクルッコしたときの標準動作
-#define VL_UNILISTLAST	7	//	ユニコード一覧を閉じたときの位置
-#define VL_MAATIP_VIEW	8	//	ＭＡＡのＡＡツールチップの表示するか
-#define VL_MAATIP_SIZE	9	//	ＭＡＡのＡＡツールチップの文字サイズ・16か12
-#define VL_LINETMP_CLM	10	//	壱行テンプレのカラム数
-#define VL_BRUSHTMP_CLM	11	//	ブラシテンプレのカラム数
-#define VL_UNIRADIX_HEX	12	//	ユニコード数値参照を１６進数にするかどうか[COL][EDIT]
-#define VL_BACKUP_INTVL	13	//	バックアップ感覚・デフォ５分くらい？
-#define VL_BACKUP_MSGON	14	//	バックアップしたときのメッセージを表示するか？
-#define VL_GRID_X_POS	15	//	グリッド線のＸドット数
-#define VL_GRID_Y_POS	16	//	グリッド線のＹドット数
-#define VL_MAA_TOPMOST	17	//	VIEWERＭＡＡを最前面・EDITORＭＡＡ窓ON/OFF
-#define VL_R_RULER_POS	18	//	右ルーラの位置
-#define VL_CRLF_CODE	19	//	改行コード：０したらば・非０ＹＹ
-//#define VL_SPACE_VIEW	20	//	空白を表示するか　非０表示
-#define VL_GRID_VIEW	21	//	グリッド表示するか
-#define VL_R_RULER_VIEW	22	//	右ルーラ表示するか
-#define VL_PAGETIP_VIEW	23	//	頁一覧のツールチップ表示するか
-#define VL_PCOMBINE_NM	24	//	１なら統合Message無し
-#define VL_PDIVIDE_NM	25	//	１なら分割Message無し
-#define VL_PDELETE_NM	26	//	１なら削除Message無し
-#define VL_MAASEP_STYLE	27	//	複数テンプレ・１なら区切り線スタイル
-#define VL_USE_BALLOON	28	//	[COL]保存確認メッセージ表示するかどうか
-#define VL_CLIPFILECNT	29	//	[COL]保存ファイルの個数
-#define VL_PLS_LN_DOCK	30	//	頁一覧窓はくっつくか
-//#define VL_BRUSH_DOCK	31	//	壱行・Brushテンプレ窓はくっつくか
-#define VS_PROFILE_NAME	32	//	
-#define VS_PAGE_FORMAT	33	//	頁番号挿入の文字列テンプレ
-#define VL_SWAP_COPY	34	//	コピー標準をSJISにするか
-#define VL_MAIN_SPLIT	35	//	メインのスプリットバーの右からの位置
-#define VL_MAXIMISED	36	//	最大化で終わったか？
-#define VL_DRT_LCLICK	37	//	ドラフトボードクリックのデフォ動作
-#define VL_FIRST_READED	38	//	マニュアル読込した
-#define VL_LAST_OPEN	39	//	最後に開いていたファイルを　０開く　１開かない　２毎回選択
-#define VL_MAA_MCLICK	40	//	ＭＡＡ一覧でミドゥクルッコしたときの標準動作
-#define VL_DRT_MCLICK	41	//	ドラフトボードクリックのデフォ動作
-#define VS_FONT_NAME	42	//	メインのフォント名、ＭＳ Ｐゴシック
-#define VL_WORKLOG		43	//	動作ログを出力するか
-#define VL_PAGE_UNDER	44	//	頁番号を最下行に挿入
-#define VL_PAGE_OVWRITE	45	//	該当行の内容を削除して上書
-#define VL_COLLECT_AON	46	//	[COL]起動時にコピペ保存をONにする
-#define VL_COLHOT_MODY	47	//	[COL]ポップアップホットキー・修飾子
-#define VL_COLHOT_VKEY	48	//	[COL]ポップアップホットキー・仮想キーコード
+#define VL_CLASHCOVER	0	//!<	起動したら１、閉じるときに０にして、CLASHを検知
+#define VL_GROUP_UNDO	1	//!<	グループアンドゥ
+#define VL_USE_UNICODE	2	//!<	ユニコードパディング
+#define VL_LAYER_TRANS	3	//!<	レイヤボックス透明度
+#define VL_RIGHT_SLIDE	4	//!<	右寄せる位置
+#define VL_MAA_SPLIT	5	//!<	ＭＡＡのスプリットバーの位置
+#define VL_MAA_LCLICK	6	//!<	ＭＡＡ一覧でクルッコしたときの標準動作
+#define VL_UNILISTLAST	7	//!<	ユニコード一覧を閉じたときの位置
+#define VL_MAATIP_VIEW	8	//!<	ＭＡＡのＡＡツールチップの表示するか
+#define VL_MAATIP_SIZE	9	//!<	ＭＡＡのＡＡツールチップの文字サイズ・16か12
+#define VL_LINETMP_CLM	10	//!<	壱行テンプレのカラム数
+#define VL_BRUSHTMP_CLM	11	//!<	ブラシテンプレのカラム数
+#define VL_UNIRADIX_HEX	12	//!<	ユニコード数値参照を１６進数にするかどうか[COL][EDIT]
+#define VL_BACKUP_INTVL	13	//!<	バックアップ感覚・デフォ５分くらい？
+#define VL_BACKUP_MSGON	14	//!<	バックアップしたときのメッセージを表示するか？
+#define VL_GRID_X_POS	15	//!<	グリッド線のＸドット数
+#define VL_GRID_Y_POS	16	//!<	グリッド線のＹドット数
+#define VL_MAA_TOPMOST	17	//!<	VIEWERＭＡＡを最前面・EDITORＭＡＡ窓ON/OFF
+#define VL_R_RULER_POS	18	//!<	右ルーラの位置
+#define VL_CRLF_CODE	19	//!<	改行コード：０したらば・非０ＹＹ
+//#define VL_SPACE_VIEW	20	//!<	空白を表示するか　非０表示
+#define VL_GRID_VIEW	21	//!<	グリッド表示するか
+#define VL_R_RULER_VIEW	22	//!<	右ルーラ表示するか
+#define VL_PAGETIP_VIEW	23	//!<	頁一覧のツールチップ表示するか
+#define VL_PCOMBINE_NM	24	//!<	１なら統合Message無し
+#define VL_PDIVIDE_NM	25	//!<	１なら分割Message無し
+#define VL_PDELETE_NM	26	//!<	１なら削除Message無し
+#define VL_MAASEP_STYLE	27	//!<	複数テンプレ・１なら区切り線スタイル
+#define VL_USE_BALLOON	28	//!<	[COL]保存確認メッセージ表示するかどうか
+#define VL_CLIPFILECNT	29	//!<	[COL]保存ファイルの個数
+#define VL_PLS_LN_DOCK	30	//!<	頁一覧窓はくっつくか
+//#define VL_BRUSH_DOCK	31	//!<	壱行・Brushテンプレ窓はくっつくか
+#define VS_PROFILE_NAME	32	//!<	
+#define VS_PAGE_FORMAT	33	//!<	頁番号挿入の文字列テンプレ
+#define VL_SWAP_COPY	34	//!<	コピー標準をSJISにするか
+#define VL_MAIN_SPLIT	35	//!<	メインのスプリットバーの右からの位置
+#define VL_MAXIMISED	36	//!<	最大化で終わったか？
+#define VL_DRT_LCLICK	37	//!<	ドラフトボードクリックのデフォ動作
+#define VL_FIRST_READED	38	//!<	マニュアル読込した
+#define VL_LAST_OPEN	39	//!<	最後に開いていたファイルを　０開く　１開かない　２毎回選択
+#define VL_MAA_MCLICK	40	//!<	ＭＡＡ一覧でミドゥクルッコしたときの標準動作
+#define VL_DRT_MCLICK	41	//!<	ドラフトボードクリックのデフォ動作
+#define VS_FONT_NAME	42	//!<	メインのフォント名、ＭＳ Ｐゴシック
+#define VL_WORKLOG		43	//!<	動作ログを出力するか
+#define VL_PAGE_UNDER	44	//!<	頁番号を最下行に挿入
+#define VL_PAGE_OVWRITE	45	//!<	該当行の内容を削除して上書
+#define VL_COLLECT_AON	46	//!<	[COL]起動時にコピペ保存をONにする
+#define VL_COLHOT_MODY	47	//!<	[COL]ポップアップホットキー・修飾子
+#define VL_COLHOT_VKEY	48	//!<	[COL]ポップアップホットキー・仮想キーコード
+#define VL_MAA_RETFCS	49	//!<	MAA窓で、選択したら編集窓にフォーカス戻す
+#define VL_PGL_RETFCS	50	//!<	頁一覧で、選択したら編集窓にフォーカス戻す
 
 //増やしたら、函数内に取扱つくっておくこと
 
@@ -291,13 +294,13 @@ LRESULT	ExceptionMessage( LPCSTR, LPCSTR, UINT, LPARAM );
 //-------------------------------------------------------------------------------------------------
 
 //	ステータスバーの内
-#define SB_MODIFY	0	//	変更
-#define SB_OP_STYLE	1	//	オペ状況
-#define SB_MOUSEPOS	2	//	マウスカーソル位置
-#define SB_CURSOR	3	//	カーソル位置のドット値とか
-#define SB_LAYER	4	//	レイヤボックスの位置
-#define SB_BYTECNT	5	//	バイト数
-#define SB_SELBYTE	6	//	選択範囲のバイト数
+#define SB_MODIFY	0	//!<	変更
+#define SB_OP_STYLE	1	//!<	オペ状況
+#define SB_MOUSEPOS	2	//!<	マウスカーソル位置
+#define SB_CURSOR	3	//!<	カーソル位置のドット値とか
+#define SB_LAYER	4	//!<	レイヤボックスの位置
+#define SB_BYTECNT	5	//!<	バイト数
+#define SB_SELBYTE	6	//!<	選択範囲のバイト数
 //-------------------------------------------------------------------------------------------------
 
 //	窓番号

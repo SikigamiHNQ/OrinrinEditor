@@ -228,6 +228,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\HoverTip.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\LayerBox.cpp"
 				>
 			</File>

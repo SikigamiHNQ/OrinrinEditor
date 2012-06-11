@@ -18,16 +18,32 @@ If not, see <http://www.gnu.org/licenses/>.
 //	‘å“ú–{’é‘Œö—pŒê‚Í«‚ðŒ©‚ç‚ê‚½‚¢
 //-------------------------------------------------------------------------------------------------
 
-//	TODO:	ÅIs‚Ì˜g‚¢‚ê‚é‚Æ—Ž‚¿‚é
+//	’ˆÓEƒRƒ}ƒ“ƒh‚ÌƒŠƒ\[ƒX‚h‚c”Ô†‚Í•ÏX•s‰ÂI
 
-//	TODO:	˜gì‚é‚Æ‚«‚ÍƒsƒŠƒ’ƒh•‚ðŽg‚¤ƒ‚n‚jH
-//	TODO:	Å‘å‰»‚©‚ç–ß‚µ‚½‚çAMAA‚ª”ñ•\Ž¦‚Å‚à•\Ž¦‚É‚È‚éƒ‚n‚jH
+
+
+//	TODO:	‚n‚jH	ƒfƒBƒŒƒCƒ[ƒhE–¢ƒ[ƒh•Å‚Ì‘SƒvƒŒƒrƒ…[‚ª‚¨‚©‚µ‚¢
+//	TODO:	CtrlShiftD ‚Ì“®ì‚Í–â‘è–³‚¢‚©
+
+//	TODO:	‚n‚jH	˜gì‚é‚Æ‚«‚ÍƒsƒŠƒ’ƒh•‚ðŽg‚¤
+//	TODO:	‚n‚jH	Å‘å‰»‚©‚ç–ß‚µ‚½‚çAMAA‚ª”ñ•\Ž¦‚Å‚à•\Ž¦‚É‚È‚é
+
+//	TODO:	‚n‚jH	MAA‚Æ•Åˆê——A‘I‘ð‚µ‚½‚çƒƒCƒ“‘‹‚ÉƒtƒH[ƒJƒX–ß‚·‚©‚Ç‚¤‚©‘I‘ðo—ˆ‚é‚æ‚¤‚É‚·‚é
+//					‰EƒNƒŠƒƒjƒ…[‚ÉON/OFF•t‚¯‚ê‚Î‚¢‚¢
+
+//	TODO:	‚n‚jH	ƒhƒ‰ƒbƒOˆÚ“®‚³‚¹‚½ŒãAƒLƒƒƒŒƒbƒg‚ÌˆÊ’u‚ª‚¨‚©‚µ‚¢
+
+//	TODO:	‚n‚jH	ƒhƒ‰ƒtƒgƒ{[ƒhEƒTƒ€ƒlƒCƒ‹EˆÚ“®o—ˆ‚é‚æ‚¤‚É
+
+//	TODO:	‚n‚jH	ƒ†[ƒU[’è‹`‚ðƒAƒNƒZƒ‰ƒL[‚ÅÝ’èo—ˆ‚é
+
+//	TODO:	‚n‚jH	ƒZƒŠƒt‰üsA•¶Í‚Ì“r’†‚Å”¼Šp‘SŠpƒXƒy[ƒXˆêŒÂ‚ ‚Á‚½ê‡Aƒ\ƒR‚Í–³Ž‹‚µ‚Ä•¶Í‚Ìæ’[‚És“ª‚ð‘µ‚¦‚é
+
+//	TODO:	•›ƒ^ƒu‚Ì–¼Ì•ÒWo—ˆ‚é‚æ‚¤‚É
+
+//	TODO:	ÅIs‚Ì˜g‚¢‚ê‚é‚Æ—Ž‚¿‚éH
 
 //	TODO:	ƒc[ƒ‹ƒ`ƒbƒvAƒ}ƒEƒXƒJ[ƒ\ƒ‹‚ªd‚È‚é‚Æ‚¿‚ç‚Â‚­‚Ì‚ÍŽd—lBŽ©ì‚µ‚©‚È‚¢‚©B
-
-//	TODO:	ƒhƒ‰ƒtƒgƒ{[ƒhEƒTƒ€ƒlƒCƒ‹EˆÚ“®o—ˆ‚é‚æ‚¤‚É
-
-//	TODO:	ƒhƒ‰ƒbƒOˆÚ“®‚³‚¹‚½ŒãAƒLƒƒƒŒƒbƒg‚ÌˆÊ’u‚ª‚¨‚©‚µ‚¢
 
 //	TODO:	ŒÂ•Ê˜g‚âƒ†[ƒUƒAƒCƒeƒ€‚ÉƒL[ƒoƒCƒ“ƒh•t‚¢‚½‚çƒ\ƒŒ‚ð•\Ž¦o—ˆ‚é‚æ‚¤‚É
 //	TODO:	‰EƒNƒŠƒƒjƒ…[‚ÌŒÂ•Ê˜g‚âƒ†[ƒUƒAƒCƒeƒ€‚ÉŠeŒÂ‚Ì–¼‘O‚ð•t‚¯‚é‚æ‚¤‚É
@@ -37,13 +53,12 @@ If not, see <http://www.gnu.org/licenses/>.
 //	TODO:	‘SƒsƒŠƒ’ƒh‚ðÁ‹Ž‚·‚é‹@”\EƒsƒŠƒ’ƒh‚Ì‘OŒã‚ðŠm”F‚µ‚ÄA‹ó”’‚Å‚ ‚ê‚Î•‚É‡‚í‚¹‚Ä’u‚«Š·‚¦E’P“Æ‚È‚ç3dotƒ†ƒjƒR[ƒh‚Å’u‚«Š·‚¦‚é
 //	TODO:	‡¬‚·‚é‚Æ‚«AãŠG‚ÌŽüˆÍ‚ð”’ƒkƒL‚·‚é‹@”\E‘OŒã‚â“§‰ß—Ìˆæ‚É‡‚í‚¹‚½ˆ—‚ª•K—vE•Žw’è‚à‚Å‚«‚é‚Æ‚¢‚¢H
 
-//	TODO:	MAA‚ÌˆêƒRƒ}‚Ì•ÒW‹@”\
+//	TODO:	MAA‚ÌˆêƒRƒ}‚Ì•ÒW‹@”\Eƒtƒ@ƒCƒ‹–¼H•v‚·‚é‚©ƒtƒ‰ƒO‚ÅŠÇ—
+//			•Û‘¶‚·‚é‚É‚ÍA‚»‚ÌMAA‚ÌŠJ‚«‚ðˆÛŽ‚µ‚Ä‚¨‚­•K—v‚ª‚ ‚é
 
 //	TODO:	ƒy[ƒWƒŠƒXƒg‚àA‚Î‚ç‚µ‚½‚Æ‚«•Â‚¶‚ç‚ê‚é‚æ‚¤‚É
 
-//	TODO:	‘}“ü‚É‚ ‚éFŽw’è‚ðŽ©•ª‚ÅƒJƒXƒ^ƒ}ƒCƒYo—ˆ‚é‚æ‚¤‚É
-//	TODO:	‚à‚µ‚­‚Íƒ†[ƒU[’è‹`‚ðƒAƒNƒZƒ‰ƒL[‚ÅÝ’èo—ˆ‚é‚æ‚¤‚É
-//	TODO:	ƒZƒŠƒt‰üsA•¶Í‚Ì“r’†‚Å”¼Šp‘SŠpƒXƒy[ƒXˆêŒÂ‚ ‚Á‚½ê‡Aƒ\ƒR‚Í–³Ž‹‚µ‚Ä•¶Í‚Ìæ’[‚És“ª‚ð‘µ‚¦‚é
+//	TODO:	‘}“ü‚É‚ ‚éFŽw’è‚ðƒJƒXƒ^ƒ}ƒCƒYo—ˆ‚é
 
 /*
 ƒc[ƒ‹ƒ`ƒbƒv‚ÌƒTƒuƒNƒ‰ƒX‚Å‚«‚È‚¢‚©H
@@ -65,7 +80,7 @@ WM_MOUSEHOVER‚ª—ˆ‚½‚çAƒŠƒXƒgƒrƒ…[‚Æ‚©‚Ìƒnƒ“ƒhƒ‹“n‚µ‚Äƒc[ƒ‹ƒ`ƒbƒvƒ|ƒbƒpƒbƒv‚ðƒ
 ”pixel‚Ìƒ}ƒEƒXƒ€[ƒu‚ðŒŸ’m‚µ‚Ä•Â‚¶‚é
 
 ƒ|ƒbƒvƒAƒbƒv‚ÌƒTƒCƒY‚ÍA•¶Žš—ñ‚ÅŒˆ‚ß‚éB‰Žæ‚è‚Q‚‚˜‚­‚ç‚¢‚ÅB
-”wŒi‚Æ•¶ŽšF‚Í GetSysColor ‚Å‚Æ‚ê‚é‚ªAWin7‚Ì‚æ‚¤‚ÈƒOƒ‰ƒf[ƒVƒ‡ƒ“‚ÍH
+”wŒi‚Æ•¶ŽšF‚Í GetSysColor ‚Å‚Æ‚ê‚é
 
 SystemParametersInfo  SPI_GETMOUSEHOVERTIME  SPI_GETMOUSEHOVERWIDTH ‚Å’²®o—ˆ‚é
 
@@ -107,10 +122,10 @@ SystemParametersInfo  SPI_GETMOUSEHOVERTIME  SPI_GETMOUSEHOVERWIDTH ‚Å’²®o—ˆ‚é
 //ƒoƒO
 //	TODO:	•ÅList‚âMAA‚Å‚Ìƒc[ƒ‹ƒ`ƒbƒv‚ª‰½“x‚à•`‰æ‚³‚ê‚éB
 //	TODO:	Å‘å‰»‚µ‚½‚è‰æ–ÊƒTƒCƒY‚©‚¦‚é‚ÆA‰E‚Ì•Åˆê——‚ªŒ©‚¦‚È‚­‚È‚é
+//	TODO:	Å‘å‰»‚µ‚ÄI‚í‚é„‹N“®‚µ‚ÄAÅ‘å‰»‰ðœ‚·‚é‚ÆAƒƒCƒ“ƒXƒvƒŠƒbƒgƒo[‚ªŒ©‚¦‚È‚­‚È‚é//‰E‚ÉƒCƒb‚¿‚á‚Á‚Ä‚é‚Ü‚Ü
 //	TODO:	‹éŒ`‘I‘ð”ÍˆÍƒoƒCƒgƒJƒEƒ“ƒg‚ª’x‚¢
 //	TODO:	•`‰æXVƒ^ƒCƒ~ƒ“ƒO‚ª‚¨‚©‚µ‚¢ê‡‚ª‘½X‚ ‚é
 //	TODO:	u‹éŒ`‘I‘ðv‚Æu•”•ª’Šov‚Ì—¼•û‚Éƒ`ƒFƒbƒN‚ð“ü‚ê‚½ó‘Ô‚Åƒhƒ‰ƒbƒO‚·‚é‚ÆƒGƒ‰[
-//	TODO:	Å‘å‰»‚µ‚ÄI‚í‚é„‹N“®‚µ‚ÄAÅ‘å‰»‰ðœ‚·‚é‚ÆAƒƒCƒ“ƒXƒvƒŠƒbƒgƒo[‚ªŒ©‚¦‚È‚­‚È‚é//‰E‚ÉƒCƒb‚¿‚á‚Á‚Ä‚é‚Ü‚Ü
 //	TODO:	ƒTƒ€ƒl•\Ž¦Aƒ|ƒbƒvƒAƒbƒv‚Å—Ž‚¿‚â‚·‚¢Hƒƒ‚ƒŠ‚Ìˆµ‚¢‚ðl‚¦‚é•K—v‚ª‚ ‚éENULLƒ`ƒFƒL‚Æ‚©
 //	•¶Žš”‚ÆƒoƒCƒg”‚ÌŒvŽZŠÔˆá‚Á‚Ä‚¢‚½Š‚ð‚È‚¨‚µ‚½
 
@@ -123,32 +138,19 @@ SystemParametersInfo  SPI_GETMOUSEHOVERTIME  SPI_GETMOUSEHOVERWIDTH ‚Å’²®o—ˆ‚é
 
 
 //‹@”\’Ç‰ÁE•ÏX
-//	TODO:	DocBadSpaceCheck“à‚ÌXVŽw—ß‚ÌÅ“K‰»‚ª•K—v
-//	TODO:	View•”•ª‚ðƒTƒ€ƒl•\Ž¦‚Å‚«‚é‚æ‚¤‚É
-//	TODO:	ƒeƒ“ƒvƒŒ‚Ìuí‚ÉÅ‘O–Ê‚É•\Ž¦vOrinrinediter‚ð•\Ž¦‚µ‚Ä‚¢‚éŽž‚¾‚¯Å‘O–Ê‚É—ˆ‚é‚æ‚¤‚É//‚à‚µ‚­‚ÍAƒƒCƒ“‘‹‚É“‡‚Æ‚©
 //	TODO:	•Å‚Ì•¡”‘I‘ð‚µ‚ÄˆÚ“®A‚c•‚c‚à
-//	TODO:	Viewer‘¤ACtrlª«‚ÅAMLT‚ÌƒZƒNƒVƒ‡ƒ“ŠÔˆÚ“®‚·‚é
+//	TODO:	ƒXƒy[ƒX•¶Žš‚ª“ñŒÂˆÈã˜A‘±‚µ‚Ä‚¢‚é‚Æ‚±‚ë‚ðAA‚Æ‘äŽŒ‚Ì‹æØ‚è‚¾‚Æ”FŽ¯‚·‚é‚æ‚¤‚ÈƒƒWƒbƒN‚ÍH
 //	TODO:	—š—ð‚©‚çŠJ‚±‚¤‚Æ‚µ‚½ƒtƒ@ƒCƒ‹Eƒvƒƒt‚ª–³‚©‚Á‚½‚çƒŠƒXƒg‚©‚çÁ‚·‚×‚«
-//	TODO:	viewer‚ÌŽåƒ^ƒu‚ðƒ}ƒEƒX‚ÆƒXƒNƒ[ƒ‹ƒo[‚¾‚¯‚Å‚È‚­AƒzƒEƒB[ƒ‹AƒL[ƒ{[ƒh‚Ì–îˆó‚âPageUp,PageDnƒL[‚Å‘€ìo—ˆ‚é—l‚É‚È‚ç‚È‚¢H
-//	TODO:	Viewer‘¤Aƒ|ƒbƒvƒAƒbƒv‚ÅA—e—Ê‚ào‚¹‚È‚¢‚©
 //	TODO:	‰E‘µ‚¦üÁ‚µ
 //	TODO:	Žg—p‚ðƒtƒ@ƒCƒ‹o—Í‚Å‚«‚é‚æ‚¤‚É
-//	TODO:	MLT‚ÌƒuƒbƒNƒ}[ƒN‹@”\Eƒ^ƒu‘‚â‚·‚©AƒcƒŠ[‚É‘‚â‚·‚©E•›ƒ^ƒu‚¶‚á‚¢‚¯‚È‚¢H
-//	TODO:	view‚ÌŽg—p‚ÌƒOƒ‹[ƒv–¼‚Ì•ÏX‹@”\EƒOƒ‹[ƒvŽ©‘ÌA’P‘Ì—¼•û‚Å
-//	TODO:	View‚Ì‰EƒNƒŠƒƒjƒ…[‚à•ÒWo—ˆ‚é‚æ‚¤‚É
-//	TODO:	ƒXƒy[ƒX•¶Žš‚ª“ñŒÂˆÈã˜A‘±‚µ‚Ä‚¢‚é‚Æ‚±‚ë‚ðAA‚Æ‘äŽŒ‚Ì‹æØ‚è‚¾‚Æ”FŽ¯‚·‚é‚æ‚¤‚ÈƒƒWƒbƒN‚ÍH
 //	TODO:	ƒtƒŠ[ƒJ[ƒ\ƒ‹ƒ‚[ƒh
-//	TODO:	•Åˆê——‚ðA•¡”‘I‘ð‚µ‚Äˆê”­íœ‚Å‚«‚é‚æ‚¤‚É
+//	TODO:	DocBadSpaceCheck“à‚ÌXVŽw—ß‚ÌÅ“K‰»‚ª•K—v
 //	TODO:	ƒŒƒCƒ„ƒ{ƒbƒNƒXŽ©‘Ì‚Ì‘€ìAã‘‚«ŽÀs‚Æ‚©‚àƒLƒ{ƒhƒVƒ‡ƒgƒJƒg‚Åo—ˆ‚é‚æ‚¤‚É
-//	TODO:	ƒhƒ‰ƒtƒgƒ{[ƒhEƒTƒ€ƒlAƒTƒCƒY•ÏX‚Å‚«‚é‚æ‚¤‚É
 //	TODO:	•¡”ƒtƒ@ƒCƒ‹ƒ^ƒuA‰EƒNƒŠƒƒjƒ…[‚Åƒtƒ@ƒCƒ‹î•ño‚·
-//	TODO:	ASD‘Î‰žƒ“Çž‚Íì‚Á‚½‚ª‚Ç‚±‚ÅŽg‚¤H
-//	TODO:	MMAƒrƒ…[AAA‚ÌƒXƒNƒ[ƒ‹‚ðƒAƒCƒeƒ€‹æØ‚è‚Å‚È‚­sƒXƒNƒ[ƒ‹‚ào—ˆ‚é‚æ‚¤‚É
 //	TODO:	ƒoƒbƒNƒAƒbƒv‹@”\‚Ì‹­‰»Eã‘‚«•Û‘¶‚µ‚½‚çƒoƒbƒNƒAƒbƒv‚Æ‚©E•ÅV‹Kì¬‚µ‚½‚ç•Û‘¶
 //	TODO:	•Û‘¶‚·‚é‚Æ‚«A“¯–¼ƒtƒ@ƒCƒ‹‚ª‚ ‚Á‚½‚çA“úŽž‚­‚Á‚Â‚¯‚ÄƒoƒbƒNƒAƒbƒv‚Æ‚©
 //	TODO:	ƒtƒ@ƒCƒ‹“à—e“Œv‹@”\‚ª—~‚µ‚¢B‘SƒoƒCƒg”A•Å”‚Æ‚©
 //	TODO:	Ctrl+K‚Ì“Œv‹@”\EPageList‚Ì€–Ú‘‚â‚µ‚Ä‘ÎˆECtrl+K‚ÅƒŠƒtƒŒƒbƒVƒ…‚Æ‚©E˜A‘±”¼Šp‚Æ‚©As––‹ó”’‚Æ‚©E‚¢‚ë‚ñ‚Èî•ñ‚ð‚¾‚·EƒŠƒ„ƒ‹ƒ^ƒCƒ€‚¾‚Æd‚¢‚Ì‚Å‘€ì‚ÅƒŠƒtƒŒƒbƒVƒ…
-//	TODO:	ƒc[ƒ‹ƒ`ƒbƒv•t‚¯‚½‚¢
 //	TODO:	•¶Žš‚ÌŒŸõE’sŠ¿‹@”\	ƒ†ƒjƒR[ƒh‹ó”’ˆêŠ‡ŒŸõ‚Æ‚©
 //	TODO:	Ø‚è”²‚«ƒŠƒtƒ@ƒŒƒ“ƒXAA‚ðŽg‚Á‚ÄA•¶Žš‚Ì‚Æ‚±‚¾‚¯Ø‚è”²‚«A‚È‚¢‚Æ‚±‚ë‚¾‚¯Ø‚è”²‚«A‚Æ‚©‚Å‚«‚é‚æ‚¤‚É‚µ‚½‚¢
 //	TODO:	ƒoƒbƒNƒAƒbƒvƒƒbƒZ[ƒWAƒXƒe[ƒ^ƒXƒo[‚Éo‚¹‚È‚¢‚©
@@ -158,6 +160,28 @@ SystemParametersInfo  SPI_GETMOUSEHOVERTIME  SPI_GETMOUSEHOVERWIDTH ‚Å’²®o—ˆ‚é
 //	TODO:	‚æ‚­Žg‚¤ƒ†ƒjƒR[ƒh‚ð“Z‚ß‚Ä‚¨‚¯‚È‚¢‚©Aƒ†[ƒU’è‹`‚Å‚¢‚¢‚ñ‚¶‚á‚Ë
 //	TODO:	ƒeƒ“ƒvƒŒ‚ÌƒRƒ“ƒ{ƒbƒNƒX‚ðAƒŠƒXƒgƒ{ƒbƒNƒXŒ^‚ÆØ‚è‘Ö‚¦‚ç‚ê‚é‚Æ‚©
 //	TODO:	‹N“®’†‚ÉAƒ‰ƒCƒ“ƒeƒ“ƒvƒŒ[ƒg‚ÌƒŠƒXƒg‚ðŠJ‚­•Ä“Ç‚Ýž‚Ý‚Å‚«‚é‚æ‚¤‚É‚µ‚Ä—~‚µ‚¢//	Brush‚à“¯‚¶‚©B‰EƒNƒŠƒƒjƒ…[‚Å
+//	TODO:	ƒvƒŒƒrƒ…[‚ðƒŠƒ„ƒ‹ƒ^ƒCƒ€‚É•ÏX‚·‚é
+//	TODO:	”ñƒ†ƒjƒR‚Ì‚Æ‚«‚ÍAƒsƒŠƒ’ƒh‚Ì—Ê‚Ì‘I‘ð‚ðH‚à‚µ‚­‚ÍÝ’èo—ˆ‚é‚æ‚¤‚É‚·‚é‚©
+//	TODO:	ƒ~ƒj•¡”sƒeƒ“ƒvƒŒEˆësƒuƒ‰ƒV‚ÌƒTƒuƒ_ƒCƒ„ƒƒO‚É‘‚â‚·‚©
+//	TODO:	ƒƒCƒ“ƒXƒvƒŠƒbƒgƒo[‚ÌˆÊ’uî•ñƒŠƒZƒbƒg‚ª‹‚é‚©‚à
+//	TODO:	ˆÊ’uî•ñ‚ÌƒŠƒZƒbƒg‹@”\EƒVƒXƒeƒ€ƒƒjƒ…[‚É“‹Ú‚·‚é
+
+//	TODO:	View•”•ª‚ðƒTƒ€ƒl•\Ž¦‚Å‚«‚é‚æ‚¤‚É
+//	TODO:	ƒeƒ“ƒvƒŒ‚Ìuí‚ÉÅ‘O–Ê‚É•\Ž¦vOrinrinediter‚ð•\Ž¦‚µ‚Ä‚¢‚éŽž‚¾‚¯Å‘O–Ê‚É—ˆ‚é‚æ‚¤‚É//‚à‚µ‚­‚ÍAƒƒCƒ“‘‹‚É“‡‚Æ‚©
+//	TODO:	Viewer‘¤ACtrlª«‚ÅAMLT‚ÌƒZƒNƒVƒ‡ƒ“ŠÔˆÚ“®‚·‚é
+//	TODO:	viewer‚ÌŽåƒ^ƒu‚ðƒ}ƒEƒX‚ÆƒXƒNƒ[ƒ‹ƒo[‚¾‚¯‚Å‚È‚­AƒzƒEƒB[ƒ‹AƒL[ƒ{[ƒh‚Ì–îˆó‚âPageUp,PageDnƒL[‚Å‘€ìo—ˆ‚é—l‚É‚È‚ç‚È‚¢H
+//	TODO:	Viewer‘¤Aƒ|ƒbƒvƒAƒbƒv‚ÅA—e—Ê‚ào‚¹‚È‚¢‚©
+//	TODO:	MLT‚ÌƒuƒbƒNƒ}[ƒN‹@”\Eƒ^ƒu‘‚â‚·‚©AƒcƒŠ[‚É‘‚â‚·‚©E•›ƒ^ƒu‚¶‚á‚¢‚¯‚È‚¢H
+//	TODO:	view‚ÌŽg—p‚ÌƒOƒ‹[ƒv–¼‚Ì•ÏX‹@”\EƒOƒ‹[ƒvŽ©‘ÌA’P‘Ì—¼•û‚Å
+//	TODO:	View‚Ì‰EƒNƒŠƒƒjƒ…[‚à•ÒWo—ˆ‚é‚æ‚¤‚É
+//	TODO:	•Åˆê——‚ðA•¡”‘I‘ð‚µ‚Äˆê”­íœ‚Å‚«‚é‚æ‚¤‚É
+//	TODO:	ƒhƒ‰ƒtƒgƒ{[ƒhEƒTƒ€ƒlAƒTƒCƒY•ÏX‚Å‚«‚é‚æ‚¤‚É
+//	TODO:	MMAƒrƒ…[AAA‚ÌƒXƒNƒ[ƒ‹‚ðƒAƒCƒeƒ€‹æØ‚è‚Å‚È‚­sƒXƒNƒ[ƒ‹‚ào—ˆ‚é‚æ‚¤‚É
+//	TODO:	MAA‘‹‚à“‡‚Å‚«‚È‚¢‚©
+
+//	TODO:	ASD‘Î‰žƒ“Çž‚Íì‚Á‚½‚ª‚Ç‚±‚ÅŽg‚¤H
+//	TODO:	ƒc[ƒ‹ƒ`ƒbƒv•t‚¯‚½‚¢
+
 //	TODO:	ƒgƒŒƒX‚Ì‚P‰æ–ÊA‚Q‰æ–ÊØ‚è‘Ö‚¦ƒ‚[ƒh
 //	TODO:	ƒgƒŒƒX‚Ì‚Q‰æ–Ê‚¾‚ÆA”wŒiŠG‚Í‚Ç‚Á‚¿‚ÌƒyƒCƒ“‚Å‚à•\Ž¦o—ˆ‚é‚æ‚¤‚É‚µ‚½‚¢
 //	TODO:	ƒgƒŒƒX‚ÅA‰æ‘œ‚ð‚Â‚Ü‚ñ‚Å’¼ÚˆÚ“®‚Å‚«‚é‚æ‚¤‚É
@@ -165,14 +189,12 @@ SystemParametersInfo  SPI_GETMOUSEHOVERTIME  SPI_GETMOUSEHOVERWIDTH ‚Å’²®o—ˆ‚é
 //	TODO:	ƒgƒŒƒXƒ‚[ƒh‘‹‚ÉAƒOƒŠƒbƒhON/OFF‚ð•t‚¯‚é
 //	TODO:	ƒgƒŒƒXƒ‚[ƒhAŠe“ü—Í’l‚Í’¼“ü—Í‚Å‚«‚é‚æ‚¤‚É
 //	TODO:	ƒgƒŒƒXƒ‚[ƒhƒ{ƒ^ƒ“‚ÍATOGGLE‚Å‚«‚é‚æ‚¤‚É‚·‚é
-//	TODO:	ƒvƒŒƒrƒ…[‚ðƒŠƒ„ƒ‹ƒ^ƒCƒ€‚É•ÏX‚·‚é
+
+
+
+
+
 //	TODO:	ƒvƒƒtƒ@ƒCƒ‹‚ÌƒcƒŠ[‚Ì•ÒWA‚à‚Á‚ÆŽèŒy‚É‚Å‚«‚È‚¢‚©
-//	TODO:	MAA‘‹‚à“‡‚Å‚«‚È‚¢‚©
-//	TODO:	ƒ~ƒj•¡”sƒeƒ“ƒvƒŒEˆësƒuƒ‰ƒV‚ÌƒTƒuƒ_ƒCƒ„ƒƒO‚É‘‚â‚·‚©
-//	TODO:	ƒƒCƒ“ƒXƒvƒŠƒbƒgƒo[‚ÌˆÊ’uî•ñƒŠƒZƒbƒg‚ª‹‚é‚©‚à
-//	TODO:	ˆÊ’uî•ñ‚ÌƒŠƒZƒbƒg‹@”\EƒVƒXƒeƒ€ƒƒjƒ…[‚É“‹Ú‚·‚é
-
-
 
 
 
@@ -426,18 +448,23 @@ ASDƒtƒ@ƒCƒ‹@@ˆës‚ªˆëƒRƒ“ƒeƒ“ƒc
 					ˆësƒeƒ“ƒvƒŒ‚Å’†ƒNƒ‹ƒbƒN‚µ‚½‚çƒŒƒCƒ„ƒ{ƒbƒNƒX‚ªŠJ‚­
 					MAAƒcƒŠ[‚Åƒtƒ@ƒCƒ‹–¼‚ð’†ƒNƒŠƒbƒN‚µ‚½‚çA•›ƒ^ƒu‚É’Ç‰Á‚Å‚«‚é
 					ƒoƒOC³‚¢‚ë‚¢‚ë
-2012/05/31	0.31	MAA‚ÉAƒtƒ@ƒCƒ‹‚Ì“r’†‚ÉƒAƒCƒeƒ€‚ð’Ç‰Á‚Å‚«‚é‚æ‚¤‚É‚µ‚½
+2012/06/11	0.31	MAA‚ÉAƒtƒ@ƒCƒ‹‚Ì“r’†‚ÉƒAƒCƒeƒ€‚ð’Ç‰Á‚Å‚«‚é‚æ‚¤‚É‚µ‚½
 					MAA‚Ì“à—e•\Ž¦‘¤‚É‚c•‚c‚·‚é‚ÆA‚»‚Ìƒtƒ@ƒCƒ‹‚ð•›ƒ^ƒu‚·‚é‚æ‚¤‚É‚µ‚½iViewerž‚Ýj
-					¦Žg—p‚É‚Í“ü‚ç‚È‚¢‚µ•œŒ³‚à‚³‚ê‚È‚¢B—vŒŸ“¢
+					¦Žg—p‚É‚Í“ü‚ç‚È‚¢‚µ•œŒ³‚à‚³‚ê‚È‚¢
 					MAAƒcƒŠ[‚É‚c•‚c‚·‚é‚ÆA’Ç‰ÁƒAƒCƒeƒ€‚Æ‚µ‚Ä•ÛŽ‚Å‚«‚é‚æ‚¤‚É‚µ‚½iViewerž‚Ýj
 					¦Ä\’z‚·‚é‚ÆÁ‚¦‚é
 					MAA‚ÌŽg—p‚ÅA•¡”‚ÌMLT‚É“¯‚¶AA‚ª—L‚éê‡‚ÉƒLƒ‡ƒh‚é‚Ì‚ðC³iViewerž‚Ýj
 					˜g‘}“üBOX‚ðk‚ß‚·‚¬‚é‚ÆƒGƒ‰[‚É‚È‚é‚Ì‚ðC³
+					ƒ†[ƒUƒAƒCƒeƒ€‚ð‰EƒNƒŠƒƒjƒ…[‚É’Ç‰Á‚Å‚«‚é‚æ‚¤‚É‚µ‚½
+					ƒhƒ‰ƒbƒOˆÚ“®‚³‚¹‚½‚çƒLƒƒƒŒƒbƒgˆÊ’u‚ª‚¨‚©‚µ‚­‚È‚é‚Ì‚ðC³
+					MAA‘‹‚Æ•Åˆê——‚ÅA‘I‘ð‚µ‚½‚çƒtƒH[ƒJƒX‚ð•ÒW‘‹‚É–ß‚·‹@”\
+					ƒhƒ‰ƒtƒgƒ{[ƒhEƒTƒ€ƒlƒCƒ‹EˆÚ“®o—ˆ‚é‚æ‚¤‚É‚µ‚½
+					ƒc[ƒ‹ƒ`ƒbƒv‚ªƒ`ƒ‰‚Â‚­‚Ì‘Îô’†
+
 
 
 XV“úŽž’ˆÓ
 
-ƒy[ƒWƒŠƒXƒg‚ÍAƒNƒŠƒbƒN‚µ‚Ä‚àƒtƒH[ƒJƒXˆÚ‚ç‚È‚¢‚æ‚¤‚É‚µ‚½
 */
 
 /*
@@ -977,6 +1004,10 @@ BOOL InitInstance( HINSTANCE hInstance, INT nCmdShow, LPTSTR ptArgv )
 
 #ifdef AA_INVERSE
 	DocInverseInit( TRUE );
+#endif
+
+#ifdef USE_HOVERTIP
+	HoverTipInitialise( hInstance, hWnd );
 #endif
 
 	SetFocus( ghViewWnd );
@@ -1559,6 +1590,10 @@ VOID Cls_OnDestroy( HWND hWnd )
 
 #ifdef AA_INVERSE
 	DocInverseInit( FALSE );
+#endif
+
+#ifdef USE_HOVERTIP
+	HoverTipInitialise( NULL, NULL );
 #endif
 
 	ToolBarBandInfoGet( NULL );
@@ -2204,6 +2239,9 @@ INT InitParamValue( UINT dMode, UINT dStyle, INT nValue )
 		case  VL_WORKLOG:		StringCchCopy( atKeyName, SUB_STRING, TEXT("WorkLogDebug") );	break;
 		case  VL_PAGE_UNDER:	StringCchCopy( atKeyName, SUB_STRING, TEXT("PageNumUnder") );	break;
 		case  VL_PAGE_OVWRITE:	StringCchCopy( atKeyName, SUB_STRING, TEXT("PageNumOvWrite") );	break;
+		case  VL_MAA_RETFCS:	StringCchCopy( atKeyName, SUB_STRING, TEXT("MaaRetFocus") );	break;
+		case  VL_PGL_RETFCS:	StringCchCopy( atKeyName, SUB_STRING, TEXT("PageRetFocus") );	break;
+
 		default:	return nValue;
 	}
 

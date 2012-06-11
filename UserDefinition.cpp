@@ -261,7 +261,7 @@ HRESULT UserDefAppendMenu( HWND hWnd )
 	hMenu = hSubMenu;
 	hSubMenu = GetSubMenu( hMenu, 10 );
 
-	UserDefMenuWrite( hSubMenu );
+	UserDefMenuWrite( hSubMenu, 1 );
 
 	DeleteMenu( hSubMenu, IDM_USERINS_NA, MF_BYCOMMAND );	//	Dummy用
 
@@ -273,15 +273,44 @@ HRESULT UserDefAppendMenu( HWND hWnd )
 
 /*!
 	ユーザ定義メニューの中身をくっつける
+	@param[in]	hMenu	くっつけるメニューのハンドル
+	@param[in]	bMode		非０メニューキー付ける　０付けない
 */
-HRESULT UserDefMenuWrite( HMENU hMenu )
+HRESULT UserDefMenuWrite( HMENU hMenu, UINT bMode )
 {
 	UINT	i;
+	TCHAR	atBuffer[MAX_PATH];
 
 	for( i = 0; gdItemCnt > i; i++ )
 	{
-		AppendMenu( hMenu, MF_STRING, (IDM_USERINS_ITEM_FIRST + i), gstUserItem[i].atItemName );
+		if( bMode )
+		{
+			StringCchPrintf( atBuffer, MAX_PATH, TEXT("%s(&%c)"), gstUserItem[i].atItemName, i+'A' );
+		}
+		else
+		{
+			StringCchCopy( atBuffer, MAX_PATH, gstUserItem[i].atItemName );
+		}
+		AppendMenu( hMenu, MF_STRING, (IDM_USERINS_ITEM_FIRST + i), atBuffer );
 	}
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+
+/*!
+	アイテムの名前を引っ張る
+	@param[in]	dNumber	アイテム番号０インデックス
+	@param[out]	ptNamed	名前入れるバッファへのポインター
+	@param[in]	cchSize	バッファの文字数・バイトじゃないぞ
+	@return		HRESULT	終了状態コード
+*/
+HRESULT UserDefItemNameget( UINT dNumber, LPTSTR ptNamed, UINT_PTR cchSize )
+{
+	//	はみ出し確認
+	if( gdItemCnt <= dNumber )	return E_OUTOFMEMORY;
+
+	StringCchCopy( ptNamed, cchSize, gstUserItem[dNumber].atItemName );
+
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------

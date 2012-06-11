@@ -25,6 +25,11 @@ If not, see <http://www.gnu.org/licenses/>.
 //	TODO:	選択頁のみ保存とか、なんかそんな機能ほしい
 
 
+#ifndef USE_HOVERTIP
+//	20120608
+#define PGL_TOOLTIP
+#endif
+
 #define PAGELIST_CLASS	TEXT("PAGE_LIST")
 #define PL_WIDTH	110
 #define PL_HEIGHT	300
@@ -46,19 +51,23 @@ static  HWND	ghPageWnd;		//!<	このウインドウのハンドル
 static  HWND	ghToolWnd;		//!<	ツールバー
 static  HWND	ghPageListWnd;	//!<	ページリストビューハンドル
 
+#ifdef PGL_TOOLTIP
 static  HWND	ghPageTipWnd;	//!<	ツールチップハンドル
 static HFONT	ghPgTipFont;	//!<	ツールチップ用
 static LPTSTR	gptPgTipBuf;	//!<	
+#endif
+static BOOLEAN	gbPgTipView;	//!<	頁ツールティップ表示ON/OFF
 
 static INT		gixPreviSel;	//!<	直前まで選択してた頁
 
 static INT		gixMouseSel;	//!<	マウスカーソル下のアレ
 static INT		gixPreSel;		//!<	マウスカーソル下のアレ
 
-static BOOLEAN	gbPgTipView;	//!<	頁ツールティップ表示ON/OFF
 
-static WNDPROC	gpfOrigPageViewProc;	//!<	
-static WNDPROC	gpfOrigPageToolProc;
+static BOOLEAN	gbPgRetFocus;	//!<	頁を選択したら編集窓にフォーカス戻すか
+
+static WNDPROC	gpfOrigPageViewProc;	//!<	頁一覧ビューの元プロシージャ
+static WNDPROC	gpfOrigPageToolProc;	//!<	ツールバーの元プロシージャ
 
 static HIMAGELIST	ghPgLstImgLst;
 
@@ -108,6 +117,10 @@ VOID	Plv_OnMouseMove( HWND, INT, INT, UINT );	//!<
 LRESULT	CALLBACK gpfPageToolProc( HWND, UINT, WPARAM, LPARAM );
 
 INT_PTR	CALLBACK PageNameDlgProc( HWND, UINT, WPARAM, LPARAM );
+
+#ifdef USE_HOVERTIP
+LPTSTR	CALLBACK PageListHoverTipInfo( LPVOID );
+#endif
 //-------------------------------------------------------------------------------------------------
 
 
@@ -122,10 +135,7 @@ HWND PageListInitialise( HINSTANCE hInstance, HWND hParentWnd, LPRECT pstFrame )
 {
 
 	LVCOLUMN	stLvColm;
-//	TBADDBITMAP	stToolBmp;
-	TTTOOLINFO	stToolInfo;
 	RECT		tbRect;
-//	LONG_PTR	tbixStd;
 	DWORD		dwExStyle, dwStyle;
 	TCHAR		atBuff[MAX_STRING];
 	HWND		hPrWnd;
@@ -134,8 +144,10 @@ HWND PageListInitialise( HINSTANCE hInstance, HWND hParentWnd, LPRECT pstFrame )
 	HBITMAP		hImg, hMsq;
 	INT			spPos;
 
+#ifdef PGL_TOOLTIP
+	TTTOOLINFO	stToolInfo;
 	LOGFONT	stFont;
-
+#endif
 	WNDCLASSEX	wcex;
 	RECT	wdRect, clRect, rect;
 
@@ -163,6 +175,9 @@ HWND PageListInitialise( HINSTANCE hInstance, HWND hParentWnd, LPRECT pstFrame )
 	gixPreviSel = -1;
 
 	gbPgTipView = InitParamValue( INIT_LOAD, VL_PAGETIP_VIEW, 1 );
+
+	//	フォーカス操作
+	gbPgRetFocus = InitParamValue( INIT_LOAD, VL_PGL_RETFCS, 0 );
 
 	InitWindowPos( INIT_LOAD, WDP_PLIST, &rect );
 	if( 0 == rect.right || 0 == rect.bottom )	//	幅高さが０はデータ無し
@@ -270,17 +285,15 @@ HWND PageListInitialise( HINSTANCE hInstance, HWND hParentWnd, LPRECT pstFrame )
 	stLvColm.pszText = TEXT("Byte");	stLvColm.cx =  45;	stLvColm.iSubItem = 2;	ListView_InsertColumn( ghPageListWnd, 2, &stLvColm );
 	stLvColm.pszText = TEXT("Line");	stLvColm.cx =  45;	stLvColm.iSubItem = 3;	ListView_InsertColumn( ghPageListWnd, 3, &stLvColm );
 
+
 //ツールチップ
+#ifdef PGL_TOOLTIP
 	ghPageTipWnd = CreateWindowEx( WS_EX_TOPMOST, TOOLTIPS_CLASS, NULL, TTS_NOPREFIX | TTS_ALWAYSTIP,
 		CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, ghPageWnd, NULL, hInstance, NULL );
-
-	SetClassLongPtr( ghPageTipWnd, GCLP_HCURSOR, (LONG_PTR)(LoadCursor( NULL, IDC_IBEAM ) ) );
-
 
 	ViewingFontGet( &stFont );
 	stFont.lfHeight = FONTSZ_REDUCE;
 	ghPgTipFont = CreateFontIndirect( &stFont );
-//	ghPgTipFont = CreateFont( FONTSZ_REDUCE, 0, 0, 0, FW_REGULAR, FALSE, FALSE, FALSE, DEFAULT_CHARSET, OUT_OUTLINE_PRECIS, CLIP_DEFAULT_PRECIS, PROOF_QUALITY, VARIABLE_PITCH, TEXT("ＭＳ Ｐゴシック") );
 	SetWindowFont( ghPageTipWnd, ghPgTipFont, TRUE );
 
 	//	ツールチップをコールバックで割り付け
@@ -300,6 +313,7 @@ HWND PageListInitialise( HINSTANCE hInstance, HWND hParentWnd, LPRECT pstFrame )
 //	lParam	The LOWORD specifies the delay time, in milliseconds. The HIWORD must be zero.
 //	SendMessage( ghPageTipWnd, TTM_SETDELAYTIME, TTDT_INITIAL, MAKELPARAM(2222,0) );
 	//	効果無し
+#endif
 
 	ShowWindow( ghPageWnd, SW_SHOW );
 	UpdateWindow( ghPageWnd );
@@ -351,9 +365,11 @@ LRESULT CALLBACK PageListProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lP
 		HANDLE_MSG( hWnd, WM_CONTEXTMENU, Plt_OnContextMenu );
 
 		case WM_DESTROY:
+#ifdef PGL_TOOLTIP
 			SetWindowFont( ghPageTipWnd, GetStockFont(DEFAULT_GUI_FONT), FALSE );
 			DeleteFont( ghPgTipFont );
 			FREE( gptPgTipBuf );
+#endif
 			ImageList_Destroy( ghPgLstImgLst );
 			return 0;
 
@@ -410,10 +426,16 @@ VOID Plt_OnCommand( HWND hWnd, INT id, HWND hWndCtl, UINT codeNotify )
 			}
 			return;
 
-		case IDM_PAGEL_AATIP_TOGGLE:
+		case IDM_PAGEL_AATIP_TOGGLE:	//	内容ポッパップするか
 			gbPgTipView = gbPgTipView ? FALSE : TRUE;
 			InitParamValue( INIT_SAVE, VL_PAGETIP_VIEW, gbPgTipView );
 			return;
+
+		case IDM_PAGEL_RETURN_FOCUS:	//	頁選択したらフォーカス戻すか
+			gbPgRetFocus = gbPgRetFocus ? FALSE : TRUE;
+			InitParamValue( INIT_SAVE, VL_PGL_RETFCS, gbPgRetFocus );
+			return;
+
 
 		default:	break;
 	}
@@ -553,7 +575,9 @@ VOID Plt_OnCommand( HWND hWnd, INT id, HWND hWndCtl, UINT codeNotify )
 VOID Plt_OnSize( HWND hWnd, UINT state, INT cx, INT cy )
 {
 	RECT	tbRect;
+#ifdef PGL_TOOLTIP
 	TTTOOLINFO	stToolInfo;
+#endif
 
 	tbRect.right = 0;
 	if( ghToolWnd )
@@ -564,6 +588,7 @@ VOID Plt_OnSize( HWND hWnd, UINT state, INT cx, INT cy )
 
 	MoveWindow( ghPageListWnd, tbRect.right, 0, cx - tbRect.right, cy, TRUE );
 
+#ifdef PGL_TOOLTIP
 	//	必要な所だけいれればおｋ
 	ZeroMemory( &stToolInfo, sizeof(TTTOOLINFO) );
 	stToolInfo.cbSize = sizeof(TTTOOLINFO);
@@ -571,7 +596,7 @@ VOID Plt_OnSize( HWND hWnd, UINT state, INT cx, INT cy )
 	stToolInfo.uId    = IDLV_PAGELISTVIEW;
 	GetClientRect( ghPageListWnd, &stToolInfo.rect );
 	SendMessage( ghPageTipWnd, TTM_NEWTOOLRECT, 0, (LPARAM)&stToolInfo );
-
+#endif
 	return;
 }
 //-------------------------------------------------------------------------------------------------
@@ -638,6 +663,10 @@ VOID Plt_OnContextMenu( HWND hWnd, HWND hWndContext, UINT xPos, UINT yPos )
 
 	//	ポッパップ表示有るか？
 	if( gbPgTipView ){	CheckMenuItem( hSubMenu, IDM_PAGEL_AATIP_TOGGLE, MF_CHECKED );	}
+
+	//	選択でフォーカス戻りか？
+	if( gbPgRetFocus ){	CheckMenuItem( hSubMenu, IDM_PAGEL_RETURN_FOCUS, MF_CHECKED );	}
+
 
 	//	未選択なら、選択してないと使えない機能を無効に
 	if( !(bSel) )
@@ -720,6 +749,9 @@ LRESULT PageListNotify( HWND hWnd, LPNMLISTVIEW pstLv )
 		{
 			TRACE( TEXT("ページ選択[%d]"), iItem );
 			DocPageChange( iItem );
+
+			//	フォーカス戻す？
+			if( gbPgRetFocus  ){	ViewFocusSet(  );	}
 		}
 	}
 
@@ -1333,6 +1365,18 @@ LRESULT CALLBACK gpfPageViewProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPa
 		HANDLE_MSG( hWnd, WM_NOTIFY,    Plv_OnNotify  );	//	コモンコントロールの個別イベント
 		HANDLE_MSG( hWnd, WM_MOUSEMOVE, Plv_OnMouseMove );	
 		HANDLE_MSG( hWnd, WM_COMMAND,   Plt_OnCommand );	
+
+#ifdef USE_HOVERTIP
+		case WM_MOUSEHOVER:
+			HoverTipOnMouseHover( hWnd, wParam, lParam, PageListHoverTipInfo );
+			return 0;
+
+		case WM_MOUSELEAVE:
+			TRACE( TEXT("MOUSE LEAVE RISING") );
+			gixMouseSel = -1;
+			gixPreSel = -1;
+			return 0;
+#endif
 	}
 
 	return CallWindowProc( gpfOrigPageViewProc, hWnd, msg, wParam, lParam );
@@ -1363,9 +1407,18 @@ VOID Plv_OnMouseMove( HWND hWnd, INT x, INT y, UINT keyFlags )
 	if( gixMouseSel != iItem )	bReDraw = TRUE;
 	gixMouseSel = iItem;
 
-	if( bReDraw )	SendMessage( ghPageTipWnd, TTM_UPDATE, 0, 0 );
+#ifdef USE_HOVERTIP
+	if( bReDraw )
+	{
+		HoverTipResist( ghPageListWnd );
+	}
+#endif
 
-	TRACE( TEXT("PLV MM %d,%d,%d [%d]"), iItem, stHitInfo.iItem, stHitInfo.iSubItem, bReDraw );
+#ifdef PGL_TOOLTIP
+	if( bReDraw )	SendMessage( ghPageTipWnd, TTM_UPDATE, 0, 0 );
+#endif
+
+//	TRACE( TEXT("PLV MM %d,%d,%d [%d]"), iItem, stHitInfo.iItem, stHitInfo.iSubItem, bReDraw );
 
 	return;
 }
@@ -1380,6 +1433,7 @@ VOID Plv_OnMouseMove( HWND hWnd, INT x, INT y, UINT keyFlags )
 */
 LRESULT Plv_OnNotify( HWND hWnd, INT idFrom, LPNMHDR pstNmhdr )
 {
+#ifdef PGL_TOOLTIP
 	INT				dBytes;
 	UINT_PTR		rdLength;
 	LPNMTTDISPINFO	pstDispInfo;
@@ -1399,7 +1453,6 @@ LRESULT Plv_OnNotify( HWND hWnd, INT idFrom, LPNMHDR pstNmhdr )
 				FREE( gptPgTipBuf );
 
 				if( !(gbPgTipView) ){	return 0;	}	//	非表示なら何もしないでおｋ
-
 				if( 0 > gixMouseSel ){	return 0;	}
 
 				TRACE( TEXT("1 TTN_GETDISPINFO %d  %X"), gixMouseSel, pstDispInfo->uFlags );
@@ -1434,12 +1487,39 @@ LRESULT Plv_OnNotify( HWND hWnd, INT idFrom, LPNMHDR pstNmhdr )
 			return 0;
 		}
 	}
+#endif
 
-	//	処理なかったら続ける？
+//	処理なかったら続ける？
 	return CallWindowProc( gpfOrigPageViewProc, hWnd, WM_NOTIFY, (WPARAM)idFrom, (LPARAM)pstNmhdr );
 
 	//	無限ループしてないか、大丈夫か
 }
 //-------------------------------------------------------------------------------------------------
 
+
+#ifdef USE_HOVERTIP
+/*!
+	HoverTip用のコールバック受取
+*/
+LPTSTR CALLBACK PageListHoverTipInfo( LPVOID pVoid )
+{
+	INT		dBytes;
+	LPTSTR	ptBuffer = NULL;
+
+	if( gixPreSel != gixMouseSel )
+	{
+		if( !(gbPgTipView) ){	return NULL;	}	//	非表示なら何もしないでおｋ
+		if( 0 > gixMouseSel ){	return NULL;	}
+
+		gixPreSel = gixMouseSel;
+
+		//	該当ページから引っ張る
+		dBytes = DocPageTextGetAlloc( gitFileIt, gixMouseSel, D_UNI, (LPVOID *)(&ptBuffer), FALSE );
+		TRACE( TEXT("HOVER CALL %d, by[%d]"), gixMouseSel, dBytes );
+	}
+
+	return ptBuffer;
+}
+//-------------------------------------------------------------------------------------------------
+#endif
 

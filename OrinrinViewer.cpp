@@ -35,6 +35,50 @@ TEXT("もし受け取っていなければ、<http://www.gnu.org/licenses/> をご覧ください。\
 
 //-------------------------------------------------------------------------------------------------
 
+//	TODO:	仕様履歴おかしい
+//	TODO:	常に手前に表示にチェキが入らない
+//	TODO:	エキストラファイル追加したら多重になる
+
+/*
+右クリメニューをEditorと統一する・元データ
+メインメニューはなくす
+
+IDC_ORINRINVIEWER MENU
+BEGIN
+    POPUP "機能(&F)"
+    BEGIN
+        MENUITEM "プロファイル作成／開く(&N)",	IDM_MAA_PROFILE_MAKE
+        MENUITEM "AA一覧ツリーを再構築(&T)",	IDM_TREE_RECONSTRUCT
+		MENUITEM "プロファイル使用履歴(&H)",	IDM_OPEN_HISTORY
+        MENUITEM SEPARATOR
+        MENUITEM "一般設定(&G)",				IDM_GENERAL_OPTION
+        MENUITEM "ファイル名で検索(&F)",		IDM_FINDMAA_DLG_OPEN
+        MENUITEM SEPARATOR
+        MENUITEM "ドラフトボード表示(&B)",		IDM_DRAUGHT_OPEN
+        MENUITEM SEPARATOR
+        MENUITEM "常に手前に表示(&A)",			IDM_TOPMOST_TOGGLE
+        MENUITEM SEPARATOR
+        MENUITEM "バージョン情報(&I)",			IDM_ABOUT
+        MENUITEM SEPARATOR
+        MENUITEM "終了(&Q)",					IDM_EXIT
+    END
+END
+
+IDM_AATREE_POPUP MENU
+BEGIN
+    POPUP "複数行テンプレツリーのアレ"
+    BEGIN
+        MENUITEM "主タブで開く(&M)",		IDM_AATREE_MAINOPEN
+        MENUITEM "副タブを追加(&S)",		IDM_AATREE_SUBADD
+        MENUITEM SEPARATOR
+        MENUITEM "ドラフトボード表示(&B)",	IDM_DRAUGHT_OPEN
+    END
+END
+
+*/
+
+//-------------------------------------------------------------------------------------------------
+
 //	表示用フォントベーステーブル・これをコピーして使う
 static LOGFONT	gstBaseFont = {
 	FONTSZ_NORMAL,			//	フォントの高さ

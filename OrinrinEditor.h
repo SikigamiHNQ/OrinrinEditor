@@ -386,6 +386,26 @@ typedef struct tagAAMATRIX
 typedef vector<AAMATRIX>::iterator	MAAM_ITR;	
 //-----------------------------
 
+
+#ifdef USE_HOVERTIP
+
+//!	HoverTip用の表示内容確保・内容は増やすかも
+//typedef struct tagHOVERTIPINFO
+//{
+//	LPTSTR	ptInfo;	//	文字列内容を示すポインタ
+//
+//} HOVERTIPINFO, *LPHOVERTIPINFO;
+
+//!	HoverTip用コールバック函数
+typedef LPTSTR (CALLBACK* HOVERTIPDISP)( LPVOID );	//!<	HoverTipコールバック関数の型宣言
+
+
+HRESULT	HoverTipInitialise( HINSTANCE, HWND );
+HRESULT	HoverTipResist( HWND );
+LRESULT	HoverTipOnMouseHover( HWND, WPARAM, LPARAM, HOVERTIPDISP );
+
+
+#endif
 //-------------------------------------------------------------------------------------------------
 
 
@@ -494,9 +514,10 @@ LPTSTR		ExePathGet( VOID );	//!<
 
 HRESULT		UniDialogueEntry( HINSTANCE, HWND );	//!<	
 
-HRESULT		FrameInitialise( LPTSTR, HINSTANCE );	//!<	
+HRESULT		FrameInitialise( LPTSTR, HINSTANCE );	//!<	枠設定のINIファイル名確保・アプリ起動後すぐ呼ばれる
 HRESULT		FrameNameModifyPopUp( HMENU, UINT );	//!<	
 INT_PTR		FrameEditDialogue( HINSTANCE, HWND, UINT );	//!<	
+HRESULT		FrameNameLoad( UINT, LPTSTR, UINT_PTR );	//!<	指定された枠の名前を返す
 
 HWND		FrameInsBoxCreate( HINSTANCE, HWND );	//!<	
 HRESULT		FrameMoveFromView( HWND, UINT );	//!<	
@@ -602,7 +623,7 @@ VOID		LineTmpleResize( HWND, LPRECT );	//!<
 VOID		DockingTabSizeGet( LPRECT );	//!<	
 HRESULT		DockingTabContextMenu( HWND, HWND, LONG, LONG );	//!<	
 HWND		DockingTabGet( VOID );	//!<	
-HRESULT		DockingTmplViewToggle( UINT );	//	函数の場所違うから注意
+HRESULT		DockingTmplViewToggle( UINT );	//!<	函数の場所違うから注意
 
 HWND		BrushTmpleInitialise( HINSTANCE, HWND, LPRECT, HWND );	//!<	
 LPTSTR		BrushStringMake( INT , LPTSTR );	//!<	
@@ -610,8 +631,9 @@ VOID		BrushTmpleResize( HWND, LPRECT );	//!<
 
 INT			UserDefInitialise( HWND, UINT );	//!<	
 HRESULT		UserDefItemInsert( HWND, UINT );	//!<	
-HRESULT		UserDefMenuWrite( HMENU );	//!<	
-HRESULT		UserDefSetString( vector<ONELINE> *, LPCTSTR, UINT );	//!<	
+HRESULT		UserDefMenuWrite( HMENU, UINT );	//!<	ユーザ定義メニューの中身をくっつける
+HRESULT		UserDefItemNameget( UINT, LPTSTR, UINT_PTR );	//!<	アイテムの名前を引っ張る
+HRESULT		UserDefSetString( vector<ONELINE> *, LPCTSTR, UINT );	//!<	保持構造体に文字列を記録する
 
 HRESULT		FrameNameModifyMenu( HWND );	//!<	
 

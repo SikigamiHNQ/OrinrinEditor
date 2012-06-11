@@ -89,6 +89,10 @@ EXTERNED HFONT	ghTipFont;			//!<	ツールチップ用
 static  HPEN	ghSepPen;			//!<	区切り線用ペン
 static BOOLEAN	gbLineSep;			//!<	AAの分けは線にする
 
+#ifndef _ORRVW
+static BOOLEAN	gbMaaRetFocus;		//!<	項目を選択したら編集窓にフォーカス戻すか
+#endif
+
 extern  UINT	gbAAtipView;		//!<	非０で、ＡＡツールチップ表示
 
 extern  HWND	ghSplitaWnd;		//!<	スプリットバーハンドル
@@ -144,8 +148,13 @@ HRESULT AaItemsInitialise( HWND hWnd, HINSTANCE hInst, LPRECT ptRect )
 
 	ghSepPen  = CreatePen( PS_SOLID, 1, RGB(0xAA,0xAA,0xAA) );
 
+	//	１なら区切り線スタイル
 	gbLineSep = InitParamValue( INIT_LOAD, VL_MAASEP_STYLE, 0 );
 
+#ifndef _ORRVW
+	//	選択したらフォーカスを編集窓に戻す？
+	gbMaaRetFocus = InitParamValue( INIT_LOAD, VL_MAA_RETFCS, 0 );
+#endif
 
 	gptTipBuffer = NULL;
 
@@ -600,6 +609,9 @@ VOID Aai_OnLButtonUp( HWND hWnd, INT x, INT y, UINT keyFlags )
 {
 	AaItemsDoSelect( hWnd, MAA_DEFAULT, TRUE );
 
+#ifndef _ORRVW
+	if( gbMaaRetFocus ){	ViewFocusSet(  );	}
+#endif
 	return;
 }
 //-------------------------------------------------------------------------------------------------
@@ -616,6 +628,9 @@ VOID Aai_OnMButtonUp( HWND hWnd, INT x, INT y, UINT keyFlags )
 {
 	AaItemsDoSelect( hWnd, MAA_SUBDEFAULT, TRUE );
 
+#ifndef _ORRVW
+	if( gbMaaRetFocus ){	ViewFocusSet(  );	}
+#endif
 	return;
 }
 //-------------------------------------------------------------------------------------------------
@@ -770,6 +785,10 @@ VOID Aai_OnContextMenu( HWND hWnd, HWND hWndContext, UINT xPos, UINT yPos )
 	//	ツールチップの表示・非表示のトゴゥ
 	if( gbAAtipView ){	CheckMenuItem( hSubMenu, IDM_MAA_AATIP_TOGGLE, MF_CHECKED );	}
 
+#ifndef _ORRVW
+	//	フォーカス戻すかどうか
+	if( gbMaaRetFocus ){	CheckMenuItem( hSubMenu, IDM_MAA_RETURN_FOCUS, MF_CHECKED );	}
+#endif
 	//	マルチモニタしてると、座標値がマイナスになることがある。
 	sx = (SHORT)xPos;
 	sy = (SHORT)yPos;
@@ -817,6 +836,12 @@ VOID Aai_OnContextMenu( HWND hWnd, HWND hWndContext, UINT xPos, UINT yPos )
 		case IDM_MAA_THUMBNAIL_OPEN:	Maa_OnCommand( hWnd , IDM_MAA_THUMBNAIL_OPEN, NULL, 0 );	break;
 
 #ifndef _ORRVW
+
+		case IDM_MAA_RETURN_FOCUS:
+			gbMaaRetFocus = gbMaaRetFocus ? FALSE : TRUE;
+			InitParamValue( INIT_SAVE, VL_MAA_RETFCS, gbMaaRetFocus );
+			break;
+
   #ifdef MAA_IADD_PLUS
 		//	途中追加
 		case IDM_MAA_ITEM_INSERT:		AacItemInsert( hWnd, gixNowSel );	break;

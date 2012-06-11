@@ -1736,7 +1736,7 @@ LPSTR DocPageTextPreviewAlloc( INT iPage, PINT pdBytes )
 			}
 			else
 			{
-				srString += ptCaret[i];
+				widString += ptCaret[i];
 			}
 		}
 

@@ -48,7 +48,7 @@ If not, see <http://www.gnu.org/licenses/>.
 extern HFONT	ghAaFont;		//	AA用フォント
 extern HFONT	ghTipFont;		//	ツールチップ用
 
-extern  UINT	gbAAtipView;	//!<	非０で、ＡＡツールチップ表示
+extern  UINT	gbAAtipView;	//	非０で、ＡＡツールチップ表示
 
 static  HWND	ghPtWnd;
 
@@ -73,6 +73,10 @@ static INT		giTarget;		//!<	クルックしたアイテム番号・－１で無し
 static  UINT	gbThumb;		//!<	サムネ状態であるか
 static  LONG	gdVwTop;		//!<	表示されてる一番左上の行番号０インデックス
 static  HWND	ghScrBarWnd;	//!<	サムネ用スクロールバァー
+
+//static POINT	gstMainLsPt;	//!<	メインから開いた場合の最終位置
+static POINT	gstViewLsPt;	//!<	ＭＡＡから開いた場合の最終位置
+
 
 static vector<AAMATRIX>	gvcDrtItems;	//!<	
 //-------------------------------------------------------------------------------------------------
@@ -103,7 +107,7 @@ VOID	Drt_OnMouseWheel( HWND, INT, INT, INT, UINT );	//!<
 	テンポラったAAを表示するウインドウの作成
 	@param[in]	hInstance	アプリのインスタンス
 	@param[in]	hPtWnd		メイン窓ウインドウハンドル
-	@return	特になし
+	@return	終了状態コード
 */
 HRESULT DraughtInitialise( HINSTANCE hInstance, HWND hPtWnd )
 {
@@ -134,6 +138,10 @@ HRESULT DraughtInitialise( HINSTANCE hInstance, HWND hPtWnd )
 		ghAreaFont = CreateFont( FONTSZ_REDUCE, 0, 0, 0, FW_REGULAR, FALSE, FALSE, FALSE, DEFAULT_CHARSET, OUT_OUTLINE_PRECIS, CLIP_DEFAULT_PRECIS, PROOF_QUALITY, VARIABLE_PITCH, TEXT("MS UI Gothic") );
 
 		ghPtWnd = hPtWnd;
+
+		//	初期状態
+		//gstMainLsPt.x = -1;
+		gstViewLsPt.x = -1;
 
 #ifndef _ORRVW
 		//	クルック動作指定ロード・デフォ動作は通常挿入
@@ -167,7 +175,7 @@ HRESULT DraughtInitialise( HINSTANCE hInstance, HWND hPtWnd )
 /*!
 	表示用ウインドウを作る
 	@param[in]	hInstance	アプリのインスタンス
-	@param[in]	hPtWnd		メイン窓ウインドウハンドル
+	@param[in]	hPtWnd		呼び出した方のウインドウハンドル
 	@param[in]	bThumb		非０MAAのサムネ表示として呼ばれた
 	@return	作ったウインドウのハンドル
 */
@@ -176,6 +184,9 @@ HWND DraughtWindowCreate( HINSTANCE hInstance, HWND hPtWnd, UINT bThumb )
 	INT_PTR	iItems;
 	INT		iRslt, iScWid = 0;
 	HDC		hdc;
+
+	INT		iBrdrWid = 0;
+	TCHAR	atCaption[SUB_STRING];
 
 	RECT	wdRect, rect;
 	TTTOOLINFO	stToolInfo;
@@ -196,11 +207,25 @@ HWND DraughtWindowCreate( HINSTANCE hInstance, HWND hPtWnd, UINT bThumb )
 
 	iItems = gvcDrtItems.size( );	//	現在個数・ここでは使わない
 
-	GetWindowRect( hPtWnd, &wdRect );
-	rect.left   = wdRect.left + 32;	//	オフセット値に特に意味はない
-	rect.top    = wdRect.top  + 32;
+	if( 0 >  gstViewLsPt.x )	//	未設定なら
+	{
+		GetWindowRect( hPtWnd, &wdRect );
+		rect.left   = wdRect.left + 32;	//	オフセット値に特に意味はない
+		rect.top    = wdRect.top  + 32;
+	
+		gstViewLsPt.x = rect.left;
+		gstViewLsPt.y = rect.top;
+	}
+	else
+	{
+		rect.left   = gstViewLsPt.x;
+		rect.top    = gstViewLsPt.y;
+	}
 	rect.right  = THM_WIDTH  * TPNL_HORIZ;
 	rect.bottom = THM_HEIGHT * TPNL_VERTI;
+
+//	if( ghPtWnd == hPtWnd )	呼びだした方によって、ラスト位置リロード・底までしなくて良いか
+
 
 	if( gbThumb )	//	サムネモード
 	{
@@ -218,11 +243,20 @@ HWND DraughtWindowCreate( HINSTANCE hInstance, HWND hPtWnd, UINT bThumb )
 
 		iScWid = GetSystemMetrics( SM_CXVSCROLL );	//	垂直スクロールバーの幅確保
 		rect.right += iScWid;
+
+		iBrdrWid = GetSystemMetrics( SM_CXFIXEDFRAME );	//	枠の幅確保
+		rect.right += (iBrdrWid*2);
+
+		StringCchCopy( atCaption, SUB_STRING, TEXT("MAA THUMBNAIL") );
+	}
+	else
+	{
+		StringCchCopy( atCaption, SUB_STRING, TEXT("DRAUGHT BOARD") );
 	}
 
 	//	ウインドウ作成	TOPMOSTいるか？	要る
 	ghDraughtWnd = CreateWindowEx( WS_EX_TOOLWINDOW | WS_EX_TOPMOST,
-		DRAUGHT_BOARD_CLASS, TEXT("Draught Board"), WS_POPUP | WS_VISIBLE | WS_BORDER,
+		DRAUGHT_BOARD_CLASS, atCaption, WS_POPUP | WS_VISIBLE | WS_CAPTION,
 		rect.left, rect.top, rect.right, rect.bottom, NULL, NULL, hInstance, NULL );
 
 	//	ツールチップ
@@ -308,11 +342,11 @@ LRESULT CALLBACK DraughtProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lPa
 		HANDLE_MSG( hWnd, WM_LBUTTONUP,   Drt_OnLButtonUp );
 		HANDLE_MSG( hWnd, WM_MBUTTONUP,   Drt_OnMButtonUp );
 		HANDLE_MSG( hWnd, WM_PAINT,       Drt_OnPaint );
-		HANDLE_MSG( hWnd, WM_CONTEXTMENU, Drt_OnContextMenu );
+		HANDLE_MSG( hWnd, WM_CONTEXTMENU, Drt_OnContextMenu );	//	右クリメニュー
 		HANDLE_MSG( hWnd, WM_DESTROY,     Drt_OnDestroy );
-		HANDLE_MSG( hWnd, WM_KILLFOCUS,   Drt_OnKillFocus );
-		HANDLE_MSG( hWnd, WM_VSCROLL,     Drt_OnVScroll );	
-		HANDLE_MSG( hWnd, WM_MOUSEWHEEL,  Drt_OnMouseWheel );		//	
+		HANDLE_MSG( hWnd, WM_KILLFOCUS,   Drt_OnKillFocus );	//	フォーカスを失った
+		HANDLE_MSG( hWnd, WM_VSCROLL,     Drt_OnVScroll );		//	縦スクロール関連
+		HANDLE_MSG( hWnd, WM_MOUSEWHEEL,  Drt_OnMouseWheel );	//	マウスホウィール
 
 //		case WM_CLOSE:	ShowWindow( ghDraughtWnd, SW_HIDE );	return 0;
 
@@ -489,9 +523,17 @@ VOID Drt_OnPaint( HWND hWnd )
 
 /*!
 	フォーカスを失った場合
+	@param[in]	hWnd			ウインドウハンドル
+	@param[in]	hwndNewFocus	フォーカスを得たウインドウのハンドル
 */
 VOID Drt_OnKillFocus( HWND hWnd, HWND hwndNewFocus )
 {
+	RECT	rect;
+
+	GetWindowRect( hWnd, &rect );
+	gstViewLsPt.x = rect.left;
+	gstViewLsPt.y = rect.top;
+
 	DestroyWindow( hWnd );
 
 	return;

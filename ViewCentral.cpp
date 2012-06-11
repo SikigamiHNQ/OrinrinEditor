@@ -1067,7 +1067,7 @@ VOID Evw_OnContextMenu( HWND hWnd, HWND hWndContext, UINT xPos, UINT yPos )
 	CheckMenuItem( hSubMenu , IDM_GRID_VIEW_TOGGLE,   gbGridView   ? MF_CHECKED : MF_UNCHECKED );
 	CheckMenuItem( hSubMenu , IDM_RIGHT_RULER_TOGGLE, gbRitRlrView ? MF_CHECKED : MF_UNCHECKED );
 
-	FrameNameModifyPopUp( hSubMenu, 1 );	//	枠の名前を挿入
+//	FrameNameModifyPopUp( hSubMenu, 1 );	//	枠の名前を挿入
 
 	dRslt = TrackPopupMenu( hSubMenu, TPM_RETURNCMD, posX, posY, 0, hWnd, NULL );	//	TPM_CENTERALIGN | TPM_VCENTERALIGN | 
 	//	選択せずで０か－１？、選択したらそのメニューのＩＤが戻るようにセット
@@ -2202,7 +2202,7 @@ VOID OperationOnCommand( HWND hWnd, INT id, HWND hWndCtl, UINT codeNotify )
 		case IDM_INSFRAME_MIKE:		ViewFrameInsert( 12 );	break;
 		case IDM_INSFRAME_NOVEMBER:	ViewFrameInsert( 13 );	break;
 		case IDM_INSFRAME_OSCAR:	ViewFrameInsert( 14 );	break;
-		case IDM_INSFRAME_POPPA:	ViewFrameInsert( 15 );	break;
+		case IDM_INSFRAME_PAPA:		ViewFrameInsert( 15 );	break;
 		case IDM_INSFRAME_QUEBEC:	ViewFrameInsert( 16 );	break;
 		case IDM_INSFRAME_ROMEO:	ViewFrameInsert( 17 );	break;
 		case IDM_INSFRAME_SIERRA:	ViewFrameInsert( 18 );	break;

@@ -90,7 +90,7 @@ CONST static CONTEXTITEM	gstContextItem[] =
 /*50*/	{  TEXT("枠（１３）"),						IDM_INSFRAME_MIKE		},
 		{  TEXT("枠（１４）"),						IDM_INSFRAME_NOVEMBER	},
 		{  TEXT("枠（１５）"),						IDM_INSFRAME_OSCAR		},
-		{  TEXT("枠（１６）"),						IDM_INSFRAME_POPPA		},
+		{  TEXT("枠（１６）"),						IDM_INSFRAME_PAPA		},
 		{  TEXT("枠（１７）"),						IDM_INSFRAME_QUEBEC		},
 /*55*/	{  TEXT("枠（１８）"),						IDM_INSFRAME_ROMEO		},
 		{  TEXT("枠（１９）"),						IDM_INSFRAME_SIERRA		},
@@ -115,7 +115,7 @@ CONST static CONTEXTITEM	gstContextItem[] =
 /*75*/	{  TEXT("ユーザアイテム（１３）"),			IDM_USER_ITEM_MIKE		},
 		{  TEXT("ユーザアイテム（１４）"),			IDM_USER_ITEM_NOVEMBER	},
 		{  TEXT("ユーザアイテム（１５）"),			IDM_USER_ITEM_OSCAR		},
-		{  TEXT("ユーザアイテム（１６）"),			IDM_USER_ITEM_POPPA		},
+		{  TEXT("ユーザアイテム（１６）"),			IDM_USER_ITEM_PAPA		},
 		{  TEXT("各頁に通し番号を入れる"),			IDM_PAGENUM_DLG_OPEN	},
 /*80*/	{  TEXT("（セパレータ）"),					0						},
 		{  TEXT("右揃え線"),	/*整形*/			IDM_RIGHT_GUIDE_SET		},
@@ -183,11 +183,11 @@ CONST static CONTEXTITEM	gstContextItem[] =
 #define ALL_ITEMS	113	//	右クリ用　０インデックス
 #define FULL_ITEMS	141	//	全アイテム
 
-//	右クリ用サブアイテム
-#define CTS_UNISPACE	22
-#define CTS_COLOURINS	31
-#define CTS_FRAMEINS	37
-
+//	右クリ用サブアイテム・位置調整忘れないように
+#define CTS_UNISPACE	23
+#define CTS_COLOURINS	32
+#define CTS_FRAMEINS	38
+#define CTS_USERITEM	63
 
 //	サブ展開するアイテムに注意セヨ・コンテキストメニューとアクセルキー
 
@@ -374,8 +374,8 @@ HMENU CntxMenuGet( VOID )
 */
 VOID CntxEditBuild( VOID )
 {
-	UINT	d, e;
-	TCHAR	atItem[SUB_STRING], atKey[MIN_STRING];
+	UINT	d, e, num;
+	TCHAR	atItem[MAX_STRING], atKey[MIN_STRING], atBuffer[SUB_STRING];
 	CTXI_VITR	itMnItm;
 
 	if( ghPopupMenu ){	DestroyMenu( ghPopupMenu  );	}	ghPopupMenu  = NULL;
@@ -395,12 +395,30 @@ VOID CntxEditBuild( VOID )
 		}
 		else
 		{
-			StringCchCopy( atItem, SUB_STRING, itMnItm->atString );
+			ZeroMemory( atBuffer, sizeof(atBuffer) );
+			StringCchCopy( atItem, MAX_STRING, itMnItm->atString );	//	先に記録
+
+			if( IDM_INSFRAME_ALPHA <= itMnItm->dCommandoID && itMnItm->dCommandoID <= IDM_INSFRAME_TANGO )
+			{	//	枠名称										//	IDM_INSFRAME_ZULU
+				num = itMnItm->dCommandoID - IDM_INSFRAME_ALPHA;
+				FrameNameLoad( num, atBuffer, SUB_STRING );
+				StringCchPrintf( atItem, MAX_STRING, TEXT("枠：%s"), atBuffer );
+			}
+			else if( IDM_USER_ITEM_ALPHA <= itMnItm->dCommandoID && itMnItm->dCommandoID <= IDM_USER_ITEM_PAPA )
+			{	//	ユーザアイテム名称
+				num = itMnItm->dCommandoID - IDM_USER_ITEM_ALPHA;
+				UserDefItemNameget( num, atBuffer, SUB_STRING );
+				StringCchPrintf( atItem, MAX_STRING, TEXT("ユーザ：%s"), atBuffer );
+			}
+			else
+			{
+				//	何も無い
+			}
 
 			if( 26 > e )
 			{
 				StringCchPrintf( atKey, MIN_STRING, TEXT("(&%c)"), 'A' + e );
-				StringCchCat( atItem, SUB_STRING, atKey );
+				StringCchCat( atItem, MAX_STRING, atKey );
 				e++;
 			}
 
@@ -410,25 +428,30 @@ VOID CntxEditBuild( VOID )
 
 				case IDM_MN_UNISPACE:
 					ghUniSpMenu = CreatePopupMenu(  );
-					for( d = 0; 8 > d; d++ )	AppendMenu( ghUniSpMenu, MF_STRING, gstContextItem[CTS_UNISPACE+d].dCommandoID, gstContextItem[22+d].atString );
+					for( d = 0; 8 > d; d++ ){	AppendMenu( ghUniSpMenu, MF_STRING, gstContextItem[CTS_UNISPACE+d].dCommandoID, gstContextItem[CTS_UNISPACE+d].atString );	}
 					AppendMenu( ghPopupMenu, MF_POPUP, (UINT_PTR)ghUniSpMenu, atItem );
 					break;
 
 				case IDM_MN_COLOUR_SEL:
 					ghColourMenu = CreatePopupMenu(  );
-					for( d = 0; 5 > d; d++ )	AppendMenu( ghColourMenu, MF_STRING, gstContextItem[CTS_COLOURINS+d].dCommandoID, gstContextItem[31+d].atString );
+					for( d = 0; 5 > d; d++ ){	AppendMenu( ghColourMenu, MF_STRING, gstContextItem[CTS_COLOURINS+d].dCommandoID, gstContextItem[CTS_COLOURINS+d].atString );	}
 					AppendMenu( ghPopupMenu, MF_POPUP, (UINT_PTR)ghColourMenu, atItem );
 					break;
 
 				case IDM_MN_INSFRAME_SEL:
 					ghFrameMenu = CreatePopupMenu(  );
-					for( d = 0; FRAME_MAX > d; d++ )	AppendMenu( ghFrameMenu, MF_STRING, gstContextItem[CTS_FRAMEINS+d].dCommandoID, gstContextItem[37+d].atString );
+					for( d = 0; FRAME_MAX > d; d++ )
+					{
+					//	FrameNameLoad( d, atBuffer, SUB_STRING );
+						AppendMenu( ghFrameMenu, MF_STRING, gstContextItem[CTS_FRAMEINS+d].dCommandoID, gstContextItem[CTS_FRAMEINS+d].atString );
+					}
+					FrameNameModifyPopUp( ghFrameMenu, 1 );
 					AppendMenu( ghPopupMenu, MF_POPUP, (UINT_PTR)ghFrameMenu, atItem );
 					break;
 
 				case IDM_MN_USER_REFS:
 					ghUsrDefMenu = CreatePopupMenu(  );
-					UserDefMenuWrite( ghUsrDefMenu );
+					UserDefMenuWrite( ghUsrDefMenu, 1 );
 					AppendMenu( ghPopupMenu, MF_POPUP, (UINT_PTR)ghUsrDefMenu, atItem );
 					break;
 			}

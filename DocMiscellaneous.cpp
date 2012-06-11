@@ -352,9 +352,9 @@ UINT DocPageByteCount( FILES_ITR itFile, INT dPage, PINT pMozi, PINT pByte )
 
 #ifdef PAGE_DELAY_LOAD
 	//	‚à‚µ•Å“WŠJ‘O‚ÉŒÄ‚Î‚ê‚Ä‚½‚ç
-	if( !(itFile->vcCont.at( dPage ).ptRawData) )
+	if( itFile->vcCont.at( dPage ).ptRawData )
 	{
-		MessageBox( NULL, TEXT("DocPageByteCount"), NULL, MB_OK );
+		MessageBox( NULL, TEXT("DocPageByteCount"), TEXT("DELAY_LOAD"), MB_OK );
 	}
 #endif
 

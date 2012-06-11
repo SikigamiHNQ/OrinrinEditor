@@ -544,6 +544,8 @@ VOID Evw_OnLButtonUp( HWND hWnd, INT x, INT y, UINT keyFlags )
 	LPTSTR	ptString = NULL;
 	UINT	cbSize;
 
+	INT		xPos, yPos;
+
 	TRACE( TEXT("マウス左アップ[%d / %d]"), x, y );
 
 	//	ダブルクルック操作後はすることはない
@@ -575,6 +577,7 @@ VOID Evw_OnLButtonUp( HWND hWnd, INT x, INT y, UINT keyFlags )
 				//選択範囲をコピペしてから。内部処理なのでユニコードでよろし
 				cbSize = DocSelectTextGetAlloc( D_UNI | bSqSel, (LPVOID *)(&ptString), NULL );
 				iCrLf = DocInsertString( &gdDocXdot, &gdDocLine, NULL, ptString, bSqSel, TRUE );
+				xPos = gdDocXdot;	yPos = gdDocLine;
 				FREE( ptString );
 				//	選択範囲を削除
 				DocSelRangeReset( NULL , NULL );	//	選択範囲がずれてまうのでリセット
@@ -582,6 +585,8 @@ VOID Evw_OnLButtonUp( HWND hWnd, INT x, INT y, UINT keyFlags )
 
 				//REDRAW指示
 				ViewRedrawSetLine( -1 );	//	範囲不明なので全画面書換
+
+				ViewPosResetCaret( xPos, yPos );	//	キャレット移動
 			}
 			gbDragMoved = FALSE;
 		}
@@ -743,14 +748,33 @@ HRESULT ViewScriptedLineFeed( VOID )
 //空白が出っ張ってる行でやったら、そこを基準点とする処理する
 
 	INT		dLines, iTgtDot, iLastDot, iLineDot, iPadDot;
-	BOOLEAN	bIsSp, bFirst = TRUE;
+	INT		iPrvDot, iChkDot;
+	BOOLEAN	bIsSp, bFirst = TRUE, bJump;
 	UINT	dStyle = 0;
 	LPTSTR	ptSpace;
 
-	//	文字列の開始地点を探す。iTgtDotがその位置のはず
-	DocLineStateCheckWithDot( gdDocXdot, gdDocLine, &iTgtDot, &iLastDot, NULL, NULL, &bIsSp );
-	//	該当箇所が最初からスペースだったら、キャレット位置を基準点にする
-	if( bIsSp ){	iTgtDot = gdDocXdot;	}
+	iChkDot = gdDocXdot;
+	iTgtDot = 0;	//	安全確認
+
+	while( iChkDot )
+	{
+		//	文字列の開始地点を探す。iTgtDotがその位置のはず
+		DocLineStateCheckWithDot( iChkDot, gdDocLine, &iTgtDot, &iLastDot, NULL, NULL, &bIsSp );
+
+		//	チェック部分が空白ではなく、先頭までイッてしまったら
+		if(  0 == iTgtDot && !(bIsSp) ){	break;	}	//	すなわち先頭部分まで移動
+
+		//	該当箇所が最初からスペースだったら、キャレット位置を基準点にする・壱行空け用
+		if( bIsSp ){	iTgtDot = iChkDot;	break;	}
+
+		DocLetterShiftPos( iTgtDot, gdDocLine, -1, &iPrvDot, &bJump );	//	壱文字戻る
+		//	戻ったところも空白かどうかチェック
+		DocLineStateCheckWithDot( iPrvDot, gdDocLine, &iChkDot, &iLastDot, NULL, NULL, &bIsSp );
+		if( bIsSp ){	break;	}	//	引き続き空白なら、そこまでとする。
+
+		iChkDot = iPrvDot;	//	一つ戻った所からチェック続行
+	}
+
 	TRACE( TEXT("TEXT START D[%d] L[%d]"), iTgtDot, gdDocLine );
 
 	dLines = DocNowFilePageLineCount(  );//DocPageParamGet( NULL , NULL );	//	行数確保
@@ -773,10 +797,10 @@ HRESULT ViewScriptedLineFeed( VOID )
 	{
 		iPadDot = iTgtDot - iLineDot;	//	埋めるのに必要なドット数
 		ptSpace = DocPaddingSpaceMake( iPadDot );	//	埋め空白作る
-		gdDocXdot = iLineDot;	//	とりやえず合わせる
+		gdDocXdot = iLineDot;	//	末端に合わせる
 		//	空白文字列追加
 		DocInsertString( &gdDocXdot, &gdDocLine, NULL, ptSpace, dStyle, bFirst );	bFirst = FALSE;
-
+		//	キャレット位置変更は↑でやってる
 		FREE(ptSpace);
 	}
 

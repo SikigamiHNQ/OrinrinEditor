@@ -681,7 +681,7 @@ LRESULT ToolBarOnNotify( HWND hWnd, INT idFrom, LPNMHDR pstNmhdr )
 
 			case IDM_USERINS_NA:
 				hPopupMenu = CreatePopupMenu(  );
-				UserDefMenuWrite( hPopupMenu );
+				UserDefMenuWrite( hPopupMenu, 0 );
 				TrackPopupMenuEx( hPopupMenu, TPM_VERTICAL, rect.left, rect.bottom, hWnd, &stTpmParam );
 				DestroyMenu( hPopupMenu );
 				break;

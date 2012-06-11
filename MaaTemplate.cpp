@@ -126,7 +126,7 @@ HWND MaaTmpltInitialise( HINSTANCE hInstance, HWND hParentWnd, LPRECT pstFrame )
 #ifdef _ORRVW
 	wcex.hIcon			= LoadIcon(hInstance, MAKEINTRESOURCE(IDI_ORINRINEDITOR));
 	wcex.hIconSm		= LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));
-	wcex.lpszMenuName	= MAKEINTRESOURCE(IDC_ORINRINVIEWER);
+	wcex.lpszMenuName	= NULL;//MAKEINTRESOURCE(IDC_ORINRINVIEWER);
 #else
 	wcex.hIcon			= NULL;
 	wcex.hIconSm		= NULL;
@@ -414,8 +414,8 @@ VOID Maa_OnCommand( HWND hWnd, INT id, HWND hwndCtl, UINT codeNotify )
 			DialogBoxParam( ghInst, MAKEINTRESOURCE(IDD_ORRVWR_OPTION_DLG), hWnd, OptionDlgProc, NULL );
 			break;
 
-		case IDM_MAA_PROFILE_MAKE:	TreeProfileOpen( hWnd );	break;
-		case IDM_TREE_RECONSTRUCT:	TreeProfileRebuild( hWnd  );	break;
+//		case IDM_MAA_PROFILE_MAKE:	TreeProfileOpen( hWnd );	break;
+//		case IDM_TREE_RECONSTRUCT:	TreeProfileRebuild( hWnd  );	break;
 #else
 		case  IDM_WINDOW_CHANGE:	WindowFocusChange( WND_MAAT,  1 );	break;
 		case  IDM_WINDOW_CHG_RVRS:	WindowFocusChange( WND_MAAT, -1 );	break;
