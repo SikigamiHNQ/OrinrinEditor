@@ -400,9 +400,11 @@ typedef vector<AAMATRIX>::iterator	MAAM_ITR;
 typedef LPTSTR (CALLBACK* HOVERTIPDISP)( LPVOID );	//!<	HoverTipコールバック関数の型宣言
 
 
-HRESULT	HoverTipInitialise( HINSTANCE, HWND );
-HRESULT	HoverTipResist( HWND );
-LRESULT	HoverTipOnMouseHover( HWND, WPARAM, LPARAM, HOVERTIPDISP );
+HRESULT	HoverTipInitialise( HINSTANCE, HWND );	//!<	
+HRESULT	HoverTipResist( HWND  );	//!<	
+HRESULT	HoverTipSizeChange( INT );	//!<	
+LRESULT	HoverTipOnMouseHover( HWND, WPARAM, LPARAM, HOVERTIPDISP );	//!<	
+LRESULT	HoverTipOnMouseLeave( HWND );	//!<	
 
 
 #endif

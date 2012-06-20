@@ -46,12 +46,13 @@ extern  UINT	gdRightRuler;	//	右線の位置
 範囲選択中に、ALT左右したら、そこの部分がスライドするとか。壱行選択中のみ？
 */
 
-
 HRESULT	DocInputReturn( INT, INT );
-
 INT		DocSquareAddPreMod( INT, INT, INT, BOOLEAN );
-
 INT		DocLetterErase( INT, INT, INT );
+
+#ifdef PAGE_DELAY_LOAD
+HRESULT	DocDelayPageNumInsert( FILES_ITR, INT, LPPAGENUMINFO, LPCTSTR );
+#endif
 //-------------------------------------------------------------------------------------------------
 
 
@@ -1421,42 +1422,50 @@ HRESULT DocPageNumInsert( HINSTANCE hInst, HWND hWnd )
 #ifdef PAGE_DELAY_LOAD
 			if( NowPageInfoGet( iNow, NULL ) )	//	ディレってないなら０
 			{
-				//	展開する・頁が多いと重い
-				DocDelayPageLoad( gitFileIt, iNow );
+				//	ディレイ文字列を操作するか
+				DocDelayPageNumInsert( gitFileIt, iNow, &stInfo, atText );
+
+				//	展開する・頁が多いと重い・しなくていい
+				//DocDelayPageLoad( gitFileIt, iNow );
 			}
+			else
+			{
 #endif
 
-			gixFocusPage = iNow;	//	内部操作
-			if( stInfo.bInUnder )	//	頁最下部に挿入
-			{
-				if( stInfo.bOverride )	//	該当行消して挿入である
+				gixFocusPage = iNow;	//	内部操作
+				if( stInfo.bInUnder )	//	頁最下部に挿入
 				{
-					iLine = DocPageParamGet( NULL, NULL );
-					iLine--;	if( 0 > iLine ){	iLine = 0;	}
-					DocLineErase( iLine , &bFirst );	//	中でアンドゥ操作変換
+					if( stInfo.bOverride )	//	該当行消して挿入である
+					{
+						iLine = DocPageParamGet( NULL, NULL );
+						iLine--;	if( 0 > iLine ){	iLine = 0;	}
+						DocLineErase( iLine , &bFirst );	//	中でアンドゥ操作変換
+					}
+					else
+					{
+						iLine = DocAdditionalLine( 1, &bFirst );//	bFirst =  FALSE;
+					}
 				}
-				else
+				else	//	壱行目に挿入
 				{
-					iLine = DocAdditionalLine( 1, &bFirst );//	bFirst =  FALSE;
+					iDot = 0;	iLine = 0;
+					if( stInfo.bOverride )	//	該当行消して挿入である
+					{
+						DocLineErase( 0 , &bFirst );	//	中でアンドゥ操作変換
+					}
+					else
+					{
+						DocInsertString( &iDot, &iLine, NULL, CH_CRLFW, 0, bFirst );	bFirst = FALSE;
+					}
+					iLine = 0;
 				}
-			}
-			else	//	壱行目に挿入
-			{
-				iDot = 0;	iLine = 0;
-				if( stInfo.bOverride )	//	該当行消して挿入である
-				{
-					DocLineErase( 0 , &bFirst );	//	中でアンドゥ操作変換
-				}
-				else
-				{
-					DocInsertString( &iDot, &iLine, NULL, CH_CRLFW, 0, bFirst );	bFirst = FALSE;
-				}
-				iLine = 0;
-			}
-			iDot = 0;
+				iDot = 0;
 
-			//	頁番号の内容挿入
-			DocInsertString( &iDot, &iLine, NULL, atText, 0, bFirst );	bFirst = FALSE;
+				//	頁番号の内容挿入
+				DocInsertString( &iDot, &iLine, NULL, atText, 0, bFirst );	bFirst = FALSE;
+#ifdef PAGE_DELAY_LOAD
+			}
+#endif
 		}
 
 		//	頁元に戻す
@@ -1468,5 +1477,91 @@ HRESULT DocPageNumInsert( HINSTANCE hInst, HWND hWnd )
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
+
+#ifdef PAGE_DELAY_LOAD
+
+/*!
+	ディレイしてる頁に頁番号を挿入
+	@param[in]	itFile		対象のファイル
+	@param[in]	iPage		そのファイルの頁
+	@param[in]	pstInfo		頁番号の処理方法
+	@param[in]	ptPageText	挿入する文字列・頁番号
+	@return	HRESULT	終了状態コード
+*/
+HRESULT DocDelayPageNumInsert( FILES_ITR itFile, INT iPage, LPPAGENUMINFO pstInfo, LPCTSTR ptPageText )
+{
+	UINT_PTR	cchPgTx;	//	頁文字列の文字数
+	UINT_PTR	cchSrc, cchSize;
+	LPTSTR	ptWork, ptMoto, ptNext, ptCaret, ptPrev;
+
+	//	あり得ないはずだが
+	if( !(itFile->vcCont.at( iPage ).ptRawData) )	return E_NOTIMPL;
+
+	ptMoto = itFile->vcCont.at( iPage ).ptRawData;
+
+	StringCchLength( ptPageText, MAX_PATH, &cchPgTx );	//	キメうち注意
+	//cchPgTx += 4;	//	改行分の余裕を確保しておく
+
+	StringCchLength( ptMoto, STRSAFE_MAX_CCH, &cchSrc );
+
+	//	ワーク領域確保・本文＋頁文字列＋改行・あまりは気にしない
+	cchSize = cchSrc + cchPgTx + 4;
+	ptWork = (LPTSTR)malloc( cchSize * sizeof(TCHAR) );
+	ZeroMemory( ptWork, cchSize * sizeof(TCHAR) );
+
+	//	最後尾なら、先に本文いれて、頁文字列追加するか、末端行の先頭に上書き＋NULL
+	//	先頭なら、先に頁文字列いれて、本文追加するか、本文弐行目から追加
+	if( pstInfo->bInUnder )	//	末尾
+	{
+		StringCchCopy( ptWork, cchSize, ptMoto );	//	先に本文
+
+		if( pstInfo->bOverride )	//	上書
+		{
+			ptNext = ptMoto;
+			ptCaret = ptMoto;
+			do{
+				ptPrev = ptNext;	//	今の開始位置を保存
+				ptNext = NextLineW( ptCaret );	//	次を確認
+				ptCaret = ptNext;	//	次の開始位置
+
+			}while( ptNext );	//	NULLなら末端までイッたということ
+
+			StringCchCopy( ptPrev, (cchPgTx + 4), ptPageText );
+			//	最低でも頁文字列＋余裕分は残ってる
+		}
+		else	//	挿入
+		{
+			StringCchCat( ptWork, cchSize, TEXT("\r\n") );	//	何にしても改行
+			StringCchCat( ptWork, cchSize, ptPageText );	//	そして追加
+		}
+	}
+	else	//	頭
+	{
+		StringCchCopy( ptWork, cchSize, ptPageText );	//	先頭である
+		StringCchCat( ptWork, cchSize, TEXT("\r\n") );	//	何にしても改行
+
+		if( pstInfo->bOverride )	//	上書
+		{
+			//	次の行の先頭から追加
+			ptNext = NextLineW( ptMoto );
+			if( ptNext )	StringCchCat( ptWork, cchSize, ptNext );
+			//	次の行が無かったら、何もする必要は無い
+		}
+		else	//	挿入
+		{
+			//	挿入ならそのまま追加すればよろし
+			StringCchCat( ptWork, cchSize, ptMoto );
+		}
+	}
+
+	//	メモリ領域付け替えておｋ・先に元文字列はフリーしちゃう
+	FREE( itFile->vcCont.at( iPage ).ptRawData );
+	itFile->vcCont.at( iPage ).ptRawData = ptWork;
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+
+#endif
 
 

@@ -65,7 +65,8 @@ typedef struct tagMULTIPLEMAA
 {
 	INT		dTabNum;				//!<	タブの番号・２インデックス
 	TCHAR	atFilePath[MAX_PATH];	//!<	ファイルパス・空なら使用から開いた
-	TCHAR	atBase[MAX_PATH];		//!<	使用リストに入れる時のグループ名
+	TCHAR	atBaseName[MAX_PATH];	//!<	使用リストに入れる時のグループ名
+	TCHAR	atDispName[MAX_PATH];	//!<	タブ表示用名称
 
 	UINT	dLastTop;				//!<	見てたAAの番号
 
@@ -118,6 +119,8 @@ INT		TabMultipleSelect( HWND, INT, UINT );	//!<	副タブから選択した場合
 //INT	TabMultipleOpen( HWND , HTREEITEM );	//
 HRESULT	TabMultipleDelete( HWND, CONST INT );	//!<	指定のタブを閉じる
 INT		TabMultipleAppend( HWND );				//!<	タブを増やす
+
+HRESULT	TabMultipleNameChange( HWND , INT );	//!<	タブ名前変更ダイヤログ開く
 
 UINT	TabMultipleIsFavTab( INT, LPTSTR, UINT_PTR );	//!<	副タブはお気にリストのであるか
 
@@ -498,7 +501,7 @@ VOID Maa_OnContextMenu( HWND hWnd, HWND hWndContext, UINT xPos, UINT yPos )
 		{
 			case IDM_AATREE_SUBADD:
 				ZeroMemory( &stMulti, sizeof(MULTIPLEMAA) );
-				StringCchCopy( stMulti.atBase, MAX_PATH, atSelName );
+				StringCchCopy( stMulti.atBaseName, MAX_PATH, atSelName );
 				//	atFilePathを空にすることで、使用リストからってことで
 				stMulti.dTabNum = 0;	//	初期化・割当は２以降
 
@@ -668,6 +671,10 @@ VOID Maa_OnContextMenu( HWND hWnd, HWND hWndContext, UINT xPos, UINT yPos )
 			case  IDM_AATABS_ALLDELETE:	
 				iRslt = MessageBox( hWnd, TEXT("全ての副タブを閉じようとしてるよ。\r\n本当に閉じちゃっていいかい？"), TEXT("お燐からの確認"), MB_YESNO | MB_ICONQUESTION | MB_DEFBUTTON2 );
 				if( IDYES == iRslt ){	TabMultipleDeleteAll( hWnd );	}
+
+			//	リネーム
+			case IDM_AATABS_RENAME:	TabMultipleNameChange( hWnd, curSel );	break;
+
 			default:	break;
 		}
 
@@ -1354,7 +1361,7 @@ INT TreeSelItemProc( HWND hWnd, HTREEITEM hSelItem, UINT dMode )
 		case  1:	//	副タブに開く場合
 			ZeroMemory( &stMulti, sizeof(MULTIPLEMAA) );
 			StringCchCopy( stMulti.atFilePath, MAX_PATH, atPath );
-			StringCchCopy( stMulti.atBase, MAX_PATH, atBaseName );
+			StringCchCopy( stMulti.atBaseName, MAX_PATH, atBaseName );
 			stMulti.dTabNum = 0;	//	初期化・割当は２以降
 
 			gltMultiFiles.push_back( stMulti );
@@ -1530,7 +1537,7 @@ UINT TabMultipleIsFavTab( INT tabSel, LPTSTR ptBase, UINT_PTR cchSize )
 		if( tabSel == itNulti->dTabNum )	//	選択されてるやつをさがす
 		{
 			//	とりあえずコピー
-			if( ptBase ){	StringCchCopy( ptBase, cchSize, itNulti->atBase );	}
+			if( ptBase ){	StringCchCopy( ptBase, cchSize, itNulti->atBaseName );	}
 
 			if( NULL == itNulti->atFilePath[0] )	return 1;	//	お気にである
 			else	return 0;	//	戻っておｋ
@@ -1566,7 +1573,7 @@ INT TabMultipleSelect( HWND hWnd, INT tabSel, UINT dMode )
 			if( 0 == dMode )	//	ビューエリアに表示
 			{
 				//	基点ディレクトリをセット
-				StringCchCopy( gatBaseName, MAX_PATH, itNulti->atBase );
+				StringCchCopy( gatBaseName, MAX_PATH, itNulti->atBaseName );
 
 				//	ここで、ファイルかお気にかを判断する・atFilePathが空であれば
 				if( NULL == itNulti->atFilePath[0] )	//	お気にである
@@ -1646,9 +1653,9 @@ HRESULT TabMultipleStore( HWND hWnd )
 	for( itNulti = gltMultiFiles.begin( ); gltMultiFiles.end( ) != itNulti; itNulti++ )
 	{
 		//	記録しないでよろしいか？
-		if( StrCmp( DROP_OBJ_NAME, itNulti->atBase ) )
+		if( StrCmp( DROP_OBJ_NAME, itNulti->atBaseName ) )
 		{
-			SqlMultiTabInsert( itNulti->atFilePath, itNulti->atBase );
+			SqlMultiTabInsert( itNulti->atFilePath, itNulti->atBaseName, itNulti->atDispName );
 		}
 	}
 
@@ -1674,7 +1681,7 @@ HRESULT TabMultipleRestore( HWND hWnd )
 	{
 		ZeroMemory( &stMulti, sizeof(MULTIPLEMAA) );
 
-		SqlMultiTabSelect( i+1, stMulti.atFilePath, stMulti.atBase );
+		SqlMultiTabSelect( i+1, stMulti.atFilePath, stMulti.atBaseName, stMulti.atDispName );
 
 		gltMultiFiles.push_back( stMulti );
 		TabMultipleAppend( hWnd );
@@ -1698,7 +1705,7 @@ HRESULT TabMultipleDropAdd( HWND hWnd, LPCTSTR ptFile )
 
 	ZeroMemory( &stMulti, sizeof(MULTIPLEMAA) );
 	StringCchCopy( stMulti.atFilePath, MAX_PATH, ptFile );
-	StringCchCopy( stMulti.atBase, MAX_PATH, DROP_OBJ_NAME );	//	特殊名称・大丈夫か
+	StringCchCopy( stMulti.atBaseName, MAX_PATH, DROP_OBJ_NAME );	//	特殊名称・大丈夫か
 	stMulti.dTabNum = 0;	//	初期化・割当は２以降
 
 	gltMultiFiles.push_back( stMulti );
@@ -1737,9 +1744,12 @@ INT TabMultipleAppend( HWND hWnd )
 	}
 	else	//	お気にリストから追加する
 	{
-		StringCchCopy( atName, MAX_PATH, itNulti->atBase );
+		StringCchCopy( atName, MAX_PATH, itNulti->atBaseName );
 		StringCchCat(  atName, MAX_PATH, TEXT("[F]") );
 	}
+
+	if( NULL == itNulti->atDispName[0] )
+	{	StringCchCopy( itNulti->atDispName , MAX_PATH, atName );	}	//	表示名デフォルト
 
 	ZeroMemory( &stTcItem, sizeof(TCITEM) );
 	stTcItem.mask = TCIF_TEXT | TCIF_PARAM;
@@ -1747,7 +1757,7 @@ INT TabMultipleAppend( HWND hWnd )
 	tCount = TabCtrl_GetItemCount( ghTabWnd );
 
 	stTcItem.lParam  = 0;//tCount;ファイルなので０でいい
-	stTcItem.pszText = atName;
+	stTcItem.pszText = itNulti->atDispName;
 	TabCtrl_InsertItem( ghTabWnd, tCount, &stTcItem );
 
 	itNulti->dTabNum = tCount;
@@ -1987,4 +1997,88 @@ UINT TreeFavIsUnderCursor( HWND hWnd, HWND hChdWnd, INT xPos, INT yPos, INT zDel
 
 
 
+
+
+/*!
+	名称変更ダイヤログボックスのメセージハンドラ・頁名の使い回しなので注意
+	@param[in]	hDlg	ダイヤログハンドル
+	@param[in]	message	ウインドウメッセージの識別番号
+	@param[in]	wParam	追加の情報１
+	@param[in]	lParam	追加の情報２
+	@retval 0	メッセージは処理していない
+	@retval no0	なんか処理された
+*/
+INT_PTR CALLBACK TabMultipleRenameDlgProc( HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam )
+{
+	static LPTSTR	cptName;
+	TCHAR	atBuffer[MAX_PATH];
+
+	switch( message )
+	{
+		case WM_INITDIALOG:
+			cptName = (LPTSTR)lParam;	//	元文字列は MAX_PATH であること
+			Edit_SetText( GetDlgItem(hDlg,IDE_PAGENAME), cptName );
+			SetFocus( GetDlgItem(hDlg,IDE_PAGENAME) );
+			return (INT_PTR)FALSE;
+
+		case WM_COMMAND:
+			if( IDOK == LOWORD(wParam) )
+			{
+				Edit_GetText( GetDlgItem(hDlg,IDE_PAGENAME), atBuffer, MAX_PATH );
+				StringCchCopy( cptName, MAX_PATH, atBuffer );
+				EndDialog( hDlg, IDOK );
+				return (INT_PTR)TRUE;
+			}
+
+			if( IDCANCEL == LOWORD(wParam) )
+			{
+				EndDialog( hDlg, IDCANCEL );
+				return (INT_PTR)TRUE;
+			}
+
+			break;
+	}
+	return (INT_PTR)FALSE;
+}
+//-------------------------------------------------------------------------------------------------
+
+/*!
+	タブ名前変更ダイヤログ開く
+	@param[in]	hWnd	ウインドウハンドル
+	@param[in]	iTabSel	選択したタブ番号
+	@return		HRESULT	終了状態コード
+*/
+HRESULT TabMultipleNameChange( HWND hWnd, INT iTabSel )
+{
+	INT_PTR	iRslt;
+	TCHAR	atName[MAX_PATH];
+	TCITEM	stTcItem;
+	MLTT_ITR	itNulti;
+
+	for( itNulti = gltMultiFiles.begin( ); gltMultiFiles.end( ) != itNulti; itNulti++ )
+	{
+		if( iTabSel == itNulti->dTabNum )	//	選択されてるやつをさがす
+		{
+			StringCchCopy( atName, MAX_PATH, itNulti->atDispName );
+
+			iRslt = DialogBoxParam( GetModuleHandle( NULL ), MAKEINTRESOURCE(IDD_PAGE_NAME_DLG), hWnd, TabMultipleRenameDlgProc, (LPARAM)atName );
+			if( IDOK == iRslt )	//	ＯＫしてたら、変更された名前がバッファに入ってるはず
+			{
+				StringCchCopy( itNulti->atDispName, MAX_PATH, atName );	//	記録変更
+
+				ZeroMemory( &stTcItem, sizeof(TCITEM) );
+				stTcItem.mask = TCIF_TEXT;
+				stTcItem.pszText = atName;
+				TabCtrl_SetItem( ghTabWnd, iTabSel, &stTcItem );
+
+				return S_OK;
+			}
+
+			return E_ABORT;
+		}
+	}
+
+	return E_OUTOFMEMORY;
+}
+//-------------------------------------------------------------------------------------------------
 

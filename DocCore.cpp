@@ -321,7 +321,7 @@ LPARAM DocMultiFileDelete( HWND hWnd, LPARAM uqNumber )
 	//	もし変更が残ってるなら注意を促す
 	if( gitFileIt->dModify )
 	{
-		iRslt = MessageBox( hWnd, TEXT("あぅあぅ！？\r\n変更したままなのですよ！　保存して閉じるのですか？"), TEXT("／(^o^)＼"), MB_YESNOCANCEL | MB_ICONQUESTION );
+		iRslt = MessageBox( hWnd, TEXT("ちょっとまって！\r\n変更したままだよ。ここで保存して閉じるかい？"), TEXT("お燐からの確認"), MB_YESNOCANCEL | MB_ICONQUESTION );
 		if( IDCANCEL == iRslt ){	return 0;	}
 
 		if( IDYES == iRslt ){	DocFileSave( hWnd, D_SJIS );	}
@@ -535,8 +535,8 @@ INT DocFileCloseCheck( HWND hWnd, UINT dMode )
 	{
 		if( itFiles->dModify )
 		{
-			StringCchPrintf( atMessage, BIG_STRING, TEXT("あぅあぅ！？\r\n%s は保存してないのです！\r\nここで保存するのですか？"), itFiles->atFileName[0] ? PathFindFileName( itFiles->atFileName ) : itFiles->atDummyName );
-			rslt = MessageBox( hWnd, atMessage, TEXT("／(^o^)＼"), MB_YESNOCANCEL | MB_ICONQUESTION );
+			StringCchPrintf( atMessage, BIG_STRING, TEXT("ちょっとまった！\r\n%s は保存してないよ。ここで保存するかい？"), itFiles->atFileName[0] ? PathFindFileName( itFiles->atFileName ) : itFiles->atDummyName );
+			rslt = MessageBox( hWnd, atMessage, TEXT("お燐からの確認"), MB_YESNOCANCEL | MB_ICONQUESTION );
 			if( IDCANCEL ==  rslt ){	return 0;	}	//	キャンセルなら終わること自体とりやめ
 			if( IDYES == rslt ){	DocFileSave( hWnd, D_SJIS );	}	//	保存するならセーブを呼ぶ
 			//	NOなら何もせず次を確認
@@ -546,32 +546,10 @@ INT DocFileCloseCheck( HWND hWnd, UINT dMode )
 
 	if( !(bMod) )	//	未保存がなかったなら確認メッセージ
 	{
-		rslt = MessageBox( hWnd, TEXT("あぅ？\r\n終わるのですか？"), TEXT("＼(^o^)／"), MB_YESNO | MB_ICONQUESTION );
+		rslt = MessageBox( hWnd, TEXT("もう終わるかい？"), TEXT("お燐からの確認"), MB_YESNO | MB_ICONQUESTION );
 		if( IDYES == rslt ){	ret = 1;	}
 		else{					ret = 0;	}
 	}
-
-#if 0
-	if( bMod )	//	更新がのこってる＝保存されてないなら
-	{
-		rslt = MessageBox( hWnd, TEXT("あぅあぅ！？\r\n保存してないファイルがあるのですよ！\r\n終わっちゃっていいのですか？"), TEXT("／(^o^)＼"), MB_YESNO | MB_ICONQUESTION );
-		if( IDYES == rslt ){	ret = 1;	}
-		else{	ret = 0;	}
-	}
-	else
-	{
-		if( dMode )
-		{
-			rslt = MessageBox( hWnd, TEXT("あぅ？\r\n終わるのですか？"), TEXT("＼(^o^)／"), MB_YESNO | MB_ICONQUESTION );
-			if( IDYES == rslt ){	ret = 1;	}
-			else{					ret = 0;	}
-		}
-		else
-		{
-			ret = 1;
-		}
-	}
-#endif
 
 	return ret;
 }
@@ -1178,6 +1156,8 @@ UINT DocDelayPageLoad( FILES_ITR itFile, INT iPage )
 }
 //-------------------------------------------------------------------------------------------------
 
+
+
 #endif
 
 /*!
@@ -1209,25 +1189,6 @@ HRESULT DocPageChange( INT dPageNum )
 #ifdef PAGE_DELAY_LOAD
 	//	まだ展開されてないなら
 	DocDelayPageLoad( gitFileIt, dPageNum );
-	//if( gitFileIt->vcCont.at( dPageNum ).ptRawData )
-	//{
-	//	TRACE( TEXT("PAGE DELAY LOAD [%d]"), dPageNum );
-
-	//	StringCchLength( gitFileIt->vcCont.at( dPageNum ).ptRawData, STRSAFE_MAX_CCH, &cchSize );
-
-	//	//	ここで、本文を読み込む
-	//	if( 0 < cchSize )	//	空行でないのなら
-	//	{
-	//		DocStringAdd( &dmyX, &dmyY, gitFileIt->vcCont.at( dPageNum ).ptRawData, cchSize );	//	この中で改行とか面倒見る
-	//	}
-
-	//	//	アンドゥは一旦リセットすべき＜頁開けただけなので
-	//	//	変更もONなってたら解除
-
-	////	DocPageParamGet( NULL, NULL );	//	再計算しちゃう＜文字追加でやってるので問題無い
-
-	//	FREE( gitFileIt->vcCont.at( dPageNum ).ptRawData  );	//	NULLか否かを見るので注意
-	//}
 #endif
 
 	PageListViewChange( dPageNum, iPrePage );

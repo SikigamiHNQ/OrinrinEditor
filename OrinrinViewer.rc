@@ -62,7 +62,6 @@ BEGIN
         MENUITEM "（未選択状態）",				IDM_DUMMY, GRAYED
         MENUITEM "主タブで開く(&M)",			IDM_AATREE_MAINOPEN
         MENUITEM "副タブを追加(&S)",			IDM_AATREE_SUBADD
-        MENUITEM "編集ビューに開く(&E)",		IDM_AATREE_GOEDIT
         MENUITEM SEPARATOR
         MENUITEM "このアイテムを削除(&D)",		IDM_MAA_ITEM_DELETE, GRAYED
         MENUITEM SEPARATOR
@@ -80,6 +79,8 @@ BEGIN
     BEGIN
         MENUITEM "このタブを閉じる(&Q)",		IDM_AATABS_DELETE
         MENUITEM "全ての副タブを閉じる(&A)",	IDM_AATABS_ALLDELETE
+        MENUITEM SEPARATOR
+        MENUITEM "表示名称の変更(&N)",			IDM_AATABS_RENAME
     END
 END
 
@@ -147,7 +148,7 @@ CAPTION "バージョン情報 - Orinrin Viewer"
 FONT 9, "MS UI Gothic"
 BEGIN
     ICON            IDI_ORINRINEDITOR,IDC_MYICON,6,6,18,21
-    LTEXT           "Orinrin Viewer, Version 10 Aurora (2012.530.2200.920)",IDC_STATIC,36,6,180,8,SS_NOPREFIX
+    LTEXT           "Orinrin Viewer, Version 11 Aurora (2012.613.2200.920)",IDC_STATIC,36,6,180,8,SS_NOPREFIX
     LTEXT           "Copyright (C) 2011 - 2012 SikigamiHNQ",IDC_STATIC,36,18,180,8
     LTEXT           "Site ： お燐ちゃんは俺の嫁．ｃｏｍ",IDC_STATIC,36,30,180,8
     DEFPUSHBUTTON   "OK",IDOK,85,180,50,14,WS_GROUP
@@ -207,6 +208,17 @@ BEGIN
     CONTROL         "",IDLV_MAA_FINDED_FILE,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_ALIGNLEFT | LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,6,24,204,96
 END
 
+IDD_PAGE_NAME_DLG DIALOG  0, 0, 167, 54
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_TOOLWINDOW
+CAPTION "名前入力"
+FONT 10, "MS UI Gothic"
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,72,36,42,12
+    PUSHBUTTON      "キャンセル",IDCANCEL,120,36,42,12
+    LTEXT           "名前を入力してください",IDC_STATIC,6,6,156,8
+    EDITTEXT        IDE_PAGENAME,6,18,156,12,ES_AUTOHSCROLL
+END
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -214,8 +226,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 2012,530,2200,920
- PRODUCTVERSION 10,0,0,920
+ FILEVERSION 2012,613,2200,920
+ PRODUCTVERSION 11,0,0,920
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -240,12 +252,12 @@ BEGIN
             VALUE "LegalTrademarks", "License : GPLv3"
             VALUE "PrivateBuild", "Build by Visual C++ 2008 Express"
             VALUE "SpecialBuild", "Not Speciality"
-            VALUE "FileVersion", "2012.530.2200.920"
-            VALUE "ProductVersion", "10.0.0.920"
-            VALUE "FileDescription", "AsciiArt Viewer Ver10"
+            VALUE "FileVersion", "2012.613.2200.920"
+            VALUE "ProductVersion", "11.0.0.920"
+            VALUE "FileDescription", "AsciiArt Viewer Ver11"
             VALUE "OriginalFilename", "OrinrinViewer.exe"
             VALUE "InternalName", "Orinrin Viewer"
-            VALUE "ProductName", "Orinrin Viewer 10"
+            VALUE "ProductName", "Orinrin Viewer 11"
         END
     END
 END

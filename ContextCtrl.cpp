@@ -1635,7 +1635,7 @@ HRESULT AccelKeyMenuRewrite( HWND hWnd, LPACCEL pstAccel, CONST INT iEntry )
 	BOOLEAN		bModify;
 	TCHAR		atBuffer[MAX_STRING], atBind[SUB_STRING];
 
-	hMenu = GetMenu( hWnd );
+	hMenu = GetMenu( hWnd );	//	サブメニューまで全部イケる
 
 	for( i = 0; FULL_ITEMS > i; i++ )
 	{

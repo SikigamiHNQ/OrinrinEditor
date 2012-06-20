@@ -58,22 +58,29 @@ SystemParametersInfo  SPI_GETMOUSEHOVERTIME  SPI_GETMOUSEHOVERWIDTH で調整出来る
 */
 #ifdef USE_HOVERTIP
 
-//#error MOUSEHOVER作りかけ
-
 
 
 #define HOVER_TIPS_CLASS	TEXT("HOVER_TIPS")
+
+#define HOVER_TIME	15000	//!<	デフォルト表示ｍｓ
+#define HOVER_TMID	1234	//!<	タイマＩＤ
+#define HOVER_MOVE	   8	//!<	これ以上マウスムーブが入ったら消す閾値
+
+#define HOVER_DELAY	1000	//!<	マウス停止からの出現待ち時間
 //-------------------------------------------------------------------------------------------------
 
 static  ATOM	gTipAtom;	//!<	ウインドウクラスアトム
 static  HWND	ghTipWnd;	//!<	ホバーチップのウインドウハンドル
 static HFONT	ghTipFont;	//!<	ツールチップ用
 
+static  UINT	gdMoveVol;	//!<	移動量カウント
+
 static LPTSTR	gptContent;	//!<	表示内容
 static RECT		gstContSize;//!<	表示大きさ
 //-------------------------------------------------------------------------------------------------
 
 
+VOID	HoverTipClose( HWND );	//!<	
 
 LRESULT	CALLBACK HoverTipProc( HWND, UINT, WPARAM, LPARAM );	//!<	
 VOID	Htp_OnPaint( HWND );						//!<	
@@ -95,10 +102,12 @@ HRESULT HoverTipInitialise( HINSTANCE hInstance, HWND hPtWnd )
 {
 	LOGFONT	stFont;
 	WNDCLASSEX	wcex;
+	INT	ttSize;
 
 	if( hInstance )
 	{
 		gptContent = NULL;
+		gdMoveVol = 0;
 
 		//	表示チップウインドウクラス作成
 		ZeroMemory( &wcex, sizeof(WNDCLASSEX) );
@@ -118,13 +127,13 @@ HRESULT HoverTipInitialise( HINSTANCE hInstance, HWND hPtWnd )
 		gTipAtom = RegisterClassEx( &wcex );
 	
 		//	表示チップウインドウ作成 | WS_EX_TOPMOST
-		ghTipWnd = CreateWindowEx( WS_EX_TOOLWINDOW,
-			HOVER_TIPS_CLASS, TEXT("InfoTip"), WS_POPUP | WS_BORDER, 0, 0, 15, 15, NULL, NULL, hInstance, NULL );
+		ghTipWnd = CreateWindowEx( WS_EX_TOOLWINDOW, HOVER_TIPS_CLASS, TEXT("InfoTip"), WS_POPUP | WS_BORDER, 0, 0, 15, 15, NULL, NULL, hInstance, NULL );
 		//	最初は非表示
 
 		//	表示フォント作成
 		ViewingFontGet( &stFont );
-		stFont.lfHeight = FONTSZ_REDUCE;
+		ttSize = InitParamValue( INIT_LOAD, VL_MAATIP_SIZE, FONTSZ_REDUCE );	//	サイズ確認
+		stFont.lfHeight = (FONTSZ_REDUCE == ttSize) ? FONTSZ_REDUCE : FONTSZ_NORMAL;
 		ghTipFont = CreateFontIndirect( &stFont );
 	}
 	else
@@ -157,13 +166,35 @@ HRESULT HoverTipResist( HWND hTgtWnd )
 	stTrackMsEv.cbSize      = sizeof(TRACKMOUSEEVENT);
 	stTrackMsEv.dwFlags     = TME_HOVER | TME_LEAVE;
 	stTrackMsEv.hwndTrack   = hTgtWnd;
-	stTrackMsEv.dwHoverTime = HOVER_DEFAULT;	//	時間、そのうち調整出来るように
+	stTrackMsEv.dwHoverTime = HOVER_DELAY;	//	時間、そのうち調整出来るように	HOVER_DEFAULT
 	TrackMouseEvent( &stTrackMsEv );
 
 
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
+
+/*!
+	ポッパップの文字サイズ変更
+	@param[in]	ttSize	文字サイズ・１２か１６しかない
+	@return		HRESULT	終了状態コード
+*/
+HRESULT HoverTipSizeChange( INT ttSize )
+{
+	LOGFONT	stFont;
+
+	DeleteFont( ghTipFont );
+
+	//	今使ってるヤツぶっ壊してから、新しいのつくってくっつける
+	ViewingFontGet( &stFont );
+	stFont.lfHeight = (FONTSZ_REDUCE == ttSize) ? FONTSZ_REDUCE : FONTSZ_NORMAL;
+	ghTipFont = CreateFontIndirect( &stFont );
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+
+
 
 /*!
 	WM_MOUSEHOVERを受け取る
@@ -227,15 +258,17 @@ LRESULT HoverTipOnMouseHover( HWND hEvWnd, WPARAM wParam, LPARAM lParam, HOVERTI
 
 	hdc = GetDC( ghTipWnd );
 
-	SetRect( &gstContSize, 0, 0, 2222, 100 );
+	SetRect( &gstContSize, 0, 0, 2222, 100 );	//	サイズは適当・横幅は大きく余裕が必要
 
-	hOldFnt = SelectFont( hdc, ghTipFont );
+	hOldFnt = SelectFont( hdc , ghTipFont );	//	サイズ併せる必要がある
 
+	//	必要な領域を確認
 	DrawText( hdc, gptContent, -1, &gstContSize, DT_LEFT | DT_CALCRECT | DT_NOPREFIX );
 	TRACE( TEXT("HOVER Size[ %d x %d, %d : %d"), gstContSize.left, gstContSize.top, gstContSize.right, gstContSize.bottom );
 
 	SelectFont( hdc, hOldFnt );
 
+	//	縁取り
 	gstContSize.right  += 4;
 	gstContSize.bottom += 4;
 
@@ -245,13 +278,17 @@ LRESULT HoverTipOnMouseHover( HWND hEvWnd, WPARAM wParam, LPARAM lParam, HOVERTI
 	if( gstContSize.right  >  deskRect.right  ){	gstContSize.right  = deskRect.right;	}
 	if( gstContSize.bottom >  deskRect.bottom ){	gstContSize.bottom = deskRect.bottom;	}
 
+	//	右下にはみ出すなら、表示出来るところまでオフセットする
 	xSub = (point.x + gstContSize.right) - deskRect.right;
 	if( 0 <  xSub ){	point.x -= xSub;	}
 	ySub = (point.y + gstContSize.bottom) - deskRect.bottom;
 	if( 0 <  ySub ){	point.y -= ySub;	}
 
-
-	SetWindowPos( ghTipWnd, HWND_TOP, point.x, point.y, gstContSize.right, gstContSize.bottom, SWP_SHOWWINDOW );
+	gdMoveVol = 0;
+	//	位置合わせして表示
+//	SetWindowPos( ghTipWnd, HWND_TOP, (point.x + 1), (point.y + 1), gstContSize.right, gstContSize.bottom, SWP_SHOWWINDOW );
+	SetWindowPos( ghTipWnd, HWND_TOPMOST, (point.x + 1), (point.y + 1), gstContSize.right, gstContSize.bottom, SWP_SHOWWINDOW | SWP_NOACTIVATE );
+	SetTimer( ghTipWnd , HOVER_TMID, HOVER_TIME, NULL );	//	消し用タイマ
 
 	ReleaseDC( ghTipWnd, hdc );
 
@@ -262,10 +299,38 @@ LRESULT HoverTipOnMouseHover( HWND hEvWnd, WPARAM wParam, LPARAM lParam, HOVERTI
 }
 //-------------------------------------------------------------------------------------------------
 
+/*!
+	WM_MOUSELEAVEを受け取る
+	@param[in]	hEvWnd		発生したウインドウのハンドル
+	@return	処理したら０
+*/
+LRESULT HoverTipOnMouseLeave( HWND hEvWnd )
+{
+	TRACE( TEXT("MOUSE LEAVE RISING") );
+
+	//	ここで、マウスカーソルがチップの上にくるとヤバイ
+	//HoverTipClose( ghTipWnd );
+
+	return 0;	//	If an application processes this message, it should return zero.
+}
+//-------------------------------------------------------------------------------------------------
+
+/*!
+	HoverTipを閉じる
+	@param[in]	hWnd	ウインドウハンドル
+*/
+VOID HoverTipClose( HWND hWnd )
+{
+	KillTimer( hWnd, HOVER_TMID );
+	ShowWindow( hWnd, SW_HIDE );
+
+	return;
+}
+//-------------------------------------------------------------------------------------------------
 
 /*!
 	ウインドウプロシージャ
-	@param[in]	hWnd	親ウインドウのハンドル
+	@param[in]	hWnd	ウインドウハンドル
 	@param[in]	message	ウインドウメッセージの識別番号
 	@param[in]	wParam	追加の情報１
 	@param[in]	lParam	追加の情報２
@@ -276,21 +341,13 @@ LRESULT CALLBACK HoverTipProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lP
 {
 	switch( message )
 	{
-	//	HANDLE_MSG( hWnd, WM_SIZE,        Htp_OnSize );	
-	//	HANDLE_MSG( hWnd, WM_COMMAND,     Htp_OnCommand );	
-	//	HANDLE_MSG( hWnd, WM_NOTIFY,      Htp_OnNotify );	//	コモンコントロールの個別イベント
-		HANDLE_MSG( hWnd, WM_LBUTTONUP,   Htp_OnLButtonUp );
+		HANDLE_MSG( hWnd, WM_LBUTTONUP,   Htp_OnLButtonUp );	//	マウスクルック・纏めてもおｋ？
 		HANDLE_MSG( hWnd, WM_MBUTTONUP,   Htp_OnMButtonUp );
 		HANDLE_MSG( hWnd, WM_RBUTTONUP,   Htp_OnRButtonUp );
 		HANDLE_MSG( hWnd, WM_MOUSEMOVE,   Htp_OnMouseMove );
-		HANDLE_MSG( hWnd, WM_PAINT,       Htp_OnPaint );
-	//	HANDLE_MSG( hWnd, WM_CONTEXTMENU, Htp_OnContextMenu );	//	右クリメニュー
-	//	HANDLE_MSG( hWnd, WM_DESTROY,     Htp_OnDestroy );
 		HANDLE_MSG( hWnd, WM_KILLFOCUS,   Htp_OnKillFocus );	//	フォーカスを失った
-	//	HANDLE_MSG( hWnd, WM_VSCROLL,     Htp_OnVScroll );		//	縦スクロール関連
-	//	HANDLE_MSG( hWnd, WM_MOUSEWHEEL,  Htp_OnMouseWheel );	//	マウスホウィール
+		HANDLE_MSG( hWnd, WM_PAINT,       Htp_OnPaint );
 		HANDLE_MSG( hWnd, WM_TIMER,       htp_OnTimer );
-
 
 		default:	break;
 	}
@@ -338,8 +395,10 @@ VOID Htp_OnPaint( HWND hWnd )
 */
 VOID htp_OnTimer( HWND hWnd, UINT id )
 {
+	//	関係ない場合・先ずありえないハズだが
+	if( HOVER_TMID != id )	return;
 
-
+	HoverTipClose( hWnd );
 
 	return;
 }
@@ -352,7 +411,7 @@ VOID htp_OnTimer( HWND hWnd, UINT id )
 */
 VOID Htp_OnKillFocus( HWND hWnd, HWND hwndNewFocus )
 {
-	ShowWindow( hWnd, SW_HIDE );
+//	HoverTipClose( hWnd );	//	TOPMOSTなら要らない
 
 	return;
 }
@@ -369,7 +428,7 @@ VOID Htp_OnLButtonUp( HWND hWnd, INT x, INT y, UINT keyFlags )
 {
 	TRACE( TEXT("HTP LUP %d x %d"), x , y );	//	クライヤント座標
 
-	ShowWindow( hWnd, SW_HIDE );
+	HoverTipClose( hWnd );
 
 	return;
 }
@@ -386,7 +445,7 @@ VOID Htp_OnMButtonUp( HWND hWnd, INT x, INT y, UINT keyFlags )
 {
 	TRACE( TEXT("HTP MUP %d x %d"), x , y );	//	クライヤント座標
 
-	ShowWindow( hWnd, SW_HIDE );
+	HoverTipClose( hWnd );
 
 	return;
 }
@@ -403,7 +462,7 @@ VOID Htp_OnRButtonUp( HWND hWnd, INT x, INT y, UINT keyFlags )
 {
 	TRACE( TEXT("HTP RUP %d x %d"), x , y );	//	クライヤント座標
 
-	ShowWindow( hWnd, SW_HIDE );
+	HoverTipClose( hWnd );
 
 	return;
 }
@@ -419,7 +478,11 @@ VOID Htp_OnRButtonUp( HWND hWnd, INT x, INT y, UINT keyFlags )
 */
 VOID Htp_OnMouseMove( HWND hWnd, INT x, INT y, UINT keyFlags )
 {
-
+	gdMoveVol++;
+	if( HOVER_MOVE < gdMoveVol )
+	{
+		HoverTipClose( hWnd );
+	}
 
 	return;
 }

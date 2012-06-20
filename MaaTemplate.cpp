@@ -899,7 +899,7 @@ INT_PTR CALLBACK TreeProfileDlgProc( HWND hDlg, UINT message, WPARAM wParam, LPA
 					count = TreeView_GetCount( chTvWnd );
 					if( 1 >= count )
 					{
-						MessageBox( hDlg, TEXT("リストアップ出来ていないようなのです。\r\nこのままではツリーが作れないのです。"), TEXT("あぅあぅ"), MB_OK | MB_ICONERROR );
+						MessageBox( hDlg, TEXT("リストアップ出来ていないみたい。\r\nこのままじゃツリーが作れないよ。"), TEXT("お燐からのお知らせ"), MB_OK | MB_ICONERROR );
 						return (INT_PTR)TRUE;
 					}
 
@@ -1214,7 +1214,7 @@ HRESULT TreeLoadDirCheck( HWND hDlg, HWND hTvWnd )
 	if( 0 == count )
 	{
 		ShowWindow( hWorkWnd, SW_HIDE );
-		MessageBox( hDlg, TEXT("ファイルが一つも選択されていないのです。\r\nこのままだと使えないのです。"), TEXT("あぅあぅ"), MB_OK | MB_ICONERROR );
+		MessageBox( hDlg, TEXT("ファイルが一つも選択されてないよ。\r\nこのままだと使えないよ。"), TEXT("お燐からのお知らせ"), MB_OK | MB_ICONERROR );
 		return E_ABORT;
 	}
 

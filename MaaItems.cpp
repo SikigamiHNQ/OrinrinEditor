@@ -63,7 +63,10 @@ typedef struct tagAATITLE
 #define SBP_DIRECT		0xFF
 
 static  HWND	ghItemsWnd;			//!<	リストのハンドル
+#ifdef MAA_TOOLTIP
 static  HWND	ghToolTipWnd;		//!<	ツールチップ
+EXTERNED HFONT	ghTipFont;			//!<	ツールチップ用
+#endif
 
 static  HWND	ghComboxWnd;		//!<	見出し用コンボックス
 
@@ -75,16 +78,15 @@ static LPTSTR	gptTipBuffer;		//!<
 static INT		gixTopItem;			//!<	一覧の最上位
 static INT		gixMaxItem;			//!<	アイテム個数
 
-static  HWND	ghScrollWnd;		//!<	スクロールバー
-
 static  LONG	gixNowSel;			//!<	マウスカーソルがあるところのインデックス
+
+static  HWND	ghScrollWnd;		//!<	スクロールバー
 
 #ifdef _ORRVW
 EXTERNED HFONT	ghAaFont;			//!<	表示用のフォント
 #else
 static HFONT	ghAaFont;			//!<	表示用のフォント
 #endif
-EXTERNED HFONT	ghTipFont;			//!<	ツールチップ用
 
 static  HPEN	ghSepPen;			//!<	区切り線用ペン
 static BOOLEAN	gbLineSep;			//!<	AAの分けは線にする
@@ -101,7 +103,9 @@ static vector<VIEWORDER>	gvcViewOrder;	//!<
 static vector<AATITLE>		gvcAaTitle;		//!<	
 //-------------------------------------------------------------------------------------------------
 
+#ifdef MAA_TOOLTIP
 LRESULT	Aai_OnNotify( HWND , INT, LPNMHDR );				//!<	
+#endif
 VOID	Aai_OnMouseMove( HWND, INT, INT, UINT );			//!<	
 VOID	Aai_OnLButtonUp( HWND, INT, INT, UINT );			//!<	
 VOID	Aai_OnMButtonUp( HWND, INT, INT, UINT );			//!<	
@@ -116,6 +120,10 @@ LRESULT	CALLBACK gpfAaTitleCbxProc( HWND, UINT, WPARAM, LPARAM );	//!<
 #ifndef _ORRVW
 INT_PTR	CALLBACK AaItemAddDlgProc( HWND, UINT, WPARAM, LPARAM );	//!<	
 #endif
+
+#ifdef USE_HOVERTIP
+LPTSTR	CALLBACK AaItemsHoverTipInfo( LPVOID );
+#endif
 //-------------------------------------------------------------------------------------------------
 
 /*!
@@ -127,9 +135,11 @@ INT_PTR	CALLBACK AaItemAddDlgProc( HWND, UINT, WPARAM, LPARAM );	//!<
 */
 HRESULT AaItemsInitialise( HWND hWnd, HINSTANCE hInst, LPRECT ptRect )
 {
-	TTTOOLINFO	stToolInfo;
-	SCROLLINFO	stScrollInfo;
+#ifdef MAA_TOOLTIP
 	INT		ttSize;
+	TTTOOLINFO	stToolInfo;
+#endif
+	SCROLLINFO	stScrollInfo;
 	RECT	rect;
 	LOGFONT	stFont;
 
@@ -137,9 +147,11 @@ HRESULT AaItemsInitialise( HWND hWnd, HINSTANCE hInst, LPRECT ptRect )
 	{
 		free( gptTipBuffer );
 		SetWindowFont( ghItemsWnd, GetStockFont(DEFAULT_GUI_FONT), FALSE );
+#ifdef MAA_TOOLTIP
 		SetWindowFont( ghToolTipWnd, GetStockFont(DEFAULT_GUI_FONT), FALSE );
-		DeleteFont( ghAaFont );
 		DeleteFont( ghTipFont );
+#endif
+		DeleteFont( ghAaFont );
 		DeletePen( ghSepPen );
 		return S_FALSE;
 	}
@@ -160,9 +172,10 @@ HRESULT AaItemsInitialise( HWND hWnd, HINSTANCE hInst, LPRECT ptRect )
 
 	gixTopItem = 0;
 
+#ifdef MAA_TOOLTIP
 	//	ツールチップ作る
 	ghToolTipWnd = CreateWindowEx( WS_EX_TOPMOST, TOOLTIPS_CLASS, NULL, TTS_NOPREFIX | TTS_ALWAYSTIP, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, hWnd, NULL, hInst, NULL );
-
+#endif
 	//	見出しコンボックス
 	ghComboxWnd = CreateWindowEx( 0, WC_COMBOBOX, TEXT(""), WS_VISIBLE | WS_CHILD | WS_BORDER | WS_VSCROLL | CBS_DROPDOWNLIST | CBS_NOINTEGRALHEIGHT, TREE_WIDTH + SPLITBAR_WIDTH, 0, ptRect->right - TREE_WIDTH - LSSCL_WIDTH, TITLECBX_HEI, hWnd, (HMENU)IDCB_AAITEMTITLE, hInst, NULL );
 	GetClientRect( ghComboxWnd, &rect );
@@ -190,8 +203,9 @@ HRESULT AaItemsInitialise( HWND hWnd, HINSTANCE hInst, LPRECT ptRect )
 	ghAaFont = CreateFontIndirect( &stFont );	//	gstBaseFont
 	SetWindowFont( ghItemsWnd, ghAaFont, TRUE );
 
+#ifdef MAA_TOOLTIP
 	//	ポッパップチップ用・12/9pt兼用
-	ttSize = InitParamValue( INIT_LOAD, VL_MAATIP_SIZE, 16 );	//	サイズ確認
+	ttSize = InitParamValue( INIT_LOAD, VL_MAATIP_SIZE, FONTSZ_REDUCE );	//	サイズ確認
 	stFont.lfHeight = (FONTSZ_REDUCE == ttSize) ? FONTSZ_REDUCE : FONTSZ_NORMAL;
 	ghTipFont = CreateFontIndirect( &stFont );
 	SetWindowFont( ghToolTipWnd, ghTipFont, TRUE );
@@ -207,6 +221,7 @@ HRESULT AaItemsInitialise( HWND hWnd, HINSTANCE hInst, LPRECT ptRect )
 	stToolInfo.lpszText = LPSTR_TEXTCALLBACK;	//	コレを指定するとコールバックになる
 	SendMessage( ghToolTipWnd, TTM_ADDTOOL, 0, (LPARAM)&stToolInfo );
 	SendMessage( ghToolTipWnd, TTM_SETMAXTIPWIDTH, 0, 0 );	//	チップの幅。０設定でいい。これしとかないと改行されない
+#endif
 
 	return S_OK;
 }
@@ -315,7 +330,9 @@ VOID AaItemsResize( HWND hWnd, LPRECT ptRect )
 {
 	INT		dWidth, dLeft;
 	RECT	sptRect, rect;
+#ifdef MAA_TOOLTIP
 	TTTOOLINFO	stToolInfo;
+#endif
 
 	SplitBarPosGet( ghSplitaWnd, &sptRect );
 	//	拡張タブバーの位置確保
@@ -330,6 +347,7 @@ VOID AaItemsResize( HWND hWnd, LPRECT ptRect )
 	MoveWindow( ghItemsWnd,  sptRect.left + SPLITBAR_WIDTH, ptRect->top + rect.bottom, dWidth, ptRect->bottom - rect.bottom, TRUE );
 	MoveWindow( ghScrollWnd, dLeft, ptRect->top + rect.bottom, LSSCL_WIDTH, ptRect->bottom - rect.bottom, TRUE );
 
+#ifdef MAA_TOOLTIP
 	//	必要な所だけいれればおｋ
 	ZeroMemory( &stToolInfo, sizeof(TTTOOLINFO) );
 	stToolInfo.cbSize = sizeof(TTTOOLINFO);
@@ -337,7 +355,7 @@ VOID AaItemsResize( HWND hWnd, LPRECT ptRect )
 	stToolInfo.uId    = IDSO_AAITEMS;
 	GetClientRect( ghItemsWnd, &stToolInfo.rect );
 	SendMessage( ghToolTipWnd, TTM_NEWTOOLRECT, 0, (LPARAM)&stToolInfo );
-
+#endif
 	InvalidateRect( ghItemsWnd, NULL, TRUE );
 	UpdateWindow( ghItemsWnd );
 
@@ -361,12 +379,27 @@ LRESULT CALLBACK gpfAaItemsProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 		HANDLE_MSG( hWnd, WM_KEYDOWN,     Aai_OnKey );			//	20120221
 		HANDLE_MSG( hWnd, WM_KEYUP,       Aai_OnKey );			//	
 
-		HANDLE_MSG( hWnd, WM_NOTIFY,      Aai_OnNotify );		//	コモンコントロールの個別イベント
 		HANDLE_MSG( hWnd, WM_MOUSEMOVE,   Aai_OnMouseMove );	//	マウスいごいた
 		HANDLE_MSG( hWnd, WM_LBUTTONUP,   Aai_OnLButtonUp );	//	マウス左ボタンダウン
 		HANDLE_MSG( hWnd, WM_MBUTTONUP,   Aai_OnMButtonUp );	//	マウス中ボタンダウン
 		HANDLE_MSG( hWnd, WM_CONTEXTMENU, Aai_OnContextMenu );	//	コンテキストメニュー発生
 		HANDLE_MSG( hWnd, WM_DROPFILES,   Aai_OnDropFiles );	//	ドラグンドロップの受付
+#ifdef MAA_TOOLTIP
+		HANDLE_MSG( hWnd, WM_NOTIFY,      Aai_OnNotify );		//	コモンコントロールの個別イベント
+#endif
+
+
+#ifdef USE_HOVERTIP
+		case WM_MOUSEHOVER:
+			HoverTipOnMouseHover( hWnd, wParam, lParam, AaItemsHoverTipInfo );
+			return 0;
+
+		case WM_MOUSELEAVE:
+			HoverTipOnMouseLeave( hWnd );
+			gixNowSel = -1;
+			return 0;
+#endif
+
 
 		default:	break;
 	}
@@ -423,7 +456,7 @@ VOID AaItemsDrawItem( HWND hWnd, CONST DRAWITEMSTRUCT *pstDrawItem )
 		rdLength = rdLen;
 
 		free( pcConts );
-
+#pragma message ("MAAの行間、ここで正しく計算するべき")
 		//	文字列に合わせてRECT確保
 		DrawText( pstDrawItem->hDC, ptConStr, rdLength, &rect, DT_LEFT | DT_EDITCONTROL | DT_NOPREFIX | DT_CALCRECT );
 		drawRect = rect;
@@ -585,7 +618,13 @@ VOID Aai_OnMouseMove( HWND hWnd, INT x, INT y, UINT keyFlags )
 	if( gixNowSel != iItem )	bReDraw = TRUE;
 	gixNowSel = iItem;
 
+#ifdef USE_HOVERTIP
+	if( bReDraw && gbAAtipView ){	HoverTipResist( ghItemsWnd );	}
+#endif
+
+#ifdef MAA_TOOLTIP
 	if( bReDraw && gbAAtipView )	SendMessage( ghToolTipWnd, TTM_UPDATE, 0, 0 );
+#endif
 
 //	TRACE( TEXT("MAA MOUSE [%d x %d] %d %u"), x, y, iItem, bReDraw );
 
@@ -706,6 +745,7 @@ VOID Aai_OnVScroll( HWND hWnd, HWND hwndCtl, UINT code, INT pos )
 }
 //-------------------------------------------------------------------------------------------------
 
+#ifdef MAA_TOOLTIP
 /*!
 	ノーティファイメッセージの処理
 	@param[in]	hWnd		ウインドウハンドル
@@ -751,6 +791,7 @@ LRESULT Aai_OnNotify( HWND hWnd, INT idFrom, LPNMHDR pstNmhdr )
 	return 0;
 }
 //-------------------------------------------------------------------------------------------------
+#endif
 
 /*!
 	コンテキストメニュー呼びだし（右クルック）
@@ -1049,10 +1090,12 @@ UINT AaItemsDoSelect( HWND hWnd, UINT dMode, UINT dDirct )
 */
 HRESULT AaItemsTipSizeChange( INT ttSize, UINT bView )
 {
+#ifdef MAA_TOOLTIP
 	LOGFONT	stFont;
-
+#endif
 	gbAAtipView = bView ? TRUE : FALSE;
 
+#ifdef MAA_TOOLTIP
 	SetWindowFont( ghToolTipWnd, GetStockFont(DEFAULT_GUI_FONT), FALSE );
 	DeleteFont( ghTipFont );
 
@@ -1062,10 +1105,44 @@ HRESULT AaItemsTipSizeChange( INT ttSize, UINT bView )
 	ghTipFont = CreateFontIndirect( &stFont );
 
 	SetWindowFont( ghToolTipWnd, ghTipFont, TRUE );
+#endif
 
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
+
+#ifdef USE_HOVERTIP
+/*!
+	HoverTip用のコールバック受取
+	@param[in]	pVoid	未定義
+	@return	確保した文字列・もしくはNULL
+*/
+LPTSTR CALLBACK AaItemsHoverTipInfo( LPVOID pVoid )
+{
+	UINT_PTR	rdLength;
+	LPSTR		pcConts = NULL;
+	LPTSTR		ptBuffer = NULL;
+
+
+	if( !(gbAAtipView) ){	return NULL;	}	//	非表示なら何もしないでおｋ
+	if( 0 > gixNowSel ){	return NULL;	}
+
+	pcConts = AacAsciiArtGet( gixNowSel );	//	該当するインデックスのＡＡを引っ張ってくる
+	if( !pcConts  ){	return 0;	}
+
+	ptBuffer = SjisDecodeAlloc( pcConts );
+	rdLength = lstrlen( ptBuffer  );	//	文字列の長さ取得
+
+	free( pcConts );
+
+	TRACE( TEXT("MAA HOVER CALL %d, by[%d]"), gixNowSel, rdLength );
+
+	return ptBuffer;
+}
+//-------------------------------------------------------------------------------------------------
+#endif
+
+
 
 #ifndef MAA_IADD_PLUS
 

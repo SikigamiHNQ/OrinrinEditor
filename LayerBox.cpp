@@ -21,7 +21,16 @@ If not, see <http://www.gnu.org/licenses/>.
 #include "OrinrinEditor.h"
 //-------------------------------------------------------------------------------------------------
 
+/*
+輪郭白ヌキするには？
+その行の、最初の空白以外の文字の手前と、末尾文字の後
+透過エリアの開始位置と終端位置
+しない・5dot・11dotくらいで
 
+挿入上書き処理する前に、白ヌキエリアを元文字列に追加しておく
+作業用文字列として、挿入処理函数内で単独で確保しておく・元文字列を破壊しないように
+開始位置とか透過領域は、白ヌキに併せて弄っておく
+*/
 
 //-------------------------------------------------------------------------------------------------
 
@@ -44,12 +53,15 @@ typedef struct tagLAYERBOXSTRUCT
 } LAYERBOXSTRUCT, *LPLAYERBOXSTRUCT;
 
 typedef list<LAYERBOXSTRUCT>::iterator	LAYER_ITR;
+typedef vector<ONELINE>::iterator		LYLINE_ITR;
 
 //-------------------------------------------------------------------------------------------------
 
 #define LAYERBOX_CLASS	TEXT("LAYER_BOX")
 #define	LB_WIDTH	310
 #define LB_HEIGHT	220
+
+#define EDGE_BLANK_WIDTH	16	//	最低限とる空白幅
 //-------------------------------------------------------------------------------------------------
 
 #define TB_ITEMS	8
@@ -131,6 +143,10 @@ HRESULT	LayerBoxSetString( LAYER_ITR, LPCTSTR, UINT, LPPOINT, UINT );	//!<
 HRESULT	LayerBoxSizeAdjust( LAYER_ITR );				//!<	
 
 INT		LayerTransparentAdjust( LAYER_ITR, INT, INT );	//!<	
+
+#ifdef EDGE_BLANK_STYLE
+HRESULT	LayerEdgeBlankSizeCheck( HWND, INT );			//!<	
+#endif
 //-------------------------------------------------------------------------------------------------
 
 /*!
@@ -378,7 +394,7 @@ LRESULT CALLBACK gpfLayerTBProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 
 			itemID = GetDlgCtrlID( hWndChild );
 
-			if( IDCB_LAYER_QUICKCLOSE == itemID )
+			if( IDCB_LAYER_QUICKCLOSE == itemID || IDCB_LAYER_EDGE_BLANK == itemID )
 			{
 				SetBkColor( hdc, GetSysColor( COLOR_WINDOW ) );
 				return (LRESULT)GetSysColorBrush( COLOR_WINDOW );
@@ -455,17 +471,17 @@ LRESULT CALLBACK LayerBoxProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lP
 {
 	switch( message )
 	{
-//		HANDLE_MSG( hWnd, WM_SIZE,    Lyb_OnSize );	
-//WM_WINDOWPOSCHANGEDを使った場合、WM_SIZEは発生しないようだ
-		HANDLE_MSG( hWnd, WM_CREATE,  Lyb_OnCreate );	
-		HANDLE_MSG( hWnd, WM_COMMAND, Lyb_OnCommand );	
-		HANDLE_MSG( hWnd, WM_PAINT,   Lyb_OnPaint );	
-		HANDLE_MSG( hWnd, WM_DESTROY, Lyb_OnDestroy );
-		HANDLE_MSG( hWnd, WM_KEYDOWN, Lyb_OnKey );
-		HANDLE_MSG( hWnd, WM_LBUTTONDBLCLK, Lyb_OnLButtonDown );
-		HANDLE_MSG( hWnd, WM_CONTEXTMENU,   Lyb_OnContextMenu );
-		HANDLE_MSG( hWnd, WM_WINDOWPOSCHANGING, Lyb_OnWindowPosChanging );
-		HANDLE_MSG( hWnd, WM_WINDOWPOSCHANGED,  Lyb_OnWindowPosChanged );
+		HANDLE_MSG( hWnd, WM_CREATE,			Lyb_OnCreate );		
+		HANDLE_MSG( hWnd, WM_COMMAND,			Lyb_OnCommand );	
+		HANDLE_MSG( hWnd, WM_PAINT,				Lyb_OnPaint );		
+		HANDLE_MSG( hWnd, WM_DESTROY,			Lyb_OnDestroy );	
+		HANDLE_MSG( hWnd, WM_KEYDOWN,			Lyb_OnKey );		
+		HANDLE_MSG( hWnd, WM_LBUTTONDBLCLK,		Lyb_OnLButtonDown );	
+		HANDLE_MSG( hWnd, WM_CONTEXTMENU,		Lyb_OnContextMenu );	
+		HANDLE_MSG( hWnd, WM_WINDOWPOSCHANGING,	Lyb_OnWindowPosChanging );	
+		HANDLE_MSG( hWnd, WM_WINDOWPOSCHANGED,	Lyb_OnWindowPosChanged );	
+	//	WM_WINDOWPOSCHANGED を使った場合、WM_SIZEは発生しないようだ
+	//	HANDLE_MSG( hWnd, WM_SIZE,				Lyb_OnSize );	
 
 		case WM_MOVING:	Lyb_OnMoving( hWnd, (LPRECT)lParam );	return 0;
 
@@ -519,8 +535,13 @@ BOOLEAN Lyb_OnCreate( HWND hWnd, LPCREATESTRUCT lpCreateStruct )
 	gpfOrigLyrTBProc = SubclassWindow( hToolWnd, gpfLayerTBProc );
 
 	//	貼り付けたら閉じるチェックボックスを付ける
-	CreateWindowEx( 0, WC_BUTTON, TEXT("貼り付けたら閉じる"), WS_CHILD | WS_VISIBLE | BS_AUTOCHECKBOX, 150, 2, 170, 23, hToolWnd, (HMENU)IDCB_LAYER_QUICKCLOSE, lcInst, NULL );
+	CreateWindowEx( 0, WC_BUTTON, TEXT("貼付たら閉じる"), WS_CHILD | WS_VISIBLE | BS_AUTOCHECKBOX, 150, 2, 138, 23, hToolWnd, (HMENU)IDCB_LAYER_QUICKCLOSE, lcInst, NULL );
 	CheckDlgButton( hToolWnd, IDCB_LAYER_QUICKCLOSE, gbQuickClose ? BST_CHECKED : BST_UNCHECKED );
+
+#ifdef EDGE_BLANK_STYLE
+	CreateWindowEx( 0, WC_BUTTON, TEXT("白ヌキ合成"), WS_CHILD | WS_VISIBLE | BS_AUTOCHECKBOX, 290, 2, 103, 23, hToolWnd, (HMENU)IDCB_LAYER_EDGE_BLANK, lcInst, NULL );
+#endif
+
 
 	if( 0 == gdBoxID )	//	最初の壱個目のときに計算
 	{
@@ -552,6 +573,7 @@ BOOLEAN Lyb_OnCreate( HWND hWnd, LPCREATESTRUCT lpCreateStruct )
 VOID Lyb_OnCommand( HWND hWnd, INT id, HWND hWndCtl, UINT codeNotify )
 {
 	LRESULT	lRslt;
+	UINT	bEdgeBlank;
 	INT	iXpos, iYln;
 
 	switch( id )
@@ -589,10 +611,18 @@ VOID Lyb_OnCommand( HWND hWnd, INT id, HWND hWndCtl, UINT codeNotify )
 			LayerOnDelete( hWnd );
 			break;
 
-		case IDCB_LAYER_QUICKCLOSE:
+		case IDCB_LAYER_QUICKCLOSE:	//	貼り付けたら閉じるか？
 			gbQuickClose = IsDlgButtonChecked( GetDlgItem(hWnd,IDW_LYB_TOOL_BAR), IDCB_LAYER_QUICKCLOSE ) ? TRUE : FALSE;
 			SetFocus( hWnd );
 			break;
+
+#ifdef EDGE_BLANK_STYLE
+		case IDCB_LAYER_EDGE_BLANK:	//	白ヌキするか
+			bEdgeBlank = IsDlgButtonChecked( GetDlgItem(hWnd,IDW_LYB_TOOL_BAR), IDCB_LAYER_EDGE_BLANK ) ? TRUE : FALSE;
+			//	ONになったら、狭い透過領域を削除せないかん
+			if( bEdgeBlank ){	LayerEdgeBlankSizeCheck( hWnd, EDGE_BLANK_WIDTH );	}
+			break;
+#endif
 
 		case IDM_LYB_TRANCE_RELEASE:	//	透過選択を解除
 			LayerTransparentToggle( hWnd, 0 );
@@ -1748,6 +1778,10 @@ HRESULT LayerContentsImportable( HWND hWnd, UINT cmdID, LPINT pXdot, LPINT pYlin
 	BOOLEAN		bFirst = TRUE;	//	なんか処理したらFALSE
 	BOOLEAN		bSpace, bBkSpase;
 
+#ifdef EDGE_BLANK_STYLE
+	UINT	bEdgeBlank;
+	INT		xDotEx, iMoziEx;
+#endif
 	LAYER_ITR	itLyr;
 
 	LETR_ITR	itLtr, itDel;
@@ -1808,6 +1842,16 @@ HRESULT LayerContentsImportable( HWND hWnd, UINT cmdID, LPINT pXdot, LPINT pYlin
 		TRACE( TEXT("ADD LINE[%d]"), iMinus );
 	}
 
+	//	白ヌキするには、前後の空白文字量を増やせばいい
+	//	透過領域が狭い場合は、非透過とする・先にスキャンするか。
+
+	bEdgeBlank = IsDlgButtonChecked( GetDlgItem(hWnd,IDW_LYB_TOOL_BAR), IDCB_LAYER_EDGE_BLANK ) ? TRUE : FALSE;
+	//	ONになったら、狭い透過領域を削除せないかん
+	if( bEdgeBlank ){	LayerEdgeBlankSizeCheck( hWnd, EDGE_BLANK_WIDTH );	}
+
+	//白ヌキするには狭い透過領域を消す
+
+
 //各行毎に挿入位置をみて、字をよけて、スキマを埋める
 //そこまでに足りないならパディング・レイヤ側のOffsetと行頭ピィリヲド～も考慮
 //上書きの場合は、ドット数に合わせてスキマを入れて、前後ズレないように
@@ -1824,7 +1868,6 @@ HRESULT LayerContentsImportable( HWND hWnd, UINT cmdID, LPINT pXdot, LPINT pYlin
 		//	dLyLine：レイヤ内の行番号　dWkLine：ビューの行番号
 		iSpDot  = itLyr->vcLyrImg.at( dLyLine ).dFrtSpDot;	//	レイヤ内ドットオフセット
 		//	行頭から、初めて非空白が出てくるドット
-		//iSpDot += itLyr->vcLyrImg.at( dLyLine ).dOffset;	//	初回のみ追加
 
 		xDot   = xTgDot + iSpDot;	//	レイヤ内オブジェクトを挿入位置
 		//	マイナスだった場合レイヤ内文字列の開始位置をずらす
@@ -1834,10 +1877,12 @@ HRESULT LayerContentsImportable( HWND hWnd, UINT cmdID, LPINT pXdot, LPINT pYlin
 		itLtr += itLyr->vcLyrImg.at( dLyLine ).dFrtSpMozi;	//	空白以外の開始位置
 		//ここで開始位置までずらしている
 
+		//	壱行ずつ状況をみながら挿入していく
 		while( itLtr != itLyr->vcLyrImg.at( dLyLine ).vcLine.end( ) )
 		{
 			while( 0 > xDot )	//	マイナスだったら＋になるまでずらしていく
 			{
+				//	該当行の末尾までイッたら終了
 				if( itLtr == itLyr->vcLyrImg.at( dLyLine ).vcLine.end( ) )	break;
 
 				//透過フラグがあれば終了
@@ -1861,8 +1906,7 @@ HRESULT LayerContentsImportable( HWND hWnd, UINT cmdID, LPINT pXdot, LPINT pYlin
 
 			if( 0 != dInLen )	//	挿入できる内容がなかったらなにもせんでいい
 			{
-
-				cchSize = wsBuff.size( ) + 1;//dInLen：挿入内容のドット幅
+				cchSize = wsBuff.size( ) + 1;	//	dInLen：挿入内容のドット幅
 				ptStr = (LPTSTR)malloc( cchSize * sizeof(TCHAR) );
 				StringCchCopy( ptStr, cchSize, wsBuff.c_str( ) );
 
@@ -1882,41 +1926,57 @@ HRESULT LayerContentsImportable( HWND hWnd, UINT cmdID, LPINT pXdot, LPINT pYlin
 						DocInsertString( &xDot, &dWkLine, NULL, ptBuffer, dStyle, bFirst );	bFirst = FALSE;
 						FREE(ptBuffer);
 					}
+
+					//余裕があるなら、白ヌキはあまり関係ないか？
 				}
 				else if( 0 > iDivid )	//	既存の文字列のほうが長い場合
 				{
 					//	その地点の状況を確認して、空白エリアなら埋めに使う
 					//	文字エリアなら、直近からパディングできるところまでを埋め直す
 					iMozi = DocLetterPosGetAdjust( &xDot, dWkLine, -1 );	//	今の文字位置を確認
+				//	iMozi：挿入位置文字数			xDot：文字列挿入位置ドット
 
+#ifndef EDGE_BLANK_STYLE
 					//	そこの文字が空白か、空白ならどこまで続いてるか確認
 					DocLineStateCheckWithDot( xDot, dWkLine, &dLeft, &dRight, &iStMozi, NULL, &bSpace );
-
+					//	dRight 使ってない
+#endif
 					//	先に上書きエリアの処理しないと、パディング直したらずれる
 					//	上書きの場合ここから先をさらに削除してギャップパディング
 					if( IDM_LYB_OVERRIDE == cmdID )
 					{
-						
-						dInBgn  = xTgDot + iSpDot;
-						dInEnd  = dInBgn + dInLen;
+						dInBgn  = xTgDot + iSpDot;	//	ボックス左端＋内部オフセット＝文字列開始位置
+						dInEnd  = dInBgn + dInLen;	//	開始位置＋文字列幅＝文字列終端位置
+
+//白抜くには、ここで範囲を広げればいい？
+//透過領域の幅と巻き込む範囲によっては、前部分を巻き込む可能性？
+//先にピタリの位置に合わせてあるので、問題は無い？
 
 						//	20110817	時々ズレが出るのを修正＜処理手順間違い
-						dEndot = dInEnd;
-						iEdMozi = DocLetterPosGetAdjust( &dEndot, dWkLine, 1 );	//	上書きされる領域
+						dEndot  = dInEnd;
+#ifdef EDGE_BLANK_STYLE
+						//	ここで dEndot をオフセットする？
+						if( bEdgeBlank ){	dEndot +=  EDGE_BLANK_WIDTH;	}
+#endif
+						iEdMozi = DocLetterPosGetAdjust( &dEndot , dWkLine, 1 );	//	上書きされる領域
+						//	キャレット位置修正
 
 						//	後半の、あまってるSpaceも考慮してパディング調整
 						DocLineStateCheckWithDot( dEndot, dWkLine, &dBkLeft, &dBkRight, &dBkStMozi, &dBkEdMozi, &bBkSpase );
 						if( bBkSpase )	//	後半の空白再編
 						{
 							dEndot  = dBkRight;
-							iEdMozi = DocLetterPosGetAdjust( &dEndot, dWkLine, 1 );	//	上書きされる領域
+							iEdMozi = DocLetterPosGetAdjust( &dEndot , dWkLine, 1 );	//	上書きされる領域
+							//↑は要らないかもだ
 							dGap    = dBkRight - dInEnd;	//	元の部分の維持のためのギャップ量
+							//	dBkRight：空白位置末端　dInEnd：挿入文字列リアル末端
 						}
 						else
 						{
-					//		dEndot  = dInEnd;
-					//		iEdMozi = DocLetterPosGetAdjust( &dEndot, dWkLine, 1 );	//	上書きされる領域
+							//dEndot  = dInEnd;
+							//iEdMozi = DocLetterPosGetAdjust( &dEndot , dWkLine, 1 );	//	上書きされる領域
 							dGap    = dEndot - dInEnd;	//	元の部分の維持のためのギャップ量
+							//	dEndot：挿入文字列キャレット末端　dInEnd：挿入文字列リアル末端
 						}
 
 						//	該当部分を削除
@@ -1935,24 +1995,51 @@ HRESULT LayerContentsImportable( HWND hWnd, UINT cmdID, LPINT pXdot, LPINT pYlin
 						}
 					}
 
-					dGap = (xTgDot + iSpDot) - xDot;
+#ifdef EDGE_BLANK_STYLE
+					if( bEdgeBlank )
+					{
+						//	オフセット位置確認
+						xDotEx  = (xTgDot + iSpDot);
+						xDotEx -= EDGE_BLANK_WIDTH;
+						if( 0 > xDotEx )	xDotEx = 0;
 
+						iMoziEx = DocLetterPosGetAdjust( &xDotEx, dWkLine, -1 );	//	今の文字位置を確認
+					//	iMoziEx：挿入位置文字数			xDotEx：挿入位置オフセット
+
+						//	そこの文字が空白か、空白ならどこまで続いてるか確認
+						DocLineStateCheckWithDot( xDotEx, dWkLine, &dLeft, &dRight, &iStMozi, NULL, &bSpace );
+
+						dGap = (xTgDot + iSpDot) - xDotEx;	//	前側の埋め処理
+						xDot = xDotEx;
+					}
+					else
+					{
+						//	そこの文字が空白か、空白ならどこまで続いてるか確認
+						DocLineStateCheckWithDot( xDot, dWkLine, &dLeft, &dRight, &iStMozi, NULL, &bSpace );
+						iMoziEx = iStMozi;	//	特に意味はない
+#endif
+						dGap = (xTgDot + iSpDot) - xDot;	//	前側の埋め処理
+#ifdef EDGE_BLANK_STYLE
+					}
+#endif
 					if( bSpace )	//	空白なら、ギャップ分と合わせて入れ直す
 					{
 						dGap  += (xDot - dLeft);	//	パディングドット数
-
 						//	既存の空白を一旦削除して
 						DocRangeDeleteByMozi( dLeft, dWkLine, iStMozi, iMozi, &bFirst );
 					}
 					else	//	文字であるなら、なにもしない
 					{
-						dLeft = xDot;
+#ifdef EDGE_BLANK_STYLE
+						//	必要なら、既存の文字列を一旦削除して
+						if( bEdgeBlank )	DocRangeDeleteByMozi( xDot, dWkLine, iMoziEx, iMozi, &bFirst );
+#endif
+						dLeft = xDot;	//	ギャップ開始位置
 					}
 
 					ptBuffer = DocPaddingSpaceWithPeriod( dGap, NULL, NULL, NULL, TRUE );
 					if( ptBuffer )
 					{
-						//	行末端からレイヤ内オブジェクトまでを埋める空白
 						DocInsertString( &dLeft, &dWkLine, NULL, ptBuffer, dStyle, bFirst );	bFirst = FALSE;
 						FREE(ptBuffer);
 					}
@@ -2031,7 +2118,7 @@ HRESULT LayerForClipboard( HWND hWnd, UINT bStyle )
 	if( itLyr == gltLayer.end( ) )	return E_OUTOFMEMORY;
 
 
-	iLines = itLyr->vcLyrImg.size( );	//	文字数確認
+	iLines = itLyr->vcLyrImg.size( );	//	行数確認
 
 	srString.clear( );
 	wsString.clear( );
@@ -2102,3 +2189,79 @@ HRESULT LayerOnDelete( HWND hWnd )
 }
 //-------------------------------------------------------------------------------------------------
 
+#ifdef EDGE_BLANK_STYLE
+
+/*!
+	白抜き指定したときに、幅の狭い透過領域をキャンセルする
+	@param[in]	hWnd	ボックスのウインドウハンドル
+	@param[in]	iNarrow	キャンセルする最大幅
+	@return		HRESULT	終了状態コード
+*/
+HRESULT LayerEdgeBlankSizeCheck( HWND hWnd, INT iNarrow )
+{
+	INT_PTR	iLines;
+	INT		iWidth;
+
+	LAYER_ITR	itLyr;
+
+	LYLINE_ITR	itLine;
+	LETR_ITR	itMozi, itMzx;
+
+#ifdef DO_TRY_CATCH
+	try{
+#endif
+
+	//	該当のレイヤーボックスを確認
+	for( itLyr = gltLayer.begin(); itLyr != gltLayer.end(); itLyr++ )
+	{
+		if( itLyr->hBoxWnd == hWnd ){	break;	}
+	}
+	if( itLyr == gltLayer.end( ) )	return E_OUTOFMEMORY;
+
+	iLines = itLyr->vcLyrImg.size( );	//	行数確認
+
+
+	//	壱行ずつ見ていく
+	for( itLine = itLyr->vcLyrImg.begin( ); itLine != itLyr->vcLyrImg.end( ); itLine++ )
+	{
+		//	文字をイテレータで確保
+		for( itMozi = itLine->vcLine.begin( ); itMozi != itLine->vcLine.end( ); itMozi++ )
+		{
+			if(  itMozi->mzStyle & CT_LYR_TRNC )	//	透過領域にヒットしたら
+			{
+				//	その領域の幅をゲッツする
+				iWidth = 0;
+				for( itMzx = itMozi; itMzx != itLine->vcLine.end( ); itMzx++ )
+				{
+					if( !(itMzx->mzStyle & CT_LYR_TRNC) )	break;	//	外れたら終わり
+					iWidth += itMzx->rdWidth;
+				}
+
+				if( EDGE_BLANK_WIDTH >= iWidth )	//	もしちっちゃいなら
+				{
+					for( ; itMzx != itMozi; itMozi++ )
+					{
+						itMozi->mzStyle &= ~CT_LYR_TRNC;
+					}
+				}
+				else
+				{
+					itMozi = itMzx;
+				}
+				itMozi--;	//	ループ先頭でインクリするため、一旦戻る
+			}
+		}
+	}
+
+	InvalidateRect( hWnd , NULL, TRUE );	//	再描画
+
+#ifdef DO_TRY_CATCH
+	}
+	catch( exception &err ){	return (HRESULT)ETC_MSG( err.what(), E_UNEXPECTED );	}
+	catch( ... ){	return (HRESULT)ETC_MSG( ("etc error") , E_UNEXPECTED );	}
+#endif
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+
+#endif

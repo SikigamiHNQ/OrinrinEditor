@@ -21,32 +21,25 @@ If not, see <http://www.gnu.org/licenses/>.
 //	注意・コマンドのリソースＩＤ番号は変更不可！
 
 
+//	TODO:	レイヤボックス白ヌキ、１６・２２とか、いくつかパヤーン作っておく
 
 //	TODO:	ＯＫ？	ディレイロード・未ロード頁の全プレビューがおかしい
 //	TODO:	CtrlShiftD の動作は問題無いか
-
 //	TODO:	ＯＫ？	枠作るときはピリヲド幅を使う
 //	TODO:	ＯＫ？	最大化から戻したら、MAAが非表示でも表示になる
-
 //	TODO:	ＯＫ？	MAAと頁一覧、選択したらメイン窓にフォーカス戻すかどうか選択出来るようにする
 //					右クリメニューにON/OFF付ければいい
-
 //	TODO:	ＯＫ？	ドラッグ移動させた後、キャレットの位置がおかしい
-
 //	TODO:	ＯＫ？	ドラフトボード・サムネイル・移動出来るように
-
 //	TODO:	ＯＫ？	ユーザー定義をアクセラキーで設定出来る
-
 //	TODO:	ＯＫ？	セリフ改行、文章の途中で半角全角スペース一個あった場合、ソコは無視して文章の先端に行頭を揃える
-
-//	TODO:	副タブの名称編集出来るように
+//	TODO:	ＯＫ？	ツールチップ、マウスカーソルが重なるとちらつくのは仕様。自作しかないか。
+//	TODO:	ＯＫ？	右クリメニューの個別枠やユーザアイテムに各個の名前を付けるように
+//	TODO:	ＯＫ？	副タブの名称編集出来るように
+//	TODO:	ＯＫ？	空白の表示非表示をメモリする
 
 //	TODO:	最終行の枠いれると落ちる？
 
-//	TODO:	ツールチップ、マウスカーソルが重なるとちらつくのは仕様。自作しかないか。
-
-//	TODO:	個別枠やユーザアイテムにキーバインド付いたらソレを表示出来るように
-//	TODO:	右クリメニューの個別枠やユーザアイテムに各個の名前を付けるように
 
 //	TODO:	メインのファイルタブに、このファイル意外を閉じる機能をつける
 //	TODO:	頁一覧、選択が移動したら表示頁も追随する＜複数選択つくってから
@@ -60,40 +53,18 @@ If not, see <http://www.gnu.org/licenses/>.
 
 //	TODO:	挿入にある色指定をカスタマイズ出来る
 
-/*
-ツールチップのサブクラスできないか？
 
-ツールチップビューを作るには
-基本的にマウスムーブで発生するはず
-制御用のハンドルつくるか？
-TrackMouseEvent WM_MOUSEHOVER WM_MOUSELEAVE をつかう
-WM_MOUSEHOVERが来たら、リストビューとかのハンドル渡してツールチップポッパップをコールする。
-コールされたら、そのハンドルに対してDISPINFO的なmessageを送る
-もしくはコールバック函数を指定するとか。
-内容ゲットしたら、作成して表示。単体しかあり得ないので、
-前のがあったら破壊するように。
-非表示のままWM_MOUSELEAVEが来たらキャンセルか？
-
-スタティックで枠つくって、サブクラスとオーナードローで対応
-表示枠の親はデスクトップか無しでいい。
-マウスクルックで閉じる・３０秒経過で閉じる
-数pixelのマウスムーブを検知して閉じる
-
-ポップアップのサイズは、文字列で決める。縁取り２ｐｘくらいで。
-背景と文字色は GetSysColor でとれる
-
-SystemParametersInfo  SPI_GETMOUSEHOVERTIME  SPI_GETMOUSEHOVERWIDTH で調整出来る
-
-*/
 
 //考え中
+
+//	レイヤー機能とは？
 
 //	頁削除メッセージの確認無しは、起動中だけにしたほうがいい？
 //	キーバインド・メニューに入ってない機能に注意
 //	枠編集DIALOGUE、オフセットでENTERとか直書換に対応セヨ
 //	ドッキングテンプレ、左に置けないか
 //	セーブ時メッセージON/OFFできるように
-//	ファイル履歴は、いじった順番になるようにすべき
+//	ファイル履歴は、いじった順番になるようにすべき＜ＯＫ？
 //	プレビューの更新ボタンつける
 //	プレビュー開いてる時に、開く操作したら閉じる？
 
@@ -120,14 +91,11 @@ SystemParametersInfo  SPI_GETMOUSEHOVERTIME  SPI_GETMOUSEHOVERWIDTH で調整出来る
 
 
 //バグ
-//	TODO:	頁ListやMAAでのツールチップが何度も描画される。
 //	TODO:	最大化したり画面サイズかえると、右の頁一覧が見えなくなる
 //	TODO:	最大化して終わる＞起動して、最大化解除すると、メインスプリットバーが見えなくなる//右にイッちゃってるまま
 //	TODO:	矩形選択範囲バイトカウントが遅い
 //	TODO:	描画更新タイミングがおかしい場合が多々ある
 //	TODO:	「矩形選択」と「部分抽出」の両方にチェックを入れた状態でドラッグするとエラー
-//	TODO:	サムネ表示、ポップアップで落ちやすい？メモリの扱いを考える必要がある・NULLチェキとか
-//	文字数とバイト数の計算間違っていた所をなおした
 
 //	TODO:	複数行テンプレ窓の主タブでホイールスクロールが効かない？
 //			メイン窓の編集スペース、Page List、複数行テンプレ窓のAA一覧ツリーなど、他の場所では問題ない
@@ -138,33 +106,42 @@ SystemParametersInfo  SPI_GETMOUSEHOVERTIME  SPI_GETMOUSEHOVERWIDTH で調整出来る
 
 
 //機能追加・変更
+//	TODO:	全頁の一括行末削除
+//	TODO:	複数機能をまとめて実行するマクロのようなもの＜プラグインでいけるか？
+
 //	TODO:	頁の複数選択して移動、Ｄ＆Ｄも
-//	TODO:	スペース文字が二個以上連続しているところをAAと台詞の区切りだと認識するようなロジックは？
+//	TODO:	ALT+Nを、頁名称一括編集にする？
+//	TODO:	頁一覧を、複数選択して一発削除できるように
+
 //	TODO:	履歴から開こうとしたファイル・プロフが無かったらリストから消すべき
-//	TODO:	右揃え線消し
-//	TODO:	使用をファイル出力できるように
+
 //	TODO:	フリーカーソルモード
-//	TODO:	DocBadSpaceCheck内の更新指令の最適化が必要
 //	TODO:	レイヤボックス自体の操作、上書き実行とかもキボドショトカトで出来るように
+//	TODO:	位置情報のリセット機能・システムメニューに搭載する
+//	TODO:	メインスプリットバーの位置情報リセットが居るかも
+
+//	TODO:	右揃え線消し
+//	TODO:	文字の検索・痴漢機能	ユニコード空白一括検索とか
+//	TODO:	ファイルを開き直す機能
+//	TODO:	起動中に、ラインテンプレートのリストを開く＆再読み込みできるようにして欲しい//	Brushも同じか。右クリメニューで
+
 //	TODO:	複数ファイルタブ、右クリメニューでファイル情報出す
+//	TODO:	Ctrl+Kの統計機能・PageListの項目増やして対処・Ctrl+Kでリフレッシュとか・連続半角とか、行末空白とか・いろんな情報をだす・リヤルタイムだと重いので操作でリフレッシュ
+//	TODO:	ファイル内容統計機能が欲しい。全バイト数、頁数とか
+
+
+//	TODO:	使用をファイル出力できるように
+//	TODO:	DocBadSpaceCheck内の更新指令の最適化が必要
 //	TODO:	バックアップ機能の強化・上書き保存したらバックアップとか・頁新規作成したら保存
 //	TODO:	保存するとき、同名ファイルがあったら、日時くっつけてバックアップとか
-//	TODO:	ファイル内容統計機能が欲しい。全バイト数、頁数とか
-//	TODO:	Ctrl+Kの統計機能・PageListの項目増やして対処・Ctrl+Kでリフレッシュとか・連続半角とか、行末空白とか・いろんな情報をだす・リヤルタイムだと重いので操作でリフレッシュ
-//	TODO:	文字の検索・痴漢機能	ユニコード空白一括検索とか
 //	TODO:	切り抜きリファレンスAAを使って、文字のとこだけ切り抜き、ないところだけ切り抜き、とかできるようにしたい
 //	TODO:	バックアップメッセージ、ステータスバーに出せないか
 //	TODO:	全部保存作る
-//	TODO:	ALT+Nを、頁名称一括編集にする？
-//	TODO:	ファイルを開き直す機能
 //	TODO:	よく使うユニコードを纏めておけないか、ユーザ定義でいいんじゃね
 //	TODO:	テンプレのコンボックスを、リストボックス型と切り替えられるとか
-//	TODO:	起動中に、ラインテンプレートのリストを開く＆再読み込みできるようにして欲しい//	Brushも同じか。右クリメニューで
 //	TODO:	プレビューをリヤルタイムに変更する
 //	TODO:	非ユニコのときは、ピリヲドの量の選択を？もしくは設定出来るようにするか
 //	TODO:	ミニ複数行テンプレ・壱行ブラシのサブダイヤログに増やすか
-//	TODO:	メインスプリットバーの位置情報リセットが居るかも
-//	TODO:	位置情報のリセット機能・システムメニューに搭載する
 
 //	TODO:	View部分をサムネ表示できるように
 //	TODO:	テンプレの「常に最前面に表示」Orinrinediterを表示している時だけ最前面に来るように//もしくは、メイン窓に統合とか
@@ -174,7 +151,6 @@ SystemParametersInfo  SPI_GETMOUSEHOVERTIME  SPI_GETMOUSEHOVERWIDTH で調整出来る
 //	TODO:	MLTのブックマーク機能・タブ増やすか、ツリーに増やすか・副タブじゃいけない？
 //	TODO:	viewの使用のグループ名の変更機能・グループ自体、単体両方で
 //	TODO:	Viewの右クリメニューも編集出来るように
-//	TODO:	頁一覧を、複数選択して一発削除できるように
 //	TODO:	ドラフトボード・サムネ、サイズ変更できるように
 //	TODO:	MMAビュー、AAのスクロールをアイテム区切りでなく行スクロールも出来るように
 //	TODO:	MAA窓も統合できないか
@@ -448,18 +424,23 @@ ASDファイル　　壱行が壱コンテンツ
 					壱行テンプレで中クルックしたらレイヤボックスが開く
 					MAAツリーでファイル名を中クリックしたら、副タブに追加できる
 					バグ修正いろいろ
-2012/06/11	0.31	MAAに、ファイルの途中にアイテムを追加できるようにした
-					MAAの内容表示側にＤ＆Ｄすると、そのファイルを副タブするようにした（Viewer込み）
+2012/06/18	0.31	MAAに、ファイルの途中にアイテムを追加できるようにした
+					MAAの内容表示側にＤ＆Ｄすると、そのファイルを副タブで開く（Viewer込み）
 					※使用には入らないし復元もされない
-					MAAツリーにＤ＆Ｄすると、追加アイテムとして保持できるようにした（Viewer込み）
+					MAAツリーにＤ＆Ｄすると、追加アイテムとしてツリーに追加（Viewer込み）
 					※再構築すると消える
 					MAAの使用で、複数のMLTに同じAAが有る場合にキョドるのを修正（Viewer込み）
 					枠挿入BOXを縮めすぎるとエラーになるのを修正
+					台詞改行で、単独スペースはノーカンにした
 					ユーザアイテムを右クリメニューに追加できるようにした
 					ドラッグ移動させたらキャレット位置がおかしくなるのを修正
 					MAA窓と頁一覧で、選択したらフォーカスを編集窓に戻す機能
-					ドラフトボード・サムネイル・移動出来るようにした
-					ツールチップがチラつくの対策中
+					ドラフトボード・サムネイルの窓を移動出来るようにした
+					ツールチップがチラつくのをなんとか出来た気がする
+					副タブの名称変更を出来るようにした（Viewer込み）
+					ファイルオーポンを高速化出来たかもだ。
+					空白の表示/非表示状態を覚えておくようにした。
+					レイヤボックス貼付に白ヌキ機能追加
 
 
 
@@ -2214,7 +2195,7 @@ INT InitParamValue( UINT dMode, UINT dStyle, INT nValue )
 		case  VL_BACKUP_INTVL:	StringCchCopy( atKeyName, SUB_STRING, TEXT("BackUpIntvl") );	break;
 		case  VL_BACKUP_MSGON:	StringCchCopy( atKeyName, SUB_STRING, TEXT("BackUpMsgOn") );	break;
 		case  VL_CRLF_CODE:		StringCchCopy( atKeyName, SUB_STRING, TEXT("CrLfCode") );		break;
-	//	case  VL_SPACE_VIEW:	StringCchCopy( atKeyName, SUB_STRING, TEXT("SpaceView") );		break;
+		case  VL_SPACE_VIEW:	StringCchCopy( atKeyName, SUB_STRING, TEXT("SpaceView") );		break;
 		case  VL_GRID_X_POS:	StringCchCopy( atKeyName, SUB_STRING, TEXT("GridXpos") );		break;
 		case  VL_GRID_Y_POS:	StringCchCopy( atKeyName, SUB_STRING, TEXT("GridYpos") );		break;
 		case  VL_GRID_VIEW:		StringCchCopy( atKeyName, SUB_STRING, TEXT("GridView") );		break;
@@ -2853,10 +2834,14 @@ INT_PTR CALLBACK OptionDlgProc( HWND hDlg, UINT message, WPARAM wParam, LPARAM l
 
 				case IDB_APPLY://適用
 				case IDOK:
-					//	MAAポップアップについて
+					//	ツールチップの文字サイズ
 					dValue = FONTSZ_NORMAL;
 					if( IsDlgButtonChecked( hDlg, IDRB_POPUP_REDUCE ) ){	dValue =  FONTSZ_REDUCE;	}
 					InitParamValue( INIT_SAVE, VL_MAATIP_SIZE, dValue );
+#ifdef USE_HOVERTIP
+					HoverTipSizeChange( dValue );	//	ポッパップ全体
+#endif
+					//	ＭＡＡで表示するかどうか・いらない？
 					iBuff = IsDlgButtonChecked( hDlg, IDCB_POPUP_VISIBLE );
 					AaItemsTipSizeChange( dValue, iBuff );
 					InitParamValue( INIT_SAVE, VL_MAATIP_VIEW, iBuff );

@@ -46,7 +46,13 @@ If not, see <http://www.gnu.org/licenses/>.
 //-------------------------------------------------------------------------------------------------
 
 extern HFONT	ghAaFont;		//	AA用フォント
+
+#ifdef MAA_TOOLTIP
 extern HFONT	ghTipFont;		//	ツールチップ用
+
+static  HWND	ghDrghtTipWnd;	//!<	ツールチップ
+static LPTSTR	gptTipBuffer;	//!<	チップ内容
+#endif
 
 extern  UINT	gbAAtipView;	//	非０で、ＡＡツールチップ表示
 
@@ -55,8 +61,6 @@ static  HWND	ghPtWnd;
 static  ATOM	gDraughtAtom;	//!<	ウインドウクラスアトム
 static  HWND	ghDraughtWnd;	//!<	このウインドウハンドル
 
-static  HWND	ghDrghtTipWnd;	//!<	ツールチップ
-static LPTSTR	gptTipBuffer;	//!<	チップ内容
 
 EXTERNED UINT	gdClickDrt;		//!<	アイテムを左クルックしたときの基本動作・０通常挿入　１矩形挿入　２レイヤボックス開く　３UNIクリップ　４SJISクリップ
 EXTERNED UINT	gdSubClickDrt;	//!<	アイテムを中クルックしたときの基本動作・０通常挿入　１矩形挿入　２レイヤボックス開く　３UNIクリップ　４SJISクリップ
@@ -68,6 +72,7 @@ static HPEN		ghLinePen;
 
 static HFONT	ghAreaFont;		//!<	サイズ表示用
 
+static INT		giItemSel;		//!<	マウスカーソル下にある枠番号
 static INT		giTarget;		//!<	クルックしたアイテム番号・－１で無し
 
 static  UINT	gbThumb;		//!<	サムネ状態であるか
@@ -92,7 +97,7 @@ LRESULT CALLBACK DraughtProc( HWND, UINT, WPARAM, LPARAM );
 VOID	Drt_OnCommand( HWND , INT, HWND, UINT );		//!<	
 VOID	Drt_OnPaint( HWND );							//!<	
 //VOID	Drt_OnSize( HWND , UINT, INT, INT );			//!<	
-LRESULT	Drt_OnNotify( HWND , INT, LPNMHDR );			//!<	
+VOID	Drt_OnMouseMove( HWND, INT, INT, UINT );		//!<	
 VOID	Drt_OnLButtonUp( HWND, INT, INT, UINT );		//!<	
 VOID	Drt_OnMButtonUp( HWND, INT, INT, UINT );		//!<	
 VOID	Drt_OnContextMenu( HWND, HWND, UINT, UINT );	//!<	
@@ -100,7 +105,13 @@ VOID	Drt_OnDestroy( HWND );							//!<
 VOID	Drt_OnKillFocus( HWND, HWND );					//!<	
 VOID	Drt_OnVScroll( HWND , HWND, UINT, INT );		//!<	
 VOID	Drt_OnMouseWheel( HWND, INT, INT, INT, UINT );	//!<	
+#ifdef MAA_TOOLTIP
+LRESULT	Drt_OnNotify( HWND , INT, LPNMHDR );			//!<	
+#endif
 
+#ifdef USE_HOVERTIP
+LPTSTR	CALLBACK DraughtHoverTipInfo( LPVOID );
+#endif
 //-------------------------------------------------------------------------------------------------
 
 /*!
@@ -143,6 +154,8 @@ HRESULT DraughtInitialise( HINSTANCE hInstance, HWND hPtWnd )
 		//gstMainLsPt.x = -1;
 		gstViewLsPt.x = -1;
 
+		giItemSel = -1;
+
 #ifndef _ORRVW
 		//	クルック動作指定ロード・デフォ動作は通常挿入
 		gdClickDrt    = InitParamValue( INIT_LOAD, VL_DRT_LCLICK, MAA_INSERT );
@@ -162,8 +175,9 @@ HRESULT DraughtInitialise( HINSTANCE hInstance, HWND hPtWnd )
 		if( ghLinePen ){	DeletePen( ghLinePen  );	}
 		if( ghAreaFont ){	DeleteFont( ghAreaFont );	}
 
+#ifdef MAA_TOOLTIP
 		FREE( gptTipBuffer );
-
+#endif
 		DraughtItemDelete( -1 );
 	}
 
@@ -189,7 +203,9 @@ HWND DraughtWindowCreate( HINSTANCE hInstance, HWND hPtWnd, UINT bThumb )
 	TCHAR	atCaption[SUB_STRING];
 
 	RECT	wdRect, rect;
+#ifdef MAA_TOOLTIP
 	TTTOOLINFO	stToolInfo;
+#endif
 
 	INT		iLines, iStep = 0;
 	LONG	rigOffs = 0;
@@ -259,11 +275,12 @@ HWND DraughtWindowCreate( HINSTANCE hInstance, HWND hPtWnd, UINT bThumb )
 		DRAUGHT_BOARD_CLASS, atCaption, WS_POPUP | WS_VISIBLE | WS_CAPTION,
 		rect.left, rect.top, rect.right, rect.bottom, NULL, NULL, hInstance, NULL );
 
+#ifdef MAA_TOOLTIP
+	FREE( gptTipBuffer );
+
 	//	ツールチップ
 	ghDrghtTipWnd = CreateWindowEx( WS_EX_TOPMOST, TOOLTIPS_CLASS, NULL, TTS_NOPREFIX | TTS_ALWAYSTIP, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, ghDraughtWnd, NULL, hInstance, NULL );
 	SetWindowFont( ghDrghtTipWnd, ghTipFont, TRUE );
-
-	FREE( gptTipBuffer );
 
 	//	ツールチップをコールバックで割り付け
 	ZeroMemory( &stToolInfo, sizeof(TTTOOLINFO) );
@@ -276,7 +293,7 @@ HWND DraughtWindowCreate( HINSTANCE hInstance, HWND hPtWnd, UINT bThumb )
 	stToolInfo.lpszText = LPSTR_TEXTCALLBACK;	//	コレを指定するとコールバックになる
 	SendMessage( ghDrghtTipWnd, TTM_ADDTOOL, 0, (LPARAM)&stToolInfo );
 	SendMessage( ghDrghtTipWnd, TTM_SETMAXTIPWIDTH, 0 , 0 );	//	チップの幅。０設定でいい。これしとかないと改行されない
-
+#endif
 
 	if( gbThumb )	//	サムネモード
 	{
@@ -338,7 +355,7 @@ LRESULT CALLBACK DraughtProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lPa
 	{
 	//	HANDLE_MSG( hWnd, WM_SIZE,        Drt_OnSize );	
 		HANDLE_MSG( hWnd, WM_COMMAND,     Drt_OnCommand );	
-		HANDLE_MSG( hWnd, WM_NOTIFY,      Drt_OnNotify );	//	コモンコントロールの個別イベント
+		HANDLE_MSG( hWnd, WM_MOUSEMOVE,   Drt_OnMouseMove );	//	マウスいごいた
 		HANDLE_MSG( hWnd, WM_LBUTTONUP,   Drt_OnLButtonUp );
 		HANDLE_MSG( hWnd, WM_MBUTTONUP,   Drt_OnMButtonUp );
 		HANDLE_MSG( hWnd, WM_PAINT,       Drt_OnPaint );
@@ -347,6 +364,21 @@ LRESULT CALLBACK DraughtProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lPa
 		HANDLE_MSG( hWnd, WM_KILLFOCUS,   Drt_OnKillFocus );	//	フォーカスを失った
 		HANDLE_MSG( hWnd, WM_VSCROLL,     Drt_OnVScroll );		//	縦スクロール関連
 		HANDLE_MSG( hWnd, WM_MOUSEWHEEL,  Drt_OnMouseWheel );	//	マウスホウィール
+#ifdef MAA_TOOLTIP
+		HANDLE_MSG( hWnd, WM_NOTIFY,      Drt_OnNotify );	//	コモンコントロールの個別イベント
+#endif
+
+#ifdef USE_HOVERTIP
+		case WM_MOUSEHOVER:
+			HoverTipOnMouseHover( hWnd, wParam, lParam, DraughtHoverTipInfo );
+			return 0;
+
+		case WM_MOUSELEAVE:
+			HoverTipOnMouseLeave( hWnd );
+			giItemSel = -1;
+			return 0;
+#endif
+
 
 //		case WM_CLOSE:	ShowWindow( ghDraughtWnd, SW_HIDE );	return 0;
 
@@ -540,6 +572,7 @@ VOID Drt_OnKillFocus( HWND hWnd, HWND hwndNewFocus )
 }
 //-------------------------------------------------------------------------------------------------
 
+#ifdef MAA_TOOLTIP
 /*!
 	ノーティファイメッセージの処理
 	@param[in]	hWnd		親ウインドウのハンドル
@@ -572,6 +605,7 @@ LRESULT Drt_OnNotify( HWND hWnd, INT idFrom, LPNMHDR pstNmhdr )
 		FREE( gptTipBuffer );
 
 		iTarget = DraughtTargetItemSet( &stMosPos );
+		TRACE( TEXT("TARGET %d"), iTarget );
 
 		if( gbThumb )	//	サムネイル
 		{
@@ -604,6 +638,37 @@ LRESULT Drt_OnNotify( HWND hWnd, INT idFrom, LPNMHDR pstNmhdr )
 	}
 
 	return 0;
+}
+//-------------------------------------------------------------------------------------------------
+#endif
+
+/*!
+	マウスが動いたときの処理
+	@param[in]	hWnd		ウインドウハンドル
+	@param[in]	x			クライアント座標Ｘ
+	@param[in]	y			クライアント座標Ｙ
+	@param[in]	keyFlags	押されてる他のボタン
+	@return		なし
+*/
+VOID Drt_OnMouseMove( HWND hWnd, INT x, INT y, UINT keyFlags )
+{
+	INT		iTarget;
+	POINT	point;
+	BOOLEAN		bReDraw = FALSE;
+
+	point.x = x;
+	point.y = y;
+
+	iTarget = DraughtTargetItemSet( &point );	//	マウスカーソル下の枠を確認
+	if( giItemSel !=  iTarget ){	bReDraw =  TRUE;	}
+	giItemSel = iTarget;
+
+#ifdef USE_HOVERTIP
+	//	初めての枠なら
+	if( bReDraw && gbAAtipView ){	HoverTipResist( ghDraughtWnd  );	}
+#endif
+
+	return;
 }
 //-------------------------------------------------------------------------------------------------
 
@@ -659,6 +724,7 @@ VOID DraughtButtonUp( HWND hWnd, INT x, INT y, UINT keyFlags, UINT message )
 	stPos.y = y;
 
 	giTarget = DraughtTargetItemSet( &stPos );
+	TRACE( TEXT("TARGET %d"), giTarget );
 
 	//	サムネ側でクルックしたなら、MAAのデフォ動作に従う
 	if( gbThumb )
@@ -727,6 +793,7 @@ VOID Drt_OnContextMenu( HWND hWnd, HWND hWndContext, UINT xPos, UINT yPos )
 	stPos = stPoint;
 	ScreenToClient( hWnd, &stPos );
 	giTarget = DraughtTargetItemSet( &stPos );
+	TRACE( TEXT("TARGET %d"), giTarget );
 
 	hMenu = LoadMenu( GetModuleHandle(NULL), MAKEINTRESOURCE(IDM_DRAUGHT_POPUP) );
 	hSubMenu = GetSubMenu( hMenu, 0 );
@@ -758,8 +825,9 @@ VOID Drt_OnDestroy( HWND hWnd )
 	ghDraughtWnd = NULL;
 	ghScrBarWnd  = NULL;
 
+#ifdef MAA_TOOLTIP
 	FREE( gptTipBuffer );
-
+#endif
 	return;
 }
 //-------------------------------------------------------------------------------------------------
@@ -865,6 +933,59 @@ VOID Drt_OnVScroll( HWND hWnd, HWND hwndCtl, UINT code, INT pos )
 	return;
 }
 //-------------------------------------------------------------------------------------------------
+
+#ifdef USE_HOVERTIP
+/*!
+	HoverTip用のコールバック受取
+	@param[in]	pVoid	未定義
+	@return	確保した文字列・もしくはNULL
+*/
+LPTSTR CALLBACK DraughtHoverTipInfo( LPVOID pVoid )
+{
+	INT		iTarget, iOffset, i;
+	INT_PTR	iItems;
+	LPSTR	pcConts = NULL;
+	LPTSTR	ptBuffer = NULL;
+
+	MAAM_ITR	itItem;
+
+
+	if( !(gbAAtipView) ){	return NULL;	}	//	非表示なら何もしないでおｋ
+	if( 0 > giItemSel ){	return NULL;	}
+
+	if( gbThumb )	//	サムネイル
+	{
+		iOffset = gdVwTop * TPNL_HORIZ;
+		iTarget = iOffset + giItemSel;
+		pcConts = AacAsciiArtGet( iTarget );	//	該当するインデックスAAを引っ張ってくる
+
+		ptBuffer = SjisDecodeAlloc( pcConts );
+		FREE( pcConts );
+	}
+	else
+	{
+		iTarget = giItemSel;
+		iItems  = gvcDrtItems.size( );	//	現在個数
+		if( iItems > iTarget )	//	保持数内であれば
+		{
+			for( i = 0, itItem = gvcDrtItems.begin(); gvcDrtItems.end() != itItem; i++, itItem++ )
+			{
+				if( iTarget == i )	//	ヒット
+				{
+					ptBuffer = SjisDecodeAlloc( itItem->pcItem );
+					break;
+				}
+			}
+		}
+	}
+
+	return ptBuffer;
+}
+//-------------------------------------------------------------------------------------------------
+#endif
+
+
+
 
 #ifndef _ORRVW
 
@@ -1188,8 +1309,6 @@ INT DraughtTargetItemSet( LPPOINT pstPos )
 
 	number = ix + iy * TPNL_HORIZ;
 
-	TRACE( TEXT("TARGET %d"), number );
-
 	return number;
 }
 //-------------------------------------------------------------------------------------------------
@@ -1383,7 +1502,7 @@ HRESULT DraughtItemExport( HWND hWnd, LPTSTR ptPath )
 
 	CloseHandle( hFile );
 
-	MessageBox( hWnd, TEXT("ファイルに保存したよ"), TEXT("操作確認"), MB_OK | MB_ICONINFORMATION );
+	MessageBox( hWnd, TEXT("ファイルに保存したよ"), TEXT("お燐からのお知らせ"), MB_OK | MB_ICONINFORMATION );
 
 	return S_OK;
 }

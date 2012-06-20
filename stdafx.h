@@ -110,11 +110,14 @@ static CONST GUID gcstGUID = { 0x66D3E881, 0x972B, 0x458B, { 0x93, 0x5E, 0x9E, 0
 #define ACCELERATOR_EDIT//	キーのアレ編集
 
 //	作成中の機能
+#define EDGE_BLANK_STYLE	//	レイヤ合成するとき、白ヌキ領域を用意する
 //#define FIND_STRINGS	//	文字列検索機能
 //#define PAGE_MULTISELECT//	頁一覧の複数選択
 #define PAGE_DELAY_LOAD	//	ファイル読み込んだ時は頁展開しない、ひつようになったら開く
 //#define PLUGIN_ENABLE	//	プラグイン機能
 #define USE_HOVERTIP
+//#define PGL_TOOLTIP
+//#define MAA_TOOLTIP
 
 #define MAA_IADD_PLUS	//	MAAへのアイテム追加機能拡張
 //	リソースの IDM_MAA_IADD_OPEN IDM_MAA_ITEM_INSERT に注意
@@ -252,7 +255,7 @@ LRESULT	ExceptionMessage( LPCSTR, LPCSTR, UINT, LPARAM );
 #define VL_MAA_TOPMOST	17	//!<	VIEWERＭＡＡを最前面・EDITORＭＡＡ窓ON/OFF
 #define VL_R_RULER_POS	18	//!<	右ルーラの位置
 #define VL_CRLF_CODE	19	//!<	改行コード：０したらば・非０ＹＹ
-//#define VL_SPACE_VIEW	20	//!<	空白を表示するか　非０表示
+#define VL_SPACE_VIEW	20	//!<	空白を表示するか　非０表示
 #define VL_GRID_VIEW	21	//!<	グリッド表示するか
 #define VL_R_RULER_VIEW	22	//!<	右ルーラ表示するか
 #define VL_PAGETIP_VIEW	23	//!<	頁一覧のツールチップ表示するか

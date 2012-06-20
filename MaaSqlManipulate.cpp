@@ -26,7 +26,8 @@ If not, see <http://www.gnu.org/licenses/>.
 
 
 //	テーボーのバージョン
-#define TREE_TBL_VER	1500	//	プロ・ファイル
+#define TREE_TBL_VER	1500	//	プロ・ファイル初期版
+#define SUBTAB_NAME_VER	2000	//	副タブの表示名称変更に対応	20120613
 //-------------------------------------------------------------------------------------------------
 
 //	テーブル検索
@@ -35,7 +36,8 @@ CONST CHAR	cacDetectTable[] = { ("SELECT name FROM sqlite_master WHERE type='tab
 //	バージョンテーブル
 CONST CHAR	cacVersionTable[]  = { ("CREATE TABLE BuildVer ( id INTEGER PRIMARY KEY, number INTEGER NOT NULL, vertext TEXT NOT NULL)") };
 CONST CHAR	cacVerStrInsFmt[]  = { ("INSERT INTO BuildVer ( number, vertext ) VALUES ( %d, '%s' )") };
-//CONST CHAR	cacVersionNumGet[] = { ("SELECT number FROM BuildVer WHERE id == 1") };
+CONST CHAR	cacVersionNumGet[] = { ("SELECT number FROM BuildVer WHERE id == 1") };
+CONST CHAR	cacVersionUpdate[] = { ("UPDATE BuildVer SET number = %d, vertext = '%s' WHERE id == 1") };
 
 
 static sqlite3	*gpDataBase;	//	使ったＡＡストア＋ツリーのキャッシュ
@@ -65,6 +67,25 @@ VOID SqlErrMsgView( sqlite3 *psqTarget, DWORD dline )
 }
 //-------------------------------------------------------------------------------------------------
 //#endif
+
+/*!
+	元文字列がNULL指定だったらブッ飛ぶので対策
+	@param[in]	ptDest	コピー先文字列ポインタ
+	@param[in]	cchSize	コピー先文字列バッファの文字数
+	@param[in]	ptSrc	元文字列
+	@return		HRESULT	終了状態コード
+*/
+HRESULT String_Cch_Copy( LPTSTR ptDest, size_t cchSize, LPCTSTR ptSrc )
+{
+	ZeroMemory( ptDest, cchSize * sizeof(TCHAR) );
+
+	if( !(ptSrc) )	return S_FALSE;
+
+	return StringCchCopy( ptDest, cchSize , ptSrc );
+}
+//-------------------------------------------------------------------------------------------------
+
+
 
 /*!
 	SQLiteの使ったＡＡのデータベースを閉じたり開いたり
@@ -178,7 +199,7 @@ HRESULT SqlFavUpload( LPTSTR ptBaseName, DWORD dHash, LPSTR pcConts, UINT rdLeng
 	CONST CHAR	acArtSelect[] = { ("SELECT id, folder FROM ArtList WHERE hash == ?") };
 	INT		rslt;
 	UINT	index, cntID, d;
-	LPCTSTR	ptFolder;
+	//LPCTSTR	ptFolder;
 	TCHAR	atFolder[MAX_PATH];
 	BOOLEAN	bIsExist;
 	sqlite3_stmt	*statement;
@@ -203,8 +224,9 @@ HRESULT SqlFavUpload( LPTSTR ptBaseName, DWORD dHash, LPSTR pcConts, UINT rdLeng
 			ZeroMemory( atFolder, sizeof(atFolder) );
 
 			index = sqlite3_column_int( statement , 0 );	//	id
-			ptFolder = (LPCTSTR)sqlite3_column_text16( statement, 1 );	//	folder
-			if( ptFolder ){	StringCchCopy( atFolder, MAX_PATH, ptFolder );	}
+			String_Cch_Copy( atFolder, MAX_PATH, (LPCTSTR)sqlite3_column_text16( statement, 1 ) );	//	folder
+			//ptFolder = (LPCTSTR)sqlite3_column_text16( statement, 1 );
+			//if( ptFolder ){	StringCchCopy( atFolder, MAX_PATH, ptFolder );	}
 
 			SqlFavUpdate( index );	//	内容更新
 
@@ -525,7 +547,7 @@ HRESULT SqlTreeTableCreate( LPTSTR ptProfName )
 	//	ツリー情報
 	CONST CHAR	cacTreeNodeTable[] = { ("CREATE TABLE TreeNode ( id INTEGER PRIMARY KEY, type INTEGER NOT NULL, parentid INTEGER NOT NULL, nodename TEXT NOT NULL )") };
 	//	副タブ情報
-	CONST CHAR	cacMultiTabTable[] = { ("CREATE TABLE MultiTab ( id INTEGER PRIMARY KEY, filepath TEXT NOT NULL, basename TEXT NOT NULL )") };
+	CONST CHAR	cacMultiTabTable[] = { ("CREATE TABLE MultiTab ( id INTEGER PRIMARY KEY, filepath TEXT NOT NULL, basename TEXT NOT NULL, dispname TEXT )") };	//	20120613	表示名称追加
 	//	使用ＡＡ情報
 	CONST CHAR	cacArtListTable[]  = { ("CREATE TABLE ArtList ( id INTEGER PRIMARY KEY, count INTEGER NOT NULL, folder TEXT NOT NULL, lastuse  REAL NOT NULL, hash INTEGER NOT NULL, conts BLOB NOT NULL )") };
 
@@ -535,6 +557,10 @@ HRESULT SqlTreeTableCreate( LPTSTR ptProfName )
 
 	BYTE	yMode = FALSE;	//	Tableあったとかなかったとか
 	INT		rslt;
+
+	UINT	dVersion;
+	CHAR	acQuery[MAX_PATH];
+
 #ifdef _DEBUG
 	INT		i;
 #endif
@@ -562,7 +588,7 @@ HRESULT SqlTreeTableCreate( LPTSTR ptProfName )
 	}
 	//	まず、てーぶりょが有るか無いかについて
 
-	if( !yMode )
+	if( !(yMode) )
 	{
 
 		TRACE( TEXT("ツリー用テーブルが見つからなかった") );
@@ -577,16 +603,17 @@ HRESULT SqlTreeTableCreate( LPTSTR ptProfName )
 		if( SQLITE_DONE != rslt ){	SQL_DEBUG( gpDataBase );	return E_ACCESSDENIED;	}
 		rslt = sqlite3_finalize(statement);
 
-		//VERSION内容を作成
+		//VERSION内容を作成	20120613変更
 		GetLocalTime( &stSysTime );
-		StringCchPrintfA( acBuildVer, SUB_STRING, ("%d.%02d%02d.%02d%02d.%d"), stSysTime.wYear, stSysTime.wMonth, stSysTime.wDay, stSysTime.wHour, stSysTime.wMinute, TREE_TBL_VER );
-		StringCchPrintfA( acText, MAX_PATH, cacVerStrInsFmt, TREE_TBL_VER, acBuildVer );
+		StringCchPrintfA( acBuildVer, SUB_STRING, ("%d.%02d%02d.%02d%02d.%d"), stSysTime.wYear, stSysTime.wMonth, stSysTime.wDay, stSysTime.wHour, stSysTime.wMinute, SUBTAB_NAME_VER );
+		StringCchPrintfA( acText, MAX_PATH, cacVerStrInsFmt, SUBTAB_NAME_VER, acBuildVer );
 		//	初期データぶち込む
 		rslt = sqlite3_prepare( gpDataBase, acText, -1, &statement, NULL );
 		if( SQLITE_OK != rslt ){	SQL_DEBUG( gpDataBase );	return E_ACCESSDENIED;	}
 		sqlite3_reset( statement );
 		rslt = sqlite3_step( statement );
 		sqlite3_finalize(statement);
+
 
 	//プロフテーブルを作成
 		rslt = sqlite3_prepare( gpDataBase, cacProfilesTable, -1, &statement, NULL );
@@ -626,6 +653,49 @@ HRESULT SqlTreeTableCreate( LPTSTR ptProfName )
 		rslt = sqlite3_finalize(statement);
 
 	}
+	else	//	存在してるなら、ヴァージョンを確かめてーテーボーを変更
+	{
+		dVersion = 0;
+		rslt = sqlite3_prepare( gpDataBase, cacVersionNumGet, -1, &statement, NULL );
+		if( SQLITE_OK != rslt ){	SQL_DEBUG( gpDataBase );	return E_ACCESSDENIED;	}
+		rslt = sqlite3_step( statement );
+		if( SQLITE_ROW == rslt ){	dVersion = sqlite3_column_int( statement, 0 );	}
+		sqlite3_finalize( statement );
+		TRACE( TEXT("PROFILE VERSION[%d]"), dVersion );
+
+
+
+		//	副タブの表示名称を追加
+		if( TREE_TBL_VER == dVersion )
+		{
+			//	テーブルに追加
+			rslt = sqlite3_prepare( gpDataBase, ("ALTER TABLE MultiTab ADD COLUMN dispname TEXT DEFAULT \"\" "), -1, &statement, NULL );
+			if( SQLITE_OK != rslt ){	SQL_DEBUG( gpDataBase );	return E_ACCESSDENIED;	}
+			rslt = sqlite3_step( statement );	//	実行
+			if( SQLITE_DONE != rslt ){	SQL_DEBUG( gpDataBase );	return E_ACCESSDENIED;	}
+			rslt = sqlite3_finalize( statement );
+
+			//バージョン情報を書き換え
+			GetLocalTime( &stSysTime  );	//	更新日時とバージョン
+			StringCchPrintfA( acBuildVer, SUB_STRING, ("%d.%02d%02d.%02d%02d.%d"),
+				stSysTime.wYear, stSysTime.wMonth, stSysTime.wDay,
+				stSysTime.wHour, stSysTime.wMinute, SUBTAB_NAME_VER );
+
+			//	Query文字列作って
+			StringCchPrintfA( acQuery, MAX_PATH, cacVersionUpdate, SUBTAB_NAME_VER, acBuildVer );
+
+			//	情報書き換える
+			rslt = sqlite3_prepare( gpDataBase, acQuery, -1, &statement, NULL);
+			if( SQLITE_OK != rslt ){	SQL_DEBUG( gpDataBase );	return E_ACCESSDENIED;	}
+
+			sqlite3_reset( statement );
+			rslt = sqlite3_step( statement );
+			sqlite3_finalize( statement );
+
+			dVersion = SUBTAB_NAME_VER;
+		}
+	}
+
 
 	return S_OK;
 }
@@ -740,7 +810,7 @@ HRESULT SqlTreeProfSelect( LPTSTR ptProfName, UINT szName, LPTSTR ptRootPath, UI
 {
 	CONST CHAR	cacSelectQuery[] = { ("SELECT * FROM Profiles WHERE id == 1") };
 
-	LPTSTR	ptBuf;
+	//LPTSTR	ptBuf;
 	TCHAR	atName[MAX_STRING], atRoot[MAX_PATH];
 	INT		index;
 	INT		rslt;
@@ -760,9 +830,10 @@ HRESULT SqlTreeProfSelect( LPTSTR ptProfName, UINT szName, LPTSTR ptRootPath, UI
 	if( SQLITE_ROW == rslt )
 	{
 		index = sqlite3_column_int( statement , 0 );	//	id
-		StringCchCopy( atName , MAX_STRING, (LPTSTR)sqlite3_column_text16( statement, 1 ) );	//	profname
-		ptBuf = (LPTSTR)sqlite3_column_text16( statement, 2 );	//	rootpath
-		if( ptBuf ){	StringCchCopy( atRoot , MAX_PATH, ptBuf );	}
+		String_Cch_Copy( atName , MAX_STRING, (LPTSTR)sqlite3_column_text16( statement, 1 ) );	//	profname
+		String_Cch_Copy( atRoot , MAX_STRING, (LPTSTR)sqlite3_column_text16( statement, 2 ) );	//	rootpath
+		//ptBuf = (LPTSTR)sqlite3_column_text16( statement, 2 );	//	rootpath
+		//if( ptBuf ){	StringCchCopy( atRoot , MAX_PATH, ptBuf );	}
 	}
 	sqlite3_finalize( statement );
 
@@ -907,7 +978,7 @@ UINT SqlTreeNodeExtraDelete( UINT delID )
 */
 UINT SqlTreeNodeExtraSelect( UINT seekID, UINT tgtID, LPTSTR ptName )
 {
-	LPCTSTR	ptBuffer;
+	//LPCTSTR	ptBuffer;
 	CHAR	acQuery[MAX_STRING];
 	INT		rslt;
 	UINT	id = 0;
@@ -924,8 +995,9 @@ UINT SqlTreeNodeExtraSelect( UINT seekID, UINT tgtID, LPTSTR ptName )
 	if( SQLITE_ROW == rslt )
 	{
 		id = sqlite3_column_int( statement, 0 );	//	id
-		ptBuffer = (LPCTSTR)sqlite3_column_text16( statement, 1 );	//	nodename
-		if( ptBuffer  ){	StringCchCopy( ptName, MAX_PATH, ptBuffer );	}
+		String_Cch_Copy( ptName, MAX_PATH, (LPCTSTR)sqlite3_column_text16( statement, 1 ) );	//	nodename
+		//ptBuffer = (LPCTSTR)sqlite3_column_text16( statement, 1 );	//	nodename
+		//if( ptBuffer  ){	StringCchCopy( ptName, MAX_PATH, ptBuffer );	}
 	}
 
 	sqlite3_finalize( statement );
@@ -1000,7 +1072,7 @@ HRESULT SqlTreeNodeEnum( UINT dProfID, BUFFERBACK pfDataing )
 			id   = sqlite3_column_int( statement, 0 );	//	id
 			type = sqlite3_column_int( statement, 1 );	//	type
 			prnt = sqlite3_column_int( statement, 2 );	//	parentid
-			StringCchCopy( atName, MAX_PATH, (LPCTSTR)sqlite3_column_text16( statement, 3 ) );	//	nodename
+			String_Cch_Copy( atName, MAX_PATH, (LPCTSTR)sqlite3_column_text16( statement, 3 ) );	//	nodename
 
 			pfDataing( id, type, prnt, atName );
 		}
@@ -1083,7 +1155,7 @@ UINT SqlTreeNodePickUpID( UINT tgtID, PUINT pType, PUINT pPrntID, LPTSTR ptName,
 		id       = sqlite3_column_int( statement, 0 );	//	id
 		*pType   = sqlite3_column_int( statement, 1 );	//	type
 		*pPrntID = sqlite3_column_int( statement, 2 );	//	parentid
-		StringCchCopy( ptName, MAX_PATH, (LPCTSTR)sqlite3_column_text16( statement, 3 ) );	//	nodename
+		String_Cch_Copy( ptName, MAX_PATH, (LPCTSTR)sqlite3_column_text16( statement, 3 ) );	//	nodename
 	}
 
 	sqlite3_finalize( statement );
@@ -1118,7 +1190,7 @@ UINT SqlChildNodePickUpID( UINT dPrntID, UINT tgtID, PUINT pType, LPTSTR ptName 
 		id     = sqlite3_column_int( statement, 0 );	//	id
 		*pType = sqlite3_column_int( statement, 1 );	//	type
 		dummy  = sqlite3_column_int( statement, 2 );	//	parentid
-		StringCchCopy( ptName, MAX_PATH, (LPCTSTR)sqlite3_column_text16( statement, 3 ) );	//	nodename
+		String_Cch_Copy( ptName, MAX_PATH, (LPCTSTR)sqlite3_column_text16( statement, 3 ) );	//	nodename
 	}
 
 	sqlite3_finalize( statement );
@@ -1338,11 +1410,12 @@ UINT SqlTreeCacheInsert( UINT dType, UINT dPrnt, LPTSTR ptName )
 	副タブ情報を追加
 	@param[in]	ptFilePath	ファイルパス・空なら使用から開いた
 	@param[in]	ptBaseName	ルート直下のディレクトリ名
+	@param[in]	ptDispName	タブの表示名
 	@return	UINT	いま登録したID番号・余り意味はない
 */
-UINT SqlMultiTabInsert( LPTSTR ptFilePath, LPTSTR ptBaseName )
+UINT SqlMultiTabInsert( LPCTSTR ptFilePath, LPCTSTR ptBaseName, LPCTSTR ptDispName )
 {
-	CONST CHAR	acMultitabInsert[] = { ("INSERT INTO MultiTab ( filepath, basename ) VALUES ( ?, ? )") };
+	CONST CHAR	acMultitabInsert[] = { ("INSERT INTO MultiTab ( filepath, basename, dispname ) VALUES ( ?, ?, ? )") };
 	CONST CHAR	acAddNumCheck[] = { ("SELECT LAST_INSERT_ROWID( ) FROM MultiTab") };
 
 	INT		rslt;
@@ -1357,6 +1430,7 @@ UINT SqlMultiTabInsert( LPTSTR ptFilePath, LPTSTR ptBaseName )
 	sqlite3_reset( statement );
 	rslt = sqlite3_bind_text16( statement, 1, ptFilePath, -1, SQLITE_STATIC );	//	filepath
 	rslt = sqlite3_bind_text16( statement, 2, ptBaseName, -1, SQLITE_STATIC );	//	basename
+	rslt = sqlite3_bind_text16( statement, 3, ptDispName, -1, SQLITE_STATIC );	//	dispname
 
 	rslt = sqlite3_step( statement );
 	if( SQLITE_DONE != rslt ){	SQL_DEBUG( gpDataBase );	}
@@ -1382,9 +1456,10 @@ UINT SqlMultiTabInsert( LPTSTR ptFilePath, LPTSTR ptBaseName )
 	@param[in]	id			検索するＩＤ
 	@param[out]	ptFilePath	ファイルパスバッファ・MAX_PATHであること
 	@param[out]	ptBaseName	ルート直下のディレクトリ名バッファ・MAX_PATHであること
+	@param[in]	ptDispName	タブの表示名・MAX_PATHであること
 	@return	UINT	引っ張ったヤツのID番号・ヒットしなかったら０
 */
-UINT SqlMultiTabSelect( INT id, LPTSTR ptFilePath, LPTSTR ptBaseName )
+UINT SqlMultiTabSelect( INT id, LPTSTR ptFilePath, LPTSTR ptBaseName, LPTSTR ptDispName )
 {
 	CHAR	acQuery[MAX_STRING];
 	INT		rslt;
@@ -1403,8 +1478,9 @@ UINT SqlMultiTabSelect( INT id, LPTSTR ptFilePath, LPTSTR ptBaseName )
 	if( SQLITE_ROW == rslt )
 	{
 		index = sqlite3_column_int( statement , 0 );	//	id
-		StringCchCopy( ptFilePath, MAX_PATH, (LPCTSTR)sqlite3_column_text16( statement, 1 ) );	//	filepath
-		StringCchCopy( ptBaseName, MAX_PATH, (LPCTSTR)sqlite3_column_text16( statement, 2 ) );	//	basename
+		String_Cch_Copy( ptFilePath, MAX_PATH, (LPCTSTR)sqlite3_column_text16( statement, 1 ) );	//	filepath
+		String_Cch_Copy( ptBaseName, MAX_PATH, (LPCTSTR)sqlite3_column_text16( statement, 2 ) );	//	basename
+		String_Cch_Copy( ptDispName, MAX_PATH, (LPCTSTR)sqlite3_column_text16( statement, 3 ) );	//	dispname
 	}
 
 	sqlite3_finalize( statement );

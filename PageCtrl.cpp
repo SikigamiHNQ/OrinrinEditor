@@ -24,12 +24,6 @@ If not, see <http://www.gnu.org/licenses/>.
 //	TODO:	各頁の詳細を表示出来るようにする
 //	TODO:	選択頁のみ保存とか、なんかそんな機能ほしい
 
-
-#ifndef USE_HOVERTIP
-//	20120608
-#define PGL_TOOLTIP
-#endif
-
 #define PAGELIST_CLASS	TEXT("PAGE_LIST")
 #define PL_WIDTH	110
 #define PL_HEIGHT	300
@@ -61,8 +55,9 @@ static BOOLEAN	gbPgTipView;	//!<	頁ツールティップ表示ON/OFF
 static INT		gixPreviSel;	//!<	直前まで選択してた頁
 
 static INT		gixMouseSel;	//!<	マウスカーソル下のアレ
-static INT		gixPreSel;		//!<	マウスカーソル下のアレ
-
+#ifdef PGL_TOOLTIP
+static INT	gixPreSel;		//!<	マウスカーソル下のアレ
+#endif
 
 static BOOLEAN	gbPgRetFocus;	//!<	頁を選択したら編集窓にフォーカス戻すか
 
@@ -111,8 +106,10 @@ HRESULT PageListCombine( HWND, INT );
 HRESULT	PageListJump( INT );
 
 LRESULT	CALLBACK gpfPageViewProc( HWND, UINT, WPARAM, LPARAM );
-LRESULT	Plv_OnNotify( HWND , INT, LPNMHDR );	//!<	
 VOID	Plv_OnMouseMove( HWND, INT, INT, UINT );	//!<	
+#ifdef PGL_TOOLTIP
+LRESULT	Plv_OnNotify( HWND , INT, LPNMHDR );	//!<	
+#endif
 
 LRESULT	CALLBACK gpfPageToolProc( HWND, UINT, WPARAM, LPARAM );
 
@@ -170,8 +167,9 @@ HWND PageListInitialise( HINSTANCE hInstance, HWND hParentWnd, LPRECT pstFrame )
 	ghInst = hInstance;
 
 	gixMouseSel = -1;
+#ifdef PGL_TOOLTIP
 	gixPreSel = -1;
-
+#endif
 	gixPreviSel = -1;
 
 	gbPgTipView = InitParamValue( INIT_LOAD, VL_PAGETIP_VIEW, 1 );
@@ -495,7 +493,7 @@ VOID Plt_OnCommand( HWND hWnd, INT id, HWND hWndCtl, UINT codeNotify )
 #ifdef PAGE_MULTISELECT
 			if( 0 <= iNxItem )	//	複数選択してるのなら、いつでも確認入れる
 			{
-				mRslt = MessageBox( hWnd, TEXT("複数の頁を削除しようとしてるのです。\r\n本当に削除していいのですか？"), TEXT("操作確認"), MB_YESNO | MB_DEFBUTTON2 );
+				mRslt = MessageBox( hWnd, TEXT("複数の頁を削除しようとしてるよ。\r\n本当に削除していいのかい？"), TEXT("お燐からの確認"), MB_YESNO | MB_DEFBUTTON2 );
 				if( IDYES == mRslt )
 				{
 					for( i = 0; iCount > i; i++ )	//	一応リミット
@@ -1362,9 +1360,11 @@ LRESULT CALLBACK gpfPageViewProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPa
 
 	switch( msg )
 	{
-		HANDLE_MSG( hWnd, WM_NOTIFY,    Plv_OnNotify  );	//	コモンコントロールの個別イベント
 		HANDLE_MSG( hWnd, WM_MOUSEMOVE, Plv_OnMouseMove );	
 		HANDLE_MSG( hWnd, WM_COMMAND,   Plt_OnCommand );	
+#ifdef PGL_TOOLTIP
+		HANDLE_MSG( hWnd, WM_NOTIFY,    Plv_OnNotify  );	//	コモンコントロールの個別イベント
+#endif
 
 #ifdef USE_HOVERTIP
 		case WM_MOUSEHOVER:
@@ -1372,9 +1372,8 @@ LRESULT CALLBACK gpfPageViewProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPa
 			return 0;
 
 		case WM_MOUSELEAVE:
-			TRACE( TEXT("MOUSE LEAVE RISING") );
+			HoverTipOnMouseLeave( hWnd );
 			gixMouseSel = -1;
-			gixPreSel = -1;
 			return 0;
 #endif
 	}
@@ -1408,14 +1407,11 @@ VOID Plv_OnMouseMove( HWND hWnd, INT x, INT y, UINT keyFlags )
 	gixMouseSel = iItem;
 
 #ifdef USE_HOVERTIP
-	if( bReDraw )
-	{
-		HoverTipResist( ghPageListWnd );
-	}
+	if( bReDraw ){	HoverTipResist( ghPageListWnd );	}
 #endif
 
 #ifdef PGL_TOOLTIP
-	if( bReDraw )	SendMessage( ghPageTipWnd, TTM_UPDATE, 0, 0 );
+	if( bReDraw ){	SendMessage( ghPageTipWnd, TTM_UPDATE, 0, 0 );	}
 #endif
 
 //	TRACE( TEXT("PLV MM %d,%d,%d [%d]"), iItem, stHitInfo.iItem, stHitInfo.iSubItem, bReDraw );
@@ -1424,6 +1420,7 @@ VOID Plv_OnMouseMove( HWND hWnd, INT x, INT y, UINT keyFlags )
 }
 //-------------------------------------------------------------------------------------------------
 
+#ifdef PGL_TOOLTIP
 /*!
 	ノーティファイメッセージの処理
 	@param[in]	hWnd		ウインドウハンドル
@@ -1433,7 +1430,6 @@ VOID Plv_OnMouseMove( HWND hWnd, INT x, INT y, UINT keyFlags )
 */
 LRESULT Plv_OnNotify( HWND hWnd, INT idFrom, LPNMHDR pstNmhdr )
 {
-#ifdef PGL_TOOLTIP
 	INT				dBytes;
 	UINT_PTR		rdLength;
 	LPNMTTDISPINFO	pstDispInfo;
@@ -1487,7 +1483,6 @@ LRESULT Plv_OnNotify( HWND hWnd, INT idFrom, LPNMHDR pstNmhdr )
 			return 0;
 		}
 	}
-#endif
 
 //	処理なかったら続ける？
 	return CallWindowProc( gpfOrigPageViewProc, hWnd, WM_NOTIFY, (WPARAM)idFrom, (LPARAM)pstNmhdr );
@@ -1495,28 +1490,26 @@ LRESULT Plv_OnNotify( HWND hWnd, INT idFrom, LPNMHDR pstNmhdr )
 	//	無限ループしてないか、大丈夫か
 }
 //-------------------------------------------------------------------------------------------------
+#endif
 
 
 #ifdef USE_HOVERTIP
 /*!
 	HoverTip用のコールバック受取
+	@param[in]	pVoid	未定義
+	@return	確保した文字列・もしくはNULL
 */
 LPTSTR CALLBACK PageListHoverTipInfo( LPVOID pVoid )
 {
 	INT		dBytes;
 	LPTSTR	ptBuffer = NULL;
 
-	if( gixPreSel != gixMouseSel )
-	{
-		if( !(gbPgTipView) ){	return NULL;	}	//	非表示なら何もしないでおｋ
-		if( 0 > gixMouseSel ){	return NULL;	}
+	if( !(gbPgTipView) ){	return NULL;	}	//	非表示なら何もしないでおｋ
+	if( 0 > gixMouseSel ){	return NULL;	}
 
-		gixPreSel = gixMouseSel;
-
-		//	該当ページから引っ張る
-		dBytes = DocPageTextGetAlloc( gitFileIt, gixMouseSel, D_UNI, (LPVOID *)(&ptBuffer), FALSE );
-		TRACE( TEXT("HOVER CALL %d, by[%d]"), gixMouseSel, dBytes );
-	}
+	//	該当ページから引っ張る
+	dBytes = DocPageTextGetAlloc( gitFileIt, gixMouseSel, D_UNI, (LPVOID *)(&ptBuffer), FALSE );
+	TRACE( TEXT("HOVER CALL %d, by[%d]"), gixMouseSel, dBytes );
 
 	return ptBuffer;
 }

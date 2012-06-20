@@ -157,8 +157,8 @@ HRESULT		SqlTreeCacheDelID( INT );
 UINT		SqlTreeCacheInsert( UINT, UINT, LPTSTR );
 
 
-UINT		SqlMultiTabInsert( LPTSTR, LPTSTR );
-UINT		SqlMultiTabSelect( INT, LPTSTR, LPTSTR );
+UINT		SqlMultiTabInsert( LPCTSTR, LPCTSTR, LPCTSTR );
+UINT		SqlMultiTabSelect( INT, LPTSTR, LPTSTR, LPTSTR );
 HRESULT		SqlMultiTabDelete( VOID );
 
 #ifdef EXTRA_NODE_STYLE

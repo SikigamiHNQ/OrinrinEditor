@@ -129,7 +129,7 @@ HRESULT DocDoOpenFile( HWND hWnd, LPTSTR ptFile )
 	dNumber = DocFileInflate( ptFile );	//	開いて中身展開
 	if( !(dNumber) )
 	{
-		MessageBox( hWnd, TEXT("ファイルを開けなかったかしらー！？"), NULL, MB_OK | MB_ICONERROR );
+		MessageBox( hWnd, TEXT("ファイルを開けなかったよ"), TEXT("お燐からのお知らせ"), MB_OK | MB_ICONERROR );
 		return E_HANDLE;
 	}
 	else
@@ -482,7 +482,7 @@ HRESULT DocFileSave( HWND hWnd, UINT bStyle )
 	hFile = CreateFile( atFilePath, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL );
 	if( INVALID_HANDLE_VALUE == hFile )
 	{
-		MessageBox( hWnd, TEXT("ファイルを開けなかったですぅ"), NULL, MB_OK | MB_ICONERROR );
+		MessageBox( hWnd, TEXT("ファイルを開けなかったよ"), TEXT("お燐からのお知らせ"), MB_OK | MB_ICONERROR );
 		return E_HANDLE;
 	}
 

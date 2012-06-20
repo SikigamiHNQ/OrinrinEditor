@@ -351,7 +351,7 @@ HWND ViewInitialise( HINSTANCE hInstance, HWND hParentWnd, LPRECT pstFrame, LPTS
 	MenuItemCheckOnOff( IDM_RIGHT_RULER_TOGGLE, gbRitRlrView );
 
 	//	空白表示制御
-	gdSpaceView = TRUE;//InitParamValue( INIT_LOAD, VL_SPACE_VIEW, 1 );
+	gdSpaceView = InitParamValue( INIT_LOAD, VL_SPACE_VIEW, TRUE );
 	MenuItemCheckOnOff( IDM_SPACE_VIEW_TOGGLE, gdSpaceView );
 	OperationOnStatusBar(  );
 
@@ -402,7 +402,7 @@ HWND ViewInitialise( HINSTANCE hInstance, HWND hParentWnd, LPRECT pstFrame, LPTS
 	iOpMode = InitParamValue( INIT_LOAD, VL_LAST_OPEN, LASTOPEN_DO );	//	ラストオーポン・とりやえず開く
 	if( LASTOPEN_ASK <= iOpMode )	//	質問型
 	{
-		iRslt = MessageBox( NULL, TEXT("最後に開けていたファイルを開くのですか？"), TEXT("起動時オープンファイル確認"), MB_YESNO | MB_ICONQUESTION );
+		iRslt = MessageBox( NULL, TEXT("最後に開いていたファイルを開くかい？"), TEXT("お燐からの確認"), MB_YESNO | MB_ICONQUESTION );
 		if( IDYES == iRslt )	iOpMode = LASTOPEN_DO;
 		else					iOpMode = LASTOPEN_NON;
 	}
@@ -2403,6 +2403,7 @@ VOID OperationOnCommand( HWND hWnd, INT id, HWND hWndCtl, UINT codeNotify )
 		//	空白の表示非表示切換
 		case IDM_SPACE_VIEW_TOGGLE:
 			gdSpaceView = !(gdSpaceView);
+			InitParamValue( INIT_SAVE, VL_SPACE_VIEW, gdSpaceView );
 			MenuItemCheckOnOff( IDM_SPACE_VIEW_TOGGLE, gdSpaceView );
 			OperationOnStatusBar(  );
 			ViewRedrawSetLine( -1 );	//	画面表示更新
