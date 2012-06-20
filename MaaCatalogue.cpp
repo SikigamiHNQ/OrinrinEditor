@@ -264,8 +264,11 @@ DWORD AacInflateMlt( LPSTR pcTotal, DWORD cbTotal )
 		stAAbuf.cbItem = pcEnd - pcCaret;	//	バイト数なのでこれでいいはず
 
 		//＠＠	末端の0x0D単独を外す
-		pcCheck = pcEnd;	pcCheck--;
-		if( 0x0D == *pcCheck )	stAAbuf.cbItem--;
+		if( 0 != stAAbuf.cbItem )
+		{
+			pcCheck = pcEnd;	pcCheck--;
+			if( 0x0D == *pcCheck )	stAAbuf.cbItem--;
+		}
 
 		stAAbuf.pcItem = (LPSTR)malloc( stAAbuf.cbItem + 2 );
 		ZeroMemory( stAAbuf.pcItem, stAAbuf.cbItem + 2 );
