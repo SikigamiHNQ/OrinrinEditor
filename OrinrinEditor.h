@@ -531,9 +531,9 @@ HMENU		CntxMenuGet( VOID );	//!<
 HRESULT		MultiFileTabFirst( LPTSTR );	//!<	
 HRESULT		MultiFileTabAppend( LPARAM, LPTSTR );	//!<	
 HRESULT		MultiFileTabSelect( LPARAM );	//!<	
-HRESULT		MultiFileTabSlide( INT );	//!<	
+HRESULT		MultiFileTabSlide( INT );		//!<	
 HRESULT		MultiFileTabRename( LPARAM, LPTSTR );	//!<	
-HRESULT		MultiFileTabClose( VOID );	//!<	
+HRESULT		MultiFileTabClose( INT );		//!<	
 INT			MultiFileTabSearch( LPARAM );	//!<	
 INT			InitMultiFileTabOpen( UINT, INT, LPTSTR );	//!<	
 
@@ -762,12 +762,12 @@ INT			DocSelectedDelete( PINT, PINT, UINT, BOOLEAN );	//!<
 INT			DocSelectedBrushFilling( LPTSTR, PINT, PINT );	//!<	
 INT			DocSelectTextGetAlloc( UINT, LPVOID *, LPPOINT * );	//!<	
 
-HRESULT		DocExtractExecute( HINSTANCE );	//!<	
+HRESULT		DocExtractExecute( HINSTANCE  );	//!<	
 
-LPARAM		DocOpendFileCheck( LPTSTR );	//!<	
-HRESULT		DocFileSave( HWND, UINT );	//!<	
-HRESULT		DocFileOpen( HWND );	//!<	
-HRESULT		DocDoOpenFile( HWND, LPTSTR );	//!<	
+LPARAM		DocOpendFileCheck( LPTSTR );		//!<	
+HRESULT		DocFileSave( HWND, UINT );			//!<	
+HRESULT		DocFileOpen( HWND );				//!<	
+HRESULT		DocDoOpenFile( HWND, LPTSTR );		//!<	
 HRESULT		DocImageSave( HWND, UINT, HFONT );	//!<	
 
 UINT		DocStringSplitMLT( LPTSTR, INT, PAGELOAD );	//!<	
@@ -776,17 +776,17 @@ UINT		DocStringSplitAST( LPTSTR, INT, PAGELOAD );	//!<
 UINT		DocImportSplitASD( LPSTR, INT, PAGELOAD );	//!<	
 
 INT			DocLineStateCheckWithDot( INT, INT, PINT, PINT, PINT, PINT, PBOOLEAN );	//!<	
-HRESULT		DocRightGuideline( LPVOID );	//!<	
+HRESULT		DocRightGuideline( LPVOID );			//!<	
 INT			DocSpaceShiftProc( UINT, PINT, INT );	//!<	
-LPTSTR		DocPaddingSpaceMake( INT );	//!<	
+LPTSTR		DocPaddingSpaceMake( INT  );			//!<	
 LPTSTR		DocPaddingSpaceUni( INT, PINT, PINT, PINT );	//!<	
 LPTSTR		DocPaddingSpaceWithGap( INT, PINT, PINT );	//!<	
 LPTSTR		DocPaddingSpaceWithPeriod( INT, PINT, PINT, PINT, BOOLEAN );	//!<	
-HRESULT		DocLastSpaceErase( PINT, INT );	//!<	
+HRESULT		DocLastSpaceErase( PINT , INT );		//!<	
 HRESULT		DocTopLetterInsert( TCHAR, PINT, INT );	//!<	
-HRESULT		DocLastLetterErase( PINT, INT );	//!<	
-HRESULT		DocTopSpaceErase( PINT, INT );	//!<	
-HRESULT		DocRightSlide( PINT, INT );	//!<	
+HRESULT		DocLastLetterErase( PINT, INT );		//!<	
+HRESULT		DocTopSpaceErase( PINT, INT );			//!<	
+HRESULT		DocRightSlide( PINT , INT );			//!<	
 
 HRESULT		DocPositionShift( UINT, PINT, INT );	//!<	
 
@@ -794,54 +794,54 @@ HRESULT		DocHeadHalfSpaceExchange( HWND );	//!<
 
 LPTSTR		DocLastSpDel( vector<LETTER> * );	//!<	
 
-INT			DocDiffAdjBaseSet( INT );	//!<	
+INT			DocDiffAdjBaseSet( INT );		//!<	
 INT			DocDiffAdjExec( PINT, INT );	//!<	
 
-VOID		ZeroONELINE( LPONELINE );	//!<	
+VOID		ZeroONELINE( LPONELINE );		//!<	
 INT			DocStringInfoCount( LPCTSTR, UINT_PTR, PINT, PINT );	//!<	
 
 BOOLEAN		NowPageInfoGet( UINT, LPPAGEINFOS );	//!<	
 
 UINT		DocRangeDeleteByMozi( INT, INT, INT, INT, PBOOLEAN );	//!<	
 
-INT			DocUndoExecute( PINT, PINT );	//!<	
-INT			DocRedoExecute( PINT, PINT );	//!<	
+INT			DocUndoExecute( PINT, PINT );		//!<	
+INT			DocRedoExecute( PINT, PINT );		//!<	
 
-LPARAM		DocFileInflate( LPTSTR );	//!<	
+LPARAM		DocFileInflate( LPTSTR );			//!<	
 INT			DocFileCloseCheck( HWND, UINT );	//!<	
-HRESULT		DocClipLetter( TCHAR );	//!<	
+HRESULT		DocClipLetter( TCHAR  );			//!<	
 VOID		DocBackupDirectoryInit( LPTSTR );	//!<	
-HRESULT		DocFileBackup( HWND );	//!<	
+HRESULT		DocFileBackup( HWND );				//!<	
 
-HRESULT		DocMultiFileDeleteAll( VOID );	//!<	
-LPARAM		DocMultiFileDelete( HWND, LPARAM );	//!<	
-HRESULT		DocMultiFileSelect( LPARAM );	//!<	
-HRESULT		DocMultiFileModify( UINT );	//!<	
-HRESULT		DocMultiFileStore( LPTSTR );	//!<	
+HRESULT		DocMultiFileCloseAll( VOID );		//!<	
+LPARAM		DocMultiFileClose( HWND, LPARAM );	//!<	
+HRESULT		DocMultiFileSelect( LPARAM );		//!<	
+HRESULT		DocMultiFileModify( UINT  );		//!<	
+HRESULT		DocMultiFileStore( LPTSTR );		//!<	
 INT			DocMultiFileFetch( INT, LPTSTR, LPTSTR );	//!<	
-LPTSTR		DocMultiFileNameGet( INT );	//!<	
+LPTSTR		DocMultiFileNameGet( INT  );		//!<	
 
 #ifdef AA_INVERSE
-HRESULT		DocInverseInit( UINT );	//!<	
+HRESULT		DocInverseInit( UINT  );	//!<	
 HRESULT		DocInverseTransform( UINT, UINT, PINT, INT );	//!<	
 #endif
 
 HRESULT		SqnInitialise( LPUNDOBUFF );	//!<	
-HRESULT		SqnFreeAll( LPUNDOBUFF );	//!<	
-HRESULT		SqnSetting( VOID );	//!<	
+HRESULT		SqnFreeAll( LPUNDOBUFF );		//!<	
+HRESULT		SqnSetting( VOID  );			//!<	
 UINT		SqnAppendLetter( LPUNDOBUFF, UINT, TCHAR, INT, INT, UINT );	//!<	
 UINT		SqnAppendString( LPUNDOBUFF, UINT, LPCTSTR, INT, INT, UINT );	//!<	
 UINT		SqnAppendSquare( LPUNDOBUFF, UINT, LPCTSTR, LPPOINT, INT, UINT );	//!<	
 
-HRESULT		UnicodeRadixExchange( LPVOID );	//!<	
+HRESULT		UnicodeRadixExchange( LPVOID  );		//!<	
 
 INT			MoziInitialise( LPTSTR, HINSTANCE );	//!<	
 HWND		MoziScripterCreate( HINSTANCE, HWND );	//!<	
-HRESULT		MoziMoveFromView( HWND , UINT );	//!<	
+HRESULT		MoziMoveFromView( HWND , UINT );		//!<	
 
 INT			VertInitialise( LPTSTR, HINSTANCE );	//!<	
 HWND		VertScripterCreate( HINSTANCE, HWND );	//!<	
-HRESULT		VertMoveFromView( HWND , UINT );	//!<	
+HRESULT		VertMoveFromView( HWND , UINT );		//!<	
 
 #ifdef FIND_STRINGS
 HRESULT		FindDialogueOpen( HINSTANCE, HWND );	//!<	
@@ -855,7 +855,7 @@ HRESULT		FindStringJump( UINT );	//!<
 LPCTSTR		NextLineW( LPCTSTR );	//!<	
 LPTSTR		NextLineW( LPTSTR );	//!<	
 
-LPSTR		NextLineA( LPSTR );	//!<	
+LPSTR		NextLineA( LPSTR  );	//!<	
 
 
 //Viewer‚à—L‚è
@@ -863,14 +863,14 @@ HRESULT	DraughtInitialise( HINSTANCE, HWND );	//!<
 HWND	DraughtWindowCreate( HINSTANCE, HWND, UINT );	//!<	
 
 UINT	DraughtItemAddFromSelect( UINT );	//!<	
-UINT	DraughtItemAdding( LPSTR );	//!<	
+UINT	DraughtItemAdding( LPSTR  );		//!<	
 
 UINT	DraughtAaImageing( LPAAMATRIX );	//!<	
 
 
 INT		TextViewSizeGet( LPCTSTR, PINT );	//!<	
 
-INT_PTR	AacItemCount( UINT );	//!<	
+INT_PTR	AacItemCount( UINT );				//!<	
 HBITMAP	AacArtImageGet( INT, LPSIZE, LPSIZE );	//!<	
 
 LPSTR	AacAsciiArtGet( DWORD );			//!<	

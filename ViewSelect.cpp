@@ -116,6 +116,8 @@ HRESULT ViewSelPositionSet( LPVOID pVoid )
 */
 UINT ViewSqSelModeToggle( UINT bMode, LPVOID pVoid )
 {
+	POINT	point;
+
 	TRACE( TEXT("矩形選択ON/OFF") );
 
 	//	選択動作中はモード変更しない
@@ -151,6 +153,8 @@ UINT ViewSqSelModeToggle( UINT bMode, LPVOID pVoid )
 	{
 		SetClassLongPtr( ghViewWnd, GCLP_HCURSOR, (LONG_PTR)(LoadCursor( NULL, IDC_IBEAM ) ) );
 	}
+	GetCursorPos( &point );
+	SetCursorPos( point.x, point.y );
 
 	return gbSqSelect;
 }
@@ -516,6 +520,9 @@ HRESULT ViewSelAreaSelect( LPVOID pVoid )
 	//	ドラッグ移動を模擬的に行う
 
 	gdDocXdot = iEndDot;	//	選択範囲として移動する
+
+	ViewDrawCaret( gdDocXdot, gdDocLine, 1 );	//	ここでキャレットも移動
+
 	ViewSelMoveCheck( TRUE );
 	ViewSelPositionSet( NULL );	//	移動した位置を記録
 

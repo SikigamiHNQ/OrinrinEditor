@@ -226,7 +226,7 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 2012,613,2200,920
+ FILEVERSION 2012,626,2200,920
  PRODUCTVERSION 11,0,0,920
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
@@ -252,7 +252,7 @@ BEGIN
             VALUE "LegalTrademarks", "License : GPLv3"
             VALUE "PrivateBuild", "Build by Visual C++ 2008 Express"
             VALUE "SpecialBuild", "Not Speciality"
-            VALUE "FileVersion", "2012.613.2200.920"
+            VALUE "FileVersion", "2012.626.2200.920"
             VALUE "ProductVersion", "11.0.0.920"
             VALUE "FileDescription", "AsciiArt Viewer Ver11"
             VALUE "OriginalFilename", "OrinrinViewer.exe"

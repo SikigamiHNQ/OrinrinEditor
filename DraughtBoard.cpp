@@ -110,7 +110,7 @@ LRESULT	Drt_OnNotify( HWND , INT, LPNMHDR );			//!<
 #endif
 
 #ifdef USE_HOVERTIP
-LPTSTR	CALLBACK DraughtHoverTipInfo( LPVOID );
+LPTSTR	CALLBACK DraughtHoverTipInfo( LPVOID  );		//!<	HoverTip用のコールバック受取
 #endif
 //-------------------------------------------------------------------------------------------------
 
@@ -196,7 +196,7 @@ HRESULT DraughtInitialise( HINSTANCE hInstance, HWND hPtWnd )
 HWND DraughtWindowCreate( HINSTANCE hInstance, HWND hPtWnd, UINT bThumb )
 {
 	INT_PTR	iItems;
-	INT		iRslt, iScWid = 0;
+	INT		iRslt, iScWid = 0, iScHei;
 	HDC		hdc;
 
 	INT		iBrdrWid = 0;
@@ -207,6 +207,7 @@ HWND DraughtWindowCreate( HINSTANCE hInstance, HWND hPtWnd, UINT bThumb )
 	TTTOOLINFO	stToolInfo;
 #endif
 
+	INT		iCapHei, iXfrm, iYfrm;
 	INT		iLines, iStep = 0;
 	LONG	rigOffs = 0;
 	SCROLLINFO	stScrollInfo;
@@ -223,6 +224,11 @@ HWND DraughtWindowCreate( HINSTANCE hInstance, HWND hPtWnd, UINT bThumb )
 
 	iItems = gvcDrtItems.size( );	//	現在個数・ここでは使わない
 
+
+	iCapHei = GetSystemMetrics( SM_CYSMCAPTION );
+	iXfrm   = GetSystemMetrics( SM_CXFIXEDFRAME );
+	iYfrm   = GetSystemMetrics( SM_CYFIXEDFRAME );
+
 	if( 0 >  gstViewLsPt.x )	//	未設定なら
 	{
 		GetWindowRect( hPtWnd, &wdRect );
@@ -237,8 +243,11 @@ HWND DraughtWindowCreate( HINSTANCE hInstance, HWND hPtWnd, UINT bThumb )
 		rect.left   = gstViewLsPt.x;
 		rect.top    = gstViewLsPt.y;
 	}
-	rect.right  = THM_WIDTH  * TPNL_HORIZ;
-	rect.bottom = THM_HEIGHT * TPNL_VERTI;
+	rect.right  = (THM_WIDTH  * TPNL_HORIZ) + (iXfrm * 2);
+	rect.bottom = (THM_HEIGHT * TPNL_VERTI);
+	iScHei = rect.bottom;
+	rect.bottom += ((iYfrm * 2) + iCapHei);
+
 
 //	if( ghPtWnd == hPtWnd )	呼びだした方によって、ラスト位置リロード・底までしなくて良いか
 
@@ -299,7 +308,7 @@ HWND DraughtWindowCreate( HINSTANCE hInstance, HWND hPtWnd, UINT bThumb )
 	{
 		//	一覧のスクロールバー
 		ghScrBarWnd = CreateWindowEx( 0, WC_SCROLLBAR, TEXT("scroll"), WS_VISIBLE | WS_CHILD | SBS_VERT,
-			rigOffs, 0, iScWid, rect.bottom, ghDraughtWnd, (HMENU)IDSB_DRT_THUM_SCROLL, hInstance, NULL );
+			rigOffs, 0, iScWid, iScHei, ghDraughtWnd, (HMENU)IDSB_DRT_THUM_SCROLL, hInstance, NULL );
 
 		ZeroMemory( &stScrollInfo, sizeof(SCROLLINFO) );
 		stScrollInfo.cbSize = sizeof(SCROLLINFO);

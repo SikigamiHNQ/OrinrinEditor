@@ -74,9 +74,9 @@ typedef struct tagMULTIPLEMAA
 
 //-------------------------------------------------------------------------------------------------
 
-extern  HWND		ghSplitaWnd;	//	スプリットバーハンドル
+extern  HWND		ghSplitaWnd;	//		スプリットバーハンドル
 
-extern HMENU		ghProfHisMenu;	//	履歴表示する部分・動的に内容作成せないかん
+extern HMENU		ghProfHisMenu;	//		履歴表示する部分・動的に内容作成せないかん
 
 static HFONT		ghTabFont;		//!<	タブ用のフォント・ちっちゃめの字
 
@@ -92,41 +92,55 @@ static HTREEITEM	ghTreeRoot;		//!<	ツリーのルートアイテム
 static TCHAR		gatAARoot[MAX_PATH];	//!<	ＡＡディレクトリのカレント
 static TCHAR		gatBaseName[MAX_PATH];	//!<	使用リストに入れる時のグループ名
 
-static INT			gixUseTab;	//!<	今開いてるの・０ツリー　１お気に入り　２～複数ファイル
+static INT			gixUseTab;		//!<	今開いてるの・０ツリー　１お気に入り　２～複数ファイル
 //	タブ番号であることに注意・複数ファイルリストの割当番号ではない
+
+#ifdef HUKUTAB_DRAGMOVE
+static POINT		gstMouseDown;		//!<	マウスボタンが押された位置
+static INT			giDragSel;			//!<	動かそうとしたタブの番号
+static BOOLEAN		gbTabDraging;		//!<	タブをドラッグしてる
+#endif
 
 static WNDPROC	gpfOriginFavListProc;	//!<	使用リストの元プロシージャ
 static WNDPROC	gpfOriginTreeViewProc;	//!<	ツリービューの元プロシージャ
 static WNDPROC	gpfOriginTabMultiProc;	//!<	タブの元プロシージャ
 
 
-static list<MULTIPLEMAA>	gltMultiFiles;	//!<	副タブで開いているファイルの保持
+static list<MULTIPLEMAA>	gltMultiFiles;			//!<	副タブで開いているファイルの保持
 typedef  list<MULTIPLEMAA>::iterator	MLTT_ITR;	//!<	副タブリストのイテレータ
 //-------------------------------------------------------------------------------------------------
 
-HRESULT	TreeItemFromSqlII( HTREEITEM  );	//!<	ディレクトリとファイルをＳＱＬからツリービューに展開
+HRESULT	TreeItemFromSqlII( HTREEITEM  );			//!<	ディレクトリとファイルをＳＱＬからツリービューに展開
 
 #ifdef EXTRA_NODE_STYLE
-UINT	TreeNodeExtraAdding( LPCTSTR  );	//!<	エキストラファイルを追加する
+UINT	TreeNodeExtraAdding( LPCTSTR  );			//!<	エキストラファイルを追加する
 HRESULT	TreeExtraItemFromSql( HTREEITEM, UINT );	//!<	エキストラファイルをＳＱＬからツリービューに展開
 #endif
 
 VOID	Mtv_OnMButtonUp( HWND, INT, INT, UINT );	//!<	ツリービューでマウスの中バラァンがうｐされた時の処理
 VOID	Mtv_OnDropFiles( HWND , HDROP );			//!<	ツリービューにドラッグンドロップされたときの処理
 
-HRESULT	TabMultipleRestore( HWND  );			//!<	複数ファイルをINIから読み込んで再展開する
-INT		TabMultipleSelect( HWND, INT, UINT );	//!<	副タブから選択した場合
-//INT	TabMultipleOpen( HWND , HTREEITEM );	//
-HRESULT	TabMultipleDelete( HWND, CONST INT );	//!<	指定のタブを閉じる
-INT		TabMultipleAppend( HWND );				//!<	タブを増やす
+HRESULT	TabMultipleRestore( HWND  );				//!<	複数ファイルをINIから読み込んで再展開する
+INT		TabMultipleSelect( HWND, INT, UINT );		//!<	副タブから選択した場合
+//INT	TabMultipleOpen( HWND , HTREEITEM );		//
+HRESULT	TabMultipleDelete( HWND, CONST INT );		//!<	指定のタブを閉じる
+INT		TabMultipleAppend( HWND );					//!<	タブを増やす
 
-HRESULT	TabMultipleNameChange( HWND , INT );	//!<	タブ名前変更ダイヤログ開く
+HRESULT	TabMultipleNameChange( HWND , INT );		//!<	タブ名前変更ダイヤログ開く
 
 UINT	TabMultipleIsFavTab( INT, LPTSTR, UINT_PTR );	//!<	副タブはお気にリストのであるか
 
 LRESULT	CALLBACK gpfFavListProc(  HWND , UINT, WPARAM, LPARAM );	//!<	使用リストのサブクラスプロシージャ
 LRESULT	CALLBACK gpfTreeViewProc( HWND , UINT, WPARAM, LPARAM );	//!<	ツリービューのサブクラスプロシージャ
 LRESULT	CALLBACK gpfTabMultiProc( HWND , UINT, WPARAM, LPARAM );	//!<	タブのサブクラスプロシージャ
+
+VOID	Mtb_OnMButtonUp( HWND, INT, INT, UINT );	//!<	
+
+#ifdef HUKUTAB_DRAGMOVE
+VOID	TabMultipleOnLButtonDown( HWND, INT, INT, UINT );	//!<	
+VOID	TabMultipleOnMouseMove(   HWND, INT, INT, UINT );	//!<	
+VOID	TabMultipleOnLButtonUp(   HWND, INT, INT, UINT );	//!<	
+#endif
 //-------------------------------------------------------------------------------------------------
 
 /*!
@@ -172,6 +186,10 @@ HRESULT TreeInitialise( HWND hWnd, HINSTANCE hInst, LPRECT ptRect )
 
 	GetClientRect( hWnd, &clRect );
 
+#ifdef HUKUTAB_DRAGMOVE
+	gbTabDraging = FALSE;
+#endif
+
 //表示選択タブ
 	ghTabWnd = CreateWindowEx( 0, WC_TABCONTROL, TEXT("treetab"),
 		WS_VISIBLE | WS_CHILD | WS_CLIPSIBLINGS | TCS_RIGHTJUSTIFY | TCS_MULTILINE,
@@ -189,14 +207,14 @@ HRESULT TreeInitialise( HWND hWnd, HINSTANCE hInst, LPRECT ptRect )
 	itRect.bottom -= itRect.top;
 
 	itRect.right -= itRect.left;
-	itRect.top = 0;
+	itRect.top  = 0;
 	itRect.left = 0;
 	TabCtrl_AdjustRect( ghTabWnd, 0, &itRect );
 
 	MoveWindow( ghTabWnd, 0, 0, clRect.right, itRect.top, TRUE );
 
 	//	サブクラス化
-	gpfOriginTabMultiProc =SubclassWindow( ghTabWnd, gpfTabMultiProc );
+	gpfOriginTabMultiProc = SubclassWindow( ghTabWnd, gpfTabMultiProc );
 
 //お気に入り用リストボックス
 	ghFavLtWnd = CreateWindowEx( WS_EX_CLIENTEDGE, WC_LISTBOX, TEXT("favlist"),
@@ -384,12 +402,145 @@ LRESULT	CALLBACK gpfTabMultiProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPa
 		HANDLE_MSG( hWnd, WM_KEYDOWN, Aai_OnKey );			//	20120221
 		HANDLE_MSG( hWnd, WM_KEYUP,   Aai_OnKey );			//	
 
+		HANDLE_MSG( hWnd, WM_MBUTTONUP, Mtb_OnMButtonUp );
+
+#ifdef HUKUTAB_DRAGMOVE
+		case WM_LBUTTONDOWN:	TabMultipleOnLButtonDown( hWnd, (INT)(SHORT)LOWORD(lParam), (INT)(SHORT)HIWORD(lParam), (UINT)(wParam) );	break;	//	
+		case WM_MOUSEMOVE:		TabMultipleOnMouseMove(   hWnd, (INT)(SHORT)LOWORD(lParam), (INT)(SHORT)HIWORD(lParam), (UINT)(wParam) );	break;	//	
+		case WM_LBUTTONUP:		TabMultipleOnLButtonUp(   hWnd, (INT)(SHORT)LOWORD(lParam), (INT)(SHORT)HIWORD(lParam), (UINT)(wParam) );	break;	//	
+#endif
+
 		default:	break;
 	}
 
 	return CallWindowProc( gpfOriginTabMultiProc, hWnd, msg, wParam, lParam );
 }
 //-------------------------------------------------------------------------------------------------
+
+/*!
+	副タブでマウスの中ボタンがうｐされたとき
+	@param[in]	hWnd		ウインドウハンドル
+	@param[in]	x			発生したクライヤントＸ座標値
+	@param[in]	y			発生したクライヤントＹ座標値
+	@param[in]	keyFlags	他に押されてるキーについて
+*/
+VOID Mtb_OnMButtonUp( HWND hWnd, INT x, INT y, UINT flags )
+{
+	INT	curSel;
+	TCHITTESTINFO	stTcHitInfo;
+
+	stTcHitInfo.pt.x = x;
+	stTcHitInfo.pt.y = y;
+	curSel = TabCtrl_HitTest( ghTabWnd, &stTcHitInfo );
+	//	タブ　０ツリー、１使用のときは何もしない
+
+	TRACE( TEXT("MTAB start TAB [%d] [%d x %d]"), curSel, x, y );
+
+	if( 1 >= curSel ){	 return;	}
+
+	TabMultipleDelete( GetParent( ghTabWnd ), curSel );
+
+	return;
+}
+//-------------------------------------------------------------------------------------------------
+
+#ifdef HUKUTAB_DRAGMOVE
+
+/*!
+	副タブでマウスの左ボタンがダウンされたとき
+	@param[in]	hWnd		ウインドウハンドル
+	@param[in]	x			発生したクライヤントＸ座標値
+	@param[in]	y			発生したクライヤントＹ座標値
+	@param[in]	keyFlags	他に押されてるキーについて
+*/
+VOID TabMultipleOnLButtonDown( HWND hWnd, INT x, INT y, UINT keyFlags )
+{
+	TCHITTESTINFO	stTcHitInfo;
+
+	TRACE( TEXT("MTAB LDOWN [%d x %d]"), x, y );
+
+	gstMouseDown.x = x;	//	ダウンした位置を基点とする
+	gstMouseDown.y = y;
+
+	stTcHitInfo.pt = gstMouseDown;
+	giDragSel = TabCtrl_HitTest( ghTabWnd, &stTcHitInfo );
+	//	タブ　０ツリー、１使用のときは何もしない
+
+	TRACE( TEXT("MTAB start TAB [%d]"), giDragSel );
+
+	return;
+}
+//-------------------------------------------------------------------------------------------------
+
+/*!
+	副タブでマウスを動かしたとき
+	@param[in]	hWnd		ウインドウハンドル
+	@param[in]	x			発生したクライヤントＸ座標値
+	@param[in]	y			発生したクライヤントＹ座標値
+	@param[in]	keyFlags	他に押されてるキーについて
+*/
+VOID TabMultipleOnMouseMove( HWND hWnd, INT x, INT y, UINT keyFlags )
+{
+	INT	mx, my, rx, ry;
+
+	//	タブ　０ツリー、１使用のときは何もしない
+	if( 1 >= giDragSel )	return;
+
+	if( (keyFlags & MK_LBUTTON) && !(gbTabDraging) )
+	{
+		//	基点からの移動量の絶対値を確認
+		mx = abs( gstMouseDown.x - x );
+		my = abs( gstMouseDown.y - y );
+
+		rx = GetSystemMetrics( SM_CXDRAG );
+		ry = GetSystemMetrics( SM_CYDRAG );
+
+
+		//	特定量移動したらドラッグ開始とする
+		if( rx < mx || ry < my )
+		{
+			TRACE( TEXT("MTAB start DRAG [%d x %d] [%d x %d]"), rx, ry, mx, my );
+			SetCapture( hWnd  );	//	マウスキャプチャ
+			gbTabDraging = TRUE;
+		}
+
+	}
+
+	return;
+}
+//-------------------------------------------------------------------------------------------------
+
+/*!
+	副タブでマウスの左ボタンがうっｐされたとき
+	@param[in]	hWnd			ウインドウハンドル
+	@param[in]	x				発生したクライヤントＸ座標値
+	@param[in]	y				発生したクライヤントＹ座標値
+	@param[in]	keyFlags		他に押されてるキーについて
+*/
+VOID TabMultipleOnLButtonUp( HWND hWnd, INT x, INT y, UINT keyFlags )
+{
+	INT	iDragSel;
+	POINT	point;
+	TCHITTESTINFO	stTcHitInfo;
+
+	TRACE( TEXT("MTAB LUP [%d x %d]"), x, y );
+	point.x = x;
+	point.y = y;
+
+	if( gbTabDraging )
+	{
+		stTcHitInfo.pt = point;
+		iDragSel = TabCtrl_HitTest( ghTabWnd, &stTcHitInfo );
+		TRACE( TEXT("MTAB end TAB [%d]"), iDragSel );
+
+		ReleaseCapture(  );
+		gbTabDraging = FALSE;
+	}
+
+	return;
+}
+//-------------------------------------------------------------------------------------------------
+#endif
 
 /*!
 	MAAのどっかで文字キーオサレが発生
@@ -1639,7 +1790,7 @@ INT TabMultipleTopMemory( INT dTop )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	複数ファイルをINIに保存する
+	複タブの構成をプロファイルに保存する
 	@param[in]	hWnd	ウインドウハンドル
 	@return		HRESULT	終了状態コード
 */
@@ -1664,7 +1815,7 @@ HRESULT TabMultipleStore( HWND hWnd )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	複数ファイルをINIから読み込んで再展開する
+	複タブをプロファイルから読み込んで再展開する
 	@param[in]	hWnd	ウインドウハンドル
 	@return		HRESULT	終了状態コード
 */
@@ -1756,7 +1907,7 @@ INT TabMultipleAppend( HWND hWnd )
 
 	tCount = TabCtrl_GetItemCount( ghTabWnd );
 
-	stTcItem.lParam  = 0;//tCount;ファイルなので０でいい
+	stTcItem.lParam  = 0;//tCount;ファイルなので０でいい・タブのは未使用
 	stTcItem.pszText = itNulti->atDispName;
 	TabCtrl_InsertItem( ghTabWnd, tCount, &stTcItem );
 
@@ -2043,7 +2194,7 @@ INT_PTR CALLBACK TabMultipleRenameDlgProc( HWND hDlg, UINT message, WPARAM wPara
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	タブ名前変更ダイヤログ開く
+	タブ名前変更の処理・ダイヤログ開いたり変更を記録したり
 	@param[in]	hWnd	ウインドウハンドル
 	@param[in]	iTabSel	選択したタブ番号
 	@return		HRESULT	終了状態コード

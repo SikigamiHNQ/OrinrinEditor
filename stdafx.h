@@ -110,6 +110,8 @@ static CONST GUID gcstGUID = { 0x66D3E881, 0x972B, 0x458B, { 0x93, 0x5E, 0x9E, 0
 #define ACCELERATOR_EDIT//	キーのアレ編集
 
 //	作成中の機能
+//#define HUKUTAB_DRAGMOVE	
+#define MIDDLE_CLICK_CLOSE
 #define EDGE_BLANK_STYLE	//	レイヤ合成するとき、白ヌキ領域を用意する
 //#define FIND_STRINGS	//	文字列検索機能
 //#define PAGE_MULTISELECT//	頁一覧の複数選択

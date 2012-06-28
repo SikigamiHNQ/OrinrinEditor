@@ -299,7 +299,7 @@ VOID Evw_OnChar( HWND hWnd, TCHAR ch, INT cRepeat )
 				gdXmemory = gdDocXdot;	//	最新位置記憶
 				//	改行した行以降全取っ替え
 				iLines = DocPageParamGet( NULL, NULL );	//	表示変更してるか
-				for( i = gdDocLine; iLines > i; i++ ){	ViewRedrawSetLine(  i );	}
+				for( i = gdDocLine; iLines >= i; i++ ){	ViewRedrawSetLine(  i );	}
 			}
 		}
 
@@ -409,8 +409,6 @@ VOID Evw_OnLButtonDown( HWND hWnd, BOOL fDoubleClick, INT x, INT y, UINT keyFlag
 
 		ViewSelAreaSelect( NULL );
 
-		ViewDrawCaret( gdDocXdot, gdDocLine, 1 );	//	位置移動
-
 		gbLDoubleClick = TRUE;
 		return;	//	これ以降は処理しなくて良いはず
 	}
@@ -461,8 +459,8 @@ VOID Evw_OnLButtonDown( HWND hWnd, BOOL fDoubleClick, INT x, INT y, UINT keyFlag
 /*!
 	ビューでマウスを動かしたとき
 	@param[in]	hWnd		ウインドウハンドル・多分ビューのやつ
-	@param[in]	x			発生したＸ座標値
-	@param[in]	y			発生したＹ座標値
+	@param[in]	x			発生したクライヤントＸ座標値
+	@param[in]	y			発生したクライヤントＹ座標値
 	@param[in]	keyFlags	他に押されてるキーについて
 */
 VOID Evw_OnMouseMove( HWND hWnd, INT x, INT y, UINT keyFlags )
@@ -470,6 +468,9 @@ VOID Evw_OnMouseMove( HWND hWnd, INT x, INT y, UINT keyFlags )
 	TCHAR	atString[SUB_STRING];
 	INT		dX, dY;
 	INT		dDot, dMaxDot, dLine, iMaxLine;	//	
+
+	//	ダブルクルック操作後は何もしない
+	if( gbLDoubleClick ){	 return;	}
 
 	dX = x;
 	dY = y;
@@ -524,6 +525,7 @@ VOID Evw_OnMouseMove( HWND hWnd, INT x, INT y, UINT keyFlags )
 
 	StringCchPrintf( atString, SUB_STRING, TEXT("MOUSE %d[dot] %d[line]"), gstCursor.x, gstCursor.y );
 	MainStatusBarSetText( SB_MOUSEPOS, atString );
+//	TRACE( atString );
 
 	return;
 }

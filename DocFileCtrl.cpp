@@ -305,7 +305,7 @@ HRESULT DocFileBackup( HWND hWnd )
 		FREE( pbSplit );
 	}
 
-	if( gbAutoBUmsg ){	NotifyBalloonExist( TEXT("作業中のファイルをバックアップ保存したのです。あぅあぅ"), TEXT("あぅあぅ"), NIIF_INFO );	}
+	if( gbAutoBUmsg ){	NotifyBalloonExist( TEXT("作業中のファイルをバックアップ保存したよ。"), TEXT("お燐からのお知らせ"), NIIF_INFO );	}
 
 	return S_OK;
 }
@@ -565,8 +565,8 @@ HRESULT DocFileSave( HWND hWnd, UINT bStyle )
 		//InitLastOpen( INIT_SAVE, atFilePath );	//	ラストオーポンを書換
 		MultiFileTabRename( (*gitFileIt).dUnique, atFilePath );	//	タブ名称変更
 		AppTitleChange( atFilePath );
-		StringCchPrintf( atBuffer, MAX_STRING, TEXT("拡張子を %s にして保存したのです。あぅあぅ"), aatExte[idExten] );
-		NotifyBalloonExist( atBuffer, TEXT("拡張子を変更したのです"), NIIF_INFO );
+		StringCchPrintf( atBuffer, MAX_STRING, TEXT("拡張子を %s にして保存したよ。"), aatExte[idExten] );
+		NotifyBalloonExist( atBuffer, TEXT("お燐からのお知らせ"), NIIF_INFO );
 
 		OpenHistoryLogging( hWnd , atFilePath );	//	ファイル名変更したので記録取り直し
 	}
@@ -584,11 +584,11 @@ HRESULT DocFileSave( HWND hWnd, UINT bStyle )
 
 		if( bUnic || bUtf8 )
 		{
-			NotifyBalloonExist( TEXT("保存したのです。あぅ"), TEXT("エクスポートしたのです"), NIIF_INFO );
+			NotifyBalloonExist( TEXT("ファイルのエクスポートしたよ。"), TEXT("お燐からのお知らせ"), NIIF_INFO );
 		}
 		else
 		{
-			NotifyBalloonExist( TEXT("保存したのです。あぅあぅ"), TEXT("ファイル出力したのです"), NIIF_INFO );
+			NotifyBalloonExist( TEXT("ファイルを保存したよ。"), TEXT("お燐からのお知らせ"), NIIF_INFO );
 		}
 	}
 

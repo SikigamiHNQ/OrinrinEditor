@@ -1000,7 +1000,7 @@ INT DocInputFromClipboard( PINT pNowDot, PINT pdLine, PINT pdMozi, UINT bSqMode 
 		if( dCrLf  )	//	処理した行以降全取っ替え
 		{
 			iLines = DocPageParamGet( NULL, NULL );	//	再計算も要るかも・・・
-			for( i = *pdLine; iLines > i; i++ ){	ViewRedrawSetLine(  i );	}
+			for( i = *pdLine; iLines >= i; i++ ){	ViewRedrawSetLine(  i );	}
 		}
 		else{	ViewRedrawSetLine( *pdLine );	}
 

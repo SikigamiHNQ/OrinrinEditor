@@ -732,22 +732,22 @@ LRESULT CALLBACK ViewWndProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lPa
 
 	switch( message )
 	{
-		HANDLE_MSG(hWnd, WM_CREATE,         Evw_OnCreate );			//	画面の構成パーツを作る。ボタンとか
-		HANDLE_MSG(hWnd, WM_PAINT,          Evw_OnPaint );			//	画面の更新とか
-		HANDLE_MSG(hWnd, WM_COMMAND,        Evw_OnCommand );		//	ボタン押されたとかのコマンド処理
-		HANDLE_MSG(hWnd, WM_DESTROY,        Evw_OnDestroy );		//	ソフト終了時の処理
-		HANDLE_MSG(hWnd, WM_VSCROLL,        Evw_OnVScroll );		//	
-		HANDLE_MSG(hWnd, WM_HSCROLL,        Evw_OnHScroll );		//	
-		HANDLE_MSG(hWnd, WM_KEYDOWN,        Evw_OnKey );			//	
-		HANDLE_MSG(hWnd, WM_KEYUP,          Evw_OnKey );			//	
-		HANDLE_MSG(hWnd, WM_CHAR,           Evw_OnChar );			//	
-		HANDLE_MSG(hWnd, WM_MOUSEMOVE,      Evw_OnMouseMove );		//	
-		HANDLE_MSG(hWnd, WM_MOUSEWHEEL,     Evw_OnMouseWheel );		//	
-		HANDLE_MSG(hWnd, WM_LBUTTONDOWN,    Evw_OnLButtonDown );	//	
-		HANDLE_MSG(hWnd, WM_LBUTTONDBLCLK,  Evw_OnLButtonDown );	//	
-		HANDLE_MSG(hWnd, WM_LBUTTONUP,      Evw_OnLButtonUp );		//	
-		HANDLE_MSG(hWnd, WM_RBUTTONDOWN,    Evw_OnRButtonDown );	//	
-		HANDLE_MSG(hWnd, WM_CONTEXTMENU,    Evw_OnContextMenu );	//	
+		HANDLE_MSG( hWnd, WM_CREATE,        Evw_OnCreate );			//	画面の構成パーツを作る。ボタンとか
+		HANDLE_MSG( hWnd, WM_PAINT,         Evw_OnPaint );			//	画面の更新とか
+		HANDLE_MSG( hWnd, WM_COMMAND,       Evw_OnCommand );		//	ボタン押されたとかのコマンド処理
+		HANDLE_MSG( hWnd, WM_DESTROY,       Evw_OnDestroy );		//	ソフト終了時の処理
+		HANDLE_MSG( hWnd, WM_VSCROLL,       Evw_OnVScroll );		//	
+		HANDLE_MSG( hWnd, WM_HSCROLL,       Evw_OnHScroll );		//	
+		HANDLE_MSG( hWnd, WM_KEYDOWN,       Evw_OnKey );			//	
+		HANDLE_MSG( hWnd, WM_KEYUP,         Evw_OnKey );			//	
+		HANDLE_MSG( hWnd, WM_CHAR,          Evw_OnChar );			//	
+		HANDLE_MSG( hWnd, WM_MOUSEMOVE,     Evw_OnMouseMove );		//	
+		HANDLE_MSG( hWnd, WM_MOUSEWHEEL,    Evw_OnMouseWheel );		//	
+		HANDLE_MSG( hWnd, WM_LBUTTONDOWN,   Evw_OnLButtonDown );	//	
+		HANDLE_MSG( hWnd, WM_LBUTTONDBLCLK, Evw_OnLButtonDown );	//	
+		HANDLE_MSG( hWnd, WM_LBUTTONUP,     Evw_OnLButtonUp );		//	
+		HANDLE_MSG( hWnd, WM_RBUTTONDOWN,   Evw_OnRButtonDown );	//	
+		HANDLE_MSG( hWnd, WM_CONTEXTMENU,   Evw_OnContextMenu );	//	
 
 /* void Cls_OnSetFocus(HWND hwnd, HWND hwndOldFocus) */
 		case WM_SETFOCUS:
@@ -881,7 +881,7 @@ VOID Evw_OnDestroy( HWND hWnd )
 		DeleteBrush( gahBrush[i] );
 	}
 
-	DocMultiFileDeleteAll(  );
+	DocMultiFileCloseAll(  );
 
 	PostQuitMessage( 0 );
 
@@ -2117,7 +2117,7 @@ VOID OperationOnCommand( HWND hWnd, INT id, HWND hWndCtl, UINT codeNotify )
 		default:					TRACE( TEXT("未実装") );	break;
 
 		//	ファイル閉じる
-		case IDM_FILE_CLOSE:		MultiFileTabClose(  );	break;
+		case IDM_FILE_CLOSE:		MultiFileTabClose( -1 );	break;
 
 		//	ユニコードパレットオーポン
 		case  IDM_UNI_PALETTE:		UniDialogueEntry( ghInst, hWnd );	break;
@@ -2269,7 +2269,7 @@ VOID OperationOnCommand( HWND hWnd, INT id, HWND hWndCtl, UINT codeNotify )
 		//	選択範囲をドラフトボードへ
 		case IDM_COPY_TO_DRAUGHT:	DraughtItemAddFromSelect( gbSqSelect  );	break;
 
-		//	カーソル位置の操作も必要・ポインタ渡しして中で弄る
+		//	貼付　カーソル位置の操作も必要・ポインタ渡しして中で弄る
 		case IDM_PASTE:			DocInputFromClipboard( &gdDocXdot, &gdDocLine, &gdDocMozi , 0 );	break;
 
 		//	矩形貼付・無理矢理矩形として貼り付ける

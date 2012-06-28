@@ -61,7 +61,8 @@ typedef vector<ONELINE>::iterator		LYLINE_ITR;
 #define	LB_WIDTH	310
 #define LB_HEIGHT	220
 
-#define EDGE_BLANK_WIDTH	16	//	最低限とる空白幅
+#define EDGE_BLANK_NARROW	16	//	最低限とる空白幅
+#define EDGE_BLANK_WIDE		22	//	広い幅
 //-------------------------------------------------------------------------------------------------
 
 #define TB_ITEMS	8
@@ -91,7 +92,7 @@ extern  HWND	ghViewWnd;		//!<	ビューウインドウハンドル
 
 static POINT	gstViewOrigin;	//!<	ビューの左上ウインドウ位置・
 
-static  ATOM	gLyrBoxAtom;	//!<	
+static  ATOM	gLyrBoxAtom;	//!<	レイヤボックス窓のクラスアトム
 
 static  LONG	gdBoxID;		//!<	通し番号・常にINCREMENT
 
@@ -128,24 +129,24 @@ VOID	Lyb_OnWindowPosChanged( HWND, const LPWINDOWPOS );	//!<
 VOID	Lyb_OnLButtonDown( HWND, BOOL, INT, INT, UINT );	//!<	
 VOID	Lyb_OnContextMenu( HWND, HWND, UINT, UINT );		//!<	
 
-HRESULT	LayerEditOnOff( HWND, UINT );					//!<	
+HRESULT	LayerEditOnOff( HWND, UINT );						//!<	
 
 
-HRESULT	LayerStringObliterate( LAYER_ITR  );			//!<	
-HRESULT	LayerFromString( LAYER_ITR, LPCTSTR );			//!<	
-HRESULT	LayerFromSelectArea( LAYER_ITR , UINT );		//!<	
-HRESULT	LayerFromClipboard( LAYER_ITR );				//!<	
-HRESULT	LayerForClipboard( HWND, UINT );				//!<	
-HRESULT	LayerOnDelete( HWND );							//!<	
-INT		LayerInputLetter( LAYER_ITR, INT, INT, TCHAR );	//!<	
-LPTSTR	LayerLineTextGetAlloc( LAYER_ITR, INT );		//!<	
+HRESULT	LayerStringObliterate( LAYER_ITR  );				//!<	
+HRESULT	LayerFromString( LAYER_ITR, LPCTSTR );				//!<	
+HRESULT	LayerFromSelectArea( LAYER_ITR , UINT );			//!<	
+HRESULT	LayerFromClipboard( LAYER_ITR );					//!<	
+HRESULT	LayerForClipboard( HWND, UINT );					//!<	
+HRESULT	LayerOnDelete( HWND );								//!<	
+INT		LayerInputLetter( LAYER_ITR, INT, INT, TCHAR );		//!<	
+LPTSTR	LayerLineTextGetAlloc( LAYER_ITR, INT );			//!<	
 HRESULT	LayerBoxSetString( LAYER_ITR, LPCTSTR, UINT, LPPOINT, UINT );	//!<	
-HRESULT	LayerBoxSizeAdjust( LAYER_ITR );				//!<	
+HRESULT	LayerBoxSizeAdjust( LAYER_ITR );					//!<	
 
-INT		LayerTransparentAdjust( LAYER_ITR, INT, INT );	//!<	
+INT		LayerTransparentAdjust( LAYER_ITR, INT, INT );		//!<	
 
 #ifdef EDGE_BLANK_STYLE
-HRESULT	LayerEdgeBlankSizeCheck( HWND, INT );			//!<	
+HRESULT	LayerEdgeBlankSizeCheck( HWND, INT );				//!<	
 #endif
 //-------------------------------------------------------------------------------------------------
 
@@ -459,7 +460,7 @@ LRESULT CALLBACK gpfLyrEditProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 
 
 /*!
-	ウインドウプロシージャ
+	レイヤボックスのウインドウプロシージャ
 	@param[in]	hWnd	親ウインドウのハンドル
 	@param[in]	message	ウインドウメッセージの識別番号
 	@param[in]	wParam	追加の情報１
@@ -501,7 +502,7 @@ LRESULT CALLBACK LayerBoxProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lP
 BOOLEAN Lyb_OnCreate( HWND hWnd, LPCREATESTRUCT lpCreateStruct )
 {
 	HINSTANCE	lcInst  = lpCreateStruct->hInstance;	//	受け取った初期化情報から、インスタンスハンドルをひっぱる
-	HWND	hToolWnd;
+	HWND	hToolWnd, hWorkWnd;
 	TCHAR	atBuffer[MAX_STRING];
 //	UINT	iIndex;
 	RECT	tbRect;
@@ -539,7 +540,11 @@ BOOLEAN Lyb_OnCreate( HWND hWnd, LPCREATESTRUCT lpCreateStruct )
 	CheckDlgButton( hToolWnd, IDCB_LAYER_QUICKCLOSE, gbQuickClose ? BST_CHECKED : BST_UNCHECKED );
 
 #ifdef EDGE_BLANK_STYLE
-	CreateWindowEx( 0, WC_BUTTON, TEXT("白ヌキ合成"), WS_CHILD | WS_VISIBLE | BS_AUTOCHECKBOX, 290, 2, 103, 23, hToolWnd, (HMENU)IDCB_LAYER_EDGE_BLANK, lcInst, NULL );
+	hWorkWnd = CreateWindowEx( 0, WC_COMBOBOX, TEXT(""), WS_CHILD | WS_VISIBLE | CBS_DROPDOWNLIST, 290, 0, 123, 70, hToolWnd, (HMENU)IDCB_LAYER_EDGE_BLANK, lcInst, NULL );
+	ComboBox_AddString( hWorkWnd, TEXT("白抜きしない") );
+	ComboBox_AddString( hWorkWnd, TEXT("狭く白抜き") );
+	ComboBox_AddString( hWorkWnd, TEXT("広く白抜き") );
+	ComboBox_SetCurSel( hWorkWnd, 0 );
 #endif
 
 
@@ -573,8 +578,8 @@ BOOLEAN Lyb_OnCreate( HWND hWnd, LPCREATESTRUCT lpCreateStruct )
 VOID Lyb_OnCommand( HWND hWnd, INT id, HWND hWndCtl, UINT codeNotify )
 {
 	LRESULT	lRslt;
-	UINT	bEdgeBlank;
-	INT	iXpos, iYln;
+	INT		bEdgeBlank;
+	INT		iXpos, iYln;
 
 	switch( id )
 	{
@@ -618,9 +623,12 @@ VOID Lyb_OnCommand( HWND hWnd, INT id, HWND hWndCtl, UINT codeNotify )
 
 #ifdef EDGE_BLANK_STYLE
 		case IDCB_LAYER_EDGE_BLANK:	//	白ヌキするか
-			bEdgeBlank = IsDlgButtonChecked( GetDlgItem(hWnd,IDW_LYB_TOOL_BAR), IDCB_LAYER_EDGE_BLANK ) ? TRUE : FALSE;
-			//	ONになったら、狭い透過領域を削除せないかん
-			if( bEdgeBlank ){	LayerEdgeBlankSizeCheck( hWnd, EDGE_BLANK_WIDTH );	}
+			if( CBN_SELCHANGE == codeNotify )
+			{
+				bEdgeBlank = ComboBox_GetCurSel( hWndCtl );
+				if( 1 == bEdgeBlank ){			LayerEdgeBlankSizeCheck( hWnd, EDGE_BLANK_NARROW );	}
+				else if( 2 ==  bEdgeBlank ){	LayerEdgeBlankSizeCheck( hWnd, EDGE_BLANK_WIDE );	}
+			}
 			break;
 #endif
 
@@ -1779,7 +1787,7 @@ HRESULT LayerContentsImportable( HWND hWnd, UINT cmdID, LPINT pXdot, LPINT pYlin
 	BOOLEAN		bSpace, bBkSpase;
 
 #ifdef EDGE_BLANK_STYLE
-	UINT	bEdgeBlank;
+	INT		bEdgeBlank;
 	INT		xDotEx, iMoziEx;
 #endif
 	LAYER_ITR	itLyr;
@@ -1844,10 +1852,10 @@ HRESULT LayerContentsImportable( HWND hWnd, UINT cmdID, LPINT pXdot, LPINT pYlin
 
 	//	白ヌキするには、前後の空白文字量を増やせばいい
 	//	透過領域が狭い場合は、非透過とする・先にスキャンするか。
+	bEdgeBlank = ComboBox_GetCurSel( GetDlgItem( GetDlgItem(hWnd,IDW_LYB_TOOL_BAR), IDCB_LAYER_EDGE_BLANK ) );
+	if( 1 == bEdgeBlank ){			LayerEdgeBlankSizeCheck( hWnd, EDGE_BLANK_NARROW );	}
+	else if( 2 ==  bEdgeBlank ){	LayerEdgeBlankSizeCheck( hWnd, EDGE_BLANK_WIDE );	}
 
-	bEdgeBlank = IsDlgButtonChecked( GetDlgItem(hWnd,IDW_LYB_TOOL_BAR), IDCB_LAYER_EDGE_BLANK ) ? TRUE : FALSE;
-	//	ONになったら、狭い透過領域を削除せないかん
-	if( bEdgeBlank ){	LayerEdgeBlankSizeCheck( hWnd, EDGE_BLANK_WIDTH );	}
 
 	//白ヌキするには狭い透過領域を消す
 
@@ -1956,7 +1964,8 @@ HRESULT LayerContentsImportable( HWND hWnd, UINT cmdID, LPINT pXdot, LPINT pYlin
 						dEndot  = dInEnd;
 #ifdef EDGE_BLANK_STYLE
 						//	ここで dEndot をオフセットする？
-						if( bEdgeBlank ){	dEndot +=  EDGE_BLANK_WIDTH;	}
+						if( 1 == bEdgeBlank ){		dEndot += EDGE_BLANK_NARROW;	}
+						else if( 2 == bEdgeBlank ){	dEndot += EDGE_BLANK_WIDE;	}
 #endif
 						iEdMozi = DocLetterPosGetAdjust( &dEndot , dWkLine, 1 );	//	上書きされる領域
 						//	キャレット位置修正
@@ -2000,8 +2009,12 @@ HRESULT LayerContentsImportable( HWND hWnd, UINT cmdID, LPINT pXdot, LPINT pYlin
 					{
 						//	オフセット位置確認
 						xDotEx  = (xTgDot + iSpDot);
-						xDotEx -= EDGE_BLANK_WIDTH;
-						if( 0 > xDotEx )	xDotEx = 0;
+
+						if( 1 == bEdgeBlank ){		xDotEx -= EDGE_BLANK_NARROW;	}
+						else if( 2 == bEdgeBlank ){	xDotEx -= EDGE_BLANK_WIDE;	}
+						else{	;	}
+
+						if( 0 > xDotEx ){	xDotEx =  0;	}
 
 						iMoziEx = DocLetterPosGetAdjust( &xDotEx, dWkLine, -1 );	//	今の文字位置を確認
 					//	iMoziEx：挿入位置文字数			xDotEx：挿入位置オフセット
@@ -2194,10 +2207,10 @@ HRESULT LayerOnDelete( HWND hWnd )
 /*!
 	白抜き指定したときに、幅の狭い透過領域をキャンセルする
 	@param[in]	hWnd	ボックスのウインドウハンドル
-	@param[in]	iNarrow	キャンセルする最大幅
+	@param[in]	iCanWid	キャンセルする最大幅
 	@return		HRESULT	終了状態コード
 */
-HRESULT LayerEdgeBlankSizeCheck( HWND hWnd, INT iNarrow )
+HRESULT LayerEdgeBlankSizeCheck( HWND hWnd, INT iCanWid )
 {
 	INT_PTR	iLines;
 	INT		iWidth;
@@ -2237,7 +2250,7 @@ HRESULT LayerEdgeBlankSizeCheck( HWND hWnd, INT iNarrow )
 					iWidth += itMzx->rdWidth;
 				}
 
-				if( EDGE_BLANK_WIDTH >= iWidth )	//	もしちっちゃいなら
+				if( iCanWid >=  iWidth )	//	もしちっちゃいなら
 				{
 					for( ; itMzx != itMozi; itMozi++ )
 					{

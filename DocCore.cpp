@@ -268,7 +268,7 @@ HRESULT DocMultiFileSelect( LPARAM uqNumber )
 	全内容を破棄・ファイルコア函数
 	@return		HRESULT	終了状態コード
 */
-HRESULT DocMultiFileDeleteAll( VOID )
+HRESULT DocMultiFileCloseAll( VOID )
 {
 	UINT_PTR	i, iPage, iLine;
 	FILES_ITR	itNow;
@@ -305,7 +305,7 @@ HRESULT DocMultiFileDeleteAll( VOID )
 	@param[in]	uqNumber	閉じたいタブの通し番号
 	@return		LPARAM		開き直したタブの通し番号・失敗したら０
 */
-LPARAM DocMultiFileDelete( HWND hWnd, LPARAM uqNumber )
+LPARAM DocMultiFileClose( HWND hWnd, LPARAM uqNumber )
 {
 	INT			iRslt;
 	UINT_PTR	i, iPage, iLine;
@@ -313,19 +313,16 @@ LPARAM DocMultiFileDelete( HWND hWnd, LPARAM uqNumber )
 	LPARAM	dNowNum, dPrevi;
 	FILES_ITR	itNow;
 	LINE_ITR	itLine;
+	TCHAR		atBuffer[MAX_PATH];
 
 	//	一つしか開いてないなら閉じない
 	iCount = gltMultiFiles.size();
 	if( 1 >= iCount )	return 0;
 
-	//	もし変更が残ってるなら注意を促す
-	if( gitFileIt->dModify )
-	{
-		iRslt = MessageBox( hWnd, TEXT("ちょっとまって！\r\n変更したままだよ。ここで保存して閉じるかい？"), TEXT("お燐からの確認"), MB_YESNOCANCEL | MB_ICONQUESTION );
-		if( IDCANCEL == iRslt ){	return 0;	}
-
-		if( IDYES == iRslt ){	DocFileSave( hWnd, D_SJIS );	}
-	}
+	//	MIDDLE_CLICK_CLOSE で、対象は今のファイル以外かもしれない
+	//そういうときはそのファイルに移動して処理する。
+	//閉じたら、元ファイルにフォーカスする。
+	//開いているファイルを閉じたら、隣のファイルにフォーカスする
 
 	dNowNum = gitFileIt->dUnique;	//	今開いてるヤツの番号
 
@@ -333,6 +330,7 @@ LPARAM DocMultiFileDelete( HWND hWnd, LPARAM uqNumber )
 	itNow++;	//	次のやつの通し番号を確保しておく。
 	dPrevi = itNow->dUnique;
 
+	//	閉じたいファイルイテレータを探す
 	for( itNow = gltMultiFiles.begin( ); itNow != gltMultiFiles.end(); itNow++ )
 	{
 		if( uqNumber == itNow->dUnique )	break;
@@ -340,6 +338,25 @@ LPARAM DocMultiFileDelete( HWND hWnd, LPARAM uqNumber )
 	}
 	if( itNow == gltMultiFiles.end() )	return 0;
 	//	もし削除対象が先頭なら、dPreviは次のやつのまま、次以降なら、直前のが入ってるはず
+	//	この時点で、itNow は削除するファイルである
+
+	if( dNowNum != uqNumber )	//	開いてるファイルと閉じたいファイルが異なるなら
+	{
+		gixFocusPage = -1;
+		DocMultiFileSelect( uqNumber  );	//	閉じる予定ファイルを開く
+		dPrevi = dNowNum;	//	元に戻さにゃ
+	}
+
+
+	//	もし変更が残ってるなら注意を促す
+	if( gitFileIt->dModify )
+	{
+		StringCchPrintf( atBuffer, MAX_PATH, TEXT("ちょっとまって！\r\n[%s] は変更したままだよ。\r\nここで保存して閉じるかい？"), PathFindFileName( gitFileIt->atFileName ) );
+		iRslt = MessageBox( hWnd, atBuffer, TEXT("お燐からの確認"), MB_YESNOCANCEL | MB_ICONQUESTION );
+		if( IDCANCEL == iRslt ){	return 0;	}
+
+		if( IDYES == iRslt ){	DocFileSave( hWnd, D_SJIS );	}
+	}
 
 	//	DocContentsObliterate内のやつ
 
@@ -363,12 +380,9 @@ LPARAM DocMultiFileDelete( HWND hWnd, LPARAM uqNumber )
 
 	gltMultiFiles.erase( itNow );	//	本体を消し
 
-	//	常に選択が有効になるので、常時個々の処理もはいるはず
-	if( dNowNum == uqNumber )	//	開いてるのを閉じたら
-	{
-		gixFocusPage = -1;
-		DocMultiFileSelect( dPrevi );	//	有効なのを開き直す
-	}
+
+	gixFocusPage = -1;
+	DocMultiFileSelect( dPrevi );	//	元ファイルもしくは隣ファイルを開き直す
 
 	return dPrevi;
 }

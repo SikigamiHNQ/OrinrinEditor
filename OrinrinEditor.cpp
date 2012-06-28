@@ -21,7 +21,6 @@ If not, see <http://www.gnu.org/licenses/>.
 //	注意・コマンドのリソースＩＤ番号は変更不可！
 
 
-//	TODO:	レイヤボックス白ヌキ、１６・２２とか、いくつかパヤーン作っておく
 
 //	TODO:	ＯＫ？	ディレイロード・未ロード頁の全プレビューがおかしい
 //	TODO:	CtrlShiftD の動作は問題無いか
@@ -37,6 +36,10 @@ If not, see <http://www.gnu.org/licenses/>.
 //	TODO:	ＯＫ？	右クリメニューの個別枠やユーザアイテムに各個の名前を付けるように
 //	TODO:	ＯＫ？	副タブの名称編集出来るように
 //	TODO:	ＯＫ？	空白の表示非表示をメモリする
+//	TODO:	ＯＫ？	ドラフトボード、ウインドウサイズがおかしい・枠付けたので
+//	TODO:	ＯＫ？	合成するとき、上絵の周囲を白ヌキする機能
+//	TODO:	ＯＫ？	レイヤボックス白ヌキ、１６・２２とか、いくつかパヤーン作っておく
+//	TODO:	ＯＫ？	中CLICKで、開いてるファイル閉じる
 
 //	TODO:	最終行の枠いれると落ちる？
 
@@ -44,7 +47,6 @@ If not, see <http://www.gnu.org/licenses/>.
 //	TODO:	メインのファイルタブに、このファイル意外を閉じる機能をつける
 //	TODO:	頁一覧、選択が移動したら表示頁も追随する＜複数選択つくってから
 //	TODO:	全ピリヲドを消去する機能・ピリヲドの前後を確認して、空白であれば幅に合わせて置き換え・単独なら3dotユニコードで置き換える
-//	TODO:	合成するとき、上絵の周囲を白ヌキする機能・前後や透過領域に合わせた処理が必要・幅指定もできるといい？
 
 //	TODO:	MAAの一コマの編集機能・ファイル名工夫するかフラグで管理
 //			保存するには、そのMAAの開きを維持しておく必要がある
@@ -424,7 +426,7 @@ ASDファイル　　壱行が壱コンテンツ
 					壱行テンプレで中クルックしたらレイヤボックスが開く
 					MAAツリーでファイル名を中クリックしたら、副タブに追加できる
 					バグ修正いろいろ
-2012/06/18	0.31	MAAに、ファイルの途中にアイテムを追加できるようにした
+2012/06/26	0.31	MAAに、ファイルの途中にアイテムを追加できるようにした
 					MAAの内容表示側にＤ＆Ｄすると、そのファイルを副タブで開く（Viewer込み）
 					※使用には入らないし復元もされない
 					MAAツリーにＤ＆Ｄすると、追加アイテムとしてツリーに追加（Viewer込み）
@@ -441,6 +443,7 @@ ASDファイル　　壱行が壱コンテンツ
 					ファイルオーポンを高速化出来たかもだ。
 					空白の表示/非表示状態を覚えておくようにした。
 					レイヤボックス貼付に白ヌキ機能追加
+					中クリックで、MAAの副タブや編集ファイルを閉じれるようにした（Viewer込み）
 
 
 
@@ -502,6 +505,7 @@ static	HACCEL		ghAccelTable;	//!<	キーボードアクセラレータハンドル
 
 static  HWND		ghFileTabWnd;	//!<	複数ファイルタブ
 static  HWND		ghFileTabTip;	//!<	複数ファイルタブツールチップ
+static WNDPROC		gpfOriginFileTabProc;	//!<	複数ファイルタブの元プロシージャ
 
 static  HWND		ghMainWnd;		//!<	メインウインドウハンドル
 static  HWND		ghStsBarWnd;	//!<	ステータスバー
@@ -586,6 +590,9 @@ VOID	Cls_OnHotKey(HWND, INT, UINT, UINT );			//!<
 VOID	Cls_OnDrawItem( HWND, CONST DRAWITEMSTRUCT * );	//!<	
 
 INT_PTR	CALLBACK OptionDlgProc( HWND, UINT, WPARAM, LPARAM );	//!<	
+
+LRESULT	CALLBACK gpfFileTabProc( HWND, UINT, WPARAM, LPARAM );	//!<	複数ファイルタブのサブクラスプロシージャ
+VOID	Ftb_OnMButtonUp( HWND, INT, INT, UINT );	//!<	
 
 HRESULT	ViewingFontNameLoad( VOID );
 
@@ -1205,6 +1212,8 @@ LRESULT CALLBACK WndProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam 
 		HANDLE_MSG( hWnd, WM_CHAR,			Evw_OnChar );		//	
 		HANDLE_MSG( hWnd, WM_MOUSEWHEEL,	Evw_OnMouseWheel );	//	
 
+		case WM_MBUTTONUP:	TRACE( TEXT("MIDDLE  UP") );	break;
+
 #ifdef NDEBUG
 		case WM_CLOSE:
 			iRslt = DocFileCloseCheck( hWnd, TRUE );
@@ -1344,6 +1353,9 @@ BOOLEAN Cls_OnCreate( HWND hWnd, LPCREATESTRUCT lpCreateStruct )
 	ghFileTabWnd = CreateWindowEx( 0, WC_TABCONTROL, TEXT("filetab"), WS_VISIBLE | WS_CHILD | WS_CLIPSIBLINGS | TCS_SINGLELINE, 0, 0, clRect.right, 0, hWnd, (HMENU)IDTB_MULTIFILE, lcInst, NULL );
 	SetWindowFont( ghFileTabWnd, ghNameFont, FALSE );
 
+	//	サブクラス
+	gpfOriginFileTabProc = SubclassWindow( ghFileTabWnd, gpfFileTabProc );
+
 	ZeroMemory( &stTcItem, sizeof(TCITEM) );
 	stTcItem.mask    = TCIF_TEXT;
 	stTcItem.pszText = NAMELESS_DUMMY;
@@ -1367,7 +1379,6 @@ BOOLEAN Cls_OnCreate( HWND hWnd, LPCREATESTRUCT lpCreateStruct )
 	stToolInfo.lpszText = LPSTR_TEXTCALLBACK;	//	コレを指定するとコールバックになる
 	SendMessage( ghFileTabTip, TTM_ADDTOOL, 0, (LPARAM)&stToolInfo );
 	SendMessage( ghFileTabTip, TTM_SETMAXTIPWIDTH, 0, 0 );	//	チップの幅。０設定でいい。これしとかないと改行されない
-
 
 
 	ghStsRedBrush = CreateSolidBrush( 0xFF );
@@ -3032,7 +3043,58 @@ BOOLEAN SelectDirectoryDlg( HWND hWnd, LPTSTR ptSelDir, UINT_PTR cchLen )
 //-------------------------------------------------------------------------------------------------
 
 
-//	起動時の最初の一個のファイルタブを追加
+/*!
+	複数ファイルタブのサブクラスプロシージャ
+	@param[in]	hWnd	リストのハンドル
+	@param[in]	msg		ウインドウメッセージの識別番号
+	@param[in]	wParam	追加の情報１
+	@param[in]	lParam	追加の情報２
+	@return	処理結果とか
+*/
+LRESULT	CALLBACK gpfFileTabProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
+{
+	switch( msg )
+	{
+		HANDLE_MSG( hWnd, WM_MBUTTONUP, Ftb_OnMButtonUp );
+
+		default:	break;
+	}
+
+	return CallWindowProc( gpfOriginFileTabProc, hWnd, msg, wParam, lParam );
+}
+//-------------------------------------------------------------------------------------------------
+
+/*!
+	複数ファイルタブでマウスの中ボタンがうｐされたとき
+	@param[in]	hWnd		ウインドウハンドル
+	@param[in]	x			発生したクライヤントＸ座標値
+	@param[in]	y			発生したクライヤントＹ座標値
+	@param[in]	keyFlags	他に押されてるキーについて
+*/
+VOID Ftb_OnMButtonUp( HWND hWnd, INT x, INT y, UINT flags )
+{
+	INT	curSel;
+	TCHITTESTINFO	stTcHitInfo;
+
+	stTcHitInfo.pt.x = x;
+	stTcHitInfo.pt.y = y;
+	curSel = TabCtrl_HitTest( ghFileTabWnd, &stTcHitInfo );
+
+	TRACE( TEXT("FTAB start TAB [%d] [%d x %d]"), curSel, x, y );
+
+#ifdef MIDDLE_CLICK_CLOSE
+	MultiFileTabClose( curSel );
+#endif
+
+	return;
+}
+//-------------------------------------------------------------------------------------------------
+
+/*!
+	起動時の最初の一個のファイルタブを追加
+	@param[in]	ptName	ファイル名
+	@return		HRESULT	終了状態コード
+*/
 HRESULT MultiFileTabFirst( LPTSTR ptName )
 {
 	TCHAR	atName[MAX_PATH];
@@ -3231,26 +3293,30 @@ INT InitMultiFileTabOpen( UINT dMode, INT iTgt, LPTSTR ptFile )
 
 /*!
 	開いてるタブを閉じるCommando
+	@param[in]	iSelTab	閉じたいタブ番号・デフォ動作なら－１
 	@return		HRESULT	終了状態コード
 */
-HRESULT MultiFileTabClose( VOID )
+HRESULT MultiFileTabClose( INT iSelTab )
 {
-	INT	curSel;
+	INT	curSel, nowSel;
 	LPARAM	dSele;
 	TCITEM	stTcItem;
 
-	//	選択してる奴を選択する
-	curSel = TabCtrl_GetCurSel( ghFileTabWnd );
+	nowSel = TabCtrl_GetCurSel( ghFileTabWnd );
+
+	if( 0 > iSelTab ){	curSel = nowSel;	}	//	選択してる奴を削除する
+	else{				curSel = iSelTab;	}	//	指定のタブを削除する
 
 	ZeroMemory( &stTcItem, sizeof(TCITEM) );
 	stTcItem.mask = TCIF_PARAM;
 	TabCtrl_GetItem( ghFileTabWnd, curSel, &stTcItem );
 
-	dSele = DocMultiFileDelete( ghMainWnd, stTcItem.lParam );
-	if( dSele )
+	dSele = DocMultiFileClose( ghMainWnd, stTcItem.lParam );
+	if( dSele )	//	値は、タブ番号ではなくファイルの通し番号であることに注意
 	{
 		TabCtrl_DeleteItem( ghFileTabWnd, curSel );
-		MultiFileTabSelect( dSele );
+		//	開いてるのを消したら、隣のに開き直す
+		if( curSel ==  nowSel ){	MultiFileTabSelect( dSele );	}
 	}
 
 	return S_OK;
