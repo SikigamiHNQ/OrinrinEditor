@@ -1395,6 +1395,9 @@ HRESULT MaaFindExecute( HWND hDlg )
 
 	ZeroMemory( atPattern, sizeof(atPattern) );
 	GetDlgItemText( hDlg, IDE_MAA_FIND_NAME, atPattern, MAX_PATH );
+	//	‹ó•¶š—ñ‚È‚çŒŸõ‚µ‚È‚¢
+	if( NULL == atPattern[0] )	return  E_ABORT;
+
 
 	dCnt = SqlTreeCount( 1, &dMax );
 

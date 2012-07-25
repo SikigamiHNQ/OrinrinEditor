@@ -687,13 +687,13 @@ INT DocStringInfoCount( LPCTSTR ptStr, UINT_PTR cchSize, PINT pMaxDot, PINT pMax
 	今のファイルの、指定した頁の情報を確保する
 	@param[in]	iTgtPage	欲しい頁番号・０インデックス
 	@param[in]	pstInfo		情報入れる構造体ポインタ
-	@return		BOOLEAN	ディレイしてたら非０
+	@return		BOOLEAN		ディレイしてたら非０
 */
 BOOLEAN NowPageInfoGet( UINT iTgtPage, LPPAGEINFOS pstInfo )
 {
 	LINE_ITR	itLine;
 	INT_PTR		iMozis;
-	UINT	dMasqus;
+	UINT		dMasqus;
 
 	//	データやばかったら弾く
 	if( gitFileIt->vcCont.size(  ) <= iTgtPage )	return 0;
@@ -743,10 +743,24 @@ BOOLEAN NowPageInfoGet( UINT iTgtPage, LPPAGEINFOS pstInfo )
 }
 //-------------------------------------------------------------------------------------------------
 
+#ifdef PAGE_DELAY_LOAD
+/*!
+	指定ファイルの指定頁は読込ディレイしているか
+	@param[in]	itFile	指定ファイル
+	@param[in]	dPage	指定頁
+	@return	ディレイしてたら非０
+*/
+BOOLEAN PageIsDelayed( FILES_ITR itFile, UINT dPage )
+{
+	return (itFile->vcCont.at( dPage ).ptRawData ? TRUE : FALSE);
+}
+//-------------------------------------------------------------------------------------------------
+
+#endif
+
 /*!
 	ONLINE構造体をクルヤーする
 	@param[in]	pstLine	クルヤーしたいやつのポインター
-	@return	無し
 */
 VOID ZeroONELINE( LPONELINE pstLine )
 {

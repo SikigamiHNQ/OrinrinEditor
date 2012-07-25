@@ -148,10 +148,10 @@ ViewBackColourGet
 
 //	êF
 static COLORREF	gaColourTable[] = { 
-	0x000000,
-	0xFFFFFF, 0xABABAB, 0x0000FF, 0xAAAAAA, 0x000000,
-	0xFFFFFF, 0x8080FF, 0xC0C000, 0xC0C000, 0x101010,
-	0xEEEEEE, 0xFFCCCC, 0xFF0000, 0xE0E0E0, 0x00FFFF
+	0x000000,	//	0
+	0xFFFFFF, 0xABABAB, 0x0000FF, 0xAAAAAA, 0x000000,	//	5
+	0xFFFFFF, 0x8080FF, 0xC0C000, 0xC0C000, 0x101010,	//	10
+	0xEEEEEE, 0xFFCCCC, 0xFF0000, 0xE0E0E0, 0x00FFFF	//	15
 };
 
 #define CLRT_BASICPEN	0	//	äÓñ{ï∂éöêF
@@ -2224,8 +2224,8 @@ VOID OperationOnCommand( HWND hWnd, INT id, HWND hWndCtl, UINT codeNotify )
 		case  IDM_FIND_DLG_OPEN:		FindDialogueOpen( ghInst, hWnd );	break;
 		case IDM_FIND_HIGHLIGHT_OFF:	FindHighlightOff(  );	break;
 
-		case IDM_FIND_JUMP_NEXT:	FindStringJump( 0 );	break;
-		case IDM_FIND_JUMP_PREV:	FindStringJump( 1 );	break;
+		case IDM_FIND_JUMP_NEXT:	FindStringJump( 0, &gdDocXdot, &gdDocLine, &gdDocMozi );	break;
+		case IDM_FIND_JUMP_PREV:	FindStringJump( 1, &gdDocXdot, &gdDocLine, &gdDocMozi );	break;
 
 #endif
 
@@ -2293,6 +2293,9 @@ VOID OperationOnCommand( HWND hWnd, INT id, HWND hWndCtl, UINT codeNotify )
 
 		//	âÊñ ÇÃçƒï`âÊ
 		case IDM_NOW_PAGE_REFRESH:
+#ifdef FIND_STRINGS
+			FindNowPageReSearch(  );
+#endif
 			ViewRedrawSetLine( -1 );
 			PreviewVisibalise( gixFocusPage, FALSE );
 			break;

@@ -456,16 +456,16 @@ VOID		AacBackupDirectoryInit( LPTSTR );	//!<
 
 BOOLEAN		MaaViewToggle( UINT );	//!<	
 
-UINT		UnicodeUseToggle( LPVOID );	//!<	
+UINT		UnicodeUseToggle( LPVOID  );	//!<	
 
-LPSTR		SjisEncodeAlloc( LPCTSTR );	//!<	
+LPSTR		SjisEncodeAlloc( LPCTSTR  );	//!<	
 
-ATOM		InitWndwClass( HINSTANCE );	//!<	
-BOOL		InitInstance( HINSTANCE, INT, LPTSTR );	//!<	
-LRESULT		CALLBACK WndProc( HWND, UINT, WPARAM, LPARAM );	//!<	
+ATOM		InitWndwClass( HINSTANCE  );	//!<	
+BOOL		InitInstance( HINSTANCE , INT, LPTSTR );	//!<	
+LRESULT		CALLBACK WndProc( HWND , UINT, WPARAM, LPARAM );	//!<	
 
 HRESULT		MainStatusBarSetText( INT, LPCTSTR );	//!<	
-HRESULT		MainSttBarSetByteCount( UINT );	//!<	
+HRESULT		MainSttBarSetByteCount( UINT  );	//!<	
 
 HRESULT		MenuItemCheckOnOff( UINT, UINT );	//!<	
 HRESULT		NotifyBalloonExist( LPTSTR, LPTSTR, DWORD );	//!<	
@@ -474,59 +474,59 @@ HRESULT		BrushModeToggle( VOID );	//!<
 
 HRESULT		WindowFocusChange( INT, INT );	//!<	
 
-HRESULT		OptionDialogueOpen( VOID );	//!<	
+HRESULT		OptionDialogueOpen( VOID  );	//!<	
 
 COLORREF	InitColourValue( UINT, UINT, COLORREF );	//!<	
 INT			InitTraceValue( UINT, LPTRACEPARAM );	//!<	
-//HRESULT	InitLastOpen( UINT, LPTSTR );	//	
+//HRESULT	InitLastOpen( UINT, LPTSTR );			//	
 INT			InitWindowTopMost( UINT, UINT, INT );	//!<	
 HRESULT		InitToolBarLayout( UINT, INT, LPREBARLAYOUTINFO );	//!<	
 
 #ifdef ACCELERATOR_EDIT
-LPACCEL		AccelKeyTableGetAlloc( LPINT );	//!<	
+LPACCEL		AccelKeyTableGetAlloc( LPINT  );	//!<	
 LPACCEL		AccelKeyTableLoadAlloc( LPINT );	//!<	
-HRESULT		AccelKeyDlgOpen( HWND );	//!<	
-HACCEL		AccelKeyHandleGet( HINSTANCE );	//!<	
+HRESULT		AccelKeyDlgOpen( HWND );			//!<	
+HACCEL		AccelKeyHandleGet( HINSTANCE  );	//!<	
 
 HACCEL		AccelKeyTableCreate( LPACCEL, INT );	//!<	
 HRESULT		AccelKeyMenuRewrite( HWND, LPACCEL, CONST INT );	//!<	
 #endif
 
-HRESULT		OpenHistoryInitialise( HWND );	//!<	
+HRESULT		OpenHistoryInitialise( HWND );			//!<	
 HRESULT		OpenHistoryLogging( HWND , LPTSTR );	//!<	
-HRESULT		OpenHistoryLoad( HWND, INT );	//!<	
+HRESULT		OpenHistoryLoad( HWND, INT );			//!<	
 
-VOID		ToolBarCreate( HWND, HINSTANCE );	//!<	
-VOID		ToolBarDestroy( VOID  );	//!<	
-HRESULT		ToolBarSizeGet( LPRECT );	//!<	
-HRESULT		ToolBarCheckOnOff( UINT, UINT );	//!<	
+VOID		ToolBarCreate( HWND, HINSTANCE );		//!<	
+VOID		ToolBarDestroy( VOID  );				//!<	
+HRESULT		ToolBarSizeGet( LPRECT );				//!<	
+HRESULT		ToolBarCheckOnOff( UINT, UINT );		//!<	
 HRESULT		ToolBarOnSize( HWND, UINT, INT, INT );	//!<	
 LRESULT		ToolBarOnNotify( HWND, INT, LPNMHDR );	//!<	
 LRESULT		ToolBarOnContextMenu( HWND , HWND, LONG, LONG );	//!<	
 VOID		ToolBarPseudoDropDown( HWND , INT );	//!<	
-UINT		ToolBarBandInfoGet( LPVOID );	//!<	
-HRESULT		ToolBarBandReset( HWND );	//!<	
+UINT		ToolBarBandInfoGet( LPVOID );			//!<	
+HRESULT		ToolBarBandReset( HWND );				//!<	
 
 UINT		AppClientAreaCalc( LPRECT );	//!<	
 
 HRESULT		AppTitleChange( LPTSTR );	//!<	
-HRESULT		AppTitleTrace( UINT );	//!<	
+HRESULT		AppTitleTrace( UINT );		//!<	
 
-LPTSTR		ExePathGet( VOID );	//!<	
+LPTSTR		ExePathGet( VOID  );		//!<	
 
-HRESULT		UniDialogueEntry( HINSTANCE, HWND );	//!<	
+HRESULT		UniDialogueEntry( HINSTANCE, HWND );		//!<	
 
-HRESULT		FrameInitialise( LPTSTR, HINSTANCE );	//!<	枠設定のINIファイル名確保・アプリ起動後すぐ呼ばれる
-HRESULT		FrameNameModifyPopUp( HMENU, UINT );	//!<	
+HRESULT		FrameInitialise( LPTSTR, HINSTANCE );		//!<	枠設定のINIファイル名確保・アプリ起動後すぐ呼ばれる
+HRESULT		FrameNameModifyPopUp( HMENU, UINT );		//!<	
 INT_PTR		FrameEditDialogue( HINSTANCE, HWND, UINT );	//!<	
 HRESULT		FrameNameLoad( UINT, LPTSTR, UINT_PTR );	//!<	指定された枠の名前を返す
 
 HWND		FrameInsBoxCreate( HINSTANCE, HWND );	//!<	
-HRESULT		FrameMoveFromView( HWND, UINT );	//!<	
+HRESULT		FrameMoveFromView( HWND, UINT );		//!<	
 
 HRESULT		CntxEditInitialise( LPTSTR, HINSTANCE );	//!<	
 HRESULT		CntxEditDlgOpen( HWND );	//!<	
-HMENU		CntxMenuGet( VOID );	//!<	
+HMENU		CntxMenuGet( VOID );		//!<	
 
 HRESULT		MultiFileTabFirst( LPTSTR );	//!<	
 HRESULT		MultiFileTabAppend( LPARAM, LPTSTR );	//!<	
@@ -543,22 +543,23 @@ VOID		AaFontCreate( UINT );	//!<
 
 HWND		ViewInitialise( HINSTANCE, HWND, LPRECT, LPTSTR );	//!<	
 HRESULT		ViewSizeMove( HWND, LPRECT );	//!<	
-HRESULT		ViewFocusSet( VOID );	//!<	
+HRESULT		ViewFocusSet( VOID );			//!<	
 
 BOOL		ViewShowCaret( VOID );			//!<	
-VOID		ViewHideCaret( VOID );	//!<	
+VOID		ViewHideCaret( VOID );			//!<	
+INT			ViewCaretPosGet( PINT, PINT );	//!<	
 
-HRESULT		ViewFrameInsert( INT );	//!<	
+HRESULT		ViewFrameInsert( INT  );		//!<	
 HRESULT		ViewMaaItemsModeSet( UINT, UINT );	//!<	
 
 INT			ViewLetterWidthGet( TCHAR );	//!<	
-HRESULT		ViewNowPosStatus( VOID );	//!<	
+HRESULT		ViewNowPosStatus( VOID );		//!<	
 
-HRESULT		ViewRedrawSetLine( INT );	//!<	
+HRESULT		ViewRedrawSetLine( INT );		//!<	
 HRESULT		ViewRedrawSetRect( LPRECT );	//!<	
 HRESULT		ViewRedrawSetVartRuler( INT );	//!<	
 HRESULT		ViewRulerRedraw( INT, INT );	//!<	
-HRESULT		ViewEditReset( VOID );	//!<	
+HRESULT		ViewEditReset( VOID );			//!<	
 
 COLORREF	ViewMoziColourGet( LPCOLORREF );	//!<	
 COLORREF	ViewBackColourGet( LPVOID );	//!<	
@@ -802,6 +803,10 @@ INT			DocStringInfoCount( LPCTSTR, UINT_PTR, PINT, PINT );	//!<
 
 BOOLEAN		NowPageInfoGet( UINT, LPPAGEINFOS );	//!<	
 
+#ifdef PAGE_DELAY_LOAD
+BOOLEAN		PageIsDelayed( FILES_ITR, UINT );	//!<	
+#endif
+
 UINT		DocRangeDeleteByMozi( INT, INT, INT, INT, PBOOLEAN );	//!<	
 
 INT			DocUndoExecute( PINT, PINT );		//!<	
@@ -844,10 +849,10 @@ HWND		VertScripterCreate( HINSTANCE, HWND );	//!<
 HRESULT		VertMoveFromView( HWND , UINT );		//!<	
 
 #ifdef FIND_STRINGS
-HRESULT		FindDialogueOpen( HINSTANCE, HWND );	//!<	
-HRESULT		FindHighlightOff( VOID );	//!<	
-HRESULT		FindStringJump( UINT );	//!<	
-
+HRESULT		FindDialogueOpen( HINSTANCE, HWND );		//!<	
+HRESULT		FindHighlightOff( VOID );					//!<	
+INT			FindStringJump( UINT, PINT, PINT, PINT );	//!<	
+HRESULT		FindNowPageReSearch( VOID );				//!<	
 #endif
 
 #endif	//	NOT _ORRVW

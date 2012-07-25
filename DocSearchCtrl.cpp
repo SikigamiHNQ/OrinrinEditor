@@ -66,17 +66,16 @@ typedef struct tagFINDPOSITION
 extern list<ONEFILE>	gltMultiFiles;	//	複数ファイル保持
 //イテレータのtypedefはヘッダへ
 
-extern FILES_ITR	gitFileIt;		//	今見てるファイルの本体
-//#define gstFile	(*gitFileIt)	//!<	イテレータを構造体と見なす
+extern FILES_ITR	gitFileIt;			//		今見てるファイルの本体
 
-extern INT		gixFocusPage;		//	注目中のページ・とりあえず０・０インデックス
+extern INT		gixFocusPage;			//		注目中のページ・とりあえず０・０インデックス
 
-EXTERNED HWND	ghFindDlg;		//!<	検索ダイヤログのハンドル
+EXTERNED HWND	ghFindDlg;				//!<	検索ダイヤログのハンドル
 
 static TCHAR	gatNowPtn[MAX_PATH];	//!<	最新の検索文字列
-static INT		gixFindMode;	//!<	検索モード　０頁のみ　１単ファイル　２全ファイル
+static INT		gixFindMode;			//!<	検索モード　０頁のみ　１単ファイル　２全ファイル
 
-static FINDPOSITION	gstFindPos;	//!<	検索ジャンプ位置
+static FINDPOSITION	gstFindPos;			//!<	検索ジャンプ位置
 
 //static list<FINDPOSITION>	gltFindPosition;	//!<	検索結果保持
 //-------------------------------------------------------------------------------------------------
@@ -299,7 +298,7 @@ HRESULT FindExecute( HWND hDlg )
 	//検索パヤーン
 	Edit_GetText( GetDlgItem(hDlg,IDE_FIND_TEXT), atBuf, MAX_PATH );
 	ZeroMemory( atPattern, sizeof(atPattern) );
-	if( bModCrlf )
+	if( bModCrlf )	//	エスケープシーケンスを展開
 	{
 		for( d = 0, h = 0; MAX_PATH > d; d++, h++ )
 		{
@@ -333,6 +332,7 @@ HRESULT FindExecute( HWND hDlg )
 	@param[in]	ptPattern	検索パヤーン
 	@param[in]	iTgtPage	対象頁
 	@param[in]	itFile		ファイルイテレータ
+	@return		HRESULT	終了状態コード
 */
 HRESULT FindPageSearch( LPTSTR ptPattern, INT iTgtPage, FILES_ITR itFile )
 {
@@ -343,6 +343,9 @@ HRESULT FindPageSearch( LPTSTR ptPattern, INT iTgtPage, FILES_ITR itFile )
 	LPTSTR		ptPage, ptCaret, ptFind = NULL;
 
 	TCHAR	ttBuf;
+
+	//	ディレイしていればチェックしなくていい
+	if( PageIsDelayed( itFile, iTgtPage ) ){	return  E_ABORT;	}
 
 	//	ラストメモリー
 	StringCchCopy( gatNowPtn, MAX_PATH, ptPattern );
@@ -387,7 +390,7 @@ HRESULT FindPageSearch( LPTSTR ptPattern, INT iTgtPage, FILES_ITR itFile )
 	@param[in]	iRange	ハイライト文字数
 	@param[in]	iPage	対象頁
 	@param[in]	itFile	ファイルイテレータ
-	@return		全体文字数
+	@return		HRESULT	終了状態コード
 */
 HRESULT FindPageHitHighlight( INT iOffset, INT iRange, INT iPage, FILES_ITR itFile )
 {
@@ -488,22 +491,99 @@ HRESULT FindPageHitHighlight( INT iOffset, INT iRange, INT iPage, FILES_ITR itFi
 /*!
 	検索位置へジャンプ
 	@param[in]	dMode	０次へ　１前へ
+	@param[in]	pxDot	カーソルドット位置・処理したら戻す
+	@param[in]	pyLine	カーソル行・処理したら戻す
+	@param[in]	pMozi	キャレットの左側の文字数・処理したら戻す
+	@return		INT		負：エラー　０：ヒット無し　１～：ヒットした
 */
-HRESULT FindStringJump( UINT dMode )
+INT FindStringJump( UINT dMode, PINT pXdot, PINT pYline, PINT pMozi )
 {
+	INT			iXdot, iYline, iMozi;
+	BOOLEAN		bStart, bBegin;
+	INT_PTR		dTotalPage, dTotalLine;
+	PAGE_ITR	itPage;	//	頁を順に見ていく
+	LINE_ITR	itLine;	//	行を順に見ていく
+	LETR_ITR	itMozi;	//	文字を順に見ていく
+
+	if( !(pXdot) || !(pYline) || !(pMozi) ){	return -1;	}
+
+	//	頁はみ出しチェキ
+	dTotalPage = gitFileIt->vcCont.size();
+	if( !(0 <= gixFocusPage && gixFocusPage < dTotalPage) ){	return -1;	}
+	//	今の頁に注目
+	itPage = gitFileIt->vcCont.begin();
+	std::advance( itPage, gixFocusPage );
+
+	iXdot  = *pXdot;
+	iYline = *pYline;
+	iMozi  = *pMozi;
 
 
-	return S_OK;
+	//	行はみ出しチェキ
+	dTotalLine = itPage->ltPage.size();
+	if( !(0 <= iYline && iYline < dTotalLine) ){	return -1;	}
+	//	今の行に注目
+	itLine = itPage->ltPage.begin();
+	std::advance( itLine, iYline );
+
+	itMozi = itLine->vcLine.begin();
+	std::advance( itMozi, iMozi );
+
+	bStart = TRUE;	bBegin = TRUE;
+	for( ; itPage->ltPage.end() != itLine; itLine++ )
+	{
+		//	最初はそのまま、次回からはその行の先頭文字から見ていく
+		if( bStart ){	bStart =  FALSE;	}
+		else{	itMozi = itLine->vcLine.begin();	}
+
+		for( ;itLine->vcLine.end() != itMozi; itMozi++ )
+		{
+			if( itMozi->mzStyle & CT_FINDED )	//	ヒット
+			{
+				if( !(bBegin)  )	//	検索開始位置のは無視する
+				{
+					*pXdot  = iXdot;
+					*pYline = iYline;
+					*pMozi  = iMozi;
+
+					ViewDrawCaret( iXdot, iYline, TRUE );	//	キャレットも移動
+
+					return 1;
+					//	頁またぎはどうすんべ
+				}
+			}
+			else{	bBegin =  FALSE;	}
+			//	
+
+			iXdot += itMozi->rdWidth;
+			iMozi++;
+		}
+
+		iYline++;	//	行番号は増やす
+		iXdot = 0;
+		iMozi = 0;
+	}
+
+	//	頁またぎはどうすんべ
+
+	return 0;
 }
 //-------------------------------------------------------------------------------------------------
 
 /*!
 	全部ハイライトＯＦＦ
+	@return		HRESULT	終了状態コード
 */
 HRESULT FindHighlightOff( VOID )
 {
+	UINT_PTR	dPage, d;
 
-	FindPageHighlightOff( gixFocusPage, gitFileIt );
+	dPage = gitFileIt->vcCont.size( );
+
+	for( d = 0; dPage > d; d++ )
+	{
+		FindPageHighlightOff( d, gitFileIt );
+	}
 
 	return S_OK;
 }
@@ -591,5 +671,17 @@ HRESULT FindLineHighlightOff( UINT iLine, LINE_ITR itLine )
 }
 //-------------------------------------------------------------------------------------------------
 
+/*!
+	今頁を再検索
+*/
+HRESULT FindNowPageReSearch( VOID )
+{
+	FindHighlightOff(  );
+
+	FindPageSearch( gatNowPtn, gixFocusPage, gitFileIt );	//	重い
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
 
 #endif

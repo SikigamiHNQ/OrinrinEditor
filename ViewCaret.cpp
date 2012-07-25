@@ -370,3 +370,18 @@ HRESULT ImeInputBoxPosSet( VOID )
 }
 //-------------------------------------------------------------------------------------------------
 
+/*!
+	今のキャレット位置をゲッツする
+	@param[in]	pXdot	キャレットのＸドット
+	@param[in]	pYline	キャレットのＹ行数
+	@return	INT	キャレットの左側の文字数
+*/
+INT ViewCaretPosGet( PINT pXdot, PINT pYline )
+{
+	if( pXdot ){	*pXdot  = gdDocXdot;	}
+	if( pYline ){	*pYline = gdDocLine;	}
+
+	return gdDocMozi;
+}
+//-------------------------------------------------------------------------------------------------
+
