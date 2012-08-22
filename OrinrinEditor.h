@@ -514,6 +514,7 @@ HRESULT		AppTitleTrace( UINT );		//!<
 
 LPTSTR		ExePathGet( VOID  );		//!<	
 
+HRESULT		UniDlgInitialise( HWND , UINT );	//!<	
 HRESULT		UniDialogueEntry( HINSTANCE, HWND );		//!<	
 
 HRESULT		FrameInitialise( LPTSTR, HINSTANCE );		//!<	枠設定のINIファイル名確保・アプリ起動後すぐ呼ばれる

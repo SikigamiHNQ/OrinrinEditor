@@ -121,6 +121,8 @@ static CONST GUID gcstGUID = { 0x66D3E881, 0x972B, 0x458B, { 0x93, 0x5E, 0x9E, 0
 //#define PGL_TOOLTIP
 //#define MAA_TOOLTIP
 
+#define UNICODE_USE_LOG
+
 #define MAA_IADD_PLUS	//	MAAへのアイテム追加機能拡張
 //	リソースの IDM_MAA_IADD_OPEN IDM_MAA_ITEM_INSERT に注意
 
@@ -288,6 +290,10 @@ LRESULT	ExceptionMessage( LPCSTR, LPCSTR, UINT, LPARAM );
 #define VL_COLHOT_VKEY	48	//!<	[COL]ポップアップホットキー・仮想キーコード
 #define VL_MAA_RETFCS	49	//!<	MAA窓で、選択したら編集窓にフォーカス戻す
 #define VL_PGL_RETFCS	50	//!<	頁一覧で、選択したら編集窓にフォーカス戻す
+#define VL_U_RULER_POS	51	//!<	下ルーラの位置行数
+#define VL_U_RULER_VIEW	52	//!<	下ルーラ表示するか
+#define VL_PAGEBYTE_MAX	53	//!<	壱レスの最大バイト数
+#define VS_UNI_USE_LOG	54	//!<	ユニコード文字の使用ログ
 
 //増やしたら、函数内に取扱つくっておくこと
 

@@ -166,6 +166,10 @@ INT APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 	ghMaaWnd = MaaTmpltInitialise( hInstance, GetDesktopWindow(), NULL );
 	if( !(ghMaaWnd) )	return (-1);
 
+#ifdef USE_HOVERTIP
+	HoverTipInitialise( hInstance, ghMaaWnd );
+#endif
+
 	DraughtInitialise( hInstance, ghMaaWnd );
 	gdClickDrt = gdUseMode;
 

@@ -31,10 +31,10 @@ If not, see <http://www.gnu.org/licenses/>.
 
 //	ホイホイ共有していいのだらうか
 
-extern FILES_ITR	gitFileIt;	//!<	今見てるファイルの本体
+extern FILES_ITR	gitFileIt;	//	今見てるファイルの本体
 
-extern INT		gixFocusPage;	//!<	注目中のページ・とりあえず０・０インデックス
-extern INT		gixDropPage;	//!<	投下ホット番号
+extern INT		gixFocusPage;	//	注目中のページ・とりあえず０・０インデックス
+extern INT		gixDropPage;	//	投下ホット番号
 //-------------------------------------------------------------------------------------------------
 
 static HINSTANCE	ghInst;		//!<	このアプリの実存値
@@ -64,14 +64,15 @@ static BOOLEAN	gbPgRetFocus;	//!<	頁を選択したら編集窓にフォーカス戻すか
 static WNDPROC	gpfOrigPageViewProc;	//!<	頁一覧ビューの元プロシージャ
 static WNDPROC	gpfOrigPageToolProc;	//!<	ツールバーの元プロシージャ
 
-static HIMAGELIST	ghPgLstImgLst;
+static HIMAGELIST	ghPgLstImgLst;	//!<	
 
 extern INT	gbTmpltDock;		//	頁・壱行テンプレのドッキング
 extern BOOLEAN	gbDockTmplView;	//	くっついてるテンプレは見えているか
 
+extern  UINT	gdPageByteMax;	//	壱レスの最大バイト数
 
-extern  HWND	ghMainSplitWnd;	//!<	メインのスプリットバーハンドル
-extern  LONG	grdSplitPos;	//!<	スプリットバーの、左側の、画面右からのオフセット
+extern  HWND	ghMainSplitWnd;	//	メインのスプリットバーハンドル
+extern  LONG	grdSplitPos;	//	スプリットバーの、左側の、画面右からのオフセット
 //-------------------------------------------------------------------------------------------------
 
 //	ツールバー・新規作成とか
@@ -824,7 +825,7 @@ LRESULT PageListNotify( HWND hWnd, LPNMLISTVIEW pstLv )
 				stInfo.dMasqus = PI_BYTES;
 				NowPageInfoGet( lvLine, &stInfo );
 
-				if( PAGE_BYTE_MAX <  stInfo.iBytes )	pstDraw->clrTextBk = 0x000000FF;
+				if( gdPageByteMax <  (UINT)(stInfo.iBytes) )	pstDraw->clrTextBk = 0x000000FF;
 				//else	pstDraw->clrTextBk = 0xFF000000;
 			}
 			//else

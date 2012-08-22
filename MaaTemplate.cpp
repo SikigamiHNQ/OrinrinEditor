@@ -489,6 +489,9 @@ VOID Maa_OnDestroy( HWND hWnd )
 
 #ifdef _ORRVW
 
+#ifdef USE_HOVERTIP
+	HoverTipInitialise( NULL, NULL );
+#endif
 	DraughtInitialise( NULL, NULL );
 
 	OpenProfileInitialise( NULL );

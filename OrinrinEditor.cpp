@@ -20,17 +20,20 @@ If not, see <http://www.gnu.org/licenses/>.
 
 //	注意・コマンドのリソースＩＤ番号は変更不可！
 
+//	TODO:	ＯＫ？	ユニコードリスト・使ったヤツの記録とか
+
 //	TODO:	viewerのMLTリストアップ、チェックボックスは灰色できないか
 //			ディレクトリ内の選択非選択がややこしい
 //			ルートディレクトリの更新日時をみて、修正か新規か判断？
 
-//	TODO:	右ルーラーみたいな、行ルーラー（３０行とか）を
+//	TODO:	ＯＫ？	右ルーラーみたいな、行ルーラー（３０行とか）を	IDM_UNDER_RULER_TOGGLE
 
-//	TODO:	バイト数警告の4096は調整出来るように
+//	TODO:	ＯＫ？	バイト数警告の4096は調整出来るように
 
 //	TODO:	プレビュー再描画しても、ALLと表示位置を維持する
 
-//	TODO:	MLT検索、文字列ないなら検索しないようにする
+//	TODO:	ツールバーにもAcceleratorキー表示する
+
 
 //	TODO:	ＯＫ？	ディレイロード・未ロード頁の全プレビューがおかしい
 //	TODO:	CtrlShiftD の動作は問題無いか
@@ -50,6 +53,7 @@ If not, see <http://www.gnu.org/licenses/>.
 //	TODO:	ＯＫ？	合成するとき、上絵の周囲を白ヌキする機能
 //	TODO:	ＯＫ？	レイヤボックス白ヌキ、１６・２２とか、いくつかパヤーン作っておく
 //	TODO:	ＯＫ？	中CLICKで、開いてるファイル閉じる
+//	TODO:	ＯＫ？	MLT検索、文字列ないなら検索しないようにする
 
 //	TODO:	最終行の枠いれると落ちる？
 
@@ -440,7 +444,7 @@ ASDファイル　　壱行が壱コンテンツ
 					壱行テンプレで中クルックしたらレイヤボックスが開く
 					MAAツリーでファイル名を中クリックしたら、副タブに追加できる
 					バグ修正いろいろ
-2012/06/26	0.31	MAAに、ファイルの途中にアイテムを追加できるようにした
+2012/08/20	0.31	MAAに、ファイルの途中にアイテムを追加できるようにした
 					MAAの内容表示側にＤ＆Ｄすると、そのファイルを副タブで開く（Viewer込み）
 					※使用には入らないし復元もされない
 					MAAツリーにＤ＆Ｄすると、追加アイテムとしてツリーに追加（Viewer込み）
@@ -454,10 +458,13 @@ ASDファイル　　壱行が壱コンテンツ
 					ドラフトボード・サムネイルの窓を移動出来るようにした
 					ツールチップがチラつくのをなんとか出来た気がする
 					副タブの名称変更を出来るようにした（Viewer込み）
-					ファイルオーポンを高速化出来たかもだ。
+					ファイルオーポンを高速化出来た気がする
 					空白の表示/非表示状態を覚えておくようにした。
 					レイヤボックス貼付に白ヌキ機能追加
 					中クリックで、MAAの副タブや編集ファイルを閉じれるようにした（Viewer込み）
+					行数ルーラーを付けた
+					バイト数オーバー警告を設定できるようにした
+					ユニコード表に、使用履歴をつけた
 
 
 
@@ -549,6 +556,8 @@ static   UINT		gdBUInterval;	//!<	バックアップ感覚・デフォ３分くらい？
 EXTERNED UINT		gbAutoBUmsg;	//!<	自動バックアップメッセージ出すか？
 EXTERNED UINT		gbCrLfCode;		//!<	改行コード：０したらば・非０ＹＹ 
 
+EXTERNED UINT		gdPageByteMax;	//!<	壱レスの最大バイト数
+
 static TCHAR		gatExePath[MAX_PATH];	//!<	実行ファイルの位置
 static TCHAR		gatIniPath[MAX_PATH];	//!<	ＩＮＩファイルの位置
 
@@ -571,7 +580,8 @@ extern  HWND	ghViewWnd;		//	ビュー
 
 extern  UINT	gdGridXpos;		//	グリッド線のＸ間隔
 extern  UINT	gdGridYpos;		//	グリッド線のＹ間隔
-extern  UINT	gdRightRuler;	//	右線の位置
+extern  UINT	gdRightRuler;	//	右線の位置ドット
+extern  UINT	gdUnderRuler;	//	下線の位置行数
 //-------------------------------------------------------------------------------------------------
 
 #ifdef PLUGIN_ENABLE
@@ -741,6 +751,7 @@ INT APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 	// アプリケーションの初期化を実行します:
 	if( !InitInstance( hInstance, nCmdShow , atArgv ) ){	return FALSE;	}
 
+#pragma message ("ここで、ToolBar用にもっと手前にINIファイルアクセスしても大丈夫か？")
 	CntxEditInitialise( gatExePath, hInstance );
 
 	VertInitialise( gatExePath, hInstance );
@@ -929,6 +940,8 @@ BOOL InitInstance( HINSTANCE hInstance, INT nCmdShow, LPTSTR ptArgv )
 
 	gbTmpltDock   = InitParamValue( INIT_LOAD, VL_PLS_LN_DOCK,  1 );	//	０独立　１くっつける
 
+	gdPageByteMax = InitParamValue( INIT_LOAD, VL_PAGEBYTE_MAX, PAGE_BYTE_MAX );	//	最大バイト数
+
 	ghMainWnd = hWnd;
 
 	//	機能チェック
@@ -991,6 +1004,8 @@ BOOL InitInstance( HINSTANCE hInstance, INT nCmdShow, LPTSTR ptArgv )
 
 	LayerBoxInitialise( hInstance, &rect );
 	LayerBoxAlphaSet( InitParamValue( INIT_LOAD, VL_LAYER_TRANS, 192 ) );
+
+	UniDlgInitialise( hWnd, TRUE );
 
 	UserDefInitialise( hWnd, TRUE );
 
@@ -1620,6 +1635,8 @@ VOID Cls_OnDestroy( HWND hWnd )
 
 	MoziInitialise( NULL, NULL );
 
+	UniDlgInitialise( NULL, FALSE );
+
 	VertInitialise( NULL, NULL );
 
 	DraughtInitialise( NULL, NULL );
@@ -1924,7 +1941,7 @@ VOID Cls_OnDrawItem( HWND hWnd, CONST DRAWITEMSTRUCT *pstDrawItem )
 		dBytes =  pstDrawItem->itemData;	//	文字列ポインタとか入ってる
 		StringCchPrintf( atBuff, SUB_STRING, TEXT("%d Bytes"), dBytes );
 
-		if( PAGE_BYTE_MAX < dBytes )	FillRect( pstDrawItem->hDC, &(pstDrawItem->rcItem), ghStsRedBrush );
+		if( gdPageByteMax < dBytes )	FillRect( pstDrawItem->hDC, &(pstDrawItem->rcItem), ghStsRedBrush );
 
 		DrawText( pstDrawItem->hDC, atBuff, -1, &(rect), DT_LEFT | DT_VCENTER | DT_SINGLELINE );
 	}
@@ -2247,6 +2264,9 @@ INT InitParamValue( UINT dMode, UINT dStyle, INT nValue )
 		case  VL_PAGE_OVWRITE:	StringCchCopy( atKeyName, SUB_STRING, TEXT("PageNumOvWrite") );	break;
 		case  VL_MAA_RETFCS:	StringCchCopy( atKeyName, SUB_STRING, TEXT("MaaRetFocus") );	break;
 		case  VL_PGL_RETFCS:	StringCchCopy( atKeyName, SUB_STRING, TEXT("PageRetFocus") );	break;
+		case  VL_U_RULER_POS:	StringCchCopy( atKeyName, SUB_STRING, TEXT("UnderRuler")  );	break;
+		case VL_U_RULER_VIEW:	StringCchCopy( atKeyName, SUB_STRING, TEXT("UndRulerView") );	break;
+		case VL_PAGEBYTE_MAX:	StringCchCopy( atKeyName, SUB_STRING, TEXT("PageByteMax") );	break;
 
 		default:	return nValue;
 	}
@@ -2285,6 +2305,7 @@ HRESULT InitParamString( UINT dMode, UINT dStyle, LPTSTR ptFile )
 		case VS_PROFILE_NAME:	StringCchCopy( atKeyName, SUB_STRING, TEXT("ProfilePath") );	break;
 		case VS_PAGE_FORMAT:	StringCchCopy( atKeyName, SUB_STRING, TEXT("PageFormat")  );	break;
 		case VS_FONT_NAME:		StringCchCopy( atKeyName, SUB_STRING, TEXT("FontName") );		break;
+		case VS_UNI_USE_LOG:	StringCchCopy( atKeyName, SUB_STRING, TEXT("UniUseLog") );		break;
 		default:	return E_INVALIDARG;
 	}
 
@@ -2705,7 +2726,7 @@ HRESULT OptionDialogueOpen( VOID )
 */
 INT_PTR CALLBACK OptionDlgProc( HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam )
 {
-	static  UINT	cdGrXp, cdGrYp, cdRtRr;
+	static  UINT	cdGrXp, cdGrYp, cdRtRr, cdUdRr;
 
 	UINT	id;
 	INT		dValue, iBuff;
@@ -2749,10 +2770,19 @@ INT_PTR CALLBACK OptionDlgProc( HWND hDlg, UINT message, WPARAM wParam, LPARAM l
 			StringCchPrintf( atBuff, SUB_STRING, TEXT("%d"), gdGridYpos );
 			Edit_SetText( GetDlgItem(hDlg,IDE_GRID_Y_POS), atBuff );
 
-			//	右ルーラ位置
+			//	右ルーラ位置ドット
 			cdRtRr = gdRightRuler;
 			StringCchPrintf( atBuff, SUB_STRING, TEXT("%d"), gdRightRuler );
 			Edit_SetText( GetDlgItem(hDlg,IDE_RIGHT_RULER_POS), atBuff );
+
+			//	下ルーラ位置行数
+			cdUdRr = gdUnderRuler;
+			StringCchPrintf( atBuff, SUB_STRING, TEXT("%d"), gdUnderRuler );
+			Edit_SetText( GetDlgItem(hDlg,IDE_UNDER_RULER_POS), atBuff );
+
+			//	頁最大バイト数
+			StringCchPrintf( atBuff, SUB_STRING, TEXT("%d"), gdPageByteMax );
+			Edit_SetText( GetDlgItem(hDlg,IDE_PAGE_BYTE_MAX), atBuff );
 
 			//	自動保存間隔
 			dValue = InitParamValue( INIT_LOAD, VL_BACKUP_INTVL, 3 );
@@ -2892,6 +2922,18 @@ INT_PTR CALLBACK OptionDlgProc( HWND hDlg, UINT message, WPARAM wParam, LPARAM l
 					gdRightRuler = StrToInt( atBuff );
 					InitParamValue( INIT_SAVE, VL_R_RULER_POS, gdRightRuler );
 					if( cdRtRr != gdRightRuler )	ViewRedrawSetLine( -1 );
+
+					//	下ルーラ位置行数
+					Edit_GetText( GetDlgItem(hDlg,IDE_UNDER_RULER_POS), atBuff, SUB_STRING );
+					gdUnderRuler = StrToInt( atBuff );
+					InitParamValue( INIT_SAVE, VL_U_RULER_POS, gdUnderRuler );
+					if( cdUdRr != gdUnderRuler )	ViewRedrawSetLine( -1 );
+
+					//	頁最大バイト数
+					Edit_GetText( GetDlgItem(hDlg,IDE_PAGE_BYTE_MAX), atBuff, SUB_STRING );
+					gdPageByteMax = StrToInt( atBuff );
+					InitParamValue( INIT_SAVE, VL_PAGEBYTE_MAX, gdPageByteMax );
+
 
 					//	自動保存間隔
 					Edit_GetText( GetDlgItem(hDlg,IDE_AUTO_BU_INTVL), atBuff, SUB_STRING );

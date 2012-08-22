@@ -79,6 +79,9 @@ static INT		gixTopItem;			//!<	一覧の最上位
 static INT		gixMaxItem;			//!<	アイテム個数
 
 static  LONG	gixNowSel;			//!<	マウスカーソルがあるところのインデックス
+#ifdef USE_HOVERTIP
+static  LONG	gixNowToolTip;		//!<	ツールチップ用セレクト
+#endif
 
 static  HWND	ghScrollWnd;		//!<	スクロールバー
 
@@ -171,6 +174,12 @@ HRESULT AaItemsInitialise( HWND hWnd, HINSTANCE hInst, LPRECT ptRect )
 	gptTipBuffer = NULL;
 
 	gixTopItem = 0;
+
+	gixNowSel = -1;
+#ifdef USE_HOVERTIP
+	gixNowToolTip = -1;
+#endif
+
 
 #ifdef MAA_TOOLTIP
 	//	ツールチップ作る
@@ -396,7 +405,7 @@ LRESULT CALLBACK gpfAaItemsProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 
 		case WM_MOUSELEAVE:
 			HoverTipOnMouseLeave( hWnd );
-			gixNowSel = -1;
+			gixNowToolTip = -1;
 			return 0;
 #endif
 
@@ -614,15 +623,20 @@ VOID Aai_OnMouseMove( HWND hWnd, INT x, INT y, UINT keyFlags )
 			if( y < bottom ){	iItem = gvcViewOrder.at(  i ).index;	break;	}
 		}
 	}
-
-	if( gixNowSel != iItem )	bReDraw = TRUE;
-	gixNowSel = iItem;
+	//	カーソル下が無効なら、iItemは－１状態
 
 #ifdef USE_HOVERTIP
+	if( gixNowToolTip != iItem ){	bReDraw =  TRUE;	}
+	gixNowSel = iItem;
+	gixNowToolTip = gixNowSel;
+
 	if( bReDraw && gbAAtipView ){	HoverTipResist( ghItemsWnd );	}
 #endif
 
 #ifdef MAA_TOOLTIP
+	if( gixNowSel != iItem ){	bReDraw =  TRUE;	}
+	gixNowSel = iItem;
+
 	if( bReDraw && gbAAtipView )	SendMessage( ghToolTipWnd, TTM_UPDATE, 0, 0 );
 #endif
 
@@ -1124,10 +1138,10 @@ LPTSTR CALLBACK AaItemsHoverTipInfo( LPVOID pVoid )
 	LPTSTR		ptBuffer = NULL;
 
 
-	if( !(gbAAtipView) ){	return NULL;	}	//	非表示なら何もしないでおｋ
-	if( 0 > gixNowSel ){	return NULL;	}
+	if( !(gbAAtipView) ){		return NULL;	}	//	非表示なら何もしないでおｋ
+	if( 0 > gixNowToolTip ){	return NULL;	}
 
-	pcConts = AacAsciiArtGet( gixNowSel );	//	該当するインデックスのＡＡを引っ張ってくる
+	pcConts = AacAsciiArtGet( gixNowToolTip );	//	該当するインデックスのＡＡを引っ張ってくる
 	if( !pcConts  ){	return 0;	}
 
 	ptBuffer = SjisDecodeAlloc( pcConts );
@@ -1135,7 +1149,7 @@ LPTSTR CALLBACK AaItemsHoverTipInfo( LPVOID pVoid )
 
 	free( pcConts );
 
-	TRACE( TEXT("MAA HOVER CALL %d, by[%d]"), gixNowSel, rdLength );
+	TRACE( TEXT("MAA HOVER CALL %d, by[%d]"), gixNowToolTip, rdLength );
 
 	return ptBuffer;
 }

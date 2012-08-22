@@ -109,12 +109,15 @@ static  UINT	gdUseSubMode;	//!<	MAAからの中クルックによる使用スタイルの指示
 
 static  UINT	gdSpaceView;	//!<	空白を表示する
 
+static BOOLEAN	gbGridView;		//!<	グリッド表示するか
 EXTERNED UINT	gdGridXpos;		//!<	グリッド線のＸ間隔
 EXTERNED UINT	gdGridYpos;		//!<	グリッド線のＹ間隔
-EXTERNED UINT	gdRightRuler;	//!<	右線の位置
 
-static BOOLEAN	gbGridView;		//!<	グリッド表示するか
 static BOOLEAN	gbRitRlrView;	//!<	右線表示するか
+EXTERNED UINT	gdRightRuler;	//!<	右線の位置ドット
+
+static BOOLEAN	gbUndRlrView;	//!<	下線表示するか
+EXTERNED UINT	gdUnderRuler;	//!<	下線の位置行数
 
 static  UINT	gdWheelLine;	//!<	マウスホウィールの行移動量のOS標準
 
@@ -349,6 +352,11 @@ HWND ViewInitialise( HINSTANCE hInstance, HWND hParentWnd, LPRECT pstFrame, LPTS
 	gdRightRuler = InitParamValue( INIT_LOAD, VL_R_RULER_POS, 800 );
 	gbRitRlrView = InitParamValue( INIT_LOAD, VL_R_RULER_VIEW, 1 );
 	MenuItemCheckOnOff( IDM_RIGHT_RULER_TOGGLE, gbRitRlrView );
+
+	//	下ルーラ表示制御
+	gdUnderRuler = InitParamValue( INIT_LOAD, VL_U_RULER_POS, 30 );
+	gbUndRlrView = InitParamValue( INIT_LOAD, VL_U_RULER_VIEW, 1 );
+	MenuItemCheckOnOff( IDM_UNDER_RULER_TOGGLE, gbUndRlrView );
 
 	//	空白表示制御
 	gdSpaceView = InitParamValue( INIT_LOAD, VL_SPACE_VIEW, TRUE );
@@ -1066,6 +1074,7 @@ VOID Evw_OnContextMenu( HWND hWnd, HWND hWndContext, UINT xPos, UINT yPos )
 	CheckMenuItem( hSubMenu , IDM_SPACE_VIEW_TOGGLE,  gdSpaceView  ? MF_CHECKED : MF_UNCHECKED );
 	CheckMenuItem( hSubMenu , IDM_GRID_VIEW_TOGGLE,   gbGridView   ? MF_CHECKED : MF_UNCHECKED );
 	CheckMenuItem( hSubMenu , IDM_RIGHT_RULER_TOGGLE, gbRitRlrView ? MF_CHECKED : MF_UNCHECKED );
+	CheckMenuItem( hSubMenu , IDM_UNDER_RULER_TOGGLE, gbUndRlrView ? MF_CHECKED : MF_UNCHECKED );
 
 //	FrameNameModifyPopUp( hSubMenu, 1 );	//	枠の名前を挿入
 
@@ -1583,18 +1592,31 @@ HRESULT ViewDrawMetricLine( HDC hdc, UINT bUpper )
 		SelectPen( hdc, hPenOld );	//	元に戻しておく
 	}
 
-	if( gbRitRlrView )
+	if( gbRitRlrView || gbUndRlrView )
 	{
-		//	８００の線・グリッドより手前に書くようにする
 		hPenOld = SelectPen( hdc , gahPen[PENT_SPACEWARN] );	//	あらかじめ確保っとく
 
-		dX = gdRightRuler;	//	設定から引っ張る
-		dY = 0;
+		//	右８００の線・グリッドより手前に書くようにする
+		if( gbRitRlrView )
+		{
+			dX = gdRightRuler;	//	設定から引っ張る
+			dY = 0;
+			ViewPositionTransform( &dX, &dY, 1 );
 
-		ViewPositionTransform( &dX, &dY, 1 );
+			MoveToEx( hdc, dX, RULER_AREA-1, NULL  );	//	開始地点
+			LineTo(   hdc, dX, height  );	//	境界線びゅー
+		}
 
-		MoveToEx( hdc, dX, RULER_AREA-1, NULL  );	//	開始地点
-		LineTo(   hdc, dX, height  );	//	境界線びゅー
+		//	下３０行の線
+		if( gbUndRlrView )
+		{
+			dX = 0;
+			dY = gdUnderRuler * LINE_HEIGHT;
+			ViewPositionTransform( &dX, &dY, 1 );
+
+			MoveToEx( hdc, LINENUM_WID, dY, NULL  );	//	開始地点
+			LineTo(   hdc, width, dY  );	//	境界線びゅー
+		}
 
 		SelectPen( hdc, hPenOld );	//	元に戻しておく
 	}
@@ -2425,6 +2447,14 @@ VOID OperationOnCommand( HWND hWnd, INT id, HWND hWndCtl, UINT codeNotify )
 			gbRitRlrView = !(gbRitRlrView);
 			InitParamValue( INIT_SAVE, VL_R_RULER_VIEW, gbRitRlrView );
 			MenuItemCheckOnOff( IDM_RIGHT_RULER_TOGGLE, gbRitRlrView );
+			ViewRedrawSetLine( -1 );	//	画面表示更新
+			break;
+
+		//	行ガイドトグル
+		case IDM_UNDER_RULER_TOGGLE:
+			gbUndRlrView = !(gbUndRlrView);
+			InitParamValue( INIT_SAVE, VL_U_RULER_VIEW, gbUndRlrView );
+			MenuItemCheckOnOff( IDM_UNDER_RULER_TOGGLE, gbUndRlrView );
 			ViewRedrawSetLine( -1 );	//	画面表示更新
 			break;
 

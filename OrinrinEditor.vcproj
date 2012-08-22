@@ -384,6 +384,30 @@
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
 			<File
+				RelativePath=".\resource\dir_extra.ico"
+				>
+			</File>
+			<File
+				RelativePath=".\resource\dir_open.ico"
+				>
+			</File>
+			<File
+				RelativePath=".\resource\directory.ico"
+				>
+			</File>
+			<File
+				RelativePath=".\resource\file_ast.ico"
+				>
+			</File>
+			<File
+				RelativePath=".\resource\file_etc.ico"
+				>
+			</File>
+			<File
+				RelativePath=".\resource\file_mlt.ico"
+				>
+			</File>
+			<File
 				RelativePath=".\OrinrinEditor.ico"
 				>
 			</File>
@@ -403,6 +427,22 @@
 					>
 				</File>
 				<File
+					RelativePath=".\resource\arrow_leftright.bmp"
+					>
+				</File>
+				<File
+					RelativePath=".\resource\arrow_leftright_q.bmp"
+					>
+				</File>
+				<File
+					RelativePath=".\resource\arrow_updown.bmp"
+					>
+				</File>
+				<File
+					RelativePath=".\resource\arrow_updown_q.bmp"
+					>
+				</File>
+				<File
 					RelativePath=".\resource\Box1.bmp"
 					>
 				</File>
@@ -411,7 +451,47 @@
 					>
 				</File>
 				<File
+					RelativePath=".\resource\Box11.bmp"
+					>
+				</File>
+				<File
+					RelativePath=".\resource\Box12.bmp"
+					>
+				</File>
+				<File
+					RelativePath=".\resource\Box13.bmp"
+					>
+				</File>
+				<File
+					RelativePath=".\resource\Box14.bmp"
+					>
+				</File>
+				<File
+					RelativePath=".\resource\Box15.bmp"
+					>
+				</File>
+				<File
+					RelativePath=".\resource\Box16.bmp"
+					>
+				</File>
+				<File
+					RelativePath=".\resource\Box17.bmp"
+					>
+				</File>
+				<File
+					RelativePath=".\resource\Box18.bmp"
+					>
+				</File>
+				<File
+					RelativePath=".\resource\Box19.bmp"
+					>
+				</File>
+				<File
 					RelativePath=".\resource\Box2.bmp"
+					>
+				</File>
+				<File
+					RelativePath=".\resource\Box20.bmp"
 					>
 				</File>
 				<File

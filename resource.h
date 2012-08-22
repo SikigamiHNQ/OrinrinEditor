@@ -30,6 +30,7 @@
 #define IDD_FIND_STRING_DLG             133
 #define IDD_FIND_MAA_DLG                134
 #define IDD_FRAME_EDIT_DLG_2            135
+#define IDD_UNICODE_PALETTE_DLG_2       136
 #define IDC_AAVIEWER                    209
 #define IDD_PATH_SET                    210
 #define IDSB_STATUSBAR                  211
@@ -74,8 +75,8 @@
 #define IDBMQ_COPY                      338
 #define IDBMP_PASTE                     339
 #define IDBMQ_PASTE                     340
-#define IDBMP_DELETE					341
-#define IDBMQ_DELETE					342
+#define IDBMP_DELETE                    341
+#define IDBMQ_DELETE                    342
 #define IDBMP_SJISCOPY                  343
 #define IDBMQ_SJISCOPY                  344
 #define IDBMP_PAGESJISCOPY              345
@@ -124,10 +125,10 @@
 #define IDBMQ_LINESSHIFTRIGHT           418
 #define IDBMP_LINESSHIFTLEFT            419
 #define IDBMQ_LINESSHIFTLEFT            420
-#define IDBMP_MIRROR_INVERSE			421
-#define IDBMQ_MIRROR_INVERSE			422
-#define IDBMP_UPSET_INVERSE				423
-#define IDBMQ_UPSET_INVERSE				424
+#define IDBMP_MIRROR_INVERSE            421
+#define IDBMQ_MIRROR_INVERSE            422
+#define IDBMP_UPSET_INVERSE             423
+#define IDBMQ_UPSET_INVERSE             424
 #define IDBMPQ_VIEW_TB_FIRST            431
 #define IDBMP_UNIPALETTE                431
 #define IDBMQ_UNIPALETTE                432
@@ -178,16 +179,16 @@
 #define IDBMP_FRMINS_HOTEL              538
 #define IDBMP_FRMINS_INDIA              539
 #define IDBMP_FRMINS_JULIETTE           540
-#define IDBMP_FRMINS_KILO				541
-#define IDBMP_FRMINS_LIMA				542
-#define IDBMP_FRMINS_MIKE				543
-#define IDBMP_FRMINS_NOVEMBER			544
-#define IDBMP_FRMINS_OSCAR				545
-#define IDBMP_FRMINS_POPPA				546
-#define IDBMP_FRMINS_QUEBEC				547
-#define IDBMP_FRMINS_ROMEO				548
-#define IDBMP_FRMINS_SIERRA				549
-#define IDBMP_FRMINS_TANGO				550
+#define IDBMP_FRMINS_KILO               541
+#define IDBMP_FRMINS_LIMA               542
+#define IDBMP_FRMINS_MIKE               543
+#define IDBMP_FRMINS_NOVEMBER           544
+#define IDBMP_FRMINS_OSCAR              545
+#define IDBMP_FRMINS_POPPA              546
+#define IDBMP_FRMINS_QUEBEC             547
+#define IDBMP_FRMINS_ROMEO              548
+#define IDBMP_FRMINS_SIERRA             549
+#define IDBMP_FRMINS_TANGO              550
 #define IDBMQ_FRMINS_SEL                561
 #define IDBMP_FRMINS_INSERT             563
 #define IDBMQ_FRMINS_INSERT             564
@@ -202,14 +203,12 @@
 #define IDBMQ_VERT_LEFT                 588
 #define IDBMP_VERT_TRANS                589
 #define IDBMQ_VERT_TRANS                590
-
-#define IDI_TREE_DIR_CLOSE				600
-#define IDI_TREE_DIR_OPEN				601
-#define IDI_TREE_DIR_EXTRA				602
-#define IDI_TREE_FILE_AST				603
-#define IDI_TREE_FILE_MLT				604
-#define IDI_TREE_FILE_ETC				605
-
+#define IDI_TREE_DIR_CLOSE              600
+#define IDI_TREE_DIR_OPEN               601
+#define IDI_TREE_DIR_EXTRA              602
+#define IDI_TREE_FILE_AST               603
+#define IDI_TREE_FILE_MLT               604
+#define IDI_TREE_FILE_ETC               605
 #define IDM_TESTCODE                    999
 #define IDSB_VIEW_STATUS_BAR            1000
 #define IDLV_PAGELISTVIEW               1001
@@ -257,21 +256,21 @@
 #define IDS_FRAME_IMAGE                 1045
 #define IDE_BOXP_NAME_EDIT              1046
 #define IDB_BOXP_NAME_APPLY             1047
-#define IDCB_LAYER_QUICKCLOSE			1048
-#define IDE_AUTO_BU_INTVL				1049
-#define IDCB_AUTOBU_MSG_ON				1050
-#define IDCB_LT_CATEGORY				1051
-#define IDLV_LT_ITEMVIEW				1052
-#define IDCB_COPY_STYLE_SWAP			1053
-#define IDCB_DOCKING_STYLE				1054
-#define IDTB_BT_TOOL_BAR				1055
-#define IDCB_BT_CATEGORY				1056
-#define IDLV_BT_ITEMVIEW				1057
-#define IDW_BRUSH_TOOL_BAR				1058
-#define IDTB_FRMINSBOX_TOOLBAR			1059
-#define IDE_PAGENAME					1060
-#define IDCB_LAYER_EDGE_BLANK			1061
-#define IDCB_UNIRADIX_HEX				1063
+#define IDCB_LAYER_QUICKCLOSE           1048
+#define IDE_AUTO_BU_INTVL               1049
+#define IDCB_AUTOBU_MSG_ON              1050
+#define IDCB_LT_CATEGORY                1051
+#define IDLV_LT_ITEMVIEW                1052
+#define IDCB_COPY_STYLE_SWAP            1053
+#define IDCB_DOCKING_STYLE              1054
+#define IDTB_BT_TOOL_BAR                1055
+#define IDCB_BT_CATEGORY                1056
+#define IDLV_BT_ITEMVIEW                1057
+#define IDW_BRUSH_TOOL_BAR              1058
+#define IDTB_FRMINSBOX_TOOLBAR          1059
+#define IDE_PAGENAME                    1060
+#define IDCB_LAYER_EDGE_BLANK           1061
+#define IDCB_UNIRADIX_HEX               1063
 #define IDE_RIGHTSLIDE_DOT              1064
 #define IDCB_USE_UNISPACE_SET           1065
 #define IDCB_GROUPUNDO_SET              1066
@@ -319,6 +318,8 @@
 #define IDE_MSC_EDITBOX                 1111
 #define IDB_MSC_VWINSERT                1112
 #define IDB_MSC_USELAYER                1113
+#define IDE_UNDER_RULER_POS             1114
+#define IDE_PAGE_BYTE_MAX               1115
 #define IDCB_TRC_DLG_USETHUMB           1117
 #define IDS_TRC_DLG_THUMBFRAME          1118
 #define IDC_STATIC_STC32                1119
@@ -407,6 +408,7 @@
 #define IDB_FUNCKEY_FILEOUT             1247
 #define IDB_FUNCKEY_INIT                1248
 #define IDB_FRM_PADDING                 1249
+#define IDS_UNI_USE_LOG                 1250
 #define IDTV_ITEMTREE                   2000
 #define IDTB_TREESEL                    2001
 #define IDSO_AAITEMS                    2002
@@ -425,10 +427,10 @@
 #define IDB_CLIPSTEAL_FILEDEL           3006
 #define IDLV_CLIPSTEAL_FILELISTVW       3007
 #define IDHK_CLIPSTEAL_FILECHANGE       3008
-#define IDB_CLIP_STEAL_ACT_ON			3009
-#define IDHK_CLIP_POPUP_KEYBIND			3010
-#define IDM_CLIPSTEAL_OPTION			32001
-#define IDM_CLIPSTEAL_TOGGLE			32002
+#define IDB_CLIP_STEAL_ACT_ON           3009
+#define IDHK_CLIP_POPUP_KEYBIND         3010
+#define IDM_CLIPSTEAL_OPTION            32001
+#define IDM_CLIPSTEAL_TOGGLE            32002
 #define IDM_OPEN_HISTORY                32680
 #define IDM_OPEN_HIS_FIRST              32681
 #define IDM_OPEN_HIS_RESERVE            32691
@@ -452,9 +454,9 @@
 #define IDM_MAA_PROFILE_MAKE            32730
 #define IDM_MAA_SEP_STYLE_TOGGLE        32731
 #define IDM_MAA_FAVFLDR_DELETE          32732
-#define IDM_MAA_RETURN_FOCUS			32733
+#define IDM_MAA_RETURN_FOCUS            32733
 #define IDM_COLOUR_EDIT_OPEN            32735
-#define IDM_UNICODE_TOGGLE				32739
+#define IDM_UNICODE_TOGGLE              32739
 #define IDM_DUMMY                       32768
 #define IDM_NEWFILE                     32771
 #define IDM_OPEN                        32772
@@ -501,6 +503,7 @@
 #define IDM_FILE_NEXT                   32816
 #define IDM_INCR_DOT_LINES              32817
 #define IDM_DECR_DOT_LINES              32818
+#define IDM_UNDER_RULER_TOGGLE          32819
 #define IDM_IMAGE_SAVE                  32820
 #define IDM_TMPLGROUPSTYLE_TGL          32821
 #define IDM_TMPLT_GROUP_PREV            32822
@@ -508,7 +511,7 @@
 #define IDM_PAGENUM_DLG_OPEN            32824
 #define IDM_MENUEDIT_DLG_OPEN           32825
 #define IDM_ACCELKEY_EDIT_DLG_OPEN      32826
-#define IDM_SQUARE_PASTE				32827
+#define IDM_SQUARE_PASTE                32827
 #define IDM_FINDMAA_DLG_OPEN            32828
 #define IDM_DRAUGHT_OPEN                32831
 #define IDM_DRAUGHT_CLOSE               32832
@@ -533,11 +536,7 @@
 #define IDM_FIND_JUMP_NEXT              32863
 #define IDM_FIND_JUMP_PREV              32864
 #define IDM_FIND_TARGET_SET             32865
-
-
-
-
-#define IDM_PAGEL_RETURN_FOCUS			32899
+#define IDM_PAGEL_RETURN_FOCUS          32899
 #define IDM_PAGEL_DETAIL                32900
 #define IDM_PAGEL_ADD                   32901
 #define IDM_PAGEL_INSERT                32902
@@ -575,26 +574,26 @@
 #define IDM_INSTAG_GREEN                32934
 #define IDM_INSTAG_RESERVE              32939
 #define IDM_INSFRAME_EDIT               32940
-#define IDM_INSFRAME_ALPHA				32941
-#define IDM_INSFRAME_BRAVO				32942
-#define IDM_INSFRAME_CHARLIE			32943
-#define IDM_INSFRAME_DELTA				32944
-#define IDM_INSFRAME_ECHO				32945
-#define IDM_INSFRAME_FOXTROT			32946
-#define IDM_INSFRAME_GOLF				32947
-#define IDM_INSFRAME_HOTEL				32948
-#define IDM_INSFRAME_INDIA				32949
-#define IDM_INSFRAME_JULIETTE			32950
-#define IDM_INSFRAME_KILO				32951
-#define IDM_INSFRAME_LIMA				32952
-#define IDM_INSFRAME_MIKE				32953
-#define IDM_INSFRAME_NOVEMBER			32954
-#define IDM_INSFRAME_OSCAR				32955
-#define IDM_INSFRAME_PAPA				32956
-#define IDM_INSFRAME_QUEBEC				32957
-#define IDM_INSFRAME_ROMEO				32958
-#define IDM_INSFRAME_SIERRA				32959
-#define IDM_INSFRAME_TANGO				32960
+#define IDM_INSFRAME_ALPHA              32941
+#define IDM_INSFRAME_BRAVO              32942
+#define IDM_INSFRAME_CHARLIE            32943
+#define IDM_INSFRAME_DELTA              32944
+#define IDM_INSFRAME_ECHO               32945
+#define IDM_INSFRAME_FOXTROT            32946
+#define IDM_INSFRAME_GOLF               32947
+#define IDM_INSFRAME_HOTEL              32948
+#define IDM_INSFRAME_INDIA              32949
+#define IDM_INSFRAME_JULIETTE           32950
+#define IDM_INSFRAME_KILO               32951
+#define IDM_INSFRAME_LIMA               32952
+#define IDM_INSFRAME_MIKE               32953
+#define IDM_INSFRAME_NOVEMBER           32954
+#define IDM_INSFRAME_OSCAR              32955
+#define IDM_INSFRAME_PAPA               32956
+#define IDM_INSFRAME_QUEBEC             32957
+#define IDM_INSFRAME_ROMEO              32958
+#define IDM_INSFRAME_SIERRA             32959
+#define IDM_INSFRAME_TANGO              32960
 #define IDM_PAGELIST_VIEW               32961
 #define IDM_ON_PREVIEW                  32962
 #define IDM_FILL_ZENSP                  32963
@@ -602,25 +601,25 @@
 #define IDM_FRAME_INS_DECIDE            32965
 #define IDM_FRMINSBOX_OPEN              32966
 #define IDM_LINE_BRUSH_TMPL_VIEW        32967
-#define IDM_FRMINSBOX_PADDING			32968
-#define IDM_USERINS_NA					32970
+#define IDM_FRMINSBOX_PADDING           32968
+#define IDM_USERINS_NA                  32970
 #define IDM_USERINS_ITEM_FIRST          32971
-#define IDM_USER_ITEM_ALPHA				32971
-#define IDM_USER_ITEM_BRAVO				32972
-#define IDM_USER_ITEM_CHARLIE			32973
-#define IDM_USER_ITEM_DELTA				32974
-#define IDM_USER_ITEM_ECHO				32975
-#define IDM_USER_ITEM_FOXTROT			32976
-#define IDM_USER_ITEM_GOLF				32977
-#define IDM_USER_ITEM_HOTEL				32978
-#define IDM_USER_ITEM_INDIA				32979
-#define IDM_USER_ITEM_JULIETTE			32980
-#define IDM_USER_ITEM_KILO				32981
-#define IDM_USER_ITEM_LIMA				32982
-#define IDM_USER_ITEM_MIKE				32983
-#define IDM_USER_ITEM_NOVEMBER			32984
-#define IDM_USER_ITEM_OSCAR				32985
-#define IDM_USER_ITEM_PAPA				32986
+#define IDM_USER_ITEM_ALPHA             32971
+#define IDM_USER_ITEM_BRAVO             32972
+#define IDM_USER_ITEM_CHARLIE           32973
+#define IDM_USER_ITEM_DELTA             32974
+#define IDM_USER_ITEM_ECHO              32975
+#define IDM_USER_ITEM_FOXTROT           32976
+#define IDM_USER_ITEM_GOLF              32977
+#define IDM_USER_ITEM_HOTEL             32978
+#define IDM_USER_ITEM_INDIA             32979
+#define IDM_USER_ITEM_JULIETTE          32980
+#define IDM_USER_ITEM_KILO              32981
+#define IDM_USER_ITEM_LIMA              32982
+#define IDM_USER_ITEM_MIKE              32983
+#define IDM_USER_ITEM_NOVEMBER          32984
+#define IDM_USER_ITEM_OSCAR             32985
+#define IDM_USER_ITEM_PAPA              32986
 #define IDM_USERINS_ITEM_LAST           32986
 #define IDM_LYB_INSERT                  32991
 #define IDM_LYB_OVERRIDE                32992
@@ -628,7 +627,7 @@
 #define IDM_LYB_TRANCE_RELEASE          32995
 #define IDM_LYB_TRANCE_ALL              32996
 #define IDM_LYB_COPY                    32997
-#define IDM_LYB_DELETE					32998
+#define IDM_LYB_DELETE                  32998
 #define IDM_MAATMPLE_VIEW               33000
 #define IDM_AATREE_MAINOPEN             33001
 #define IDM_AATREE_SUBADD               33002
@@ -642,22 +641,13 @@
 #define IDM_MOZI_SETTING                33010
 #define IDM_MOZI_ADVANCE                33011
 #define IDM_MOZI_LISTDEL                33012
-#define IDM_AATABS_ALLDELETE			33013
-#define IDM_MAA_ITEM_INSERT				33014
-#define IDM_MAA_ITEM_DELETE				33015
-#define IDM_AATABS_RENAME				33016
-#define IDM_MIRROR_INVERSE				33021
-#define IDM_UPSET_INVERSE				33022
-
-#ifdef PLUGIN_ENABLE
-//---------------------------------------------------------------------
-//[_16in] Add - 2012/05/01
-
-//-- 以下プラグイン用
-#define IDM_PLUGIN_ITEM_BASE			34000
-//---------------------------------------------------------------------
-#endif
-
+#define IDM_AATABS_ALLDELETE            33013
+#define IDM_MAA_ITEM_INSERT             33014
+#define IDM_MAA_ITEM_DELETE             33015
+#define IDM_AATABS_RENAME               33016
+#define IDM_MIRROR_INVERSE              33021
+#define IDM_UPSET_INVERSE               33022
+#define IDM_PLUGIN_ITEM_BASE            34000
 #define IDC_STATIC                      -1
 
 // Next default values for new objects
@@ -667,7 +657,7 @@
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        236
 #define _APS_NEXT_COMMAND_VALUE         33014
-#define _APS_NEXT_CONTROL_VALUE         1250
+#define _APS_NEXT_CONTROL_VALUE         1251
 #define _APS_NEXT_SYMED_VALUE           120
 #endif
 #endif

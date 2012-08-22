@@ -152,7 +152,7 @@ DWORD AacInflateAst( LPSTR pcTotal, DWORD cbTotal )
 	LPSTR	pcCaret;	//	読込開始・現在位置
 	LPSTR	pcStart;	//	セパレータの直前
 	LPSTR	pcEnd;
-	LPSTR	pcCheck;
+//	LPSTR	pcCheck;
 	UINT	iNumber;	//	通し番号カウント
 
 	UINT	cbItem;
@@ -199,8 +199,8 @@ DWORD AacInflateAst( LPSTR pcTotal, DWORD cbTotal )
 		stAAbuf.cbItem = pcEnd - pcCaret;	//	CHAR単位であるか
 
 		//＠＠	末端の0x0D単独を外す
-		pcCheck = pcEnd;	pcCheck--;
-		if( 0x0D == *pcCheck )	stAAbuf.cbItem--;
+	//	pcCheck = pcEnd;	pcCheck--;
+	//	if( 0x0D == *pcCheck )	stAAbuf.cbItem--;
 
 		//	最終頁でない場合は末端の改行分引く
 		//if( !(bLast) && 0 < cbItem ){	cbItem -= CH_CRLF_CCH;	}
@@ -241,7 +241,7 @@ DWORD AacInflateMlt( LPSTR pcTotal, DWORD cbTotal )
 {
 	LPSTR	pcCaret;	//	読込開始・現在位置
 	LPSTR	pcEnd;		//	一つのAAの末端位置・セパレータの直前
-	LPSTR	pcCheck;
+//	LPSTR	pcCheck;
 	DWORD	iNumber;	//	通し番号カウント
 	AAMATRIX	stAAbuf;//	一つのAAの保持・ベクターに入れる
 
@@ -264,11 +264,11 @@ DWORD AacInflateMlt( LPSTR pcTotal, DWORD cbTotal )
 		stAAbuf.cbItem = pcEnd - pcCaret;	//	バイト数なのでこれでいいはず
 
 		//＠＠	末端の0x0D単独を外す
-		if( 0 != stAAbuf.cbItem )
-		{
-			pcCheck = pcEnd;	pcCheck--;
-			if( 0x0D == *pcCheck )	stAAbuf.cbItem--;
-		}
+	//	if( 0 != stAAbuf.cbItem )
+	//	{
+	//		pcCheck = pcEnd;	pcCheck--;
+	//		if( 0x0D == *pcCheck )	stAAbuf.cbItem--;
+	//	}
 
 		stAAbuf.pcItem = (LPSTR)malloc( stAAbuf.cbItem + 2 );
 		ZeroMemory( stAAbuf.pcItem, stAAbuf.cbItem + 2 );

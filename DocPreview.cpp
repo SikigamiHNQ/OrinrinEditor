@@ -25,13 +25,13 @@ If not, see <http://www.gnu.org/licenses/>.
 IEコンポつかうにはATLが要る
 ttp://ysmt.blog21.fc2.com/blog-entry-244.html
 
-VCExpressにはATL入ってないので、別口でゲットする
+VCExpressにはATL入ってないので、別口でゲットする・VCProとかには入ってるかも
 
 WindowsDriverKit710に入ってる
 がいど
-http://www.microsoft.com/japan/whdc/DevTools/WDK/WDKpkg.mspx
+ttp://www.microsoft.com/japan/whdc/DevTools/WDK/WDKpkg.mspx
 ダウソ
-http://www.microsoft.com/download/en/details.aspx?displaylang=en&id=11800
+ttp://www.microsoft.com/download/en/details.aspx?displaylang=en&id=11800
 
 
 インクルードファイルパスに、"(DDKフォルダ)\inc\atl71"
@@ -104,6 +104,8 @@ static HINSTANCE	ghInst;			//!<	現在のインターフェイス
 static  HWND	ghToolWnd;			//!<	ツールバー
 static HIMAGELIST ghPrevwImgLst;	//!<	ツールバーアイコンのイメージリスト
 
+static INT		giViewMode;			//!<	表示状態：０～単体頁　－１全頁
+
 extern  HWND	ghPrntWnd;				//	親ウインドウハンドル
 extern list<ONEFILE>	gltMultiFiles;	//	複数ファイル保持
 extern FILES_ITR	gitFileIt;			//	今見てるファイルの本体
@@ -120,8 +122,6 @@ static  TBBUTTON	gstTBInfo[] = {
 #define SEPARATE_TAG	("[SEPARATE]")
 
 static CONST CHAR	gcacWeek[7][4] = { ("日"), ("月"), ("火"), ("水"), ("木"), ("金"), ("土") };
-
-//static  CHAR	gacResLineFmt[] = { ("<br>\r\n%d 名前：名無しの妖精さん[sage] 投稿日：%d/%02d/%02d(%s) %02d:%02d:%02d ID:OrinEdit99<br>\r\n") };
 
 static  CHAR	gacResHeaderFmt[] = { "<dt>%d 名前：名無しの妖精さん[sage] 投稿日：%d/%02d/%02d(%s) %02d:%02d:%02d ID:OrinEdit99</dt> <dd>" };	//	
 static  CHAR	gacResFooterFmt[] = { "<br></dd>\r\n" };
@@ -184,6 +184,8 @@ VOID PreviewInitialise( HINSTANCE hInstance, HWND hParentWnd )
 		PreviewHeaderGet(  );
 
 		CoInitialize( NULL );
+
+		giViewMode = 0;
 
 		ghPrevwImgLst = ImageList_Create( 16, 16, ILC_COLOR24 | ILC_MASK, 1, 1 );
 		hImg = LoadBitmap( ghInst, MAKEINTRESOURCE( (IDBMP_PREVIEW_ALL) ) );
@@ -274,12 +276,25 @@ HRESULT PreviewVisibalise( INT iNowPage, BOOLEAN bForeg )
 	CComVariant	vEmpty;
 	CComVariant	vUrl( TEXT("about:blank") );
 
+	//LONG	toptop, height, offhei, scrtop;
+	//CComQIPtr<IHTMLWindow2>		pWindow;
+	//CComQIPtr<IHTMLElement2>	pElement;
 
 	if( ghPrevWnd )	//	已にPreview窓有ったら
 	{
-		SendMessage( ghToolWnd, TB_CHECKBUTTON, IDM_PVW_ALLVW, FALSE );
+	//	SendMessage( ghToolWnd, TB_CHECKBUTTON, IDM_PVW_ALLVW, FALSE );
 
-		PreviewPageWrite( iNowPage );	//	内容書き換え
+#pragma message ("全プレ書換時に、スクロールバーの位置覚えておいて、そこまでScrollさせる？")
+//		gpWebBrowser2->get_Top( &toptop );
+//		gpWebBrowser2->get_Height( &height );	//	多分コンポーネントの高さ
+//		gpDocument->get_parentWindow( &pWindow );
+
+//		pElement->get_scrollHeight( &offhei );
+//		pElement->get_scrollTop( &scrtop );
+
+		//	内容書き換え
+		if( 0 > giViewMode ){	PreviewPageWrite(  -1 );	}
+		else{	PreviewPageWrite( iNowPage );	}
 		InvalidateRect( ghPrevWnd, NULL, TRUE );
 
 		if( bForeg )	SetForegroundWindow( ghPrevWnd );
@@ -369,7 +384,7 @@ HRESULT PreviewVisibalise( INT iNowPage, BOOLEAN bForeg )
 		}
 		else
 		{
-			NotifyBalloonExist( TEXT("あぅあぅ、IEコンポーネントを初期化出来なかったのです。あぅあぅ"), TEXT("あぅあぅ"), NIIF_ERROR );
+			NotifyBalloonExist( TEXT("ＩＥコンポーネントを初期化出来なかったよ・・・"), TEXT("お燐からのお知らせ"), NIIF_ERROR );
 			hRslt = E_ACCESSDENIED;
 		}
 	}
@@ -424,7 +439,7 @@ VOID Pvw_OnCommand( HWND hWnd, INT id, HWND hWndCtl, UINT codeNotify )
 	{
 		case IDM_PVW_ALLVW:	//	全プレON/OFF
 			lRslt = SendMessage( ghToolWnd, TB_ISBUTTONCHECKED, IDM_PVW_ALLVW, 0 );
-			if( lRslt )	PreviewPageWrite( -1 );
+			if( lRslt )	PreviewPageWrite(  -1 );
 			else		PreviewPageWrite( gixFocusPage );
 			InvalidateRect( ghPrevWnd, NULL, TRUE );
 			break;
@@ -540,9 +555,11 @@ HRESULT PreviewPageWrite( INT iViewPage )
 
 	hRslt = S_OK;
 
+	giViewMode = iViewPage;
+
 	if( !(gpcHtmlHdr) )
 	{
-		NotifyBalloonExist( TEXT("プレビュー用テンプレートファイルが見つからないのです。あぅあぅ"), TEXT("あぅあぅ"), NIIF_ERROR );
+		NotifyBalloonExist( TEXT("プレビュー用テンプレートファイルが見つからないよ"), TEXT("お燐からのお知らせ"), NIIF_ERROR );
 		return E_HANDLE;
 	}
 

@@ -23,7 +23,7 @@ If not, see <http://www.gnu.org/licenses/>.
 
 //-------------------------------------------------------------------------------------------------
 
-static  HWND	ghRebarWnd;			//!<	リバーのほうがいい？どうやって配置の再現を？
+static  HWND	ghRebarWnd;			//!<	リバー
 
 static  HWND	ghMainTBWnd;		//!<	メインツールバーのウインドウハンドル
 static  HWND	ghEditTBWnd;		//!<	編集ツールバーのウインドウハンドル
@@ -469,6 +469,9 @@ VOID ToolBarCreate( HWND hWnd, HINSTANCE lcInst )
 }
 //-------------------------------------------------------------------------------------------------
 
+/*!
+	ツールバーの破壊
+*/
 VOID ToolBarDestroy( VOID )
 {
 	ImageList_Destroy( ghMainImgLst );

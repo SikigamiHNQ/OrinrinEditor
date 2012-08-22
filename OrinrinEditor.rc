@@ -33,15 +33,14 @@ LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
 
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
-IDI_ORINRINEDITOR       ICON	"OrinrinEditor.ico"
-IDI_SMALL               ICON	"OrinrinEditor.ico"
-
-IDI_TREE_DIR_CLOSE		ICON	"resource\\directory.ico"
-IDI_TREE_DIR_OPEN		ICON	"resource\\dir_open.ico"
-IDI_TREE_DIR_EXTRA		ICON	"resource\\dir_extra.ico"
-IDI_TREE_FILE_AST		ICON	"resource\\file_ast.ico"
-IDI_TREE_FILE_MLT		ICON	"resource\\file_mlt.ico"
-IDI_TREE_FILE_ETC		ICON	"resource\\file_etc.ico"
+IDI_ORINRINEDITOR       ICON                    "OrinrinEditor.ico"
+IDI_SMALL               ICON                    "OrinrinEditor.ico"
+IDI_TREE_DIR_CLOSE      ICON                    "resource\\directory.ico"
+IDI_TREE_DIR_OPEN       ICON                    "resource\\dir_open.ico"
+IDI_TREE_DIR_EXTRA      ICON                    "resource\\dir_extra.ico"
+IDI_TREE_FILE_AST       ICON                    "resource\\file_ast.ico"
+IDI_TREE_FILE_MLT       ICON                    "resource\\file_mlt.ico"
+IDI_TREE_FILE_ETC       ICON                    "resource\\file_etc.ico"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -52,52 +51,52 @@ IDC_ORINRINEDITOR MENU
 BEGIN
     POPUP "ファイル(&F)"
     BEGIN
-        MENUITEM "新規作成(&N)",				IDM_NEWFILE
-        MENUITEM "ファイル開く(&O)",			IDM_OPEN
-        MENUITEM "ファイル使用履歴(&H)",		IDM_OPEN_HISTORY
+        MENUITEM "新規作成(&N)",						IDM_NEWFILE
+        MENUITEM "ファイル開く(&O)",					IDM_OPEN
+        MENUITEM "ファイル使用履歴(&H)",				IDM_OPEN_HISTORY
         MENUITEM SEPARATOR
-        MENUITEM "上書き保存(&S)",				IDM_OVERWRITESAVE
-        MENUITEM "名前を付けて保存(&M)",		IDM_RENAMESAVE
-        MENUITEM "現在頁を画像にして保存(&I)",	IDM_IMAGE_SAVE
+        MENUITEM "上書き保存(&S)",						IDM_OVERWRITESAVE
+        MENUITEM "名前を付けて保存(&M)",				IDM_RENAMESAVE
+        MENUITEM "現在頁を画像にして保存(&I)",			IDM_IMAGE_SAVE
         MENUITEM SEPARATOR
-        MENUITEM "ファイルを閉じる(&C)",		IDM_FILE_CLOSE
+        MENUITEM "ファイルを閉じる(&C)",				IDM_FILE_CLOSE
         MENUITEM SEPARATOR
-        MENUITEM "一般設定(&G)",				IDM_GENERAL_OPTION
-        MENUITEM "右クリックメニュー編集(&E)",	IDM_MENUEDIT_DLG_OPEN
-        MENUITEM "編集エリアの配色編集(&L)",	IDM_COLOUR_EDIT_OPEN
-        MENUITEM "アクセルキー設定の編集(&K)",	IDM_ACCELKEY_EDIT_DLG_OPEN
-        MENUITEM "AA一覧ツリーを再構築(&T)",	IDM_TREE_RECONSTRUCT
+        MENUITEM "一般設定(&G)",						IDM_GENERAL_OPTION
+        MENUITEM "右クリックメニュー編集(&E)",			IDM_MENUEDIT_DLG_OPEN
+        MENUITEM "編集エリアの配色編集(&L)",			IDM_COLOUR_EDIT_OPEN
+        MENUITEM "アクセルキー設定の編集(&K)",			IDM_ACCELKEY_EDIT_DLG_OPEN
+        MENUITEM "AA一覧ツリーを再構築(&T)",			IDM_TREE_RECONSTRUCT
         MENUITEM SEPARATOR
-        MENUITEM "バージョン情報(&A)",			IDM_ABOUT
+        MENUITEM "バージョン情報(&A)",					IDM_ABOUT
         MENUITEM SEPARATOR
-        MENUITEM "終了(&Q)",					IDM_EXIT
+        MENUITEM "終了(&Q)",							IDM_EXIT
     END
     POPUP "編集(&E)"
     BEGIN
-        MENUITEM "元に戻す(&U)",					IDM_UNDO
-        MENUITEM "やり直し(&R)",					IDM_REDO
+        MENUITEM "元に戻す(&U)",						IDM_UNDO
+        MENUITEM "やり直し(&R)",						IDM_REDO
         MENUITEM SEPARATOR
-        MENUITEM "切り取り(&T)",					IDM_CUT
-        MENUITEM "Unicodeコピー(&C)",				IDM_COPY
-        MENUITEM "貼付(&P)",						IDM_PASTE
-        MENUITEM "削除(&D)",						IDM_DELETE
+        MENUITEM "切り取り(&T)",						IDM_CUT
+        MENUITEM "Unicodeコピー(&C)",					IDM_COPY
+        MENUITEM "貼付(&P)",							IDM_PASTE
+        MENUITEM "削除(&D)",							IDM_DELETE
         MENUITEM SEPARATOR
-        MENUITEM "SJISコピー(&J)",					IDM_SJISCOPY
-        MENUITEM "全体をSJISコピー(&S)",			IDM_SJISCOPY_ALL
-        MENUITEM "選択範囲をドラフトボードへ(&G)",	IDM_COPY_TO_DRAUGHT
+        MENUITEM "SJISコピー(&J)",						IDM_SJISCOPY
+        MENUITEM "全体をSJISコピー(&S)",				IDM_SJISCOPY_ALL
+        MENUITEM "選択範囲をドラフトボードへ(&G)",		IDM_COPY_TO_DRAUGHT
         MENUITEM SEPARATOR
-        MENUITEM "全選択(&A)",						IDM_ALLSEL
+        MENUITEM "全選択(&A)",							IDM_ALLSEL
         MENUITEM SEPARATOR
-        MENUITEM "矩形選択(&B)",					IDM_SQSELECT
-		MENUITEM "矩形貼付(&Q)",					IDM_SQUARE_PASTE
+        MENUITEM "矩形選択(&B)",						IDM_SQSELECT
+        MENUITEM "矩形貼付(&Q)",						IDM_SQUARE_PASTE
         MENUITEM SEPARATOR
-        MENUITEM "レイヤボックス(&L)",				IDM_LAYERBOX
-        MENUITEM "部分抽出モード(&E)",				IDM_EXTRACTION_MODE
+        MENUITEM "レイヤボックス(&L)",					IDM_LAYERBOX
+        MENUITEM "部分抽出モード(&E)",					IDM_EXTRACTION_MODE
         MENUITEM SEPARATOR
-        MENUITEM "次の行以降を新頁に分割(&V)",		IDM_PAGEL_DIVIDE
+        MENUITEM "次の行以降を新頁に分割(&V)",			IDM_PAGEL_DIVIDE
         MENUITEM SEPARATOR
-        MENUITEM "文字列検索(&F)",					IDM_FIND_DLG_OPEN
-        MENUITEM "検索ハイライト解除(&H)",			IDM_FIND_HIGHLIGHT_OFF
+        MENUITEM "文字列検索(&F)",						IDM_FIND_DLG_OPEN
+        MENUITEM "検索ハイライト解除(&H)",				IDM_FIND_HIGHLIGHT_OFF
     END
     POPUP "挿入(&I)"
     BEGIN
@@ -114,11 +113,11 @@ BEGIN
         END
         POPUP "色指定(&C)"
         BEGIN
-            MENUITEM "白(&W)",			IDM_INSTAG_WHITE
-            MENUITEM "青(&U)",			IDM_INSTAG_BLUE
-            MENUITEM "黒(&B)",			IDM_INSTAG_BLACK
-            MENUITEM "赤(&R)",			IDM_INSTAG_RED
-            MENUITEM "緑(&G)",			IDM_INSTAG_GREEN
+            MENUITEM "白(&W)",	IDM_INSTAG_WHITE
+            MENUITEM "青(&U)",	IDM_INSTAG_BLUE
+            MENUITEM "黒(&B)",	IDM_INSTAG_BLACK
+            MENUITEM "赤(&R)",	IDM_INSTAG_RED
+            MENUITEM "緑(&G)",	IDM_INSTAG_GREEN
         END
         MENUITEM SEPARATOR
         MENUITEM "枠挿入ボックス(&I)",	IDM_FRMINSBOX_OPEN
@@ -127,8 +126,8 @@ BEGIN
         BEGIN
             MENUITEM "枠編集(&Z)",		IDM_INSFRAME_EDIT
             MENUITEM SEPARATOR
-			MENUITEM "枠　Bravo",		IDM_INSFRAME_BRAVO
-			MENUITEM "枠　Charlie",		IDM_INSFRAME_CHARLIE
+            MENUITEM "枠　Bravo",		IDM_INSFRAME_BRAVO
+            MENUITEM "枠　Charlie",		IDM_INSFRAME_CHARLIE
             MENUITEM "枠　Delta",		IDM_INSFRAME_DELTA
             MENUITEM "枠　Echo",		IDM_INSFRAME_ECHO
             MENUITEM "枠　Foxtrot",		IDM_INSFRAME_FOXTROT
@@ -136,8 +135,8 @@ BEGIN
             MENUITEM "枠　Hotel",		IDM_INSFRAME_HOTEL
             MENUITEM "枠　India",		IDM_INSFRAME_INDIA
             MENUITEM "枠　Juliette",	IDM_INSFRAME_JULIETTE
-			MENUITEM "枠　Kilo",		IDM_INSFRAME_KILO
-			MENUITEM "枠　Lima",		IDM_INSFRAME_LIMA
+            MENUITEM "枠　Kilo",		IDM_INSFRAME_KILO
+            MENUITEM "枠　Lima",		IDM_INSFRAME_LIMA
             MENUITEM "枠　Mike",		IDM_INSFRAME_MIKE
             MENUITEM "枠　November",	IDM_INSFRAME_NOVEMBER
             MENUITEM "枠　Oscar",		IDM_INSFRAME_OSCAR
@@ -160,31 +159,31 @@ BEGIN
     END
     POPUP "整形(&P)"
     BEGIN
-        MENUITEM "右揃え線(&R)",				IDM_RIGHT_GUIDE_SET
-        MENUITEM "行頭に全角空白追加(&I)",		IDM_INS_TOPSPACE
+        MENUITEM "右揃え線(&R)",			IDM_RIGHT_GUIDE_SET
+        MENUITEM "行頭に全角空白追加(&I)",	IDM_INS_TOPSPACE
         MENUITEM SEPARATOR
-        MENUITEM "行頭空白削除(&U)",			IDM_DEL_TOPSPACE
-        MENUITEM "行末空白削除(&G)",			IDM_DEL_LASTSPACE
-        MENUITEM "行末文字削除(&E)",			IDM_DEL_LASTLETTER
-        MENUITEM "選択範囲を空白にする(&F)",	IDM_FILL_SPACE
-        MENUITEM "頁全体を空白で埋める(&B)",	IDM_FILL_ZENSP
+        MENUITEM "行頭空白削除(&U)",					IDM_DEL_TOPSPACE
+        MENUITEM "行末空白削除(&G)",					IDM_DEL_LASTSPACE
+        MENUITEM "行末文字削除(&E)",					IDM_DEL_LASTLETTER
+        MENUITEM "選択範囲を空白にする(&F)",			IDM_FILL_SPACE
+        MENUITEM "頁全体を空白で埋める(&B)",			IDM_FILL_ZENSP
         MENUITEM SEPARATOR
         MENUITEM "行頭半角空白をユニコードに変換(&L)",	IDM_HEADHALF_EXCHANGE
         MENUITEM SEPARATOR
-		MENUITEM "左右反転(&M)",				IDM_MIRROR_INVERSE
-		MENUITEM "上下反転(&N)",				IDM_UPSET_INVERSE
+        MENUITEM "左右反転(&M)",						IDM_MIRROR_INVERSE
+        MENUITEM "上下反転(&N)",						IDM_UPSET_INVERSE
         MENUITEM SEPARATOR
-        MENUITEM "右に寄せる(&H)",				IDM_RIGHT_SLIDE
-        MENUITEM "１ドット増やす(&D)",			IDM_INCREMENT_DOT
-        MENUITEM "１ドット減らす(&O)",			IDM_DECREMENT_DOT
+        MENUITEM "右に寄せる(&H)",						IDM_RIGHT_SLIDE
+        MENUITEM "１ドット増やす(&D)",					IDM_INCREMENT_DOT
+        MENUITEM "１ドット減らす(&O)",					IDM_DECREMENT_DOT
         MENUITEM SEPARATOR
-        MENUITEM "全体を１ドット右へ(&J)",		IDM_INCR_DOT_LINES
-        MENUITEM "全体を１ドット左へ(&K)",		IDM_DECR_DOT_LINES
+        MENUITEM "全体を１ドット右へ(&J)",				IDM_INCR_DOT_LINES
+        MENUITEM "全体を１ドット左へ(&K)",				IDM_DECR_DOT_LINES
         MENUITEM SEPARATOR
         POPUP "ドットずれ調整(&A)"
         BEGIN
-            MENUITEM "調整基準ロック(&R)",		IDM_DOTDIFF_LOCK
-            MENUITEM "カーソル位置で調整(&D)",	IDM_DOTDIFF_ADJT
+            MENUITEM "調整基準ロック(&R)",				IDM_DOTDIFF_LOCK
+            MENUITEM "カーソル位置で調整(&D)",			IDM_DOTDIFF_ADJT
         END
     END
     POPUP "表示(&N)"
@@ -192,6 +191,7 @@ BEGIN
         MENUITEM "空白を表示(&W)",				IDM_SPACE_VIEW_TOGGLE
         MENUITEM "グリッド線を表示(&H)",		IDM_GRID_VIEW_TOGGLE
         MENUITEM "右ガイド線を表示(&M)",		IDM_RIGHT_RULER_TOGGLE
+        MENUITEM "下ガイド線を表示(&S)",		IDM_UNDER_RULER_TOGGLE
         MENUITEM SEPARATOR
         MENUITEM "複数行テンプレート表示(&A)",	IDM_MAATMPLE_VIEW
         MENUITEM "複数行サムネイル(&B)",		IDM_MAA_THUMBNAIL_OPEN
@@ -211,7 +211,7 @@ BEGIN
     POPUP "頁一覧操作"
     BEGIN
         MENUITEM "内容ポップアップ表示(&T)",		IDM_PAGEL_AATIP_TOGGLE
-		MENUITEM "選択したら編集窓にフォーカス",	IDM_PAGEL_RETURN_FOCUS
+        MENUITEM "選択したら編集窓にフォーカス",	IDM_PAGEL_RETURN_FOCUS
         MENUITEM SEPARATOR
         MENUITEM "末尾に新規作成(&N)",				IDM_PAGEL_ADD
         MENUITEM "選択頁の次に新規作成(&I)",		IDM_PAGEL_INSERT
@@ -250,7 +250,7 @@ BEGIN
         MENUITEM SEPARATOR
         MENUITEM "ＡＡポップアップ表示(&T)",		IDM_MAA_AATIP_TOGGLE
         MENUITEM "ＡＡ区切りスタイル切換",			IDM_MAA_SEP_STYLE_TOGGLE
-		MENUITEM "選択したら編集窓にフォーカス",	IDM_MAA_RETURN_FOCUS
+        MENUITEM "選択したら編集窓にフォーカス",	IDM_MAA_RETURN_FOCUS
         MENUITEM SEPARATOR
         MENUITEM "ここにアイテム追加(&A)",			IDM_MAA_ITEM_INSERT
     END
@@ -417,7 +417,7 @@ CAPTION "バージョン情報 - Orinrin Editor"
 FONT 9, "MS UI Gothic"
 BEGIN
     ICON            IDI_ORINRINEDITOR,IDC_MYICON,6,6,20,20
-    LTEXT           "Orinrin Editor, Version 0.31 Aurora (2012.628.2200.920)",IDC_STATIC,36,6,168,8,SS_NOPREFIX
+    LTEXT           "Orinrin Editor, Version 0.31 Aurora (2012.822.2200.920)",IDC_STATIC,36,6,168,8,SS_NOPREFIX
     LTEXT           "Copyright (C) 2011 - 2012 Orinrin/SikigamiHNQ",IDC_STATIC,36,18,168,8
     LTEXT           "Site ： お燐ちゃんは俺の嫁．ｃｏｍ",IDC_STATIC,36,30,168,8
     DEFPUSHBUTTON   "OK",IDOK,84,180,48,12,WS_GROUP
@@ -465,6 +465,50 @@ BEGIN
     LTEXT           "0x0070",IDS_UA_HOTEL,63,148,30,8
 END
 
+IDD_UNICODE_PALETTE_DLG_2 DIALOGEX 0, 0, 438, 218
+STYLE DS_SETFONT | DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_TOOLWINDOW
+CAPTION "ユニコード一覧表"
+FONT 11, "MS UI Gothic", 0, 0, 0x0
+BEGIN
+    COMBOBOX        IDCB_UNI_GROUPSEL,96,6,336,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    CONTROL         "",IDLV_UNI_CATALOGUE,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_OWNERDATA | LVS_NOCOLUMNHEADER | LVS_NOSORTHEADER | WS_BORDER,96,36,336,126
+    EDITTEXT        IDE_UNI_LETTER_NAME,96,168,336,12,ES_AUTOHSCROLL | ES_READONLY
+    GROUPBOX        "文字",IDC_STATIC,6,24,54,132
+    CTEXT           "",IDS_UNI_LETTER_IMG,12,36,42,42,SS_CENTERIMAGE | WS_BORDER
+    EDITTEXT        IDE_UNI_HEX_CODE,12,84,42,12,ES_CENTER | ES_AUTOHSCROLL | ES_READONLY | NOT WS_BORDER
+    EDITTEXT        IDE_UNI_DEC_CODE,12,102,42,12,ES_CENTER | ES_AUTOHSCROLL | ES_READONLY | NOT WS_BORDER
+    PUSHBUTTON      "確定",IDB_UNI_DECIDE,12,120,42,12
+    PUSHBUTTON      "コピー",IDB_UNI_COPY_CLIP,12,138,42,12
+    LTEXT           "0x0",IDC_STATIC,96,24,13,8
+    LTEXT           "0x1",IDC_STATIC,126,24,13,8
+    LTEXT           "0x2",IDC_STATIC,146,24,13,8
+    LTEXT           "0x3",IDC_STATIC,166,24,13,8
+    LTEXT           "0x4",IDC_STATIC,186,24,13,8
+    LTEXT           "0x5",IDC_STATIC,206,24,13,8
+    LTEXT           "0x6",IDC_STATIC,226,24,13,8
+    LTEXT           "0x7",IDC_STATIC,246,24,13,8
+    LTEXT           "0x8",IDC_STATIC,266,24,13,8
+    LTEXT           "0x9",IDC_STATIC,286,24,13,8
+    LTEXT           "0xA",IDC_STATIC,306,24,13,8
+    LTEXT           "0xB",IDC_STATIC,326,24,13,8
+    LTEXT           "0xC",IDC_STATIC,346,24,13,8
+    LTEXT           "0xD",IDC_STATIC,366,24,13,8
+    LTEXT           "0xE",IDC_STATIC,386,24,13,8
+    LTEXT           "0xF",IDC_STATIC,406,24,13,8
+    LTEXT           "0x0000",IDS_UA_ALPHA,63,38,30,8
+    LTEXT           "0x0010",IDS_UA_BRAVO,63,54,30,8
+    LTEXT           "0x0020",IDS_UA_CHARLIE,63,69,30,8
+    LTEXT           "0x0030",IDS_UA_DELTA,63,85,30,8
+    LTEXT           "0x0040",IDS_UA_ECHO,63,101,30,8
+    LTEXT           "0x0050",IDS_UA_FOXTROT,63,117,30,8
+    LTEXT           "0x0060",IDS_UA_GOLF,63,133,30,8
+    LTEXT           "0x0070",IDS_UA_HOTEL,63,148,30,8
+    CONTROL         "",IDS_UNI_USE_LOG,"Static",SS_OWNERDRAW | SS_NOTIFY | WS_BORDER | WS_GROUP,96,186,336,24
+    LTEXT           "使用したユニコード文字",IDC_STATIC,6,186,84,8
+    LTEXT           "ダブルクリックで張り付ける。",IDC_STATIC,6,198,84,8
+END
+
 IDD_FRAME_EDIT_DLG DIALOG  0, 0, 186, 182
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_TOOLWINDOW
@@ -494,7 +538,7 @@ BEGIN
     CONTROL         "",IDS_FRAME_IMAGE,"Static",SS_OWNERDRAW | SS_NOPREFIX | SS_NOTIFY | WS_BORDER | WS_GROUP,6,108,174,48,WS_EX_CLIENTEDGE
 END
 
-IDD_FRAME_EDIT_DLG_2 DIALOG 0, 0, 226, 294
+IDD_FRAME_EDIT_DLG_2 DIALOG  0, 0, 226, 294
 STYLE DS_SETFONT | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
 EXSTYLE WS_EX_TOOLWINDOW
 CAPTION "エンハンスド枠の設定"
@@ -536,11 +580,11 @@ BEGIN
     EDITTEXT        IDE_PAGENAME,6,18,156,12,ES_AUTOHSCROLL
 END
 
-IDD_GENERAL_OPTION_DLG DIALOG  0, 0, 342, 322
+IDD_GENERAL_OPTION_DLG DIALOGEX 0, 0, 342, 322
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_TOOLWINDOW
 CAPTION "設定いろいろ"
-FONT 9, "MS UI Gothic"
+FONT 9, "MS UI Gothic", 0, 0, 0x0
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,174,306,42,12
     PUSHBUTTON      "キャンセル",IDCANCEL,234,306,42,12
@@ -560,8 +604,8 @@ BEGIN
     GROUPBOX        "改行コード",IDC_STATIC,192,114,90,24
     CONTROL         "したらば",IDRB_CRLF_STRB,"Button",BS_AUTORADIOBUTTON | WS_GROUP,198,126,36,10
     CONTROL         "2ch・YY",IDRB_CRLF_2CH_YY,"Button",BS_AUTORADIOBUTTON,240,126,36,10
-    GROUPBOX        "右ルーラ位置",IDC_STATIC,288,114,48,36
-    EDITTEXT        IDE_RIGHT_RULER_POS,294,130,36,12,ES_CENTER | ES_AUTOHSCROLL | ES_NUMBER
+    GROUPBOX        "右ルーラ位置",IDC_STATIC,288,114,48,30
+    EDITTEXT        IDE_RIGHT_RULER_POS,294,126,36,12,ES_CENTER | ES_AUTOHSCROLL | ES_NUMBER
     GROUPBOX        "グリッド位置（ドット指定）",IDC_STATIC,204,42,132,36
     CTEXT           "X",IDC_STATIC,210,54,8,12,SS_CENTERIMAGE
     EDITTEXT        IDE_GRID_X_POS,222,54,24,12,ES_CENTER | ES_AUTOHSCROLL | ES_NUMBER
@@ -610,6 +654,11 @@ BEGIN
     CONTROL         "コピー(Unicode)",IDRB_DRTSUB_CLIP_UNI,"Button",BS_AUTORADIOBUTTON,198,288,60,8
     CONTROL         "コピー(ShiftJIS)",IDRB_DRTSUB_CLIP_SJIS,"Button",BS_AUTORADIOBUTTON,264,288,60,8
     PUSHBUTTON      "フォント変更\r\n（再起動後に有効）",IDB_CHOOSEFONT,270,228,66,24,BS_MULTILINE
+    GROUPBOX        "下ルーラ位置",IDC_STATIC,270,150,66,30
+    EDITTEXT        IDE_UNDER_RULER_POS,276,162,30,12,ES_CENTER | ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "※行数",IDC_STATIC,312,162,22,12,SS_CENTERIMAGE
+    GROUPBOX        "壱レス最大バイト数",IDC_STATIC,270,186,66,30
+    EDITTEXT        IDE_PAGE_BYTE_MAX,288,198,30,12,ES_CENTER | ES_AUTOHSCROLL | ES_NUMBER
 END
 
 IDD_TRACEADJUST_DLG DIALOG  0, 0, 139, 281
@@ -730,7 +779,7 @@ END
 IDD_MSGCHECKBOX_DLG DIALOG  0, 0, 210, 71
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION
 EXSTYLE WS_EX_TOOLWINDOW
-CAPTION "操作確認なのです。あぅあぅ"
+CAPTION "操作確認だよ"
 FONT 10, "MS UI Gothic"
 BEGIN
     ICON            32516,IDC_ICON_BOX,6,6,20,20
@@ -853,7 +902,7 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 2012,628,2200,920
+ FILEVERSION 2012,822,2200,920
  PRODUCTVERSION 0,31,0,920
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
@@ -879,7 +928,7 @@ BEGIN
             VALUE "LegalTrademarks", "License : GPLv3"
             VALUE "PrivateBuild", "Build by Visual C++ 2008 Express"
             VALUE "SpecialBuild", "Not Speciality"
-            VALUE "FileVersion", "2012.628.2200.920"
+            VALUE "FileVersion", "2012.822.2200.920"
             VALUE "ProductVersion", "0.31.0.920"
             VALUE "FileDescription", "AsciiArt Story Editor by Orinrin!"
             VALUE "OriginalFilename", "OrinrinEditor.exe"
@@ -1038,16 +1087,16 @@ IDBMP_FRMINS_GOLF       BITMAP                  "resource\\Box7.bmp"
 IDBMP_FRMINS_HOTEL      BITMAP                  "resource\\Box8.bmp"
 IDBMP_FRMINS_INDIA      BITMAP                  "resource\\Box9.bmp"
 IDBMP_FRMINS_JULIETTE   BITMAP                  "resource\\Box10.bmp"
-IDBMP_FRMINS_KILO		BITMAP					"resource\\Box11.bmp"
-IDBMP_FRMINS_LIMA		BITMAP					"resource\\Box12.bmp"
-IDBMP_FRMINS_MIKE		BITMAP					"resource\\Box13.bmp"
-IDBMP_FRMINS_NOVEMBER	BITMAP					"resource\\Box14.bmp"
-IDBMP_FRMINS_OSCAR		BITMAP					"resource\\Box15.bmp"
-IDBMP_FRMINS_POPPA		BITMAP					"resource\\Box16.bmp"
-IDBMP_FRMINS_QUEBEC		BITMAP					"resource\\Box17.bmp"
-IDBMP_FRMINS_ROMEO		BITMAP					"resource\\Box18.bmp"
-IDBMP_FRMINS_SIERRA		BITMAP					"resource\\Box19.bmp"
-IDBMP_FRMINS_TANGO		BITMAP					"resource\\Box20.bmp"
+IDBMP_FRMINS_KILO       BITMAP                  "resource\\Box11.bmp"
+IDBMP_FRMINS_LIMA       BITMAP                  "resource\\Box12.bmp"
+IDBMP_FRMINS_MIKE       BITMAP                  "resource\\Box13.bmp"
+IDBMP_FRMINS_NOVEMBER   BITMAP                  "resource\\Box14.bmp"
+IDBMP_FRMINS_OSCAR      BITMAP                  "resource\\Box15.bmp"
+IDBMP_FRMINS_POPPA      BITMAP                  "resource\\Box16.bmp"
+IDBMP_FRMINS_QUEBEC     BITMAP                  "resource\\Box17.bmp"
+IDBMP_FRMINS_ROMEO      BITMAP                  "resource\\Box18.bmp"
+IDBMP_FRMINS_SIERRA     BITMAP                  "resource\\Box19.bmp"
+IDBMP_FRMINS_TANGO      BITMAP                  "resource\\Box20.bmp"
 IDBMQ_FRMINS_SEL        BITMAP                  "resource\\Box_q.bmp"
 IDBMP_FRMINS_INSERT     BITMAP                  "resource\\BoxInsert.bmp"
 IDBMQ_FRMINS_INSERT     BITMAP                  "resource\\BoxInsert_q.bmp"
@@ -1063,12 +1112,11 @@ IDBMQ_VERT_LEFT         BITMAP                  "resource\\VertLeft_q.bmp"
 IDBMP_VERT_TRANS        BITMAP                  "resource\\VertTrans.bmp"
 IDBMQ_VERT_TRANS        BITMAP                  "resource\\VertTrans_q.bmp"
 IDBMP_UNICODE_MODE      BITMAP                  "resource\\Unicode_Use.bmp"
-IDBMQ_UNICODE_MODE		BITMAP                  "resource\\Unicode_Use_q.bmp"
-
-IDBMP_MIRROR_INVERSE	BITMAP					"resource\\arrow_leftright.bmp"
-IDBMQ_MIRROR_INVERSE	BITMAP					"resource\\arrow_leftright_q.bmp"
-IDBMP_UPSET_INVERSE		BITMAP					"resource\\arrow_updown.bmp"
-IDBMQ_UPSET_INVERSE		BITMAP					"resource\\arrow_updown_q.bmp"
+IDBMQ_UNICODE_MODE      BITMAP                  "resource\\Unicode_Use_q.bmp"
+IDBMP_MIRROR_INVERSE    BITMAP                  "resource\\arrow_leftright.bmp"
+IDBMQ_MIRROR_INVERSE    BITMAP                  "resource\\arrow_leftright_q.bmp"
+IDBMP_UPSET_INVERSE     BITMAP                  "resource\\arrow_updown.bmp"
+IDBMQ_UPSET_INVERSE     BITMAP                  "resource\\arrow_updown_q.bmp"
 
 
 /////////////////////////////////////////////////////////////////////////////

@@ -35,25 +35,6 @@ If not, see <http://www.gnu.org/licenses/>.
 #endif
 //-------------------------------------------------------------------------------------------------
 
-
-//static LOGFONT	gstUniFont = {
-//	FONTSZ_NORMAL,			//	フォントの高さ
-//	0,						//	平均幅
-//	0,						//	文字送りの方向とX軸との角度
-//	0,						//	ベースラインとX軸との角度
-//	FW_NORMAL,				//	文字の太さ(0~1000まで・400=nomal)
-//	FALSE,					//	イタリック体
-//	FALSE,					//	アンダーライン
-//	FALSE,					//	打ち消し線
-//	DEFAULT_CHARSET,		//	文字セット
-//	OUT_OUTLINE_PRECIS,		//	出力精度
-//	CLIP_DEFAULT_PRECIS,	//	クリッピング精度
-//	PROOF_QUALITY,			//	出力品質
-//	VARIABLE_PITCH,			//	固定幅か可変幅
-//	TEXT("ＭＳ Ｐゴシック")	//	フォント名
-//};
-//-------------------------------------------------------------------------------------------------
-
 static  HWND	ghMainWnd;		//!<	
 static  HWND	ghUniPltWnd;	//!<	
 static  HWND	ghGroupSelWnd;	//!<	
@@ -61,23 +42,164 @@ static  HWND	ghUniLvWnd;		//!<
 
 static WNDPROC	gpfOrgUniListProc;	//!<	
 
-static HFONT	ghLvFont, ghPanelFont;	//!<	
+static HFONT	ghLvFont, ghPanelFont;	//!<	表示に用いるフォント
 
 static TCHAR	gtSelMozi;	//!<	
 
-static UINT		gSelRow;	//!<	
+static  UINT	gSelRow;	//!<	
 static INT		gSelClm;	//!<	
+
+#ifdef UNICODE_USE_LOG
+//	使用ログ・１６個保持
+#define UNIUSELOG_MAX	16
+static list<TCHAR>	gltUseMozi;
+typedef list<TCHAR>::iterator	UUSE_LITR;
+#endif
 //-------------------------------------------------------------------------------------------------
 
-INT_PTR	CALLBACK UniPaletteDlgProc( HWND, UINT, WPARAM, LPARAM );
+#ifdef UNICODE_USE_LOG
+HRESULT UniUseLogging( HWND, TCHAR );
+#endif
 
-INT_PTR	Uni_OnInitDialog( HWND, HWND, LPARAM );
-INT_PTR	Uni_OnCommand( HWND, INT, HWND, UINT );
-INT_PTR	Uni_OnClose( HWND );
-INT_PTR	Uni_OnNotify( HWND, INT, LPNMHDR );
+INT_PTR	CALLBACK UniPaletteDlgProc( HWND, UINT, WPARAM, LPARAM );	//!<	
 
-LRESULT	CALLBACK gpfUniListProc( HWND, UINT, WPARAM, LPARAM );	//	
+INT_PTR	Uni_OnInitDialog( HWND , HWND, LPARAM );	//!<	
+INT_PTR	Uni_OnCommand( HWND , INT, HWND, UINT );	//!<	
+INT_PTR	Uni_OnClose( HWND );	//!<	
+INT_PTR	Uni_OnNotify( HWND , INT, LPNMHDR );	//!<	
+#ifdef UNICODE_USE_LOG
+INT_PTR	Uni_OnDrawItem( HWND , CONST LPDRAWITEMSTRUCT );	//!<	
+#endif
+
+
+LRESULT	CALLBACK gpfUniListProc( HWND, UINT, WPARAM, LPARAM );	//!<	
 //-------------------------------------------------------------------------------------------------
+
+/*!
+	ユニコードパレットの初期化
+	@param[in]	hWnd	ウインドウハンドル
+	@param[in]	bMode	非０作成　０破壊
+*/
+HRESULT UniDlgInitialise( HWND hWnd, UINT dMode )
+{
+#ifdef UNICODE_USE_LOG
+	ULONG	d;
+	TCHAR	tMozi;
+	TCHAR	atBuff[MAX_PATH], atStr[MIN_STRING];
+	LPTSTR	ptEnd, ptBuff;
+	UUSE_LITR	itMous;
+
+	ZeroMemory( atBuff, sizeof(atBuff) );
+
+
+	if( dMode )
+	{
+		gltUseMozi.clear();
+		//	内容読み出す・XXXXX,XXXXX,XXXXX　みたいな感じで保存
+		InitParamString( INIT_LOAD, VS_UNI_USE_LOG, atBuff );
+		if( 0 != atBuff[0] )
+		{
+			ptBuff = &(atBuff[0]);	//	開始
+			for( d = 0; UNIUSELOG_MAX > d; d++ )
+			{
+				tMozi = (TCHAR)_tcstoul( ptBuff, &ptEnd , 10 );	//	
+
+				gltUseMozi.push_front( tMozi );
+
+				if( 0 == *ptEnd ){	break;	}	//	末端までイッた
+				ptBuff =  ptEnd + 1;	//	次に進む
+			}
+		}
+	}
+	else
+	{
+		for( d = 0, itMous = gltUseMozi.begin(); itMous != gltUseMozi.end(); itMous++, d++ )
+		{
+			StringCchPrintf( atStr, MIN_STRING, TEXT("%d"), *itMous );
+
+			if( 0 != d ){	StringCchCat( atBuff, MAX_PATH, TEXT(",") );	}
+			StringCchCat( atBuff, MAX_PATH, atStr );
+		}
+
+		InitParamString( INIT_SAVE, VS_UNI_USE_LOG, atBuff );
+	}
+#endif
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+
+#ifdef UNICODE_USE_LOG
+/*!
+	使用したやつをリストに追加
+	@param[in]	hDlg		ダイヤログハンドル
+	@param[in]	tAddMozi	使った文字
+*/
+HRESULT UniUseLogging( HWND hDlg, TCHAR tAddMozi )
+{
+	ULONG_PTR	dSize;
+	UUSE_LITR	itUse;
+
+	//	已記録か確認
+	for( itUse = gltUseMozi.begin(); itUse != gltUseMozi.end(); itUse++ )
+	{
+		if( *itUse == tAddMozi )	//	ヒットしたら、そいつを一旦抜く
+		{
+			gltUseMozi.erase( itUse );
+			break;
+		}
+	}
+
+	gltUseMozi.push_front( tAddMozi );	//	使った物を先頭にいれる
+
+	dSize = gltUseMozi.size();
+	if( UNIUSELOG_MAX < dSize )
+	{
+		gltUseMozi.pop_back(  );	//	一番古いのを抜く
+	}
+
+	InvalidateRect( GetDlgItem( hDlg, IDS_UNI_USE_LOG ), NULL, TRUE );
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+
+/*!
+	使用一覧から、使ったのを引っ張る
+	@param[in]	hDlg	ダイヤログハンドル
+	@param[in]	hWndCtl	クライヤントハンドル
+	@param[in]	x		クライヤントＸ座標
+	@param[in]	y		クライヤントＹ座標
+*/
+HRESULT UniUseFromLog( HWND hDlg, HWND hWndCtl, LONG x, LONG y )
+{
+	LONG_PTR	useCnt;
+	LONG	iWidth, iPos;
+	RECT	rect;
+	TCHAR	tMozi;
+	UUSE_LITR	itUse;
+
+
+	GetClientRect( GetDlgItem( hDlg, IDS_UNI_USE_LOG ), &rect );
+	iWidth = rect.bottom;
+
+	iPos = x / iWidth;	//	切り捨てにすれば０インデックスおｋ
+	useCnt = gltUseMozi.size();
+	if( useCnt <= iPos )	return E_OUTOFMEMORY;	//	はみ出したらダメッ・・・！
+
+	itUse = gltUseMozi.begin();
+	std::advance( itUse, iPos );	//	目的までズラして
+
+	tMozi = *itUse;
+
+	Evw_OnChar( ghMainWnd, tMozi, 0 );
+	UniUseLogging( hDlg, tMozi );
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+
+#endif
 
 /*!
 	ユニコードパレットダイヤログーを開く処理
@@ -95,8 +217,13 @@ HRESULT UniDialogueEntry( HINSTANCE hInst, HWND hWnd )
 	if( ghUniPltWnd ){	PostMessage( ghUniPltWnd, WM_CLOSE, 0 , 0 );	return S_OK;	}
 
 	gtSelMozi = NULL;
-	ghUniPltWnd = CreateDialogParam( hInst, MAKEINTRESOURCE(IDD_UNICODE_PALETTE_DLG), hWnd, UniPaletteDlgProc, 0 );
+
 	//	ダイヤログーはモーダレスでありんす
+#ifdef UNICODE_USE_LOG
+	ghUniPltWnd = CreateDialogParam( hInst, MAKEINTRESOURCE(IDD_UNICODE_PALETTE_DLG_2), hWnd, UniPaletteDlgProc, 0 );
+#else
+	ghUniPltWnd = CreateDialogParam( hInst, MAKEINTRESOURCE(IDD_UNICODE_PALETTE_DLG), hWnd, UniPaletteDlgProc, 0 );
+#endif
 
 	if( ghUniPltWnd )
 	{
@@ -128,6 +255,9 @@ INT_PTR CALLBACK UniPaletteDlgProc( HWND hDlg, UINT message, WPARAM wParam, LPAR
 		case WM_COMMAND:	return Uni_OnCommand( hDlg, (INT)(LOWORD(wParam)), (HWND)(lParam), (UINT)HIWORD(wParam) );
 		case WM_CLOSE:		return Uni_OnClose( hDlg  );
 		case WM_NOTIFY:		return Uni_OnNotify( hDlg, (INT)(wParam), (LPNMHDR)(lParam) );
+#ifdef UNICODE_USE_LOG
+		case WM_DRAWITEM:	return Uni_OnDrawItem( hDlg, (LPDRAWITEMSTRUCT)(lParam) );
+#endif
 	}
 
 	return (INT_PTR)FALSE;
@@ -202,6 +332,7 @@ INT_PTR Uni_OnInitDialog( HWND hDlg, HWND hWndFocus, LPARAM lParam )
 	iTopIdx *= rect.bottom;
 	ListView_Scroll( ghUniLvWnd, 0, iTopIdx );
 
+
 	SetFocus( ghUniLvWnd );
 
 	return (INT_PTR)FALSE;
@@ -220,6 +351,7 @@ INT_PTR Uni_OnCommand( HWND hDlg, INT id, HWND hWndCtl, UINT codeNotify )
 {
 	INT	dSel, tIdx, dPos;
 	RECT	rect;
+	POINT	point;
 
 	switch( id )
 	{
@@ -246,12 +378,35 @@ INT_PTR Uni_OnCommand( HWND hDlg, INT id, HWND hWndCtl, UINT codeNotify )
 
 
 		case IDB_UNI_DECIDE:
-			if( gtSelMozi ){	Evw_OnChar( ghMainWnd, gtSelMozi, 0 );	}
+			if( gtSelMozi )
+			{
+				Evw_OnChar( ghMainWnd, gtSelMozi, 0 );
+#ifdef UNICODE_USE_LOG
+				UniUseLogging( hDlg, gtSelMozi );
+#endif
+			}
 			return (INT_PTR)TRUE;
 
 		case IDB_UNI_COPY_CLIP:	
-			if( gtSelMozi ){	DocClipLetter( gtSelMozi ) ;	}
+			if( gtSelMozi )
+			{
+				DocClipLetter( gtSelMozi  );
+#ifdef UNICODE_USE_LOG
+				UniUseLogging( hDlg, gtSelMozi );
+#endif
+			}
 			return (INT_PTR)TRUE;
+
+#ifdef UNICODE_USE_LOG
+		case IDS_UNI_USE_LOG:
+			if( STN_DBLCLK == codeNotify )	//	ダブルクルック
+			{
+				GetCursorPos( &point );
+				ScreenToClient( hWndCtl, &point );
+				UniUseFromLog( hDlg, hWndCtl, point.x, point.y );
+			}
+			return (INT_PTR)TRUE;
+#endif
 
 	//	case IDOK:
 		case IDCANCEL:
@@ -380,7 +535,13 @@ INT_PTR Uni_OnNotify( HWND hDlg, INT idFrom, LPNMHDR pstNmhdr )
 	if( NM_DBLCLK == pstListView->hdr.code )	//	ダボルクリッケした奴の処理
 	{
 		//	確定操作として扱う
-		if( gtSelMozi ){	Evw_OnChar( ghMainWnd, gtSelMozi, 0 );	}
+		if( gtSelMozi )
+		{
+			Evw_OnChar( ghMainWnd, gtSelMozi, 0 );
+#ifdef UNICODE_USE_LOG
+			UniUseLogging( hDlg, gtSelMozi );
+#endif
+		}
 	}
 
 	//	選択壱弐色をつけるのはカスタムドロー
@@ -470,6 +631,49 @@ return( CDRF_DODEFAULT );
 	return (INT_PTR)FALSE;
 }
 //-------------------------------------------------------------------------------------------------
+
+#ifdef UNICODE_USE_LOG
+/*!
+	スタティックのオーナードローの処理
+	@param[in]	hWnd		ウインドウハンドル
+	@param[in]	pstDrawItem	オーナドローデータ
+*/
+INT_PTR Uni_OnDrawItem( HWND hDlg, CONST LPDRAWITEMSTRUCT pstDrawItem )
+{
+	LONG	iWidth;
+	RECT	rect;
+	HFONT	hOldFnt;
+	TCHAR	atUnic[2];
+	UUSE_LITR	itUse;
+
+	//	関係ないのは放置
+	if( IDS_UNI_USE_LOG != pstDrawItem->CtlID ){	return (INT_PTR)FALSE;	}
+
+	hOldFnt = SelectFont( pstDrawItem->hDC , ghLvFont );	//	フォントくっつける
+
+	SetBkMode( pstDrawItem->hDC, TRANSPARENT );
+	rect = pstDrawItem->rcItem;
+	iWidth = rect.bottom;	//	正方形の描画エリアとする
+
+	FillRect( pstDrawItem->hDC, &(pstDrawItem->rcItem), GetSysColorBrush( COLOR_WINDOW ) );
+
+	atUnic[0] = 0;	atUnic[1] = 0;
+	rect.right = iWidth;	//	最初のエリア設定
+	for( itUse = gltUseMozi.begin(); itUse != gltUseMozi.end(); itUse++ )
+	{
+		atUnic[0] =  *itUse;	//	壱文字づつ描画していく
+		DrawText( pstDrawItem->hDC, atUnic, 1, &(rect), DT_CENTER | DT_VCENTER | DT_SINGLELINE );
+
+		rect.left  += iWidth;	//	描画位置をシフト
+		rect.right += iWidth;
+	}
+
+	SelectFont( pstDrawItem->hDC, hOldFnt );	//	引っぺがす
+
+	return (INT_PTR)TRUE;
+}
+//-------------------------------------------------------------------------------------------------
+#endif
 
 /*!
 	ユニコード一覧のサブクラスプロシージャ
