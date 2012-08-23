@@ -49,27 +49,40 @@ IDI_TREE_FILE_ETC		ICON	"resource\\file_etc.ico"
 // Menu
 //
 
-IDM_AATREE_POPUP MENU 
+IDC_ORINRINVIEWER MENU
 BEGIN
-    POPUP "複数行テンプレツリーのアレ"
+    POPUP "機能(&F)"
     BEGIN
         MENUITEM "プロファイル作成／開く(&N)",	IDM_MAA_PROFILE_MAKE
         MENUITEM "AA一覧ツリーを再構築(&T)",	IDM_TREE_RECONSTRUCT
-        MENUITEM "プロファイル使用履歴(&H)",	IDM_OPEN_HISTORY
+		MENUITEM "プロファイル使用履歴(&H)",	IDM_OPEN_HISTORY
         MENUITEM SEPARATOR
+        MENUITEM "一般設定(&G)",				IDM_GENERAL_OPTION
         MENUITEM "ファイル名で検索(&F)",		IDM_FINDMAA_DLG_OPEN
+        MENUITEM SEPARATOR
+        MENUITEM "サムネイル一覧表示(&M)",		IDM_MAA_THUMBNAIL_OPEN
+        MENUITEM "ドラフトボード表示(&B)",		IDM_DRAUGHT_OPEN
+        MENUITEM SEPARATOR
+        MENUITEM "常に手前に表示(&A)",			IDM_TOPMOST_TOGGLE
+        MENUITEM SEPARATOR
+        MENUITEM "バージョン情報(&I)",			IDM_ABOUT
+        MENUITEM SEPARATOR
+        MENUITEM "終了(&Q)",					IDM_EXIT
+    END
+END
+
+IDM_AATREE_POPUP MENU
+BEGIN
+    POPUP "複数行テンプレツリーのアレ"
+    BEGIN
+        MENUITEM "ファイル名で検索(&F)",		IDM_FINDMAA_DLG_OPEN
+        MENUITEM "ドラフトボード表示(&B)",		IDM_DRAUGHT_OPEN
         MENUITEM SEPARATOR
         MENUITEM "（未選択状態）",				IDM_DUMMY, GRAYED
         MENUITEM "主タブで開く(&M)",			IDM_AATREE_MAINOPEN
         MENUITEM "副タブを追加(&S)",			IDM_AATREE_SUBADD
         MENUITEM SEPARATOR
         MENUITEM "このアイテムを削除(&D)",		IDM_MAA_ITEM_DELETE, GRAYED
-        MENUITEM SEPARATOR
-        MENUITEM "一般設定(&G)",				IDM_GENERAL_OPTION
-        MENUITEM "常に手前に表示(&A)",			IDM_TOPMOST_TOGGLE
-        MENUITEM SEPARATOR
-        MENUITEM "バージョン情報(&I)",			IDM_ABOUT
-        MENUITEM "終了(&Q)",					IDM_EXIT
     END
 END
 
@@ -148,7 +161,7 @@ CAPTION "バージョン情報 - Orinrin Viewer"
 FONT 9, "MS UI Gothic"
 BEGIN
     ICON            IDI_ORINRINEDITOR,IDC_MYICON,6,6,18,21
-    LTEXT           "Orinrin Viewer, Version 10 Aurora (2012.822.2200.920)",IDC_STATIC,36,6,180,8,SS_NOPREFIX
+    LTEXT           "Orinrin Viewer, Version 10 Aurora (2012.823.2200.920)",IDC_STATIC,36,6,180,8,SS_NOPREFIX
     LTEXT           "Copyright (C) 2011 - 2012 SikigamiHNQ",IDC_STATIC,36,18,180,8
     LTEXT           "Site ： お燐ちゃんは俺の嫁．ｃｏｍ",IDC_STATIC,36,30,180,8
     DEFPUSHBUTTON   "OK",IDOK,85,180,50,14,WS_GROUP
@@ -226,7 +239,7 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 2012,822,2200,920
+ FILEVERSION 2012,823,2200,920
  PRODUCTVERSION 10,0,0,920
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
@@ -252,7 +265,7 @@ BEGIN
             VALUE "LegalTrademarks", "License : GPLv3"
             VALUE "PrivateBuild", "Build by Visual C++ 2008 Express"
             VALUE "SpecialBuild", "Not Speciality"
-            VALUE "FileVersion", "2012.822.2200.920"
+            VALUE "FileVersion", "2012.823.2200.920"
             VALUE "ProductVersion", "10.0.0.920"
             VALUE "FileDescription", "AsciiArt Viewer Ver10"
             VALUE "OriginalFilename", "OrinrinViewer.exe"

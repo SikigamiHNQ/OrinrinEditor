@@ -45,9 +45,11 @@ extern HMENU	ghHistyMenu;		//	履歴表示する部分・動的に内容作成せないかん
 static LRESULT	CALLBACK gpfToolbarProc( HWND, UINT, WPARAM, LPARAM );
 //-------------------------------------------------------------------------------------------------
 
+#define TBT_STRING	32
+
 //	ファイル
 #define TB_MAIN_ITEMS	5
-static TBBUTTON gstMainTBInfo[] = {
+static  TBBUTTON	gstMainTBInfo[] = {
 	{  0,	IDM_NEWFILE,		TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,						{0, 0}, 0, 0  },	//	
 	{  1,	IDM_OPEN,			TBSTATE_ENABLED,	TBSTYLE_DROPDOWN | TBSTYLE_AUTOSIZE,	{0, 0}, 0, 0  },	//	
 	{  2,	IDM_OVERWRITESAVE,	TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,						{0, 0}, 0, 0  },	//	
@@ -55,9 +57,15 @@ static TBBUTTON gstMainTBInfo[] = {
 	{  3,	IDM_GENERAL_OPTION,	TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,						{0, 0}, 0, 0  } 	//	
 };	//	内容変更したら、ツールバー文字列の設定とかも変更セヨ
 
+static CONST TCHAR	gatMainTBtext[TB_MAIN_ITEMS][TBT_STRING] = { 
+	{ TEXT("新規作成") },	{ TEXT("ファイル開く") },	{ TEXT("上書き保存") },	{ TEXT("") },
+	{ TEXT("一般設定") }
+};
+
+
 //	編集
 #define TB_EDIT_ITEMS	21
-static TBBUTTON gstEditTBInfo[] = {
+static  TBBUTTON	gstEditTBInfo[] = {
 	{  0,	IDM_UNDO,			TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,					{0, 0}, 0, 0  },	//	アンドゥ
 	{  1,	IDM_REDO,			TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,					{0, 0}, 0, 0  },	//	リドゥ
 	{  0,	0,					TBSTATE_ENABLED,	TBSTYLE_SEP,						{0, 0}, 0, 0  },
@@ -81,9 +89,21 @@ static TBBUTTON gstEditTBInfo[] = {
 	{ 13,	IDM_UNICODE_TOGGLE,	TBSTATE_ENABLED,	TBSTYLE_CHECK | TBSTYLE_AUTOSIZE,	{0, 0}, 0, 0  },	//	ユニコード使用ON/OFF
 };
 
+static CONST TCHAR	gatEditTBtext[TB_EDIT_ITEMS][TBT_STRING] = { 
+	{ TEXT("元に戻す") },	{ TEXT("やり直し") },	{ TEXT("") },
+	{ TEXT("切り取り") },	{ TEXT("コピー") },	{ TEXT("貼付") },	{ TEXT("削除") },	{ TEXT("") },
+	{ TEXT("SJISコピー") },	{ TEXT("全体をSJISコピー") },	{ TEXT("") },
+	{ TEXT("全選択") },	{ TEXT("矩形選択") },	{ TEXT("") },
+	{ TEXT("レイヤボックス") },	{ TEXT("") },
+	{ TEXT("次の行以降を新頁に分割") },	{ TEXT("") },
+	{ TEXT("部分抽出モード") },	{ TEXT("") },
+	{ TEXT("ユニコード空白を使う") }
+};
+
+
 //	挿入
 #define  TB_INSERT_ITEMS	6
-static TBBUTTON gstInsertTBInfo[] = {
+static  TBBUTTON	gstInsertTBInfo[] = {
 	{  0, IDM_IN_UNI_SPACE,		TBSTATE_ENABLED,	TBSTYLE_DROPDOWN | TBSTYLE_AUTOSIZE,	{0, 0}, 0, 0  },	//	
 	{  1, IDM_INSTAG_COLOUR,	TBSTATE_ENABLED,	TBSTYLE_DROPDOWN | TBSTYLE_AUTOSIZE,	{0, 0}, 0, 0  },	//	
 	{  2, IDM_FRMINSBOX_OPEN,	TBSTATE_ENABLED,	TBSTYLE_DROPDOWN | TBSTYLE_AUTOSIZE,	{0, 0}, 0, 0  },	//	
@@ -92,9 +112,15 @@ static TBBUTTON gstInsertTBInfo[] = {
 	{  4, IDM_MOZI_SCR_OPEN,	TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,						{0, 0}, 0, 0  } 	//	
 };
 
+static CONST TCHAR	gatInsertTBtext[TB_INSERT_ITEMS][TBT_STRING] = { 
+	{ TEXT("ユニコード空白") },	{ TEXT("色変更タグ") },	{ TEXT("枠") },	{ TEXT("ユーザ定義") },	{ TEXT("") },
+	{ TEXT("文字ＡＡ変換ボックス") }
+};
+
+
 //	整形
-#define TB_LAYOUT_ITEMS	16
-static TBBUTTON gstLayoutTBInfo[] = {
+#define  TB_LAYOUT_ITEMS	16
+static  TBBUTTON	gstLayoutTBInfo[] = {
 	{  0, IDM_RIGHT_GUIDE_SET,	TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,	{0, 0}, 0, 0  },	//	右揃え線
 	{  1, IDM_INS_TOPSPACE,		TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,	{0, 0}, 0, 0  },	//	行頭に空白挿入
 	{  0, 0,					TBSTATE_ENABLED,	TBSTYLE_SEP,		{0, 0}, 0, 0  },
@@ -113,14 +139,26 @@ static TBBUTTON gstLayoutTBInfo[] = {
 	{  9, IDM_DECR_DOT_LINES,	TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,	{0, 0}, 0, 0  } 	//	１ドット左へ
 };
 
+static CONST TCHAR	gatLayoutTBtext[TB_LAYOUT_ITEMS][TBT_STRING] = { 
+	{ TEXT("右揃え線") },	{ TEXT("行頭に全角空白追加") },	{ TEXT("") },
+	{ TEXT("行頭空白削除") },	{ TEXT("行末空白削除") },	{ TEXT("行末文字削除") },	{ TEXT("") },
+	{ TEXT("左右反転") },	{ TEXT("上下反転") },	{ TEXT("") },
+	{ TEXT("右に寄せる") },	{ TEXT("１ドット増やす") },	{ TEXT("１ドット減らす") },	{ TEXT("") },
+	{ TEXT("全体を１ドット右へ") },	{ TEXT("全体を１ドット左へ") }
+};
+
 //	表示
 #define TB_VIEW_ITEMS	5
-static TBBUTTON gstViewTBInfo[] = {
+static  TBBUTTON	gstViewTBInfo[] = {
 	{  0, IDM_UNI_PALETTE,			TBSTATE_ENABLED,	TBSTYLE_CHECK | TBSTYLE_AUTOSIZE,	{0, 0}, 0, 0  },	//	
 	{  1, IDM_TRACE_MODE_ON,		TBSTATE_ENABLED,	TBSTYLE_CHECK | TBSTYLE_AUTOSIZE,	{0, 0}, 0, 0  },	//	
 	{  2, IDM_ON_PREVIEW,			TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,					{0, 0}, 0, 0  },	//	
 	{  3, IDM_DRAUGHT_OPEN,			TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,					{0, 0}, 0, 0  },	//	
 	{  4, IDM_MAA_THUMBNAIL_OPEN,	TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,					{0, 0}, 0, 0  } 	//	
+};
+
+static CONST TCHAR	gatViewTBtext[TB_VIEW_ITEMS][TBT_STRING] = { 
+	{ TEXT("ユニコード表") },	{ TEXT("トレスモード") },	{ TEXT("プレビュー") },	{ TEXT("ドラフトボード") },	{ TEXT("複数行サムネイル") }
 };
 
 //全体
@@ -180,6 +218,9 @@ VOID ToolBarCreate( HWND hWnd, HINSTANCE lcInst )
 
 	HBITMAP	hImg, hMsq;
 
+	LPACCEL	pstAccel;
+	INT	iEntry;
+
 //リバー
 	ghRebarWnd = CreateWindowEx( WS_EX_TOOLWINDOW, REBARCLASSNAME, NULL,	//	RBS_VARHEIGHT
 		WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | RBS_BANDBORDERS | RBS_DBLCLKTOGGLE | CCS_NODIVIDER | CCS_TOP,
@@ -201,6 +242,7 @@ VOID ToolBarCreate( HWND hWnd, HINSTANCE lcInst )
 	InitToolBarLayout( INIT_LOAD, TB_BAND_COUNT, stInfo );
 	//	データ有れば書き換わる、なかったら初期値そのまま
 
+	pstAccel = AccelKeyTableLoadAlloc( &iEntry );
 
 //メインツールバー
 	ghMainTBWnd = CreateWindowEx( 0, TOOLBARCLASSNAME, TEXT("maintb"),
@@ -219,15 +261,14 @@ VOID ToolBarCreate( HWND hWnd, HINSTANCE lcInst )
 		DeleteBitmap( hImg );	DeleteBitmap( hMsq );
 	}
 	SendMessage( ghMainTBWnd, TB_SETIMAGELIST, 0, (LPARAM)ghMainImgLst );
-
 	SendMessage( ghMainTBWnd, TB_SETBUTTONSIZE, 0, MAKELPARAM(16,16) );
 
 	SendMessage( ghMainTBWnd, TB_BUTTONSTRUCTSIZE, (WPARAM)sizeof(TBBUTTON), 0 );
 	//	ツールチップ文字列を設定・ボタンテキストがツールチップになる
-	StringCchCopy( atBuff, MAX_STRING, TEXT("新規作成") );		gstMainTBInfo[0].iString = SendMessage( ghMainTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-	StringCchCopy( atBuff, MAX_STRING, TEXT("ファイル開く") );	gstMainTBInfo[1].iString = SendMessage( ghMainTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-	StringCchCopy( atBuff, MAX_STRING, TEXT("上書き保存") );	gstMainTBInfo[2].iString = SendMessage( ghMainTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-	StringCchCopy( atBuff, MAX_STRING, TEXT("一般設定") );		gstMainTBInfo[4].iString = SendMessage( ghMainTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING, gatMainTBtext[0] );	AccelKeyTextBuild( atBuff, MAX_STRING , gstMainTBInfo[ 0].idCommand, pstAccel, iEntry );	gstMainTBInfo[0].iString = SendMessage( ghMainTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING, gatMainTBtext[1] );	AccelKeyTextBuild( atBuff, MAX_STRING , gstMainTBInfo[ 1].idCommand, pstAccel, iEntry );	gstMainTBInfo[1].iString = SendMessage( ghMainTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING, gatMainTBtext[2] );	AccelKeyTextBuild( atBuff, MAX_STRING , gstMainTBInfo[ 2].idCommand, pstAccel, iEntry );	gstMainTBInfo[2].iString = SendMessage( ghMainTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING, gatMainTBtext[4] );	AccelKeyTextBuild( atBuff, MAX_STRING , gstMainTBInfo[ 4].idCommand, pstAccel, iEntry );	gstMainTBInfo[4].iString = SendMessage( ghMainTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
 
 	SendMessage( ghMainTBWnd, TB_ADDBUTTONS, (WPARAM)TB_MAIN_ITEMS, (LPARAM)&gstMainTBInfo );	//	ツールバーにボタンを挿入
 
@@ -264,29 +305,20 @@ VOID ToolBarCreate( HWND hWnd, HINSTANCE lcInst )
 
 	SendMessage( ghEditTBWnd, TB_BUTTONSTRUCTSIZE, (WPARAM)sizeof(TBBUTTON), 0 );
 	//	ツールチップ文字列を設定・ボタンテキストがツールチップになる
-	StringCchCopy( atBuff, MAX_STRING, TEXT("元に戻す") );					gstEditTBInfo[ 0].iString = SendMessage( ghEditTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-	StringCchCopy( atBuff, MAX_STRING, TEXT("やり直し") );					gstEditTBInfo[ 1].iString = SendMessage( ghEditTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-													
-	StringCchCopy( atBuff, MAX_STRING, TEXT("切り取り") );					gstEditTBInfo[ 3].iString = SendMessage( ghEditTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-	StringCchCopy( atBuff, MAX_STRING, TEXT("コピー") );					gstEditTBInfo[ 4].iString = SendMessage( ghEditTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-	StringCchCopy( atBuff, MAX_STRING, TEXT("貼付") );						gstEditTBInfo[ 5].iString = SendMessage( ghEditTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-	StringCchCopy( atBuff, MAX_STRING, TEXT("削除") );						gstEditTBInfo[ 6].iString = SendMessage( ghEditTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-													
-	StringCchCopy( atBuff, MAX_STRING, TEXT("SJISコピー") );				gstEditTBInfo[ 8].iString = SendMessage( ghEditTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-	StringCchCopy( atBuff, MAX_STRING, TEXT("全体をSJISコピー") );			gstEditTBInfo[ 9].iString = SendMessage( ghEditTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-													
-	StringCchCopy( atBuff, MAX_STRING, TEXT("全選択") );					gstEditTBInfo[11].iString = SendMessage( ghEditTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-	StringCchCopy( atBuff, MAX_STRING, TEXT("矩形選択") );					gstEditTBInfo[12].iString = SendMessage( ghEditTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-													
-	StringCchCopy( atBuff, MAX_STRING, TEXT("レイヤボックス") );			gstEditTBInfo[14].iString = SendMessage( ghEditTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-													
-	StringCchCopy( atBuff, MAX_STRING, TEXT("次の行以降を新頁に分割") );	gstEditTBInfo[16].iString = SendMessage( ghEditTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-													
-	StringCchCopy( atBuff, MAX_STRING, TEXT("部分抽出モード") );			gstEditTBInfo[18].iString = SendMessage( ghEditTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-//	StringCchCopy( atBuff, MAX_STRING, TEXT("抽出してレイヤボックスへ") );	gstEditTBInfo[19].iString = SendMessage( ghEditTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-
-	StringCchCopy( atBuff, MAX_STRING, TEXT("ユニコード空白を使う") );		gstEditTBInfo[20].iString = SendMessage( ghEditTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-
+	StringCchCopy( atBuff, MAX_STRING , gatEditTBtext[ 0] );	AccelKeyTextBuild( atBuff, MAX_STRING , gstEditTBInfo[ 0].idCommand, pstAccel, iEntry );	gstEditTBInfo[ 0].iString = SendMessage( ghEditTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING , gatEditTBtext[ 1] );	AccelKeyTextBuild( atBuff, MAX_STRING , gstEditTBInfo[ 1].idCommand, pstAccel, iEntry );	gstEditTBInfo[ 1].iString = SendMessage( ghEditTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING , gatEditTBtext[ 3] );	AccelKeyTextBuild( atBuff, MAX_STRING , gstEditTBInfo[ 3].idCommand, pstAccel, iEntry );	gstEditTBInfo[ 3].iString = SendMessage( ghEditTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING , gatEditTBtext[ 4] );	AccelKeyTextBuild( atBuff, MAX_STRING , gstEditTBInfo[ 4].idCommand, pstAccel, iEntry );	gstEditTBInfo[ 4].iString = SendMessage( ghEditTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING , gatEditTBtext[ 5] );	AccelKeyTextBuild( atBuff, MAX_STRING , gstEditTBInfo[ 5].idCommand, pstAccel, iEntry );	gstEditTBInfo[ 5].iString = SendMessage( ghEditTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING , gatEditTBtext[ 6] );	AccelKeyTextBuild( atBuff, MAX_STRING , gstEditTBInfo[ 6].idCommand, pstAccel, iEntry );	gstEditTBInfo[ 6].iString = SendMessage( ghEditTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING , gatEditTBtext[ 8] );	AccelKeyTextBuild( atBuff, MAX_STRING , gstEditTBInfo[ 8].idCommand, pstAccel, iEntry );	gstEditTBInfo[ 8].iString = SendMessage( ghEditTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING , gatEditTBtext[ 9] );	AccelKeyTextBuild( atBuff, MAX_STRING , gstEditTBInfo[ 9].idCommand, pstAccel, iEntry );	gstEditTBInfo[ 9].iString = SendMessage( ghEditTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING , gatEditTBtext[11] );	AccelKeyTextBuild( atBuff, MAX_STRING , gstEditTBInfo[11].idCommand, pstAccel, iEntry );	gstEditTBInfo[11].iString = SendMessage( ghEditTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING , gatEditTBtext[12] );	AccelKeyTextBuild( atBuff, MAX_STRING , gstEditTBInfo[12].idCommand, pstAccel, iEntry );	gstEditTBInfo[12].iString = SendMessage( ghEditTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING , gatEditTBtext[14] );	AccelKeyTextBuild( atBuff, MAX_STRING , gstEditTBInfo[14].idCommand, pstAccel, iEntry );	gstEditTBInfo[14].iString = SendMessage( ghEditTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING , gatEditTBtext[16] );	AccelKeyTextBuild( atBuff, MAX_STRING , gstEditTBInfo[16].idCommand, pstAccel, iEntry );	gstEditTBInfo[16].iString = SendMessage( ghEditTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING , gatEditTBtext[18] );	AccelKeyTextBuild( atBuff, MAX_STRING , gstEditTBInfo[18].idCommand, pstAccel, iEntry );	gstEditTBInfo[18].iString = SendMessage( ghEditTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING , gatEditTBtext[20] );	AccelKeyTextBuild( atBuff, MAX_STRING , gstEditTBInfo[20].idCommand, pstAccel, iEntry );	gstEditTBInfo[20].iString = SendMessage( ghEditTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
 	SendMessage( ghEditTBWnd, TB_ADDBUTTONS, (WPARAM)TB_EDIT_ITEMS, (LPARAM)&gstEditTBInfo );	//	ツールバーにボタンを挿入
 	SendMessage( ghEditTBWnd, TB_AUTOSIZE, 0, 0 );	//	ボタンのサイズに合わせてツールバーをリサイズ
 
@@ -324,11 +356,11 @@ VOID ToolBarCreate( HWND hWnd, HINSTANCE lcInst )
 
 	SendMessage( ghInsertTBWnd, TB_BUTTONSTRUCTSIZE, (WPARAM)sizeof(TBBUTTON), 0 );
 	//	ツールチップ文字列を設定・ボタンテキストがツールチップになる
-	StringCchCopy( atBuff, MAX_STRING, TEXT("ユニコード空白") );		gstInsertTBInfo[ 0].iString = SendMessage( ghInsertTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-	StringCchCopy( atBuff, MAX_STRING, TEXT("色変更タグ") );			gstInsertTBInfo[ 1].iString = SendMessage( ghInsertTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-	StringCchCopy( atBuff, MAX_STRING, TEXT("枠") );					gstInsertTBInfo[ 2].iString = SendMessage( ghInsertTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-	StringCchCopy( atBuff, MAX_STRING, TEXT("ユーザ定義") );			gstInsertTBInfo[ 3].iString = SendMessage( ghInsertTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-	StringCchCopy( atBuff, MAX_STRING, TEXT("文字ＡＡ変換ボックス") );	gstInsertTBInfo[ 5].iString = SendMessage( ghInsertTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING, gatInsertTBtext[ 0] );	AccelKeyTextBuild( atBuff, MAX_STRING, gstInsertTBInfo[ 0].idCommand, pstAccel, iEntry );	gstInsertTBInfo[ 0].iString = SendMessage( ghInsertTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING, gatInsertTBtext[ 1] );	AccelKeyTextBuild( atBuff, MAX_STRING, gstInsertTBInfo[ 1].idCommand, pstAccel, iEntry );	gstInsertTBInfo[ 1].iString = SendMessage( ghInsertTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING, gatInsertTBtext[ 2] );	AccelKeyTextBuild( atBuff, MAX_STRING, gstInsertTBInfo[ 2].idCommand, pstAccel, iEntry );	gstInsertTBInfo[ 2].iString = SendMessage( ghInsertTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING, gatInsertTBtext[ 3] );	AccelKeyTextBuild( atBuff, MAX_STRING, gstInsertTBInfo[ 3].idCommand, pstAccel, iEntry );	gstInsertTBInfo[ 3].iString = SendMessage( ghInsertTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING, gatInsertTBtext[ 5] );	AccelKeyTextBuild( atBuff, MAX_STRING, gstInsertTBInfo[ 5].idCommand, pstAccel, iEntry );	gstInsertTBInfo[ 5].iString = SendMessage( ghInsertTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
 	SendMessage( ghInsertTBWnd , TB_ADDBUTTONS, (WPARAM)TB_INSERT_ITEMS, (LPARAM)&gstInsertTBInfo );	//	ツールバーにボタンを挿入
 	SendMessage( ghInsertTBWnd, TB_AUTOSIZE, 0, 0 );	//	ボタンのサイズに合わせてツールバーをリサイズ
 
@@ -361,18 +393,18 @@ VOID ToolBarCreate( HWND hWnd, HINSTANCE lcInst )
 
 	SendMessage( ghLayoutTBWnd, TB_BUTTONSTRUCTSIZE, (WPARAM)sizeof(TBBUTTON), 0 );
 	//	ツールチップ文字列を設定・ボタンテキストがツールチップになる
-	StringCchCopy( atBuff, MAX_STRING, TEXT("右揃え線") );				gstLayoutTBInfo[ 0].iString = SendMessage( ghLayoutTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-	StringCchCopy( atBuff, MAX_STRING, TEXT("行頭に全角空白追加") );	gstLayoutTBInfo[ 1].iString = SendMessage( ghLayoutTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-	StringCchCopy( atBuff, MAX_STRING, TEXT("行頭空白削除") );			gstLayoutTBInfo[ 3].iString = SendMessage( ghLayoutTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-	StringCchCopy( atBuff, MAX_STRING, TEXT("行末空白削除") );			gstLayoutTBInfo[ 4].iString = SendMessage( ghLayoutTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-	StringCchCopy( atBuff, MAX_STRING, TEXT("行末文字削除") );			gstLayoutTBInfo[ 5].iString = SendMessage( ghLayoutTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-	StringCchCopy( atBuff, MAX_STRING, TEXT("左右反転") );				gstLayoutTBInfo[ 7].iString = SendMessage( ghLayoutTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-	StringCchCopy( atBuff, MAX_STRING, TEXT("上下反転") );				gstLayoutTBInfo[ 8].iString = SendMessage( ghLayoutTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-	StringCchCopy( atBuff, MAX_STRING, TEXT("右に寄せる") );			gstLayoutTBInfo[10].iString = SendMessage( ghLayoutTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-	StringCchCopy( atBuff, MAX_STRING, TEXT("１ドット増やす") );		gstLayoutTBInfo[11].iString = SendMessage( ghLayoutTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-	StringCchCopy( atBuff, MAX_STRING, TEXT("１ドット減らす") );		gstLayoutTBInfo[12].iString = SendMessage( ghLayoutTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-	StringCchCopy( atBuff, MAX_STRING, TEXT("全体を１ドット右へ") );	gstLayoutTBInfo[14].iString = SendMessage( ghLayoutTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-	StringCchCopy( atBuff, MAX_STRING, TEXT("全体を１ドット左へ") );	gstLayoutTBInfo[15].iString = SendMessage( ghLayoutTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING, gatLayoutTBtext[ 0] );	AccelKeyTextBuild( atBuff, MAX_STRING, gstLayoutTBInfo[ 0].idCommand, pstAccel, iEntry );	gstLayoutTBInfo[ 0].iString = SendMessage( ghLayoutTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING, gatLayoutTBtext[ 1] );	AccelKeyTextBuild( atBuff, MAX_STRING, gstLayoutTBInfo[ 1].idCommand, pstAccel, iEntry );	gstLayoutTBInfo[ 1].iString = SendMessage( ghLayoutTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING, gatLayoutTBtext[ 3] );	AccelKeyTextBuild( atBuff, MAX_STRING, gstLayoutTBInfo[ 3].idCommand, pstAccel, iEntry );	gstLayoutTBInfo[ 3].iString = SendMessage( ghLayoutTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING, gatLayoutTBtext[ 4] );	AccelKeyTextBuild( atBuff, MAX_STRING, gstLayoutTBInfo[ 4].idCommand, pstAccel, iEntry );	gstLayoutTBInfo[ 4].iString = SendMessage( ghLayoutTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING, gatLayoutTBtext[ 5] );	AccelKeyTextBuild( atBuff, MAX_STRING, gstLayoutTBInfo[ 5].idCommand, pstAccel, iEntry );	gstLayoutTBInfo[ 5].iString = SendMessage( ghLayoutTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING, gatLayoutTBtext[ 7] );	AccelKeyTextBuild( atBuff, MAX_STRING, gstLayoutTBInfo[ 7].idCommand, pstAccel, iEntry );	gstLayoutTBInfo[ 7].iString = SendMessage( ghLayoutTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING, gatLayoutTBtext[ 8] );	AccelKeyTextBuild( atBuff, MAX_STRING, gstLayoutTBInfo[ 8].idCommand, pstAccel, iEntry );	gstLayoutTBInfo[ 8].iString = SendMessage( ghLayoutTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING, gatLayoutTBtext[10] );	AccelKeyTextBuild( atBuff, MAX_STRING, gstLayoutTBInfo[10].idCommand, pstAccel, iEntry );	gstLayoutTBInfo[10].iString = SendMessage( ghLayoutTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING, gatLayoutTBtext[11] );	AccelKeyTextBuild( atBuff, MAX_STRING, gstLayoutTBInfo[11].idCommand, pstAccel, iEntry );	gstLayoutTBInfo[11].iString = SendMessage( ghLayoutTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING, gatLayoutTBtext[12] );	AccelKeyTextBuild( atBuff, MAX_STRING, gstLayoutTBInfo[12].idCommand, pstAccel, iEntry );	gstLayoutTBInfo[12].iString = SendMessage( ghLayoutTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING, gatLayoutTBtext[14] );	AccelKeyTextBuild( atBuff, MAX_STRING, gstLayoutTBInfo[14].idCommand, pstAccel, iEntry );	gstLayoutTBInfo[14].iString = SendMessage( ghLayoutTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING, gatLayoutTBtext[15] );	AccelKeyTextBuild( atBuff, MAX_STRING, gstLayoutTBInfo[15].idCommand, pstAccel, iEntry );	gstLayoutTBInfo[15].iString = SendMessage( ghLayoutTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
 
 	SendMessage( ghLayoutTBWnd , TB_ADDBUTTONS, (WPARAM)TB_LAYOUT_ITEMS, (LPARAM)&gstLayoutTBInfo );	//	ツールバーにボタンを挿入
 
@@ -406,11 +438,11 @@ VOID ToolBarCreate( HWND hWnd, HINSTANCE lcInst )
 
 	SendMessage( ghViewTBWnd, TB_BUTTONSTRUCTSIZE, (WPARAM)sizeof(TBBUTTON), 0 );
 	//	ツールチップ文字列を設定・ボタンテキストがツールチップになる
-	StringCchCopy( atBuff, MAX_STRING, TEXT("ユニコード表") );		gstViewTBInfo[ 0].iString = SendMessage( ghViewTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-	StringCchCopy( atBuff, MAX_STRING, TEXT("トレスモード") );		gstViewTBInfo[ 1].iString = SendMessage( ghViewTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-	StringCchCopy( atBuff, MAX_STRING, TEXT("プレビュー") );		gstViewTBInfo[ 2].iString = SendMessage( ghViewTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-	StringCchCopy( atBuff, MAX_STRING, TEXT("ドラフトボード") );	gstViewTBInfo[ 3].iString = SendMessage( ghViewTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-	StringCchCopy( atBuff, MAX_STRING, TEXT("複数行サムネイル") );	gstViewTBInfo[ 4].iString = SendMessage( ghViewTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING , gatViewTBtext[ 0] );	AccelKeyTextBuild( atBuff, MAX_STRING , gstViewTBInfo[ 0].idCommand, pstAccel, iEntry );	gstViewTBInfo[ 0].iString = SendMessage( ghViewTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING , gatViewTBtext[ 1] );	AccelKeyTextBuild( atBuff, MAX_STRING , gstViewTBInfo[ 1].idCommand, pstAccel, iEntry );	gstViewTBInfo[ 1].iString = SendMessage( ghViewTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING , gatViewTBtext[ 2] );	AccelKeyTextBuild( atBuff, MAX_STRING , gstViewTBInfo[ 2].idCommand, pstAccel, iEntry );	gstViewTBInfo[ 2].iString = SendMessage( ghViewTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING , gatViewTBtext[ 3] );	AccelKeyTextBuild( atBuff, MAX_STRING , gstViewTBInfo[ 3].idCommand, pstAccel, iEntry );	gstViewTBInfo[ 3].iString = SendMessage( ghViewTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING , gatViewTBtext[ 4] );	AccelKeyTextBuild( atBuff, MAX_STRING , gstViewTBInfo[ 4].idCommand, pstAccel, iEntry );	gstViewTBInfo[ 4].iString = SendMessage( ghViewTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
 
 	SendMessage( ghViewTBWnd, TB_ADDBUTTONS, (WPARAM)TB_VIEW_ITEMS, (LPARAM)&gstViewTBInfo );	//	ツールバーにボタンを挿入
 	SendMessage( ghViewTBWnd, TB_AUTOSIZE, 0, 0 );	//	ボタンのサイズに合わせてツールバーをリサイズ
@@ -418,6 +450,8 @@ VOID ToolBarCreate( HWND hWnd, HINSTANCE lcInst )
 	//	ツールバーサブクラス化
 	gpfOrigTBProc = SubclassWindow( ghViewTBWnd, gpfToolbarProc );
 
+
+	FREE( pstAccel );
 
 	//配置
 	ZeroMemory( &stRbandInfo, sizeof(REBARBANDINFO) );
@@ -466,6 +500,74 @@ VOID ToolBarCreate( HWND hWnd, HINSTANCE lcInst )
 	}
 
 	return;
+}
+//-------------------------------------------------------------------------------------------------
+
+/*!
+	ツールバーのインフォチップのアクセルキーテキストを変更
+	@param[in]	pstAccel	内容テーブル・無い時はNULL
+	@param[in]	iEntry		テーブルのエントリ数
+	@return		HRESULT	終了状態コード
+*/
+HRESULT ToolBarInfoChange( LPACCEL pstAccel, INT iEntry )
+{
+	TCHAR	atText[MAX_STRING];
+	TBBUTTONINFO	stButtonInfo;
+
+	INT	i;
+
+	ZeroMemory( &stButtonInfo, sizeof(TBBUTTONINFO) );
+	stButtonInfo.cbSize  = sizeof(TBBUTTONINFO);
+	stButtonInfo.dwMask  = TBIF_TEXT;
+	stButtonInfo.pszText = atText;
+	stButtonInfo.cchText = MAX_STRING;
+
+	for( i = 0; TB_MAIN_ITEMS > i; i++ )
+	{
+		if( 0 == gstMainTBInfo[i].idCommand )	continue;
+
+		StringCchCopy( atText, MAX_STRING, gatMainTBtext[i] );
+		AccelKeyTextBuild( atText, MAX_STRING , gstMainTBInfo[i].idCommand, pstAccel, iEntry );
+		SendMessage( ghMainTBWnd, TB_SETBUTTONINFO, (WPARAM)(gstMainTBInfo[i].idCommand), (LPARAM)&stButtonInfo );
+	}
+
+	for( i = 0; TB_EDIT_ITEMS > i; i++ )
+	{
+		if( 0 == gstEditTBInfo[i].idCommand )	continue;
+
+		StringCchCopy( atText, MAX_STRING, gatEditTBtext[i] );
+		AccelKeyTextBuild( atText, MAX_STRING , gstEditTBInfo[i].idCommand, pstAccel, iEntry );
+		SendMessage( ghEditTBWnd, TB_SETBUTTONINFO, (WPARAM)(gstEditTBInfo[i].idCommand), (LPARAM)&stButtonInfo );
+	}
+
+	for( i = 0; TB_INSERT_ITEMS > i; i++ )
+	{
+		if( 0 == gstInsertTBInfo[i].idCommand )	continue;
+
+		StringCchCopy( atText, MAX_STRING, gatInsertTBtext[i] );
+		AccelKeyTextBuild( atText, MAX_STRING , gstInsertTBInfo[i].idCommand, pstAccel, iEntry );
+		SendMessage( ghInsertTBWnd, TB_SETBUTTONINFO, (WPARAM)(gstInsertTBInfo[i].idCommand), (LPARAM)&stButtonInfo );
+	}
+
+	for( i = 0; TB_LAYOUT_ITEMS > i; i++ )
+	{
+		if( 0 == gstLayoutTBInfo[i].idCommand )	continue;
+
+		StringCchCopy( atText, MAX_STRING, gatLayoutTBtext[i] );
+		AccelKeyTextBuild( atText, MAX_STRING , gstLayoutTBInfo[i].idCommand, pstAccel, iEntry );
+		SendMessage( ghLayoutTBWnd, TB_SETBUTTONINFO, (WPARAM)(gstLayoutTBInfo[i].idCommand), (LPARAM)&stButtonInfo );
+	}
+
+	for( i = 0; TB_VIEW_ITEMS > i; i++ )
+	{
+		if( 0 == gstViewTBInfo[i].idCommand )	continue;
+
+		StringCchCopy( atText, MAX_STRING, gatViewTBtext[i] );
+		AccelKeyTextBuild( atText, MAX_STRING , gstViewTBInfo[i].idCommand, pstAccel, iEntry );
+		SendMessage( ghViewTBWnd, TB_SETBUTTONINFO, (WPARAM)(gstViewTBInfo[i].idCommand), (LPARAM)&stButtonInfo );
+	}
+
+	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 

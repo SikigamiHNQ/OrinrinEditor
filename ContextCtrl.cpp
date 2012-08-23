@@ -848,6 +848,8 @@ HRESULT AccelKeyDlgOpen( HWND hWnd )
 		pstAccel = AccelKeyTableLoadAlloc( &iEntry );
 		AccelKeyTableCreate( pstAccel, iEntry );
 
+		ToolBarInfoChange( pstAccel, iEntry );
+
 		FREE( pstAccel );
 	}
 
@@ -1202,6 +1204,37 @@ HRESULT AccelKeyBindString( LPACCEL pstAccel, LPTSTR ptBuffer, UINT_PTR cchSize 
 	StringCchCat( ptBuffer, cchSize, atKey );
 
 	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+
+/*!
+	コマンド番号を参照して、ヒットしたらアクセル文字列を作ってくっつける
+	@param[in]	ptText		処理結果をくっつける文字列ポインター
+	@param[in]	cchSize		バッファの文字数
+	@param[in]	dCommand	コマンド番号
+	@param[in]	pstAccel	アクセラキーテーブル
+	@param[in]	iEntry		テーブルのデータ数
+	@return		HRESULT		終了状態コード
+*/
+HRESULT AccelKeyTextBuild( LPTSTR ptText, UINT_PTR cchSize, DWORD dCommand, CONST LPACCEL pstAccel, INT iEntry )
+{
+	TCHAR	atKeystr[SUB_STRING];
+	INT		i;
+
+	for( i = 0; iEntry > i; i++ )
+	{
+		if( pstAccel[i].cmd == dCommand )
+		{
+			AccelKeyBindString( &(pstAccel[i]), atKeystr, SUB_STRING );
+
+			StringCchCat( ptText, cchSize, TEXT("\r\n") );
+			StringCchCat( ptText, cchSize, atKeystr );
+
+			return S_OK;
+		}
+	}
+
+	return E_OUTOFMEMORY;
 }
 //-------------------------------------------------------------------------------------------------
 

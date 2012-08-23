@@ -38,7 +38,6 @@
 #define IDM_AALIST_POPUP                213
 #define IDM_AATREE_POPUP                214
 #define IDM_LAYERBOX_POPUP              215
-#define IDM_AAVIEW_POPUP                216
 #define IDM_MULTIFILE_POPUP             217
 #define IDM_TEMPLATE_POPUP              218
 #define IDM_DRAUGHT_POPUP               219

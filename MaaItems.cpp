@@ -827,8 +827,6 @@ VOID Aai_OnContextMenu( HWND hWnd, HWND hWndContext, UINT xPos, UINT yPos )
 	dOpen = TabMultipleNowSel(  );	//	開いてるので処理かえる
 	//	ACT_ALLTREE	ACT_FAVLIST
 
-// _ORRVW
-//	hMenu = LoadMenu( GetModuleHandle(NULL), MAKEINTRESOURCE(IDM_AAVIEW_POPUP) );
 #pragma message ("Editorとviewerの、メニューリソースの整合性に注意セヨ")
 	hMenu = LoadMenu( GetModuleHandle(NULL), MAKEINTRESOURCE(IDM_AALIST_POPUP) );
 	hSubMenu = GetSubMenu( hMenu, 0 );

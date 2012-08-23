@@ -497,6 +497,7 @@ HRESULT		OpenHistoryLogging( HWND , LPTSTR );	//!<
 HRESULT		OpenHistoryLoad( HWND, INT );			//!<	
 
 VOID		ToolBarCreate( HWND, HINSTANCE );		//!<	
+HRESULT		ToolBarInfoChange( LPACCEL, INT );		//!<	
 VOID		ToolBarDestroy( VOID  );				//!<	
 HRESULT		ToolBarSizeGet( LPRECT );				//!<	
 HRESULT		ToolBarCheckOnOff( UINT, UINT );		//!<	
@@ -528,6 +529,8 @@ HRESULT		FrameMoveFromView( HWND, UINT );		//!<
 HRESULT		CntxEditInitialise( LPTSTR, HINSTANCE );	//!<	
 HRESULT		CntxEditDlgOpen( HWND );	//!<	
 HMENU		CntxMenuGet( VOID );		//!<	
+
+HRESULT		AccelKeyTextBuild( LPTSTR, UINT_PTR, DWORD, LPACCEL, INT );
 
 HRESULT		MultiFileTabFirst( LPTSTR );	//!<	
 HRESULT		MultiFileTabAppend( LPARAM, LPTSTR );	//!<	

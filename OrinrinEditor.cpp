@@ -20,6 +20,10 @@ If not, see <http://www.gnu.org/licenses/>.
 
 //	注意・コマンドのリソースＩＤ番号は変更不可！
 
+
+//	TODO:	ＭＡＡテンプレ検索ショートカットつけとく
+
+
 //	TODO:	ＯＫ？	ユニコードリスト・使ったヤツの記録とか
 
 //	TODO:	viewerのMLTリストアップ、チェックボックスは灰色できないか
@@ -444,7 +448,7 @@ ASDファイル　　壱行が壱コンテンツ
 					壱行テンプレで中クルックしたらレイヤボックスが開く
 					MAAツリーでファイル名を中クリックしたら、副タブに追加できる
 					バグ修正いろいろ
-2012/08/20	0.31	MAAに、ファイルの途中にアイテムを追加できるようにした
+2012/08/23	0.31	MAAに、ファイルの途中にアイテムを追加できるようにした
 					MAAの内容表示側にＤ＆Ｄすると、そのファイルを副タブで開く（Viewer込み）
 					※使用には入らないし復元もされない
 					MAAツリーにＤ＆Ｄすると、追加アイテムとしてツリーに追加（Viewer込み）
@@ -742,17 +746,14 @@ INT APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 		iCode = MessageBox( NULL, TEXT("エディタが正しく終了出来なかった気配があるよ。\r\nバックアップが残っているかもしれないから、先に確認してみて！\r\nこのまま起動してもいいかい？　「いいえ」を選ぶと、ここで終了するよ。"), TEXT("ごめんね"), MB_YESNO|MB_ICONWARNING|MB_DEFBUTTON2 );
 		if( IDNO == iCode ){	return 0;	}
 	}
-
 	InitParamValue( INIT_SAVE, VL_CLASHCOVER, 1 );
-
 
 	ViewingFontNameLoad(  );	//	フォント名確保
 
+	CntxEditInitialise( gatExePath, hInstance );	//	これの後だったのを手前に移動
+
 	// アプリケーションの初期化を実行します:
 	if( !InitInstance( hInstance, nCmdShow , atArgv ) ){	return FALSE;	}
-
-#pragma message ("ここで、ToolBar用にもっと手前にINIファイルアクセスしても大丈夫か？")
-	CntxEditInitialise( gatExePath, hInstance );
 
 	VertInitialise( gatExePath, hInstance );
 
