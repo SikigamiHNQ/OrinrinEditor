@@ -260,6 +260,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\MiniTemplate.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\MoziScript.cpp"
 				>
 			</File>

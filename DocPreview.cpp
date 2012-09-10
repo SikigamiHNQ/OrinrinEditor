@@ -86,13 +86,15 @@ END_OBJECT_MAP( )
 
 //-------------------------------------------------------------------------------------------------
 
+#define REDRAW_ATSCROLL
+
 #define DOC_PREVIEW_CLASS	TEXT("PREVIEW_CLASS")	//!<	プレビュー窓のクラス名
 
 #define PVW_WIDTH	 820	//!<	デフォルト画面幅
 #define PVW_HEIGHT	 480	//!<	デフォルト画面高さ
 //-------------------------------------------------------------------------------------------------
 
-static CComQIPtr<IHTMLDocument2>	gpDocument;		//!<	ＩＥコンポーネントのなにか
+static CComQIPtr<IHTMLDocument2>	gpDocument2;	//!<	ＩＥコンポーネントのなにか
 static CComQIPtr<IWebBrowser2>		gpWebBrowser2;	//!<	ＩＥコンポーネントのナニカ
 static  HWND	ghIEwnd;							//!<	ＩＥコンポーネントのハンドル
 
@@ -276,25 +278,49 @@ HRESULT PreviewVisibalise( INT iNowPage, BOOLEAN bForeg )
 	CComVariant	vEmpty;
 	CComVariant	vUrl( TEXT("about:blank") );
 
-	//LONG	toptop, height, offhei, scrtop;
-	//CComQIPtr<IHTMLWindow2>		pWindow;
-	//CComQIPtr<IHTMLElement2>	pElement;
+#ifdef REDRAW_ATSCROLL
+	LONG	height, offhei, scrtop;
+//	CComQIPtr<IHTMLWindow2>		pWindow2;
+	CComQIPtr<IHTMLElement>		pElement;
+	CComQIPtr<IHTMLElement2>	pElement2;
+#endif
 
 	if( ghPrevWnd )	//	已にPreview窓有ったら
 	{
 	//	SendMessage( ghToolWnd, TB_CHECKBUTTON, IDM_PVW_ALLVW, FALSE );
 
 #pragma message ("全プレ書換時に、スクロールバーの位置覚えておいて、そこまでScrollさせる？")
-//		gpWebBrowser2->get_Top( &toptop );
-//		gpWebBrowser2->get_Height( &height );	//	多分コンポーネントの高さ
-//		gpDocument->get_parentWindow( &pWindow );
 
-//		pElement->get_scrollHeight( &offhei );
-//		pElement->get_scrollTop( &scrtop );
+#ifdef REDRAW_ATSCROLL
+		gpWebBrowser2->get_Height( &height );	//	多分コンポーネントの高さ
+
+		gpDocument2->get_body( &pElement );
+		pElement.QueryInterface( &pElement2 );
+		pElement.Release(  );
+
+		pElement2->get_scrollHeight( &offhei );	//	全体の高さ
+		pElement2->get_scrollTop( &scrtop );	//	表示位置のスクロール量
+		pElement2.Release(  );
+
+#endif
 
 		//	内容書き換え
 		if( 0 > giViewMode ){	PreviewPageWrite(  -1 );	}
 		else{	PreviewPageWrite( iNowPage );	}
+
+		gpWebBrowser2->Refresh(  );
+
+#ifdef REDRAW_ATSCROLL
+		gpDocument2->get_body( &pElement );
+		pElement.QueryInterface( &pElement2 );
+		pElement.Release(  );
+
+		pElement2->get_scrollHeight( &offhei );	//	全体の高さ
+
+		pElement2->put_scrollTop(  scrtop );	//	表示位置のスクロール量
+		pElement2.Release(  );
+#endif
+
 		InvalidateRect( ghPrevWnd, NULL, TRUE );
 
 		if( bForeg )	SetForegroundWindow( ghPrevWnd );
@@ -376,8 +402,8 @@ HRESULT PreviewVisibalise( INT iNowPage, BOOLEAN bForeg )
 				hRslt = gpWebBrowser2->get_Document( &pDispatch );
 				if( SUCCEEDED(hRslt) && pDispatch )
 				{
-					gpDocument = pDispatch;
-					if( gpDocument ){	hRslt = S_OK;	break;	}
+					gpDocument2 = pDispatch;
+					if( gpDocument2 ){	hRslt = S_OK;	break;	}
 				}
 				Sleep(100);
 			}
@@ -520,7 +546,7 @@ VOID Pvw_OnDestroy( HWND hWnd )
 
 	ghPrevWnd = NULL;
 
-	gpDocument.Release( );
+	gpDocument2.Release( );
 
 	gpWebBrowser2.Release( );
 
@@ -619,7 +645,7 @@ HRESULT PreviewPageWrite( INT iViewPage )
 
 	sfArray = SafeArrayCreateVector( VT_VARIANT, 0, 1 );
 			
-	if (sfArray == NULL || gpDocument == NULL)
+	if (sfArray == NULL || gpDocument2 == NULL)
 	{
 		goto cleanup;
 	}
@@ -628,9 +654,9 @@ HRESULT PreviewPageWrite( INT iViewPage )
 	param->vt = VT_BSTR;
 	param->bstrVal = bstr;
 	hRslt = SafeArrayUnaccessData(sfArray);
-	hRslt = gpDocument->writeln(sfArray);
+	hRslt = gpDocument2->writeln(sfArray);
 
-	hRslt = gpDocument->close( );
+	hRslt = gpDocument2->close( );
 
 cleanup:
 	if( bstr )

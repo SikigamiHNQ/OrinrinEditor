@@ -243,14 +243,15 @@ INT InitParamValue( UINT dMode, UINT dStyle, INT nValue )
 
 	switch( dStyle )
 	{
-		case VL_MAA_SPLIT:		StringCchCopy( atKeyName, SUB_STRING, TEXT("MaaSplit") );		break;
-		case VL_MAA_LCLICK:		StringCchCopy( atKeyName, SUB_STRING, TEXT("MaaMethod") );		break;
-		case VL_MAATIP_VIEW:	StringCchCopy( atKeyName, SUB_STRING, TEXT("MaaToolTip")  );	break;
-		case VL_MAATIP_SIZE:	StringCchCopy( atKeyName, SUB_STRING, TEXT("MaaToolTipSize") );	break;
-		case VL_MAA_TOPMOST:	StringCchCopy( atKeyName, SUB_STRING, TEXT("MaaTopMost")  );	break;
-		case VL_MAASEP_STYLE:	StringCchCopy( atKeyName, SUB_STRING, TEXT("MaaSepLine")  );	break;
-		case VL_MAA_MCLICK:		StringCchCopy( atKeyName, SUB_STRING, TEXT("MaaSubMethod") );	break;
-		default:	return 0;
+		case  VL_MAA_SPLIT:		StringCchCopy( atKeyName, SUB_STRING, TEXT("MaaSplit") );		break;
+		case  VL_MAA_LCLICK:	StringCchCopy( atKeyName, SUB_STRING, TEXT("MaaMethod") );		break;
+		case  VL_MAATIP_VIEW:	StringCchCopy( atKeyName, SUB_STRING, TEXT("MaaToolTip")  );	break;
+		case  VL_MAATIP_SIZE:	StringCchCopy( atKeyName, SUB_STRING, TEXT("MaaToolTipSize") );	break;
+		case  VL_MAA_TOPMOST:	StringCchCopy( atKeyName, SUB_STRING, TEXT("MaaTopMost")  );	break;
+		case  VL_MAASEP_STYLE:	StringCchCopy( atKeyName, SUB_STRING, TEXT("MaaSepLine")  );	break;
+		case  VL_MAA_MCLICK:	StringCchCopy( atKeyName, SUB_STRING, TEXT("MaaSubMethod") );	break;
+		case  VL_MAA_BKCOLOUR:	StringCchCopy( atKeyName, SUB_STRING, TEXT("MaaBkColour") );	break;
+		default:	return nValue;
 	}
 
 	if( dMode )	//	ロード
@@ -675,6 +676,30 @@ BOOLEAN SelectDirectoryDlg( HWND hWnd, LPTSTR ptSelFolder, UINT_PTR cchLen )
 //-------------------------------------------------------------------------------------------------
 #pragma endregion	//	("設定ダイヤログ")
 
+
+/*!
+	指定文字の幅を首都苦
+	@param[in]	ch	幅を計りたい文字
+	@return		幅ドット数
+*/
+INT ViewLetterWidthGet( TCHAR ch )
+{
+	SIZE	stSize;
+	HDC		hdc= GetDC( ghMaaWnd );
+	HFONT	hFtOld;
+
+	hFtOld = SelectFont( hdc, ghAaFont );
+
+	GetTextExtentPoint32( hdc, &ch, 1, &stSize );
+
+	SelectFont( hdc, hFtOld );
+
+	ReleaseDC( ghMaaWnd, hdc );
+
+	return stSize.cx;
+}
+//-------------------------------------------------------------------------------------------------
+//	本体はviewCentral
 /*!
 	文字列のドット幅を数える
 	@param[in]	ptStr	数えたい文字列

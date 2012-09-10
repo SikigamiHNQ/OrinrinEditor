@@ -34,6 +34,11 @@ If not, see <http://www.gnu.org/licenses/>.
 #define TREE_WIDTH	170	//!<	MAAのツリービューの標準幅
 #define LSSCL_WIDTH	15	//!<	MAAのAA一覧のスクロールバーの幅
 
+//	ステータスバーのアイテム内容
+#define SBMAA_PROFNAME	0
+#define SBMAA_AXIS		1
+#define SBMAA_FILENAME	2
+
 //	開けてる
 #define  ACT_ALLTREE	0
 #define  ACT_FAVLIST	1
@@ -113,6 +118,7 @@ HRESULT		AacItemInsert( HWND, LONG );
   #else
 HRESULT		AacItemAdding( HWND, LPTSTR );
   #endif
+HRESULT		AacItemDelete( HWND, LONG );
 #endif
 
 HRESULT		SqlDatabaseOpenClose( BYTE, LPCTSTR );	//!<	
@@ -131,6 +137,8 @@ HRESULT		TreeLoadDirCheck( HWND, HWND );
 
 HTREEITEM	MaaSearchTreeItem( INT );
 HTREEITEM	MaaSelectIDfile( HWND, INT );
+
+HRESULT		MaaBackColourChoose( HWND );
 
 INT			MaaSearchTreeID( HTREEITEM );
 

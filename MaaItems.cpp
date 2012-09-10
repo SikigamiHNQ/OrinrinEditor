@@ -91,6 +91,8 @@ EXTERNED HFONT	ghAaFont;			//!<	表示用のフォント
 static HFONT	ghAaFont;			//!<	表示用のフォント
 #endif
 
+static HBRUSH	ghBkBrush;			//!<	表示エリヤの背景色
+
 static  HPEN	ghSepPen;			//!<	区切り線用ペン
 static BOOLEAN	gbLineSep;			//!<	AAの分けは線にする
 
@@ -146,6 +148,8 @@ HRESULT AaItemsInitialise( HWND hWnd, HINSTANCE hInst, LPRECT ptRect )
 	RECT	rect;
 	LOGFONT	stFont;
 
+	COLORREF	dBkColour;
+
 	if( !(hWnd) )
 	{
 		free( gptTipBuffer );
@@ -156,6 +160,7 @@ HRESULT AaItemsInitialise( HWND hWnd, HINSTANCE hInst, LPRECT ptRect )
 #endif
 		DeleteFont( ghAaFont );
 		DeletePen( ghSepPen );
+		DeleteBrush( ghBkBrush );
 		return S_FALSE;
 	}
 
@@ -165,6 +170,9 @@ HRESULT AaItemsInitialise( HWND hWnd, HINSTANCE hInst, LPRECT ptRect )
 
 	//	１なら区切り線スタイル
 	gbLineSep = InitParamValue( INIT_LOAD, VL_MAASEP_STYLE, 0 );
+
+	dBkColour = (COLORREF)InitParamValue( INIT_LOAD, VL_MAA_BKCOLOUR, 0x00FFFFFF );
+	ghBkBrush = CreateSolidBrush( dBkColour );
 
 #ifndef _ORRVW
 	//	選択したらフォーカスを編集窓に戻す？
@@ -389,8 +397,8 @@ LRESULT CALLBACK gpfAaItemsProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 		HANDLE_MSG( hWnd, WM_KEYUP,       Aai_OnKey );			//	
 
 		HANDLE_MSG( hWnd, WM_MOUSEMOVE,   Aai_OnMouseMove );	//	マウスいごいた
-		HANDLE_MSG( hWnd, WM_LBUTTONUP,   Aai_OnLButtonUp );	//	マウス左ボタンダウン
-		HANDLE_MSG( hWnd, WM_MBUTTONUP,   Aai_OnMButtonUp );	//	マウス中ボタンダウン
+		HANDLE_MSG( hWnd, WM_LBUTTONUP,   Aai_OnLButtonUp );	//	マウス左ボタンあげ
+		HANDLE_MSG( hWnd, WM_MBUTTONUP,   Aai_OnMButtonUp );	//	マウス中ボタンあげ
 		HANDLE_MSG( hWnd, WM_CONTEXTMENU, Aai_OnContextMenu );	//	コンテキストメニュー発生
 		HANDLE_MSG( hWnd, WM_DROPFILES,   Aai_OnDropFiles );	//	ドラグンドロップの受付
 #ifdef MAA_TOOLTIP
@@ -448,7 +456,7 @@ VOID AaItemsDrawItem( HWND hWnd, CONST DRAWITEMSTRUCT *pstDrawItem )
 
 	SetBkMode( pstDrawItem->hDC, TRANSPARENT );	//	文字描画は背景透過で夜露死苦
 
-	FillRect( pstDrawItem->hDC, &rect, GetStockBrush(WHITE_BRUSH) );
+	FillRect( pstDrawItem->hDC, &rect, ghBkBrush );
 
 	gvcViewOrder.clear();
 
@@ -479,11 +487,11 @@ VOID AaItemsDrawItem( HWND hWnd, CONST DRAWITEMSTRUCT *pstDrawItem )
 		stVwrder.dDownr  = drawRect.bottom;
 
 		//	項目ごとに互い違いの色にするか、区切り線を引く
-		if( gbLineSep ){	FillRect( pstDrawItem->hDC, &drawRect, GetStockBrush(WHITE_BRUSH) );	}
+		if( gbLineSep ){	FillRect( pstDrawItem->hDC, &drawRect, ghBkBrush );	}
 		else
 		{
 			if( 1 & rdNextItem )	FillRect( pstDrawItem->hDC, &drawRect, GetStockBrush(LTGRAY_BRUSH) );
-			else					FillRect( pstDrawItem->hDC, &drawRect, GetStockBrush(WHITE_BRUSH) );
+			else					FillRect( pstDrawItem->hDC, &drawRect, ghBkBrush );
 		}
 
 		DrawText( pstDrawItem->hDC, ptConStr, rdLength, &drawRect, DT_LEFT | DT_EDITCONTROL | DT_NOPREFIX );
@@ -609,6 +617,8 @@ VOID Aai_OnMouseMove( HWND hWnd, INT x, INT y, UINT keyFlags )
 	LONG		iItem = -1, bottom;
 	BOOLEAN		bReDraw = FALSE;
 
+	INT		iDot = 0, iLine = 0, iByte = 0;
+
 	//	そのときマウスカーソル下にあるアイテムを選択しておく
 
 	if( !( gvcViewOrder.empty() ) )
@@ -640,11 +650,30 @@ VOID Aai_OnMouseMove( HWND hWnd, INT x, INT y, UINT keyFlags )
 	if( bReDraw && gbAAtipView )	SendMessage( ghToolTipWnd, TTM_UPDATE, 0, 0 );
 #endif
 
-//	TRACE( TEXT("MAA MOUSE [%d x %d] %d %u"), x, y, iItem, bReDraw );
+	if( bReDraw )
+	{
+		iDot = AacArtSizeGet( iItem, &iLine, &iByte );
+		//pcConts = AacAsciiArtGet( iItem );
+		//if( pcConts )
+		//{
+		//	ptString = SjisDecodeAlloc( pcConts );
+		//	FREE( pcConts );
+		//	if( ptString )
+		//	{
+		//		iDot = TextViewSizeGet( ptString, &iLine );
+		//		FREE( ptString );
+		//	}
+		//}
 
-	//	デバッグ用・あとで消すか内容変更
-	StringCchPrintf( atBuffer, MAX_STRING, TEXT("(%d x %d) %d"), x, y, iItem );
-	StatusBarMsgSet( 1, atBuffer );
+		TRACE( TEXT("MAA MOUSE %3d[%dDOT x %dLINE]%dByte"), iItem+1, iDot, iLine, iByte );
+#ifdef _ORRVW
+		StringCchPrintf( atBuffer, MAX_STRING, TEXT("%3d[%dDOT x %dLINE]"), iItem+1, iDot, iLine );
+#else
+		StringCchPrintf( atBuffer, MAX_STRING, TEXT("%3d[%dDOT x %dLINE] %dByte"), iItem+1, iDot, iLine, iByte );
+#endif
+		StatusBarMsgSet( SBMAA_AXIS, atBuffer );
+	}
+
 
 	return;
 }
@@ -854,12 +883,19 @@ VOID Aai_OnContextMenu( HWND hWnd, HWND hWndContext, UINT xPos, UINT yPos )
 	switch( dRslt )
 	{
 		case IDM_MAA_FAV_DELETE:
-			pcConts = AacAsciiArtGet( gixNowSel );	//	該当するインデックスAAを引っ張ってくる
-			if( !pcConts ){	return;	}
+			if( ACT_FAVLIST == dOpen )	//	使用の場合
+			{
+				pcConts = AacAsciiArtGet( gixNowSel );	//	該当するインデックスAAを引っ張ってくる
+				if( !pcConts ){	return;	}
 
-			rdLength = strlen( pcConts );	//	文字列の長さ取得
-			AaItemsFavDelete( pcConts, rdLength );	//	削除Commando発行
-			FavContsRedrawRequest( hWnd );	//	再描画しなきゃだね
+				rdLength = strlen( pcConts );	//	文字列の長さ取得
+				AaItemsFavDelete( pcConts, rdLength );	//	削除Commando発行
+				FavContsRedrawRequest( hWnd );	//	再描画しなきゃだね
+			}
+			else	//	それ以外なら、主タブか副タブ
+			{
+		//		AacItemDelete( hWnd, gixNowSel );
+			}
 			break;
 
 #ifndef _ORRVW
@@ -887,6 +923,8 @@ VOID Aai_OnContextMenu( HWND hWnd, HWND hWndContext, UINT xPos, UINT yPos )
 			break;
 
 		case IDM_MAA_THUMBNAIL_OPEN:	Maa_OnCommand( hWnd , IDM_MAA_THUMBNAIL_OPEN, NULL, 0 );	break;
+
+		case IDM_MAAITEM_BKCOLOUR:		MaaBackColourChoose( hWnd );	break;
 
 #ifndef _ORRVW
 
@@ -1033,6 +1071,50 @@ HRESULT AaItemsFavDelete( LPSTR pcConts, UINT rdLength )
 //-------------------------------------------------------------------------------------------------
 
 
+/*!
+	MAA窓の背景色選択ダイヤログの面倒見る
+	@param[in]	hWnd	オーナーウインドウハンドル
+	@return	HRESULT	終了状態コード
+*/
+HRESULT MaaBackColourChoose( HWND hWnd )
+{
+	BOOL	bRslt;
+	COLORREF	adColourTemp[16], dColour;
+	CHOOSECOLOR	stChColour;
+
+	ZeroMemory( adColourTemp, sizeof(adColourTemp) );
+
+	dColour = (COLORREF)InitParamValue( INIT_LOAD, VL_MAA_BKCOLOUR, 0x00FFFFFF );
+
+	adColourTemp[0] = dColour;
+
+	ZeroMemory( &stChColour, sizeof(CHOOSECOLOR) );
+	stChColour.lStructSize  = sizeof(CHOOSECOLOR);
+	stChColour.hwndOwner    = hWnd;
+//	stChColour.hInstance    = GetModuleHandle( NULL );
+	stChColour.rgbResult    = dColour;
+	stChColour.lpCustColors = adColourTemp;
+	stChColour.Flags        = CC_RGBINIT;
+
+	bRslt = ChooseColor( &stChColour  );	//	色ダイヤログ使う
+	if( bRslt )
+	{
+		dColour =  stChColour.rgbResult;
+		InitParamValue( INIT_SAVE, VL_MAA_BKCOLOUR, (INT)dColour );
+
+		DeleteBrush( ghBkBrush );	//	ブラシ作り直し
+		ghBkBrush = CreateSolidBrush( dColour );
+
+		InvalidateRect( ghItemsWnd, NULL, TRUE );
+
+		return S_OK;
+	}
+
+	return E_ABORT;
+}
+//-------------------------------------------------------------------------------------------------
+
+
 
 
 /*!
@@ -1080,6 +1162,7 @@ UINT AaItemsDoSelect( HWND hWnd, UINT dMode, UINT dDirct )
 	rdLength = strlen( pcConts );	//	文字列の長さ取得
 
 	uRslt = ViewMaaMaterialise( pcConts , rdLength, dMode );	//	本体に飛ばす
+	//	EditorとViewerで本体が異なるので注意
 
 	//	ここでお気に入りに入れる
 	if( SUCCEEDED( AaItemsFavUpload( pcConts, rdLength ) ) )

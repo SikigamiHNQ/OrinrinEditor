@@ -108,20 +108,21 @@ static CONST GUID gcstGUID = { 0x66D3E881, 0x972B, 0x458B, { 0x93, 0x5E, 0x9E, 0
 #define  FRAME_MLINE	//	枠パーツ複数行
 #define AA_INVERSE		//	上下左右反転機能
 #define ACCELERATOR_EDIT//	キーのアレ編集
+#define USE_HOVERTIP
+//#define PGL_TOOLTIP
+//#define MAA_TOOLTIP
+#define EDGE_BLANK_STYLE	//	レイヤ合成するとき、白ヌキ領域を用意する
+
 
 //	作成中の機能
 //#define HUKUTAB_DRAGMOVE	
 #define MIDDLE_CLICK_CLOSE
-#define EDGE_BLANK_STYLE	//	レイヤ合成するとき、白ヌキ領域を用意する
 //#define FIND_STRINGS	//	文字列検索機能
 //#define PAGE_MULTISELECT//	頁一覧の複数選択
 #define PAGE_DELAY_LOAD	//	ファイル読み込んだ時は頁展開しない、ひつようになったら開く
 //#define PLUGIN_ENABLE	//	プラグイン機能
-#define USE_HOVERTIP
-//#define PGL_TOOLTIP
-//#define MAA_TOOLTIP
-
 #define UNICODE_USE_LOG
+//#define MINI_TEMPLATE	
 
 #define MAA_IADD_PLUS	//	MAAへのアイテム追加機能拡張
 //	リソースの IDM_MAA_IADD_OPEN IDM_MAA_ITEM_INSERT に注意
@@ -235,6 +236,7 @@ LRESULT	ExceptionMessage( LPCSTR, LPCSTR, UINT, LPARAM );
 #define WDP_BRTMPL		4
 #define WDP_MAATPL		5
 #define WDP_PREVIEW		6
+#define WDP_MMAATPL		7
 
 #define FONTSZ_NORMAL	16
 #define FONTSZ_REDUCE	12
@@ -294,6 +296,8 @@ LRESULT	ExceptionMessage( LPCSTR, LPCSTR, UINT, LPARAM );
 #define VL_U_RULER_VIEW	52	//!<	下ルーラ表示するか
 #define VL_PAGEBYTE_MAX	53	//!<	壱レスの最大バイト数
 #define VS_UNI_USE_LOG	54	//!<	ユニコード文字の使用ログ
+#define VL_MAA_BKCOLOUR	55	//!<	ＭＡＡ窓の背景色変更
+#define VS_RGUIDE_MOZI	56	//!<	右揃え線の文字・壱文字限定
 
 //増やしたら、函数内に取扱つくっておくこと
 

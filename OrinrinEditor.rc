@@ -95,6 +95,8 @@ BEGIN
         MENUITEM SEPARATOR
         MENUITEM "次の行以降を新頁に分割(&V)",			IDM_PAGEL_DIVIDE
         MENUITEM SEPARATOR
+        MENUITEM "選択文字列を頁名にする(&N)",			IDM_PAGENAME_SELASSIGN
+        MENUITEM SEPARATOR
         MENUITEM "文字列検索(&F)",						IDM_FIND_DLG_OPEN
         MENUITEM "検索ハイライト解除(&H)",				IDM_FIND_HIGHLIGHT_OFF
     END
@@ -251,6 +253,7 @@ BEGIN
         MENUITEM "ＡＡポップアップ表示(&T)",		IDM_MAA_AATIP_TOGGLE
         MENUITEM "ＡＡ区切りスタイル切換",			IDM_MAA_SEP_STYLE_TOGGLE
         MENUITEM "選択したら編集窓にフォーカス",	IDM_MAA_RETURN_FOCUS
+        MENUITEM "背景色変更(&K)",					IDM_MAAITEM_BKCOLOUR
         MENUITEM SEPARATOR
         MENUITEM "ここにアイテム追加(&A)",			IDM_MAA_ITEM_INSERT
     END
@@ -417,7 +420,7 @@ CAPTION "バージョン情報 - Orinrin Editor"
 FONT 9, "MS UI Gothic"
 BEGIN
     ICON            IDI_ORINRINEDITOR,IDC_MYICON,6,6,20,20
-    LTEXT           "Orinrin Editor, Version 0.31 Aurora (2012.823.2200.920)",IDC_STATIC,36,6,168,8,SS_NOPREFIX
+    LTEXT           "Orinrin Editor, Version 0.31 Aurora (2012.910.2200.920)",IDC_STATIC,36,6,168,8,SS_NOPREFIX
     LTEXT           "Copyright (C) 2011 - 2012 Orinrin/SikigamiHNQ",IDC_STATIC,36,18,168,8
     LTEXT           "Site ： お燐ちゃんは俺の嫁．ｃｏｍ",IDC_STATIC,36,30,168,8
     DEFPUSHBUTTON   "OK",IDOK,84,180,48,12,WS_GROUP
@@ -902,7 +905,7 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 2012,823,2200,920
+ FILEVERSION 2012,910,2200,920
  PRODUCTVERSION 0,31,0,920
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
@@ -928,7 +931,7 @@ BEGIN
             VALUE "LegalTrademarks", "License : GPLv3"
             VALUE "PrivateBuild", "Build by Visual C++ 2008 Express"
             VALUE "SpecialBuild", "Not Speciality"
-            VALUE "FileVersion", "2012.823.2200.920"
+            VALUE "FileVersion", "2012.910.2200.920"
             VALUE "ProductVersion", "0.31.0.920"
             VALUE "FileDescription", "AsciiArt Story Editor by Orinrin!"
             VALUE "OriginalFilename", "OrinrinEditor.exe"

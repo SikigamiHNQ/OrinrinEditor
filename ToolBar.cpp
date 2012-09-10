@@ -218,9 +218,6 @@ VOID ToolBarCreate( HWND hWnd, HINSTANCE lcInst )
 
 	HBITMAP	hImg, hMsq;
 
-	LPACCEL	pstAccel;
-	INT	iEntry;
-
 //リバー
 	ghRebarWnd = CreateWindowEx( WS_EX_TOOLWINDOW, REBARCLASSNAME, NULL,	//	RBS_VARHEIGHT
 		WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | RBS_BANDBORDERS | RBS_DBLCLKTOGGLE | CCS_NODIVIDER | CCS_TOP,
@@ -241,8 +238,6 @@ VOID ToolBarCreate( HWND hWnd, HINSTANCE lcInst )
 	//	保存状態読込
 	InitToolBarLayout( INIT_LOAD, TB_BAND_COUNT, stInfo );
 	//	データ有れば書き換わる、なかったら初期値そのまま
-
-	pstAccel = AccelKeyTableLoadAlloc( &iEntry );
 
 //メインツールバー
 	ghMainTBWnd = CreateWindowEx( 0, TOOLBARCLASSNAME, TEXT("maintb"),
@@ -265,10 +260,10 @@ VOID ToolBarCreate( HWND hWnd, HINSTANCE lcInst )
 
 	SendMessage( ghMainTBWnd, TB_BUTTONSTRUCTSIZE, (WPARAM)sizeof(TBBUTTON), 0 );
 	//	ツールチップ文字列を設定・ボタンテキストがツールチップになる
-	StringCchCopy( atBuff, MAX_STRING, gatMainTBtext[0] );	AccelKeyTextBuild( atBuff, MAX_STRING , gstMainTBInfo[ 0].idCommand, pstAccel, iEntry );	gstMainTBInfo[0].iString = SendMessage( ghMainTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-	StringCchCopy( atBuff, MAX_STRING, gatMainTBtext[1] );	AccelKeyTextBuild( atBuff, MAX_STRING , gstMainTBInfo[ 1].idCommand, pstAccel, iEntry );	gstMainTBInfo[1].iString = SendMessage( ghMainTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-	StringCchCopy( atBuff, MAX_STRING, gatMainTBtext[2] );	AccelKeyTextBuild( atBuff, MAX_STRING , gstMainTBInfo[ 2].idCommand, pstAccel, iEntry );	gstMainTBInfo[2].iString = SendMessage( ghMainTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-	StringCchCopy( atBuff, MAX_STRING, gatMainTBtext[4] );	AccelKeyTextBuild( atBuff, MAX_STRING , gstMainTBInfo[ 4].idCommand, pstAccel, iEntry );	gstMainTBInfo[4].iString = SendMessage( ghMainTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING, gatMainTBtext[0] );	gstMainTBInfo[0].iString = SendMessage( ghMainTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING, gatMainTBtext[1] );	gstMainTBInfo[1].iString = SendMessage( ghMainTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING, gatMainTBtext[2] );	gstMainTBInfo[2].iString = SendMessage( ghMainTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING, gatMainTBtext[4] );	gstMainTBInfo[4].iString = SendMessage( ghMainTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
 
 	SendMessage( ghMainTBWnd, TB_ADDBUTTONS, (WPARAM)TB_MAIN_ITEMS, (LPARAM)&gstMainTBInfo );	//	ツールバーにボタンを挿入
 
@@ -305,20 +300,20 @@ VOID ToolBarCreate( HWND hWnd, HINSTANCE lcInst )
 
 	SendMessage( ghEditTBWnd, TB_BUTTONSTRUCTSIZE, (WPARAM)sizeof(TBBUTTON), 0 );
 	//	ツールチップ文字列を設定・ボタンテキストがツールチップになる
-	StringCchCopy( atBuff, MAX_STRING , gatEditTBtext[ 0] );	AccelKeyTextBuild( atBuff, MAX_STRING , gstEditTBInfo[ 0].idCommand, pstAccel, iEntry );	gstEditTBInfo[ 0].iString = SendMessage( ghEditTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-	StringCchCopy( atBuff, MAX_STRING , gatEditTBtext[ 1] );	AccelKeyTextBuild( atBuff, MAX_STRING , gstEditTBInfo[ 1].idCommand, pstAccel, iEntry );	gstEditTBInfo[ 1].iString = SendMessage( ghEditTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-	StringCchCopy( atBuff, MAX_STRING , gatEditTBtext[ 3] );	AccelKeyTextBuild( atBuff, MAX_STRING , gstEditTBInfo[ 3].idCommand, pstAccel, iEntry );	gstEditTBInfo[ 3].iString = SendMessage( ghEditTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-	StringCchCopy( atBuff, MAX_STRING , gatEditTBtext[ 4] );	AccelKeyTextBuild( atBuff, MAX_STRING , gstEditTBInfo[ 4].idCommand, pstAccel, iEntry );	gstEditTBInfo[ 4].iString = SendMessage( ghEditTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-	StringCchCopy( atBuff, MAX_STRING , gatEditTBtext[ 5] );	AccelKeyTextBuild( atBuff, MAX_STRING , gstEditTBInfo[ 5].idCommand, pstAccel, iEntry );	gstEditTBInfo[ 5].iString = SendMessage( ghEditTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-	StringCchCopy( atBuff, MAX_STRING , gatEditTBtext[ 6] );	AccelKeyTextBuild( atBuff, MAX_STRING , gstEditTBInfo[ 6].idCommand, pstAccel, iEntry );	gstEditTBInfo[ 6].iString = SendMessage( ghEditTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-	StringCchCopy( atBuff, MAX_STRING , gatEditTBtext[ 8] );	AccelKeyTextBuild( atBuff, MAX_STRING , gstEditTBInfo[ 8].idCommand, pstAccel, iEntry );	gstEditTBInfo[ 8].iString = SendMessage( ghEditTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-	StringCchCopy( atBuff, MAX_STRING , gatEditTBtext[ 9] );	AccelKeyTextBuild( atBuff, MAX_STRING , gstEditTBInfo[ 9].idCommand, pstAccel, iEntry );	gstEditTBInfo[ 9].iString = SendMessage( ghEditTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-	StringCchCopy( atBuff, MAX_STRING , gatEditTBtext[11] );	AccelKeyTextBuild( atBuff, MAX_STRING , gstEditTBInfo[11].idCommand, pstAccel, iEntry );	gstEditTBInfo[11].iString = SendMessage( ghEditTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-	StringCchCopy( atBuff, MAX_STRING , gatEditTBtext[12] );	AccelKeyTextBuild( atBuff, MAX_STRING , gstEditTBInfo[12].idCommand, pstAccel, iEntry );	gstEditTBInfo[12].iString = SendMessage( ghEditTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-	StringCchCopy( atBuff, MAX_STRING , gatEditTBtext[14] );	AccelKeyTextBuild( atBuff, MAX_STRING , gstEditTBInfo[14].idCommand, pstAccel, iEntry );	gstEditTBInfo[14].iString = SendMessage( ghEditTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-	StringCchCopy( atBuff, MAX_STRING , gatEditTBtext[16] );	AccelKeyTextBuild( atBuff, MAX_STRING , gstEditTBInfo[16].idCommand, pstAccel, iEntry );	gstEditTBInfo[16].iString = SendMessage( ghEditTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-	StringCchCopy( atBuff, MAX_STRING , gatEditTBtext[18] );	AccelKeyTextBuild( atBuff, MAX_STRING , gstEditTBInfo[18].idCommand, pstAccel, iEntry );	gstEditTBInfo[18].iString = SendMessage( ghEditTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-	StringCchCopy( atBuff, MAX_STRING , gatEditTBtext[20] );	AccelKeyTextBuild( atBuff, MAX_STRING , gstEditTBInfo[20].idCommand, pstAccel, iEntry );	gstEditTBInfo[20].iString = SendMessage( ghEditTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING , gatEditTBtext[ 0] );	gstEditTBInfo[ 0].iString = SendMessage( ghEditTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING , gatEditTBtext[ 1] );	gstEditTBInfo[ 1].iString = SendMessage( ghEditTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING , gatEditTBtext[ 3] );	gstEditTBInfo[ 3].iString = SendMessage( ghEditTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING , gatEditTBtext[ 4] );	gstEditTBInfo[ 4].iString = SendMessage( ghEditTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING , gatEditTBtext[ 5] );	gstEditTBInfo[ 5].iString = SendMessage( ghEditTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING , gatEditTBtext[ 6] );	gstEditTBInfo[ 6].iString = SendMessage( ghEditTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING , gatEditTBtext[ 8] );	gstEditTBInfo[ 8].iString = SendMessage( ghEditTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING , gatEditTBtext[ 9] );	gstEditTBInfo[ 9].iString = SendMessage( ghEditTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING , gatEditTBtext[11] );	gstEditTBInfo[11].iString = SendMessage( ghEditTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING , gatEditTBtext[12] );	gstEditTBInfo[12].iString = SendMessage( ghEditTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING , gatEditTBtext[14] );	gstEditTBInfo[14].iString = SendMessage( ghEditTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING , gatEditTBtext[16] );	gstEditTBInfo[16].iString = SendMessage( ghEditTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING , gatEditTBtext[18] );	gstEditTBInfo[18].iString = SendMessage( ghEditTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING , gatEditTBtext[20] );	gstEditTBInfo[20].iString = SendMessage( ghEditTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
 	SendMessage( ghEditTBWnd, TB_ADDBUTTONS, (WPARAM)TB_EDIT_ITEMS, (LPARAM)&gstEditTBInfo );	//	ツールバーにボタンを挿入
 	SendMessage( ghEditTBWnd, TB_AUTOSIZE, 0, 0 );	//	ボタンのサイズに合わせてツールバーをリサイズ
 
@@ -356,11 +351,11 @@ VOID ToolBarCreate( HWND hWnd, HINSTANCE lcInst )
 
 	SendMessage( ghInsertTBWnd, TB_BUTTONSTRUCTSIZE, (WPARAM)sizeof(TBBUTTON), 0 );
 	//	ツールチップ文字列を設定・ボタンテキストがツールチップになる
-	StringCchCopy( atBuff, MAX_STRING, gatInsertTBtext[ 0] );	AccelKeyTextBuild( atBuff, MAX_STRING, gstInsertTBInfo[ 0].idCommand, pstAccel, iEntry );	gstInsertTBInfo[ 0].iString = SendMessage( ghInsertTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-	StringCchCopy( atBuff, MAX_STRING, gatInsertTBtext[ 1] );	AccelKeyTextBuild( atBuff, MAX_STRING, gstInsertTBInfo[ 1].idCommand, pstAccel, iEntry );	gstInsertTBInfo[ 1].iString = SendMessage( ghInsertTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-	StringCchCopy( atBuff, MAX_STRING, gatInsertTBtext[ 2] );	AccelKeyTextBuild( atBuff, MAX_STRING, gstInsertTBInfo[ 2].idCommand, pstAccel, iEntry );	gstInsertTBInfo[ 2].iString = SendMessage( ghInsertTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-	StringCchCopy( atBuff, MAX_STRING, gatInsertTBtext[ 3] );	AccelKeyTextBuild( atBuff, MAX_STRING, gstInsertTBInfo[ 3].idCommand, pstAccel, iEntry );	gstInsertTBInfo[ 3].iString = SendMessage( ghInsertTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-	StringCchCopy( atBuff, MAX_STRING, gatInsertTBtext[ 5] );	AccelKeyTextBuild( atBuff, MAX_STRING, gstInsertTBInfo[ 5].idCommand, pstAccel, iEntry );	gstInsertTBInfo[ 5].iString = SendMessage( ghInsertTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING, gatInsertTBtext[ 0] );	gstInsertTBInfo[ 0].iString = SendMessage( ghInsertTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING, gatInsertTBtext[ 1] );	gstInsertTBInfo[ 1].iString = SendMessage( ghInsertTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING, gatInsertTBtext[ 2] );	gstInsertTBInfo[ 2].iString = SendMessage( ghInsertTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING, gatInsertTBtext[ 3] );	gstInsertTBInfo[ 3].iString = SendMessage( ghInsertTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING, gatInsertTBtext[ 5] );	gstInsertTBInfo[ 5].iString = SendMessage( ghInsertTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
 	SendMessage( ghInsertTBWnd , TB_ADDBUTTONS, (WPARAM)TB_INSERT_ITEMS, (LPARAM)&gstInsertTBInfo );	//	ツールバーにボタンを挿入
 	SendMessage( ghInsertTBWnd, TB_AUTOSIZE, 0, 0 );	//	ボタンのサイズに合わせてツールバーをリサイズ
 
@@ -393,18 +388,18 @@ VOID ToolBarCreate( HWND hWnd, HINSTANCE lcInst )
 
 	SendMessage( ghLayoutTBWnd, TB_BUTTONSTRUCTSIZE, (WPARAM)sizeof(TBBUTTON), 0 );
 	//	ツールチップ文字列を設定・ボタンテキストがツールチップになる
-	StringCchCopy( atBuff, MAX_STRING, gatLayoutTBtext[ 0] );	AccelKeyTextBuild( atBuff, MAX_STRING, gstLayoutTBInfo[ 0].idCommand, pstAccel, iEntry );	gstLayoutTBInfo[ 0].iString = SendMessage( ghLayoutTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-	StringCchCopy( atBuff, MAX_STRING, gatLayoutTBtext[ 1] );	AccelKeyTextBuild( atBuff, MAX_STRING, gstLayoutTBInfo[ 1].idCommand, pstAccel, iEntry );	gstLayoutTBInfo[ 1].iString = SendMessage( ghLayoutTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-	StringCchCopy( atBuff, MAX_STRING, gatLayoutTBtext[ 3] );	AccelKeyTextBuild( atBuff, MAX_STRING, gstLayoutTBInfo[ 3].idCommand, pstAccel, iEntry );	gstLayoutTBInfo[ 3].iString = SendMessage( ghLayoutTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-	StringCchCopy( atBuff, MAX_STRING, gatLayoutTBtext[ 4] );	AccelKeyTextBuild( atBuff, MAX_STRING, gstLayoutTBInfo[ 4].idCommand, pstAccel, iEntry );	gstLayoutTBInfo[ 4].iString = SendMessage( ghLayoutTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-	StringCchCopy( atBuff, MAX_STRING, gatLayoutTBtext[ 5] );	AccelKeyTextBuild( atBuff, MAX_STRING, gstLayoutTBInfo[ 5].idCommand, pstAccel, iEntry );	gstLayoutTBInfo[ 5].iString = SendMessage( ghLayoutTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-	StringCchCopy( atBuff, MAX_STRING, gatLayoutTBtext[ 7] );	AccelKeyTextBuild( atBuff, MAX_STRING, gstLayoutTBInfo[ 7].idCommand, pstAccel, iEntry );	gstLayoutTBInfo[ 7].iString = SendMessage( ghLayoutTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-	StringCchCopy( atBuff, MAX_STRING, gatLayoutTBtext[ 8] );	AccelKeyTextBuild( atBuff, MAX_STRING, gstLayoutTBInfo[ 8].idCommand, pstAccel, iEntry );	gstLayoutTBInfo[ 8].iString = SendMessage( ghLayoutTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-	StringCchCopy( atBuff, MAX_STRING, gatLayoutTBtext[10] );	AccelKeyTextBuild( atBuff, MAX_STRING, gstLayoutTBInfo[10].idCommand, pstAccel, iEntry );	gstLayoutTBInfo[10].iString = SendMessage( ghLayoutTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-	StringCchCopy( atBuff, MAX_STRING, gatLayoutTBtext[11] );	AccelKeyTextBuild( atBuff, MAX_STRING, gstLayoutTBInfo[11].idCommand, pstAccel, iEntry );	gstLayoutTBInfo[11].iString = SendMessage( ghLayoutTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-	StringCchCopy( atBuff, MAX_STRING, gatLayoutTBtext[12] );	AccelKeyTextBuild( atBuff, MAX_STRING, gstLayoutTBInfo[12].idCommand, pstAccel, iEntry );	gstLayoutTBInfo[12].iString = SendMessage( ghLayoutTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-	StringCchCopy( atBuff, MAX_STRING, gatLayoutTBtext[14] );	AccelKeyTextBuild( atBuff, MAX_STRING, gstLayoutTBInfo[14].idCommand, pstAccel, iEntry );	gstLayoutTBInfo[14].iString = SendMessage( ghLayoutTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-	StringCchCopy( atBuff, MAX_STRING, gatLayoutTBtext[15] );	AccelKeyTextBuild( atBuff, MAX_STRING, gstLayoutTBInfo[15].idCommand, pstAccel, iEntry );	gstLayoutTBInfo[15].iString = SendMessage( ghLayoutTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING, gatLayoutTBtext[ 0] );	gstLayoutTBInfo[ 0].iString = SendMessage( ghLayoutTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING, gatLayoutTBtext[ 1] );	gstLayoutTBInfo[ 1].iString = SendMessage( ghLayoutTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING, gatLayoutTBtext[ 3] );	gstLayoutTBInfo[ 3].iString = SendMessage( ghLayoutTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING, gatLayoutTBtext[ 4] );	gstLayoutTBInfo[ 4].iString = SendMessage( ghLayoutTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING, gatLayoutTBtext[ 5] );	gstLayoutTBInfo[ 5].iString = SendMessage( ghLayoutTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING, gatLayoutTBtext[ 7] );	gstLayoutTBInfo[ 7].iString = SendMessage( ghLayoutTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING, gatLayoutTBtext[ 8] );	gstLayoutTBInfo[ 8].iString = SendMessage( ghLayoutTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING, gatLayoutTBtext[10] );	gstLayoutTBInfo[10].iString = SendMessage( ghLayoutTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING, gatLayoutTBtext[11] );	gstLayoutTBInfo[11].iString = SendMessage( ghLayoutTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING, gatLayoutTBtext[12] );	gstLayoutTBInfo[12].iString = SendMessage( ghLayoutTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING, gatLayoutTBtext[14] );	gstLayoutTBInfo[14].iString = SendMessage( ghLayoutTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING, gatLayoutTBtext[15] );	gstLayoutTBInfo[15].iString = SendMessage( ghLayoutTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
 
 	SendMessage( ghLayoutTBWnd , TB_ADDBUTTONS, (WPARAM)TB_LAYOUT_ITEMS, (LPARAM)&gstLayoutTBInfo );	//	ツールバーにボタンを挿入
 
@@ -438,11 +433,11 @@ VOID ToolBarCreate( HWND hWnd, HINSTANCE lcInst )
 
 	SendMessage( ghViewTBWnd, TB_BUTTONSTRUCTSIZE, (WPARAM)sizeof(TBBUTTON), 0 );
 	//	ツールチップ文字列を設定・ボタンテキストがツールチップになる
-	StringCchCopy( atBuff, MAX_STRING , gatViewTBtext[ 0] );	AccelKeyTextBuild( atBuff, MAX_STRING , gstViewTBInfo[ 0].idCommand, pstAccel, iEntry );	gstViewTBInfo[ 0].iString = SendMessage( ghViewTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-	StringCchCopy( atBuff, MAX_STRING , gatViewTBtext[ 1] );	AccelKeyTextBuild( atBuff, MAX_STRING , gstViewTBInfo[ 1].idCommand, pstAccel, iEntry );	gstViewTBInfo[ 1].iString = SendMessage( ghViewTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-	StringCchCopy( atBuff, MAX_STRING , gatViewTBtext[ 2] );	AccelKeyTextBuild( atBuff, MAX_STRING , gstViewTBInfo[ 2].idCommand, pstAccel, iEntry );	gstViewTBInfo[ 2].iString = SendMessage( ghViewTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-	StringCchCopy( atBuff, MAX_STRING , gatViewTBtext[ 3] );	AccelKeyTextBuild( atBuff, MAX_STRING , gstViewTBInfo[ 3].idCommand, pstAccel, iEntry );	gstViewTBInfo[ 3].iString = SendMessage( ghViewTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
-	StringCchCopy( atBuff, MAX_STRING , gatViewTBtext[ 4] );	AccelKeyTextBuild( atBuff, MAX_STRING , gstViewTBInfo[ 4].idCommand, pstAccel, iEntry );	gstViewTBInfo[ 4].iString = SendMessage( ghViewTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING , gatViewTBtext[ 0] );	gstViewTBInfo[ 0].iString = SendMessage( ghViewTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING , gatViewTBtext[ 1] );	gstViewTBInfo[ 1].iString = SendMessage( ghViewTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING , gatViewTBtext[ 2] );	gstViewTBInfo[ 2].iString = SendMessage( ghViewTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING , gatViewTBtext[ 3] );	gstViewTBInfo[ 3].iString = SendMessage( ghViewTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING , gatViewTBtext[ 4] );	gstViewTBInfo[ 4].iString = SendMessage( ghViewTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
 
 	SendMessage( ghViewTBWnd, TB_ADDBUTTONS, (WPARAM)TB_VIEW_ITEMS, (LPARAM)&gstViewTBInfo );	//	ツールバーにボタンを挿入
 	SendMessage( ghViewTBWnd, TB_AUTOSIZE, 0, 0 );	//	ボタンのサイズに合わせてツールバーをリサイズ
@@ -450,8 +445,6 @@ VOID ToolBarCreate( HWND hWnd, HINSTANCE lcInst )
 	//	ツールバーサブクラス化
 	gpfOrigTBProc = SubclassWindow( ghViewTBWnd, gpfToolbarProc );
 
-
-	FREE( pstAccel );
 
 	//配置
 	ZeroMemory( &stRbandInfo, sizeof(REBARBANDINFO) );

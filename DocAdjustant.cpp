@@ -76,7 +76,7 @@ CONST  TCHAR	gaatDotPtrnPeriod[11][9] = {
 	{ TEXT("　　...") },	//	31	9
 	{ TEXT("　 　 ") }		//	32	10
 };
-#define RIGHT_WALL	TEXT('|')
+#define RIGHT_WALL	TEXT('|')	//	右揃え用壁文字
 
 //	右揃え用空白パヤーンユニコード	20120315
 CONST  TCHAR	gaatDotPtrnUnic[11][6] = {
@@ -664,7 +664,7 @@ HRESULT DocRightGuideSet( INT dTop, INT dBottom )
 
 	UINT_PTR	iLines, cchSize;
 	INT			baseDot, i, j, iMz, nDot, sDot, lDot, iUnt, iPadot;
-	TCHAR		ch;
+	TCHAR		ch, atBuffer[MAX_PATH];
 	LPTSTR		ptBuffer;
 	BOOLEAN		bFirst;
 	wstring		wsBuffer;
@@ -673,6 +673,11 @@ HRESULT DocRightGuideSet( INT dTop, INT dBottom )
 	iLines = DocNowFilePageLineCount( );
 	if( 0 > dTop )		dTop = 0;
 	if( 0 > dBottom )	dBottom = iLines - 1;
+
+	//	
+	ZeroMemory( atBuffer, sizeof(atBuffer) );
+	atBuffer[0] = RIGHT_WALL;
+	InitParamString( INIT_LOAD, VS_RGUIDE_MOZI, atBuffer );
 
 	//	一番長いとところを確認
 	baseDot = DocPageMaxDotGet( dTop, dBottom );
@@ -688,7 +693,7 @@ HRESULT DocRightGuideSet( INT dTop, INT dBottom )
 		//	変数使い回し注意
 
 		iPadot = nDot;
-		wsBuffer.clear( );
+		wsBuffer.clear( );	//	アンドゥバッファ用記録
 
 		for( j = 0; iUnt > j; j++ )
 		{
@@ -702,6 +707,7 @@ HRESULT DocRightGuideSet( INT dTop, INT dBottom )
 		if( gbUniPad  ){	iMz = lstrlen( gaatDotPtrnUnic[sDot]  );	}
 		else{				iMz = lstrlen( gaatDotPtrnPeriod[sDot] );	}
 
+		//	揃え線までの空白を埋める
 		for( j = 0; iMz > j; j++ )
 		{
 			if( gbUniPad  ){	ch = gaatDotPtrnUnic[sDot][j];	}	//	20120315
@@ -712,8 +718,9 @@ HRESULT DocRightGuideSet( INT dTop, INT dBottom )
 			nDot += lDot;
 		}
 
-		wsBuffer += RIGHT_WALL;
-		lDot  = DocInputLetter( nDot, i, RIGHT_WALL );
+		//	揃え末端文字入れ込む
+		wsBuffer += atBuffer[0];
+		lDot  = DocInputLetter( nDot, i, atBuffer[0] );
 		nDot += lDot;
 
 		DocBadSpaceCheck( i );	//	ここで空白チェキ

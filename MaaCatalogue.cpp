@@ -152,7 +152,7 @@ DWORD AacInflateAst( LPSTR pcTotal, DWORD cbTotal )
 	LPSTR	pcCaret;	//	読込開始・現在位置
 	LPSTR	pcStart;	//	セパレータの直前
 	LPSTR	pcEnd;
-	LPSTR	pcCheck;
+	//LPSTR	pcCheck;
 	UINT	iNumber;	//	通し番号カウント
 
 	UINT	cbItem;
@@ -199,8 +199,8 @@ DWORD AacInflateAst( LPSTR pcTotal, DWORD cbTotal )
 		stAAbuf.cbItem = pcEnd - pcCaret;	//	CHAR単位であるか
 
 		//＠＠	末端の0x0D単独を外す
-		pcCheck = pcEnd;	pcCheck--;
-		if( 0x0D == *pcCheck )	stAAbuf.cbItem--;
+		//pcCheck = pcEnd;	pcCheck--;
+		//if( 0x0D == *pcCheck )	stAAbuf.cbItem--;
 
 		//	最終頁でない場合は末端の改行分引く
 		//if( !(bLast) && 0 < cbItem ){	cbItem -= CH_CRLF_CCH;	}
@@ -241,7 +241,7 @@ DWORD AacInflateMlt( LPSTR pcTotal, DWORD cbTotal )
 {
 	LPSTR	pcCaret;	//	読込開始・現在位置
 	LPSTR	pcEnd;		//	一つのAAの末端位置・セパレータの直前
-	LPSTR	pcCheck;
+	//LPSTR	pcCheck;
 	DWORD	iNumber;	//	通し番号カウント
 	AAMATRIX	stAAbuf;//	一つのAAの保持・ベクターに入れる
 
@@ -264,11 +264,11 @@ DWORD AacInflateMlt( LPSTR pcTotal, DWORD cbTotal )
 		stAAbuf.cbItem = pcEnd - pcCaret;	//	バイト数なのでこれでいいはず
 
 		//＠＠	末端の0x0D単独を外す
-		if( 0 != stAAbuf.cbItem )
-		{
-			pcCheck = pcEnd;	pcCheck--;
-			if( 0x0D == *pcCheck )	stAAbuf.cbItem--;
-		}
+		//if( 0 != stAAbuf.cbItem )
+		//{
+		//	pcCheck = pcEnd;	pcCheck--;
+		//	if( 0x0D == *pcCheck )	stAAbuf.cbItem--;
+		//}
 
 		stAAbuf.pcItem = (LPSTR)malloc( stAAbuf.cbItem + 2 );
 		ZeroMemory( stAAbuf.pcItem, stAAbuf.cbItem + 2 );
@@ -479,6 +479,58 @@ LPSTR AacAsciiArtGet( DWORD iNumber )
 //-------------------------------------------------------------------------------------------------
 
 /*!
+	通し番号を受けて、内容の最大ドット数と行数とバイト数を戻す
+	@param[in]	iNumber	通し番号０インデックス
+	@param[out]	piLine	行数返す
+	@param[out]	pBytes	バイト数返す（Editorのみ）
+	@return		最大ドット数
+*/
+INT AacArtSizeGet( DWORD iNumber, PINT piLine, PINT pBytes )
+{
+	INT	iDot, cx, cy, iByte = 0;
+	size_t	items;
+	LPSTR	pcConts;
+	LPTSTR	ptString;
+
+	items = gvcArts.size( );
+	if( items <=  iNumber ){	return 0;	}
+
+	if( 0 >= gvcArts.at( iNumber ).stSize.cx || 0 >= gvcArts.at( iNumber ).stSize.cy )
+	{
+		pcConts = (LPSTR)malloc( gvcArts.at( iNumber ).cbItem + 1 );
+		if( pcConts )
+		{
+			TRACE( TEXT("AA Size Calculate[%d]"), iNumber );
+
+			ZeroMemory( pcConts, gvcArts.at( iNumber ).cbItem + 1 );
+			CopyMemory( pcConts, gvcArts.at( iNumber ).pcItem, gvcArts.at( iNumber ).cbItem );
+
+			ptString = SjisDecodeAlloc( pcConts );
+			FREE( pcConts );
+			if( ptString )
+			{
+				cx = TextViewSizeGet( ptString, &cy );
+#ifndef _ORRVW
+				DocRawDataParamGet( ptString, NULL, &iByte );
+#endif
+				FREE( ptString );
+
+				gvcArts.at( iNumber ).stSize.cx = cx;
+				gvcArts.at( iNumber ).stSize.cy = cy;
+				gvcArts.at( iNumber ).iByteSize = iByte;
+			}
+		}
+	}
+
+	iDot    = gvcArts.at( iNumber ).stSize.cx;
+	if( piLine ){	*piLine = gvcArts.at( iNumber ).stSize.cy;	}
+	if( pBytes ){	*pBytes = gvcArts.at( iNumber ).iByteSize;	}
+
+	return iDot;
+}
+//-------------------------------------------------------------------------------------------------
+
+/*!
 	MLTの保持内容を全破棄
 	@return	HRESULT	終了状態コード
 */
@@ -676,6 +728,38 @@ INT_PTR CALLBACK AaItemAddDlgProc( HWND hDlg, UINT message, WPARAM wParam, LPARA
 //-------------------------------------------------------------------------------------------------
 
 /*!
+	通し番号を受けて、それを削除
+	@param[in]	hWnd	親ウインドウハンドル
+	@param[in]	iNumber	通し番号０インデックス・マイナスなら何もしない
+	@return	HRESULT	終了状態コード
+*/
+HRESULT AacItemDelete( HWND hWnd, LONG iNumber )
+{
+	UINT		curSel;
+	MAAM_ITR	itMaaItem;
+
+	if( 0 > iNumber )	return E_OUTOFMEMORY;
+
+	itMaaItem = gvcArts.begin();
+	std::advance( itMaaItem , iNumber );	//	目標まで進める
+
+	//デリート確認がいる
+
+	gvcArts.erase( itMaaItem );	//	デリート処理
+
+	AacItemBackUpCreate( NULL );	//	バックアップしておく
+
+	AacItemOutput( hWnd );	//	ここでファイルを出力更新
+
+	//	追加処理したらリロードする
+	curSel = TabMultipleNowSel(  );
+	AaItemsDoShow( hWnd, gatOpenFile, curSel );
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+
+/*!
 	通し番号を受けて、そこの手前にアイテム追加
 	@param[in]	hWnd	親ウインドウハンドル
 	@param[in]	iNumber	通し番号０インデックス・マイナスなら末尾に追加とする
@@ -722,7 +806,7 @@ HRESULT AacItemInsert( HWND hWnd, LONG iNumber )
 			AacItemOutput( hWnd );
 
 			//追加処理したらリロードする・コンボックスクルヤーとか注意
-			AaTitleClear(  );	//	リロードするので見出しコンボックスくりゃー
+		//	AaTitleClear(  );	//	AaItemsDoShowの中でやってるからここには不要
 			curSel = TabMultipleNowSel(  );
 			AaItemsDoShow( hWnd, gatOpenFile, curSel );
 		}

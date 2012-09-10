@@ -408,6 +408,8 @@
 #define IDB_FUNCKEY_INIT                1248
 #define IDB_FRM_PADDING                 1249
 #define IDS_UNI_USE_LOG                 1250
+#define IDCB_MT_CATEGORY				1251
+#define IDLV_MT_ITEMSTATIC				1252
 #define IDTV_ITEMTREE                   2000
 #define IDTB_TREESEL                    2001
 #define IDSO_AAITEMS                    2002
@@ -646,6 +648,8 @@
 #define IDM_AATABS_RENAME               33016
 #define IDM_MIRROR_INVERSE              33021
 #define IDM_UPSET_INVERSE               33022
+#define IDM_MAAITEM_BKCOLOUR			33023
+#define IDM_PAGENAME_SELASSIGN			33024
 #define IDM_PLUGIN_ITEM_BASE            34000
 #define IDC_STATIC                      -1
 

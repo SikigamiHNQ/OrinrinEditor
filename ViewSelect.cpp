@@ -65,7 +65,7 @@ HRESULT	ViewSqSelAdjust( INT );
 
 /*!
 	選択操作中であるかどうかの問い合わせ
-	@param[out]	pSqSel	矩形選択中であるかどうか
+	@param[out]	pSqSel	矩形選択中であるかどうか・NULL可
 	@return	BOOLEAN	非０選択中である　０選択してない
 */
 BOOLEAN IsSelecting( PUINT pSqSel )

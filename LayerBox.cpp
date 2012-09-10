@@ -1733,15 +1733,15 @@ INT LayerInputLetter( LAYER_ITR itLyr, INT nowDot, INT rdLine, TCHAR ch )
 	try{
 #endif
 	//	データ作成
-	ZeroMemory( &stLetter, sizeof(LETTER) );
-	stLetter.cchMozi = ch;
-	stLetter.rdWidth = ViewLetterWidthGet( ch );
-	stLetter.mzStyle = CT_NORMAL;
-	if( iswspace( ch ) ){	stLetter.mzStyle |= CT_SPACE;	}
-	//	非シフトJIS文字を確認
-	if( !( DocIsSjisTrance(ch,stLetter.acSjis) ) ){	stLetter.mzStyle |= CT_CANTSJIS;	}
-	DocLetterByteCheck( &stLetter );	//	バイト数確認
-	//stLetter.mzByte  = strlen( stLetter.acSjis );
+	DocLetterDataCheck( &stLetter, ch );
+	//ZeroMemory( &stLetter, sizeof(LETTER) );
+	//stLetter.cchMozi = ch;
+	//stLetter.rdWidth = ViewLetterWidthGet( ch );
+	//stLetter.mzStyle = CT_NORMAL;
+	//if( iswspace( ch ) ){	stLetter.mzStyle |= CT_SPACE;	}
+	////	非シフトJIS文字を確認
+	//if( !( DocIsSjisTrance(ch,stLetter.acSjis) ) ){	stLetter.mzStyle |= CT_CANTSJIS;	}
+	//DocLetterByteCheck( &stLetter );	//	バイト数確認
 
 
 	itLyr->vcLyrImg.at( rdLine ).vcLine.push_back( stLetter );

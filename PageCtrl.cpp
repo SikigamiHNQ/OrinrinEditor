@@ -1183,7 +1183,7 @@ INT_PTR CALLBACK PageNameDlgProc( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 	switch( message )
 	{
 		case WM_INITDIALOG:
-			cdPage = lParam;
+			cdPage = lParam;	//	編集する頁番号
 			Edit_SetText( GetDlgItem(hDlg,IDE_PAGENAME), (*gitFileIt).vcCont.at( cdPage ).atPageName );
 			SetFocus( GetDlgItem(hDlg,IDE_PAGENAME) );
 			return (INT_PTR)FALSE;
@@ -1248,6 +1248,29 @@ HRESULT PageListNameSet( INT dPage, LPTSTR ptName )
 	stLvi.pszText  = ptName;
 	stLvi.iSubItem =  1;	//	名前
 	ListView_SetItem( ghPageListWnd, &stLvi );
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+
+/*!
+	今開いている頁の名前をセット
+	@param[in]	ptName	頁名称・６３文字以内
+	@return		HRESULT	終了状態コード
+*/
+HRESULT PageListNameRewrite( LPTSTR ptName )
+{
+	UINT_PTR	cchSize;
+
+	StringCchLength( ptName, STRSAFE_MAX_CCH, &cchSize );
+
+	//	はみ出さないように、サイズ末端を強制NULL
+	if( SUB_STRING <= cchSize ){	ptName[(SUB_STRING-1)] = NULL;	}
+
+	//	本体書き換えて
+	StringCchCopy( (*gitFileIt).vcCont.at( gixFocusPage ).atPageName, SUB_STRING, ptName );
+
+	PageListNameSet( gixFocusPage, ptName );	//	表示も書換
 
 	return S_OK;
 }

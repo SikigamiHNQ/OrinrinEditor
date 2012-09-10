@@ -890,7 +890,7 @@ HRESULT TreeConstruct( HWND hWnd, LPCTSTR ptCurrent, BOOLEAN bSubTabReb )
 
 	StringCchPrintf( atRoote, MAX_PATH, TEXT("ROOT[%s]"), gatAARoot );
 
-	StatusBarMsgSet( 2, TEXT("ツリーを構築中です") );
+	StatusBarMsgSet( SBMAA_FILENAME, TEXT("ツリーを構築中です") );
 
 	TreeView_DeleteAllItems( ghTreeWnd );	//	アイテム全破壊
 	//	ルートアイテム作る
@@ -913,7 +913,7 @@ HRESULT TreeConstruct( HWND hWnd, LPCTSTR ptCurrent, BOOLEAN bSubTabReb )
 	//	ディレクトリ指定が無かったら終わり
 	if( 0 == ptCurrent[0] )
 	{
-		StatusBarMsgSet( 2, TEXT("") );
+		StatusBarMsgSet( SBMAA_FILENAME, TEXT("") );
 		return E_INVALIDARG;
 	}
 
@@ -923,7 +923,7 @@ HRESULT TreeConstruct( HWND hWnd, LPCTSTR ptCurrent, BOOLEAN bSubTabReb )
 
 	//	SQLから展開　ここでは展開しない
 
-	StatusBarMsgSet( 2, TEXT("") );
+	StatusBarMsgSet( SBMAA_FILENAME, TEXT("") );
 	TreeView_Expand( ghTreeWnd, ghTreeRoot, TVE_EXPAND );
 
 	//	副タブもSQLから再構築
@@ -1452,7 +1452,7 @@ INT TreeSelItemProc( HWND hWnd, HTREEITEM hSelItem, UINT dMode )
 		if( 0 == dMode )
 		{
 			StringCchCopy( gatBaseName, MAX_PATH, PathFindFileName( atPath ) );
-			StatusBarMsgSet( 2, atName );	//	ステータスバーにファイル名表示
+			StatusBarMsgSet( SBMAA_FILENAME, atName );	//	ステータスバーにファイル名表示
 		}
 		StringCchCopy( atBaseName, MAX_PATH, PathFindFileName( atPath ) );	//	いつでも記録で大丈夫か	20120530
 	}
@@ -1468,7 +1468,7 @@ INT TreeSelItemProc( HWND hWnd, HTREEITEM hSelItem, UINT dMode )
 		if( 0 == dMode )
 		{
 			StringCchCopy( gatBaseName, MAX_PATH, atName );
-			StatusBarMsgSet( 2, atName );	//	ステータスバーにファイル名表示
+			StatusBarMsgSet( SBMAA_FILENAME, atName );	//	ステータスバーにファイル名表示
 		}
 		StringCchCopy( atBaseName, MAX_PATH, atName );	//	いつでも記録で大丈夫か	20120530
 
@@ -1744,7 +1744,7 @@ INT TabMultipleSelect( HWND hWnd, INT tabSel, UINT dMode )
 					AaItemsDoShow( hWnd, itNulti->atFilePath, ACT_SUBITEM );
 				}
 
-				StatusBarMsgSet( 2, atName );	//	ステータスバーにファイル名表示
+				StatusBarMsgSet( SBMAA_FILENAME, atName );	//	ステータスバーにファイル名表示
 			}
 #ifndef _ORRVW
 			else	//	ファイル名を確保して、さらに編集ビュー側で開く処理をする

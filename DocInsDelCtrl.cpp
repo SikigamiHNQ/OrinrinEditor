@@ -55,8 +55,6 @@ HRESULT	DocDelayPageNumInsert( FILES_ITR, INT, LPPAGENUMINFO, LPCTSTR );
 #endif
 //-------------------------------------------------------------------------------------------------
 
-
-//こういうコードは、DLLから使うようにすれば、より精度の良いのとさしかえとか 
 /*!
 	該当のユニコード文字が、シフトJISに変換出来るかどうか確認
 	@param[in]	cchMozi	確認したい文字彝
@@ -118,6 +116,32 @@ INT_PTR DocLetterByteCheck( LPLETTER pstLet )
 	}
 
 	return pstLet->mzByte;
+}
+//-------------------------------------------------------------------------------------------------
+
+/*!
+	文字データ作る・不要ならバイト数だけ確保できる
+	@param[in]	pstLttr	文字データ入れる構造体へのポインター・NULL可
+	@param[in]	ch		データ作りたい文字
+	@return		改行の次の位置
+*/
+INT_PTR DocLetterDataCheck( LPLETTER pstLttr, TCHAR ch )
+{
+	INT_PTR	iByte;
+	LETTER	stTemp;	//	この函数内用・データ不要時に使うダミー君
+
+	if( !(pstLttr) ){	pstLttr = &stTemp;	}	//	ダミー君
+
+	ZeroMemory( pstLttr, sizeof(LETTER) );
+	pstLttr->cchMozi = ch;
+	pstLttr->rdWidth = ViewLetterWidthGet( ch );
+	pstLttr->mzStyle = CT_NORMAL;
+	if( iswspace( ch ) ){	pstLttr->mzStyle |= CT_SPACE;	}
+	if( !( DocIsSjisTrance( ch, pstLttr->acSjis ) ) ){	pstLttr->mzStyle |= CT_CANTSJIS;	}
+	//	非シフトJIS文字を確認
+	iByte = DocLetterByteCheck( pstLttr  );	//	バイト数確認
+
+	return iByte;
 }
 //-------------------------------------------------------------------------------------------------
 
@@ -576,15 +600,15 @@ INT DocInputLetter( INT nowDot, INT rdLine, TCHAR ch )
 	iCount = itLine->vcLine.size( );
 
 	//	データ作成
-	ZeroMemory( &stLetter, sizeof(LETTER) );
-	stLetter.cchMozi = ch;
-	stLetter.rdWidth = ViewLetterWidthGet( ch );
-	stLetter.mzStyle = CT_NORMAL;
-	if( iswspace( ch ) )	stLetter.mzStyle |= CT_SPACE;
-	//	非シフトJIS文字を確認
-	if( !( DocIsSjisTrance(ch,stLetter.acSjis) ) )	stLetter.mzStyle |= CT_CANTSJIS;
-	//	文字のバイトサイズ確認
-	DocLetterByteCheck( &stLetter );
+	DocLetterDataCheck( &stLetter, ch );
+	//ZeroMemory( &stLetter, sizeof(LETTER) );
+	//stLetter.cchMozi = ch;
+	//stLetter.rdWidth = ViewLetterWidthGet( ch );
+	//stLetter.mzStyle = CT_NORMAL;
+	//if( iswspace( ch ) )	stLetter.mzStyle |= CT_SPACE;
+	////	非シフトJIS文字を確認
+	//if( !( DocIsSjisTrance(ch,stLetter.acSjis) ) )	stLetter.mzStyle |= CT_CANTSJIS;
+	//DocLetterByteCheck( &stLetter );	//	文字のバイトサイズ確認
 
 
 	if( iLetter >=  iCount )	//	文字数同じなら末端に追加ということ

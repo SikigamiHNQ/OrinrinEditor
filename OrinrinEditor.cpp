@@ -20,24 +20,57 @@ If not, see <http://www.gnu.org/licenses/>.
 
 //	注意・コマンドのリソースＩＤ番号は変更不可！
 
+//	TODO:	MAAファイルのコマの削除処理作ってる	MaaItems.cpp
+
+//	TODO:	最小化から復帰すると、MAA非表示でも表示になっちゃう
+//	メイン窓のWM_ACTIVATEに来る前に表示されてる？MAA窓のACTIVATEを捕まえる必要があるか
+
+//	TODO:	選択範囲をASTの頁名にする機能	IDM_PAGENAME_SELASSIGN
+
+
+//	TODO:	ＯＫ？	プレビュー再描画しても、ALLと表示位置を維持する
+
+//	TODO:	汎用ＡＡディレクトリにジャンプできるように、とか・ブックマーク機能？
+
+//	TODO:	右揃え線の文字変更できない？
+
+//	TODO:	保存時の拡張子指定選択・オート、MLT、AST、TXT
 
 //	TODO:	ＭＡＡテンプレ検索ショートカットつけとく
-
-
-//	TODO:	ＯＫ？	ユニコードリスト・使ったヤツの記録とか
 
 //	TODO:	viewerのMLTリストアップ、チェックボックスは灰色できないか
 //			ディレクトリ内の選択非選択がややこしい
 //			ルートディレクトリの更新日時をみて、修正か新規か判断？
 
-//	TODO:	ＯＫ？	右ルーラーみたいな、行ルーラー（３０行とか）を	IDM_UNDER_RULER_TOGGLE
+//	TODO:	MAAのＡＡ表示は高さが狭い
 
+//	TODO:	メニューのヘルプから、説明書ASTをいつでも呼べるようになってるといい
+
+
+//	TODO:	最終行の枠いれると落ちる？
+
+//検索について・文字入力とか削除あったら、ハイライト再計算を？
+//Ｆ５の描画リロードでハイライト付け直しするように
+
+
+//	TODO:	メインのファイルタブに、このファイル意外を閉じる機能をつける
+//	TODO:	頁一覧、選択が移動したら表示頁も追随する＜複数選択つくってから
+//	TODO:	全ピリヲドを消去する機能・ピリヲドの前後を確認して、空白であれば幅に合わせて置き換え・単独なら3dotユニコードで置き換える
+
+//	TODO:	MAAの一コマの編集機能・ファイル名工夫するかフラグで管理
+//			保存するには、そのMAAの開きを維持しておく必要がある
+
+//	TODO:	ページリストも、ばらしたとき閉じられるように
+
+//	TODO:	挿入にある色指定をカスタマイズ出来る
+
+
+//	TODO:	ＯＫ？	ＭＡＡテンプレのステータスバーページ番号の表示が０基準なので１にする
+
+//	TODO:	ＯＫ？	ツールバーにもAcceleratorキー表示する
 //	TODO:	ＯＫ？	バイト数警告の4096は調整出来るように
-
-//	TODO:	プレビュー再描画しても、ALLと表示位置を維持する
-
-//	TODO:	ツールバーにもAcceleratorキー表示する
-
+//	TODO:	ＯＫ？	右ルーラーみたいな、行ルーラー（３０行とか）を	IDM_UNDER_RULER_TOGGLE
+//	TODO:	ＯＫ？	ユニコードリスト・使ったヤツの記録とか
 
 //	TODO:	ＯＫ？	ディレイロード・未ロード頁の全プレビューがおかしい
 //	TODO:	CtrlShiftD の動作は問題無いか
@@ -58,26 +91,7 @@ If not, see <http://www.gnu.org/licenses/>.
 //	TODO:	ＯＫ？	レイヤボックス白ヌキ、１６・２２とか、いくつかパヤーン作っておく
 //	TODO:	ＯＫ？	中CLICKで、開いてるファイル閉じる
 //	TODO:	ＯＫ？	MLT検索、文字列ないなら検索しないようにする
-
-//	TODO:	最終行の枠いれると落ちる？
-
-//検索について・文字入力とか削除あったら、ハイライト再計算を？
-//Ｆ５の描画リロードでハイライト付け直しするように
-
-
-//	TODO:	メインのファイルタブに、このファイル意外を閉じる機能をつける
-//	TODO:	頁一覧、選択が移動したら表示頁も追随する＜複数選択つくってから
-//	TODO:	全ピリヲドを消去する機能・ピリヲドの前後を確認して、空白であれば幅に合わせて置き換え・単独なら3dotユニコードで置き換える
-
-//	TODO:	MAAの一コマの編集機能・ファイル名工夫するかフラグで管理
-//			保存するには、そのMAAの開きを維持しておく必要がある
-
-//	TODO:	ページリストも、ばらしたとき閉じられるように
-
-//	TODO:	挿入にある色指定をカスタマイズ出来る
-
-//	TODO:	viewer側の表示色変更・背景とか
-
+//	TODO:	ＯＫ？	viewer側の表示色変更・背景とか
 
 //考え中
 
@@ -204,11 +218,6 @@ If not, see <http://www.gnu.org/licenses/>.
 
 
 
-
-//	ツールチップのポップディレイは、TTM_SETDELAYTIME で調整出来る
-//	wParam	TTDT_INITIAL	表示までの時間
-//	lParam	The LOWORD specifies the delay time, in milliseconds. The HIWORD must be zero.
-//変わってるように思えない。なんか間違えてるか
 
 
 //	ファイルを読み込むとランタイムエラーでることがある・なんか変更してから？
@@ -448,7 +457,7 @@ ASDファイル　　壱行が壱コンテンツ
 					壱行テンプレで中クルックしたらレイヤボックスが開く
 					MAAツリーでファイル名を中クリックしたら、副タブに追加できる
 					バグ修正いろいろ
-2012/08/23	0.31	MAAに、ファイルの途中にアイテムを追加できるようにした
+2012/09/06	0.31	MAAに、ファイルの途中にアイテムを追加できるようにした
 					MAAの内容表示側にＤ＆Ｄすると、そのファイルを副タブで開く（Viewer込み）
 					※使用には入らないし復元もされない
 					MAAツリーにＤ＆Ｄすると、追加アイテムとしてツリーに追加（Viewer込み）
@@ -469,7 +478,9 @@ ASDファイル　　壱行が壱コンテンツ
 					行数ルーラーを付けた
 					バイト数オーバー警告を設定できるようにした
 					ユニコード表に、使用履歴をつけた
-
+					ＭＡＡ窓の背景色変更出来るようにした
+					プレビューを再描画しても、そのとき開いていた位置と状態を維持できる、はず
+					選択範囲をAST頁名称にする機能追加
 
 
 更新日時注意
@@ -750,19 +761,19 @@ INT APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 
 	ViewingFontNameLoad(  );	//	フォント名確保
 
-	CntxEditInitialise( gatExePath, hInstance );	//	これの後だったのを手前に移動
-
 	// アプリケーションの初期化を実行します:
 	if( !InitInstance( hInstance, nCmdShow , atArgv ) ){	return FALSE;	}
+
+	CntxEditInitialise( gatExePath, hInstance );	//	初期化の後でないといかん
 
 	VertInitialise( gatExePath, hInstance );
 
 	RegisterHotKey( ghMainWnd, IDHK_THREAD_DROP, MOD_CONTROL | MOD_SHIFT, VK_D );
 
 	//	読み込むテーブルに注意
-	//ghAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_ORINRINEDITOR));
 	pstAccel = AccelKeyTableLoadAlloc( &iEntry );
 	AccelKeyTableCreate( pstAccel, iEntry );
+	ToolBarInfoChange( pstAccel, iEntry );	//	ツールバーのツールチップテキストにもキーを表示せる
 	FREE( pstAccel );
 
 #ifdef PLUGIN_ENABLE
@@ -1305,6 +1316,7 @@ WA_CLICKACTIVE	2	マウスクリックによって、ウィンドウがアクティブになります。
 		if( WS_EX_TOPMOST & rdExStyle )	hWorkWnd = HWND_TOPMOST;
 		else							hWorkWnd = hWnd;
 		SetWindowPos( ghPgVwWnd, hWorkWnd, 0, 0, 0, 0, SWP_NOACTIVATE | SWP_NOMOVE | SWP_NOSIZE );
+
 
 		if( InitParamValue( INIT_LOAD, VL_MAA_TOPMOST, 1 ) )	//	
 		{
@@ -2266,8 +2278,9 @@ INT InitParamValue( UINT dMode, UINT dStyle, INT nValue )
 		case  VL_MAA_RETFCS:	StringCchCopy( atKeyName, SUB_STRING, TEXT("MaaRetFocus") );	break;
 		case  VL_PGL_RETFCS:	StringCchCopy( atKeyName, SUB_STRING, TEXT("PageRetFocus") );	break;
 		case  VL_U_RULER_POS:	StringCchCopy( atKeyName, SUB_STRING, TEXT("UnderRuler")  );	break;
-		case VL_U_RULER_VIEW:	StringCchCopy( atKeyName, SUB_STRING, TEXT("UndRulerView") );	break;
-		case VL_PAGEBYTE_MAX:	StringCchCopy( atKeyName, SUB_STRING, TEXT("PageByteMax") );	break;
+		case  VL_U_RULER_VIEW:	StringCchCopy( atKeyName, SUB_STRING, TEXT("UndRulerView") );	break;
+		case  VL_PAGEBYTE_MAX:	StringCchCopy( atKeyName, SUB_STRING, TEXT("PageByteMax") );	break;
+		case  VL_MAA_BKCOLOUR:	StringCchCopy( atKeyName, SUB_STRING, TEXT("MaaBkColour") );	break;
 
 		default:	return nValue;
 	}
@@ -2292,14 +2305,14 @@ INT InitParamValue( UINT dMode, UINT dStyle, INT nValue )
 	文字列の設定内容をセーブロード
 	@param[in]		dMode	非０ロード　０セーブ
 	@param[in]		dStyle	パラメータの種類
-	@param[in,out]	ptFile	ロード：デフォルト文字列　セーブ：保存する文字列　MAX_PATHであること
+	@param[in,out]	ptStr	ロード：デフォルト文字列　セーブ：保存する文字列　MAX_PATHであること
 	@return			HRESULT	終了状態コード
 */
-HRESULT InitParamString( UINT dMode, UINT dStyle, LPTSTR ptFile )
+HRESULT InitParamString( UINT dMode, UINT dStyle, LPTSTR ptStr )
 {
 	TCHAR	atKeyName[MIN_STRING], atDefault[MAX_PATH];
 
-	if(  !(ptFile) )	return E_INVALIDARG;
+	if( !(ptStr) )	return E_INVALIDARG;
 
 	switch( dStyle )
 	{
@@ -2307,17 +2320,18 @@ HRESULT InitParamString( UINT dMode, UINT dStyle, LPTSTR ptFile )
 		case VS_PAGE_FORMAT:	StringCchCopy( atKeyName, SUB_STRING, TEXT("PageFormat")  );	break;
 		case VS_FONT_NAME:		StringCchCopy( atKeyName, SUB_STRING, TEXT("FontName") );		break;
 		case VS_UNI_USE_LOG:	StringCchCopy( atKeyName, SUB_STRING, TEXT("UniUseLog") );		break;
+		case VS_RGUIDE_MOZI:	StringCchCopy( atKeyName, SUB_STRING, TEXT("RightGuideMozi") );	break;
 		default:	return E_INVALIDARG;
 	}
 
 	if( dMode )	//	ロード
 	{
-		StringCchCopy( atDefault, MAX_PATH, ptFile );
-		GetPrivateProfileString( TEXT("General"), atKeyName, atDefault, ptFile, MAX_PATH, gatIniPath );
+		StringCchCopy( atDefault, MAX_PATH, ptStr );
+		GetPrivateProfileString( TEXT("General"), atKeyName, atDefault, ptStr, MAX_PATH, gatIniPath );
 	}
 	else
 	{
-		WritePrivateProfileString( TEXT("General"), atKeyName, ptFile, gatIniPath );
+		WritePrivateProfileString( TEXT("General"), atKeyName, ptStr, gatIniPath );
 	}
 
 	return S_OK;
@@ -2382,6 +2396,7 @@ HRESULT InitWindowPos( UINT dMode, UINT dStyle, LPRECT pstRect )
 		case  WDP_BRTMPL:	StringCchCopy( atAppName, SUB_STRING, TEXT("BrushTmple") );	break;
 		case  WDP_MAATPL:	StringCchCopy( atAppName, SUB_STRING, TEXT("MaaTmple") );	break;
 		case  WDP_PREVIEW:	StringCchCopy( atAppName, SUB_STRING, TEXT("Preview") );	break;
+		case  WDP_MMAATPL:	StringCchCopy( atAppName, SUB_STRING, TEXT("MnMaaTmple") );	break;
 		default:	return E_INVALIDARG;
 	}
 

@@ -64,7 +64,7 @@ static TCHAR	gatTemplatePath[MAX_PATH];	//!<	MLTルートディレクトリ
 static list<OPENHIST>	gltProfHist;	//!<	プロフ開いた履歴・
 EXTERNED HMENU	ghProfHisMenu;			//!<	履歴表示する部分・動的に内容作成せないかん
 
-static CONST INT	giStbRoom[] = { 250 , 350 , -1 };
+static CONST INT	giStbRoom[] = { 150 , 350 , -1 };
 //-------------------------------------------------------------------------------------------------
 
 LRESULT	CALLBACK MaaTmpltWndProc( HWND, UINT, WPARAM, LPARAM );
@@ -84,6 +84,7 @@ VOID	TreeProfCheckState( HWND, HTREEITEM, UINT );				//!<
 #ifdef TREEPROF_AUTOCHECK
 UINT	TreeProfCheckExistent( HWND, LPTSTR, HWND, HTREEITEM, UINT );	//!<	
 #endif
+
 //-------------------------------------------------------------------------------------------------
 
 /*!
@@ -404,9 +405,11 @@ VOID Maa_OnCommand( HWND hWnd, INT id, HWND hwndCtl, UINT codeNotify )
 		case IDM_FILE_CLOSE:	TabMultipleSelDelete( hWnd );	break;
 
 
-		//	ここに来るのは、メインメニューからの選択のみ
+		//	ここに来るのは、メインメニューからの選択のみ？ホントか？
 
 #ifdef _ORRVW
+		case IDM_MAAITEM_BKCOLOUR:	MaaBackColourChoose( hWnd );	break;
+
 		case IDM_ABOUT:	DialogBox( ghInst , MAKEINTRESOURCE(IDD_ORRVWR_ABOUTBOX), hWnd, About );	break;
 		case IDM_EXIT:	DestroyWindow( hWnd );	break;
 
@@ -416,6 +419,7 @@ VOID Maa_OnCommand( HWND hWnd, INT id, HWND hwndCtl, UINT codeNotify )
 
 		case IDM_MAA_PROFILE_MAKE:	TreeProfileOpen( hWnd );	break;
 		case IDM_TREE_RECONSTRUCT:	TreeProfileRebuild( hWnd  );	break;
+
 #else
 		case  IDM_WINDOW_CHANGE:	WindowFocusChange( WND_MAAT,  1 );	break;
 		case  IDM_WINDOW_CHG_RVRS:	WindowFocusChange( WND_MAAT, -1 );	break;
@@ -695,7 +699,7 @@ INT TreeProfileMake( HWND hWnd, LPTSTR ptProf )
 	//	プロファイル名をステータスバーに表示しておく
 	StringCchCopy( atBuffer, MAX_PATH, atFilePath );
 	PathStripPath( atBuffer );
-	StatusBarMsgSet( 0, atBuffer );
+	StatusBarMsgSet( SBMAA_PROFNAME, atBuffer );	//	プロファイル名
 
 	ZeroMemory( atFolder,  sizeof(atFolder) );
 
@@ -1762,6 +1766,4 @@ HRESULT OpenProfileLogging( HWND hWnd, LPCTSTR ptProf )
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-
-
 

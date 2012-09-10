@@ -220,7 +220,6 @@ UINT_PTR DocNowFilePageLineCount( VOID )
 }
 //-------------------------------------------------------------------------------------------------
 
-#ifdef PAGE_DELAY_LOAD
 /*!
 	生データの、総行数と文字数とバイト数を返す
 	@param[out]	ptRaw	生データ
@@ -232,7 +231,7 @@ UINT DocRawDataParamGet( LPCTSTR ptRaw, PINT piMozi, PINT piByte )
 {
 	UINT_PTR	cchSize, d;
 	INT			iMozis, iLines, iBytes, iBy;
-	LETTER	stLetter;
+	//LETTER	stLetter;
 
 	StringCchLength( ptRaw, STRSAFE_MAX_CCH, &cchSize );
 	//	改行を含むので、この時点では文字数ではない
@@ -256,11 +255,12 @@ UINT DocRawDataParamGet( LPCTSTR ptRaw, PINT piMozi, PINT piByte )
 		}
 
 		//	その文字のバイト数を確認
-		ZeroMemory( &stLetter, sizeof(LETTER) );
-		stLetter.cchMozi = ptRaw[d];
-		if( !( DocIsSjisTrance( stLetter.cchMozi, stLetter.acSjis ) ) ){	stLetter.mzStyle |= CT_CANTSJIS;	}
-		//	非シフトJIS文字を確認
-		iBy = DocLetterByteCheck( &stLetter );	//	バイト数確認
+		iBy = DocLetterDataCheck( NULL, ptRaw[d] );
+		//ZeroMemory( &stLetter, sizeof(LETTER) );
+		//stLetter.cchMozi = ptRaw[d];
+		////	非シフトJIS文字を確認
+		//if( !( DocIsSjisTrance( stLetter.cchMozi, stLetter.acSjis ) ) ){	stLetter.mzStyle |= CT_CANTSJIS;	}
+		//iBy = DocLetterByteCheck( &stLetter );	//	バイト数確認
 
 		iBytes += iBy;
 		iMozis++;
@@ -273,7 +273,6 @@ UINT DocRawDataParamGet( LPCTSTR ptRaw, PINT piMozi, PINT piByte )
 }
 //-------------------------------------------------------------------------------------------------
 
-#endif
 
 /*!
 	現在のページの総行数と文字数とバイト数を返す・ついでにバイト情報とか更新・ファイルコア函数

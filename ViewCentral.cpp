@@ -1150,7 +1150,7 @@ INT ViewLetterWidthGet( TCHAR ch )
 	return stSize.cx;
 }
 //-------------------------------------------------------------------------------------------------
-
+//	OrinrinViewerにコピーがあるので注意
 /*!
 	文字列のドット幅を数える
 	@param[in]	ptStr	数えたい文字列
@@ -2250,6 +2250,8 @@ VOID OperationOnCommand( HWND hWnd, INT id, HWND hWndCtl, UINT codeNotify )
 		case IDM_FIND_JUMP_PREV:	FindStringJump( 1, &gdDocXdot, &gdDocLine, &gdDocMozi );	break;
 
 #endif
+		case IDM_PAGENAME_SELASSIGN:	DocSelText2PageName(  );	break;
+
 
 		//	アンドゥする
 		case IDM_UNDO:	OperationUndoRedo( IDM_UNDO, &gdDocXdot, &gdDocLine );	break;
@@ -2571,7 +2573,7 @@ HRESULT ViewColourEditDlg( HWND hWnd )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	バージョン情報ボックスのメッセージハンドラです。
+	編集エリヤ色変更ダイヤログーのメッセージハンドラ
 	@param[in]	hDlg		ダイヤログハンドル
 	@param[in]	message		ウインドウメッセージの識別番号
 	@param[in]	wParam		追加の情報１

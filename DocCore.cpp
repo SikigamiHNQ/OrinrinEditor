@@ -1876,6 +1876,7 @@ HRESULT DocPageDivide( HWND hWnd, HINSTANCE hInst, INT iNow )
 
 /*!
 	ホットキーによる投下の調整
+	@return		HRESULT	終了状態コード
 */
 HRESULT DocThreadDropCopy( VOID )
 {
@@ -1917,3 +1918,41 @@ HRESULT DocThreadDropCopy( VOID )
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
+
+/*!
+	選択範囲のテキストを頁名称にする
+	@return		HRESULT	終了状態コード
+*/
+HRESULT DocSelText2PageName( VOID )
+{
+
+	INT	cbSize;
+	LPVOID	pString = NULL;
+	LPTSTR	ptText;
+	UINT_PTR	cchSize, d;
+
+	if( !( IsSelecting( NULL ) ) )	return  E_ABORT;	//	選択してないなら何もしない
+
+	cbSize = DocSelectTextGetAlloc( D_UNI, &pString, NULL );	//	選択範囲をいただく
+	TRACE( TEXT("BYTE:%d"), cbSize );
+
+	ptText = (LPTSTR)pString;
+	StringCchLength( ptText, STRSAFE_MAX_CCH, &cchSize );
+
+	for( d = 0; cchSize > d; d++ )	//	改行カット
+	{
+		if( 0x0D == ptText[d] )
+		{
+			ptText[d] = NULL;
+			break;
+		}
+	}
+
+	PageListNameRewrite( ptText );
+
+	FREE( pString );
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+

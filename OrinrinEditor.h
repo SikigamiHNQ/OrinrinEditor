@@ -147,6 +147,18 @@ typedef struct tagOPENHISTORY
 typedef list<OPENHIST>::iterator	OPHIS_ITR;
 //----------------
 
+//!	壱文字の情報・受け渡しにも使う
+typedef struct tagLETTER
+{
+	TCHAR	cchMozi;	//!<	文字
+	INT		rdWidth;	//!<	この文字の幅
+	UINT	mzStyle;	//!<	文字のタイプ・空白とかそういうの
+	CHAR	acSjis[10];	//!<	シフトJISコード、もしくは「&#dddd;」形式をいれる
+	INT_PTR	mzByte;		//!<	SJISバイトサイズ
+
+} LETTER, *LPLETTER;
+typedef vector<LETTER>::iterator	LETR_ITR;
+//-----------------------------
 
 #ifndef _ORRVW
 
@@ -237,19 +249,7 @@ typedef struct tagUNDOBUFF
 } UNDOBUFF, *LPUNDOBUFF;
 //-----------------------------
 
-
-//!	壱文字の情報・受け渡しにも使う
-typedef struct tagLETTER
-{
-	TCHAR	cchMozi;	//!<	文字
-	INT		rdWidth;	//!<	この文字の幅
-	UINT	mzStyle;	//!<	文字のタイプ・空白とかそういうの
-	CHAR	acSjis[10];	//!<	シフトJISコード、もしくは「&#dddd;」形式をいれる
-	INT_PTR	mzByte;		//!<	SJISバイトサイズ
-
-} LETTER, *LPLETTER;
-typedef vector<LETTER>::iterator	LETR_ITR;
-//-----------------------------
+//壱文字の情報構造体宣言を↑に移動
 
 //!	壱行の管理
 typedef struct tagONELINE
@@ -316,7 +316,7 @@ typedef list<ONEFILE>::iterator	FILES_ITR;
 
 //	複数ファイル扱うなら、さらにコレを包含すればいい？
 
-//!	壱行・ブラシテンプレ用
+//!	壱行・ブラシテンプレ用・カテゴリ名保持のアレ
 typedef struct tagAATEMPLATE
 {
 	TCHAR	atCtgryName[SUB_STRING];	//!<	セットの名前
@@ -375,6 +375,7 @@ typedef struct tagAAMATRIX
 
 	LPSTR	pcItem;	//!<	読み込んだAAを保持しておくポインタ・SJIS形式のままでいいか？
 
+	INT		iByteSize;	//!<	
 	//	サムネ用
 	INT		iMaxDot;	//!<	横幅最大ドット数
 	INT		iLines;		//!<	使用行数
@@ -433,6 +434,7 @@ BOOLEAN		SelectDirectoryDlg( HWND, LPTSTR, UINT_PTR );	//!<
 
 UINT		ViewMaaMaterialise( LPSTR, UINT, UINT );	//!<	
 INT			ViewStringWidthGet( LPCTSTR );	//!<	
+INT			ViewLetterWidthGet( TCHAR );	//!<	
 
 UINT		ViewMaaItemsModeGet( PUINT );	//!<	
 
@@ -440,6 +442,10 @@ LPTSTR		SjisDecodeAlloc( LPSTR );	//!<
 LPSTR		SjisEntityExchange( LPCSTR );	//!<	
 BOOLEAN		HtmlEntityCheckA( TCHAR, LPSTR , UINT_PTR );	//!<	
 BOOLEAN		HtmlEntityCheckW( TCHAR, LPTSTR, UINT_PTR );	//!<	
+
+BOOLEAN		DocIsSjisTrance( TCHAR, LPSTR );	//!<	
+INT_PTR		DocLetterByteCheck( LPLETTER );	//!<	
+INT_PTR		DocLetterDataCheck( LPLETTER, TCHAR );
 
 BOOLEAN		FileExtensionCheck( LPTSTR, LPTSTR );	//!<	
 
@@ -556,7 +562,6 @@ INT			ViewCaretPosGet( PINT, PINT );	//!<
 HRESULT		ViewFrameInsert( INT  );		//!<	
 HRESULT		ViewMaaItemsModeSet( UINT, UINT );	//!<	
 
-INT			ViewLetterWidthGet( TCHAR );	//!<	
 HRESULT		ViewNowPosStatus( VOID );		//!<	
 
 HRESULT		ViewRedrawSetLine( INT );		//!<	
@@ -615,6 +620,7 @@ HRESULT		PageListDelete( INT );	//!<
 HRESULT		PageListViewChange( INT , INT );	//!<	
 HRESULT		PageListInfoSet( INT, INT, INT );	//!<	
 HRESULT		PageListNameSet( INT , LPTSTR );	//!<	
+HRESULT		PageListNameRewrite( LPTSTR );	//!<	
 INT			PageListIsNamed( FILES_ITR );	//!<	
 
 HRESULT		PageListViewRewrite( INT  );	//!<	
@@ -675,6 +681,8 @@ BOOLEAN		DocRangeIsError( FILES_ITR , INT, INT );	//!<
 UINT_PTR	DocNowFilePageCount( VOID );	//!<	
 UINT_PTR	DocNowFilePageLineCount( VOID );	//!<	
 
+UINT		DocRawDataParamGet( LPCTSTR, PINT, PINT );	//!<	
+
 VOID		DocCaretPosMemory( UINT , LPPOINT );	//!<	
 
 HRESULT		DocOpenFromNull( HWND );	//!<	
@@ -704,9 +712,6 @@ UINT		DocBadSpaceCheck( INT );	//!<
 BOOLEAN		DocBadSpaceIsExist( INT );	//!<	
 
 HRESULT		DocPageDivide( HWND, HINSTANCE, INT );	//!<	
-
-BOOLEAN		DocIsSjisTrance( TCHAR, LPSTR );	//!<	
-INT_PTR		DocLetterByteCheck( LPLETTER );	//!<	
 
 INT			DocInputLetter( INT, INT, TCHAR );	//!<	
 INT			DocInputBkSpace( PINT, PINT );	//!<	
@@ -749,6 +754,8 @@ HRESULT		DocSelRangeGet( PINT, PINT );	//!<
 HRESULT		DocSelRangeReset( PINT, PINT );	//!<	
 VOID		DocSelByteSet( INT );	//!<	
 //BOOLEAN		DocIsSelecting( VOID );
+
+HRESULT		DocSelText2PageName( VOID );	//!<	
 
 LPTSTR		DocClipboardDataGet( PUINT );	//!<	
 HRESULT		DocClipboardDataSet( LPVOID, INT, UINT );	//!<	
@@ -883,4 +890,5 @@ INT_PTR	AacItemCount( UINT );				//!<
 HBITMAP	AacArtImageGet( INT, LPSIZE, LPSIZE );	//!<	
 
 LPSTR	AacAsciiArtGet( DWORD );			//!<	
+INT		AacArtSizeGet( DWORD, PINT, PINT );
 

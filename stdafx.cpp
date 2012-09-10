@@ -368,6 +368,59 @@ LPTSTR SjisDecodeAlloc( LPSTR pcBuff )
 //-------------------------------------------------------------------------------------------------
 
 /*!
+	文字列をうけとって、行数と最大ドット幅を計算
+	@param[in]	ptText	チェキりたいユニコード文字列受け取る
+	@param[out]	piLine	行数返す
+	@return		最大ドット数
+*/
+INT TextViewSizeGet( LPCTSTR ptText, PINT piLine )
+{
+	UINT_PTR	cchSize, i;
+	INT		xDot, yLine, dMaxDot;
+
+	wstring	wString;
+
+
+	StringCchLength( ptText, STRSAFE_MAX_CCH, &cchSize );
+
+	yLine = 1;	dMaxDot = 0;
+	for( i = 0; cchSize > i; i++ )
+	{
+		if( CC_CR == ptText[i] && CC_LF == ptText[i+1] )	//	改行であったら
+		{
+			//	ドット数確認
+			xDot = ViewStringWidthGet( wString.c_str() );
+			if( dMaxDot < xDot )	dMaxDot = xDot;
+
+			wString.clear( );
+			i++;		//	0x0D,0x0Aだから、壱文字飛ばすのがポイント
+			yLine++;	//	改行したから行数数える
+		}
+		else if( CC_TAB == ptText[i] )
+		{
+			//	タブは無かったことにする
+		}
+		else
+		{
+			wString += ptText[i];
+		}
+	}
+
+	if( 1 <= wString.size() )	//	最終行確認
+	{
+		//	ドット数確認
+		xDot = ViewStringWidthGet( wString.c_str() );
+		if( dMaxDot < xDot )	dMaxDot = xDot;
+	}
+
+	if( piLine )	*piLine = yLine;	//	空行だったとしても１行はある
+	return dMaxDot;
+
+//ViewStringWidthGetは、ViewCentral、OrinrinViewerに、それぞれある
+}
+//-------------------------------------------------------------------------------------------------
+
+/*!
 	現在行から、次の行の先頭へ移動
 	@param[in]	pt	改行を検索開始するところ
 	@return		改行の次の位置
