@@ -39,7 +39,7 @@ extern HFONT	ghAaFont;		//	AA用フォント
 extern INT		gbTmpltDock;	//	テンプレのドッキング
 extern BOOLEAN	gbDockTmplView;	//	くっついてるテンプレは見えているか
 
-extern  HWND	ghMainSplitWnd;	//	メインのスプリットバーハンドル
+//extern  HWND	ghMainSplitWnd;	//	メインのスプリットバーハンドル
 extern  LONG	grdSplitPos;	//	スプリットバーの、左側の、画面右からのオフセット
 
 static HIMAGELIST	ghBrushImgLst;
@@ -291,6 +291,27 @@ HWND BrushTmpleInitialise( HINSTANCE hInstance, HWND hParentWnd, LPRECT pstFrame
 	}
 
 	return ghBrTmplWnd;
+}
+//-------------------------------------------------------------------------------------------------
+
+/*!
+	フローティングブラシテンプレの位置リセット
+	@param[in]	hMainWnd	メインウインドウハンドル
+	@return	HRESULT	終了状態コード
+*/
+HRESULT BrushTmplePositionReset( HWND hMainWnd )
+{
+	RECT	wdRect, rect;
+
+	GetWindowRect( hMainWnd, &wdRect );
+	rect.left   = wdRect.right + 32;
+	rect.top    = wdRect.top + 32;
+	rect.right  = BT_WIDTH;
+	rect.bottom = BT_HEIGHT;
+
+	SetWindowPos( ghBrTmplWnd, HWND_TOP, rect.left, rect.top, rect.right, rect.bottom, SWP_SHOWWINDOW | SWP_NOZORDER );
+
+	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 

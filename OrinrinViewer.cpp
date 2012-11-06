@@ -251,6 +251,8 @@ INT InitParamValue( UINT dMode, UINT dStyle, INT nValue )
 		case  VL_MAASEP_STYLE:	StringCchCopy( atKeyName, SUB_STRING, TEXT("MaaSepLine")  );	break;
 		case  VL_MAA_MCLICK:	StringCchCopy( atKeyName, SUB_STRING, TEXT("MaaSubMethod") );	break;
 		case  VL_MAA_BKCOLOUR:	StringCchCopy( atKeyName, SUB_STRING, TEXT("MaaBkColour") );	break;
+		case  VL_THUMB_HORIZ:	StringCchCopy( atKeyName, SUB_STRING, TEXT("ThumbHoriz")  );	break;
+		case  VL_THUMB_VERTI:	StringCchCopy( atKeyName, SUB_STRING, TEXT("ThumbVerti")  );	break;
 		default:	return nValue;
 	}
 
@@ -475,12 +477,13 @@ HRESULT DocClipboardDataSet( LPVOID pDatum, INT cbSize, UINT dStyle )
 
 /*!
 	MAAからSJISを受け取って処理する・Editor側にもある
+	@param[in]	hWnd	ウインドウハンドル
 	@param[in]	pcCont	AAの文字列
 	@param[in]	cbSize	バイト数・末端NULLは含まない
 	@param[in]	dMode	使用モード・デフォもしくは個別指定
 	@return		非０デフォ動作した　０指定モードだった
 */
-UINT ViewMaaMaterialise( LPSTR pcCont, UINT cbSize, UINT dMode )
+UINT ViewMaaMaterialise( HWND hWnd, LPSTR pcCont, UINT cbSize, UINT dMode )
 {
 	LPTSTR		ptString;
 	UINT_PTR	cchSize;
@@ -503,7 +506,7 @@ UINT ViewMaaMaterialise( LPSTR pcCont, UINT cbSize, UINT dMode )
 
 		FREE(ptString);
 	}
-	else if( MAA_DRAUGHT == dMode ){	DraughtItemAdding( pcCont );	}	//	ドラフトボードに追加
+	else if( MAA_DRAUGHT == dMode ){	DraughtItemAdding( hWnd, pcCont );	}	//	ドラフトボードに追加
 	else{	DocClipboardDataSet( pcCont, (cbSize + 1), D_SJIS );	}	//	SJISコピー
 
 

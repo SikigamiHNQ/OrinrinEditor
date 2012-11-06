@@ -119,7 +119,7 @@ static CONST TCHAR	gatInsertTBtext[TB_INSERT_ITEMS][TBT_STRING] = {
 
 
 //	整形
-#define  TB_LAYOUT_ITEMS	16
+#define  TB_LAYOUT_ITEMS	19
 static  TBBUTTON	gstLayoutTBInfo[] = {
 	{  0, IDM_RIGHT_GUIDE_SET,	TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,	{0, 0}, 0, 0  },	//	右揃え線
 	{  1, IDM_INS_TOPSPACE,		TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,	{0, 0}, 0, 0  },	//	行頭に空白挿入
@@ -136,7 +136,10 @@ static  TBBUTTON	gstLayoutTBInfo[] = {
 	{  7, IDM_DECREMENT_DOT,	TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,	{0, 0}, 0, 0  },	//	１ドット減らす
 	{  0, 0,					TBSTATE_ENABLED,	TBSTYLE_SEP,		{0, 0}, 0, 0  },
 	{  8, IDM_INCR_DOT_LINES,	TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,	{0, 0}, 0, 0  },	//	１ドット右へ
-	{  9, IDM_DECR_DOT_LINES,	TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,	{0, 0}, 0, 0  } 	//	１ドット左へ
+	{  9, IDM_DECR_DOT_LINES,	TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,	{0, 0}, 0, 0  },	//	１ドット左へ
+	{  0, 0,					TBSTATE_ENABLED,	TBSTYLE_SEP,		{0, 0}, 0, 0  },
+	{ 12, IDM_DOT_SPLIT_LEFT,	TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,	{0, 0}, 0, 0  },	//	真ん中から１ドット右へ
+	{ 13, IDM_DOT_SPLIT_RIGHT,	TBSTATE_ENABLED,	TBSTYLE_AUTOSIZE,	{0, 0}, 0, 0  } 	//	真ん中から１ドット左へ
 };
 
 static CONST TCHAR	gatLayoutTBtext[TB_LAYOUT_ITEMS][TBT_STRING] = { 
@@ -144,7 +147,8 @@ static CONST TCHAR	gatLayoutTBtext[TB_LAYOUT_ITEMS][TBT_STRING] = {
 	{ TEXT("行頭空白削除") },	{ TEXT("行末空白削除") },	{ TEXT("行末文字削除") },	{ TEXT("") },
 	{ TEXT("左右反転") },	{ TEXT("上下反転") },	{ TEXT("") },
 	{ TEXT("右に寄せる") },	{ TEXT("１ドット増やす") },	{ TEXT("１ドット減らす") },	{ TEXT("") },
-	{ TEXT("全体を１ドット右へ") },	{ TEXT("全体を１ドット左へ") }
+	{ TEXT("全体を１ドット右へ") },	{ TEXT("全体を１ドット左へ") },	{ TEXT("") },
+	{ TEXT("指定位置から左に狭める") },	{ TEXT("指定位置から右へ広げる") }
 };
 
 //	表示
@@ -373,7 +377,7 @@ VOID ToolBarCreate( HWND hWnd, HINSTANCE lcInst )
 	//stToolBmp.hInst = HINST_COMMCTRL;
 	//stToolBmp.nID   = IDB_VIEW_SMALL_COLOR;
 	//SendMessage( ghLayoutTBWnd, TB_ADDBITMAP, 0, (LPARAM)&stToolBmp );
-	ghLayoutImgLst = ImageList_Create( 16, 16, ILC_COLOR24 | ILC_MASK, 12, 1 );
+	ghLayoutImgLst = ImageList_Create( 16, 16, ILC_COLOR24 | ILC_MASK, 14, 1 );
 	resnum = IDBMPQ_LAYOUT_TB_FIRST;
 	for( ici = 0; 12 > ici; ici++ )
 	{
@@ -382,7 +386,18 @@ VOID ToolBarCreate( HWND hWnd, HINSTANCE lcInst )
 		ImageList_Add( ghLayoutImgLst, hImg, hMsq );	//	イメージリストにイメージを追加
 		DeleteBitmap( hImg );	DeleteBitmap( hMsq );
 	}
+	hImg = LoadBitmap( lcInst, MAKEINTRESOURCE( IDBMP_SPLIT_LEFT ) );
+	hMsq = LoadBitmap( lcInst, MAKEINTRESOURCE( IDBMQ_SPLIT_LEFT ) );
+	ImageList_Add( ghLayoutImgLst, hImg, hMsq );	//	イメージリストにイメージを追加
+	DeleteBitmap( hImg );	DeleteBitmap( hMsq );
+
+	hImg = LoadBitmap( lcInst, MAKEINTRESOURCE( IDBMP_SPLIT_RIGHT ) );
+	hMsq = LoadBitmap( lcInst, MAKEINTRESOURCE( IDBMQ_SPLIT_RIGHT ) );
+	ImageList_Add( ghLayoutImgLst, hImg, hMsq );	//	イメージリストにイメージを追加
+	DeleteBitmap( hImg );	DeleteBitmap( hMsq );
+
 	SendMessage( ghLayoutTBWnd, TB_SETIMAGELIST, 0, (LPARAM)ghLayoutImgLst );
+
 
 	SendMessage( ghLayoutTBWnd, TB_SETBUTTONSIZE, 0, MAKELPARAM(16,16) );
 
@@ -400,6 +415,8 @@ VOID ToolBarCreate( HWND hWnd, HINSTANCE lcInst )
 	StringCchCopy( atBuff, MAX_STRING, gatLayoutTBtext[12] );	gstLayoutTBInfo[12].iString = SendMessage( ghLayoutTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
 	StringCchCopy( atBuff, MAX_STRING, gatLayoutTBtext[14] );	gstLayoutTBInfo[14].iString = SendMessage( ghLayoutTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
 	StringCchCopy( atBuff, MAX_STRING, gatLayoutTBtext[15] );	gstLayoutTBInfo[15].iString = SendMessage( ghLayoutTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING, gatLayoutTBtext[17] );	gstLayoutTBInfo[17].iString = SendMessage( ghLayoutTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
+	StringCchCopy( atBuff, MAX_STRING, gatLayoutTBtext[18] );	gstLayoutTBInfo[18].iString = SendMessage( ghLayoutTBWnd, TB_ADDSTRING, 0, (LPARAM)atBuff );
 
 	SendMessage( ghLayoutTBWnd , TB_ADDBUTTONS, (WPARAM)TB_LAYOUT_ITEMS, (LPARAM)&gstLayoutTBInfo );	//	ツールバーにボタンを挿入
 

@@ -24,7 +24,6 @@ If not, see <http://www.gnu.org/licenses/>.
 //	反転用パーツは、必要になったらロードするようにする
 
 
-#ifdef AA_INVERSE
 
 #define IV_MIRROR	1
 #define IV_UPSET	0
@@ -768,8 +767,4 @@ UINT InversePartsCheck( UINT dMode, LPCTSTR ptSource, LPTSTR ptOutput, UINT_PTR 
 	return cchPrt;
 }
 //-------------------------------------------------------------------------------------------------
-
-//#error 作りかけ
-
-#endif
 

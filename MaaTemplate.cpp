@@ -40,6 +40,10 @@ PathStripPath	末端をファイル名ディレクトリ関係なしに切り出す
 #endif
 #define MA_WIDTH	320
 #define MA_HEIGHT	320
+
+#ifdef MAA_TEXT_FIND
+#define TXTFIND_BARHEI	25
+#endif
 //-------------------------------------------------------------------------------------------------
 
 static HINSTANCE	ghInst;		//!<	アプリの実存
@@ -67,13 +71,19 @@ EXTERNED HMENU	ghProfHisMenu;			//!<	履歴表示する部分・動的に内容作成せないかん
 static CONST INT	giStbRoom[] = { 150 , 350 , -1 };
 //-------------------------------------------------------------------------------------------------
 
-LRESULT	CALLBACK MaaTmpltWndProc( HWND, UINT, WPARAM, LPARAM );
+LRESULT	CALLBACK MaaTmpltWndProc( HWND, UINT, WPARAM, LPARAM );	//!<	
 BOOLEAN	Maa_OnCreate( HWND, LPCREATESTRUCT );			//!<	WM_CREATE の処理・固定Editとかつくる
 VOID	Maa_OnPaint( HWND );							//!<	WM_PAINT の処理・枠線描画とか
 VOID	Maa_OnDestroy( HWND );							//!<	WM_DESTROY の処理・BRUSHとかのオブジェクトの破壊を忘れないように
 LRESULT	Maa_OnNotify( HWND , INT, LPNMHDR );			//!<	
 VOID	Maa_OnDrawItem( HWND, CONST DRAWITEMSTRUCT * );	//!<	
 VOID	Maa_OnMeasureItem( HWND, MEASUREITEMSTRUCT * );	//!<	
+
+#ifndef _ORRVW	//	エディタのみ
+VOID	Maa_OnActivate( HWND, UINT, HWND, BOOL );		//!<	
+VOID	Maa_OnShowWindow( HWND, BOOL, UINT );	//!<	
+#endif
+
 
 #define TREEPROF_AUTOCHECK
 
@@ -151,7 +161,7 @@ HWND MaaTmpltInitialise( HINSTANCE hInstance, HWND hParentWnd, LPRECT pstFrame )
 		rect.top  = ( wdRect.bottom - MA_HEIGHT ) / 2;
 #else
 		rect.left   = wdRect.right + 64;
-		rect.top    = wdRect.top + 64;
+		rect.top    = wdRect.top + 64;	//	オフセットは、他のウインドウとかぶらなきゃ良い
 #endif
 		rect.right  = MA_WIDTH;
 		rect.bottom = MA_HEIGHT;
@@ -228,6 +238,28 @@ HWND MaaTmpltInitialise( HINSTANCE hInstance, HWND hParentWnd, LPRECT pstFrame )
 }
 //-------------------------------------------------------------------------------------------------
 
+/*!
+	ＭＡＡ窓の位置リセット
+	@param[in]	hMainWnd	メインウインドウハンドル
+	@return	HRESULT	終了状態コード
+*/
+HRESULT MaaTmpltPositionReset( HWND hMainWnd )
+{
+	RECT	wdRect, rect;
+
+	GetWindowRect( hMainWnd, &wdRect );
+	rect.left   = wdRect.right + 64;
+	rect.top    = wdRect.top + 64;	//	オフセットは、他のウインドウとかぶらなきゃ良い
+	rect.right  = MA_WIDTH;
+	rect.bottom = MA_HEIGHT;
+
+	SetWindowPos( ghMaaWnd, HWND_TOP, rect.left, rect.top, rect.right, rect.bottom, SWP_SHOWWINDOW | SWP_NOZORDER );
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+
+
 #ifndef _ORRVW
 /*!
 	ＭＡＡ窓のＶＩＥＷをtoggleする
@@ -268,6 +300,11 @@ BOOLEAN MaaViewToggle( UINT bSet )
 LRESULT CALLBACK MaaTmpltWndProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam )
 {
 	UINT	uRslt;
+#ifdef MAA_TEXT_FIND
+	INT		itemID;
+	HDC		hdc;
+	HWND	hWndChild;
+#endif
 
 	switch( message )
 	{
@@ -281,12 +318,31 @@ LRESULT CALLBACK MaaTmpltWndProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM
 		HANDLE_MSG( hWnd, WM_DRAWITEM,    Maa_OnDrawItem  );	//	
 		HANDLE_MSG( hWnd, WM_MEASUREITEM, Maa_OnMeasureItem );	//	
 		HANDLE_MSG( hWnd, WM_CONTEXTMENU, Maa_OnContextMenu );	//	
-
+#ifndef _ORRVW	//	エディタのみ
+		HANDLE_MSG( hWnd, WM_ACTIVATE,    Maa_OnActivate  );	//	アクティブになったりはずれたり
+		HANDLE_MSG( hWnd, WM_SHOWWINDOW,  Maa_OnShowWindow );	//	
+#endif
 		HANDLE_MSG( hWnd, WM_KEYDOWN,     Aai_OnKey );			//	20120221
 		HANDLE_MSG( hWnd, WM_KEYUP,       Aai_OnKey );			//	
 
 		HANDLE_MSG( hWnd, WM_VSCROLL,     Aai_OnVScroll );		//	
 
+#ifdef MAA_TEXT_FIND
+		case  WM_CTLCOLORSTATIC:	//	文字列部分の色変更
+			hdc = (HDC)(wParam);
+			hWndChild = (HWND)(lParam);
+
+			itemID = GetDlgCtrlID( hWndChild );
+
+			//	
+			if( IDS_MAA_TXTFIND_FIND   == itemID || IDS_MAA_TXTFIND_MSGBOX == itemID || 
+				IDB_MAA_TXTFIND_TOP_GO == itemID || IDB_MAA_TXTFIND_NOW_GO == itemID )
+			{
+				SetBkColor( hdc, GetSysColor( COLOR_WINDOW ) );
+				return (LRESULT)GetSysColorBrush( COLOR_WINDOW );
+			}
+			break;
+#endif
 		case WM_MOUSEWHEEL:	//	返り値が必要な場合を考慮
 			uRslt = Maa_OnMouseWheel( hWnd, (INT)(SHORT)LOWORD(lParam), (INT)(SHORT)HIWORD(lParam), (INT)(SHORT)HIWORD(wParam), (UINT)(SHORT)LOWORD(wParam) );
 			break;
@@ -297,6 +353,69 @@ LRESULT CALLBACK MaaTmpltWndProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM
 	return DefWindowProc( hWnd, message, wParam, lParam );
 }
 //-------------------------------------------------------------------------------------------------
+
+#ifndef _ORRVW	//	エディタのみ
+
+/*!
+	ウインドウが非表示か表示状態にされたときに飛んでくる
+	@param[in]	hWnd	ウインドウハンドル
+	@param[in]	fShow	非０表示状態にされた　０非表示状態にされた
+	@param[in]	status	０ShowWindow函数で操作された　非０その他の理由
+*/
+VOID Maa_OnShowWindow( HWND hWnd, BOOL fShow, UINT status )
+{
+	INT	rslt;
+/*
+SW_OTHERUNZOOM	 4	The window is being uncovered because a maximize window was restored or minimized.
+SW_OTHERZOOM	 2	The window is being covered by another window that has been maximized.
+SW_PARENTCLOSING 1	The window's owner window is being minimized.
+SW_PARENTOPENING 3	The window's owner window is being restored.
+*/
+	TRACE( TEXT("MAA SHOWWINDOW fShow[%u] status[%u]"), fShow, status );
+
+	if( fShow )	//	表示状態にされたとき
+	{
+		rslt = InitParamValue( INIT_LOAD, VL_MAA_TOPMOST, 1 );
+		if( !(rslt) )	//	非表示指示であった場合は
+		{
+			ShowWindow( ghMaaWnd, SW_HIDE );	//	非表示にしておく
+		}
+	}
+	//ここでも一瞬表示される
+
+	return;
+}
+//-------------------------------------------------------------------------------------------------
+
+/*!
+	あくちぶなったら呼ばれる
+	@param[in]	hWnd			ウインドウハンドル
+	@param[in]	state			状態
+	@param[in]	hWndActDeact	あくちぶ又は非あくちぶになるやつ・NULLでも可
+	@param[in]	fMinimized		最小化ならNULL
+*/
+VOID Maa_OnActivate( HWND hWnd, UINT state, HWND hWndActDeact, BOOL fMinimized )
+{
+//	LONG_PTR	rdExStyle;
+//	HWND		hWorkWnd;
+	BOOL		bStyle;
+
+/*
+WA_INACTIVE		0	ウィンドウが非アクティブになります。
+WA_ACTIVE		1	マウスをクリックする以外の方法 (ウィンドウの選択にキーボード インターフェイスを使用する方法など) で、ウィンドウがアクティブになります。
+WA_CLICKACTIVE	2	マウスクリックによって、ウィンドウがアクティブになります。
+*/
+	bStyle = IsWindowVisible( ghMaaWnd );	//	今の状態確認
+	TRACE( TEXT("MAA ACTIVATE[%d] STATE[%u] HWND[%X][%X] MIN[%u]"), bStyle, state, hWndActDeact, ghMainWnd, fMinimized );
+
+//メイン窓もしくは他のフローティング窓からフォーカスを得た場合はなにもしない
+//単独でアクティベートしたら、メイン窓をフォアグラウンドにする？
+
+	return;
+}
+//-------------------------------------------------------------------------------------------------
+
+#endif
 
 /*!
 	クリエイト。
@@ -309,6 +428,7 @@ BOOLEAN Maa_OnCreate( HWND hWnd, LPCREATESTRUCT lpCreateStruct )
 	HINSTANCE lcInst = lpCreateStruct->hInstance;	//	受け取った初期化情報から、インスタンスハンドルをひっぱる
 	RECT	rect, sbRect, tbRect;
 
+	INT	iTfTop;
 	INT	spPos;
 
 
@@ -318,8 +438,25 @@ BOOLEAN Maa_OnCreate( HWND hWnd, LPCREATESTRUCT lpCreateStruct )
 	ghStsBarWnd = CreateStatusWindow( WS_CHILD | WS_VISIBLE | CCS_BOTTOM | SBARS_SIZEGRIP, TEXT(""), hWnd, IDSB_STATUSBAR );
 	GetClientRect( ghStsBarWnd, &sbRect );
 	rect.bottom -= sbRect.bottom;
-
 	SendMessage( ghStsBarWnd, SB_SETPARTS, 3, (LPARAM)giStbRoom );
+
+#ifdef MAA_TEXT_FIND
+	//	検索パーツ用エリア
+	rect.bottom -= TXTFIND_BARHEI;
+	iTfTop = rect.bottom + 1;
+	//	「検索」スタティック
+	CreateWindowEx( 0, WC_STATIC, TEXT("検索"), WS_VISIBLE | WS_CHILD | SS_RIGHT | SS_CENTERIMAGE, 1, iTfTop, 40, 23, hWnd, (HMENU)IDS_MAA_TXTFIND_FIND, lcInst, NULL );
+	//	検索単語エディット
+	CreateWindowEx( 0, WC_EDIT, TEXT(""), WS_VISIBLE | WS_CHILD | WS_BORDER, 42, iTfTop, 139, 23, hWnd, (HMENU)IDE_MAA_TXTFIND_TEXT, lcInst, NULL );
+	//	先頭から・表示位置からラヂオボタン
+	CreateWindowEx( 0, WC_BUTTON, TEXT("先頭から"), WS_VISIBLE | WS_CHILD | WS_GROUP | BS_AUTORADIOBUTTON | BS_VCENTER, 183, iTfTop, 80, 23, hWnd, (HMENU)IDB_MAA_TXTFIND_TOP_GO, lcInst, NULL );
+	CreateWindowEx( 0, WC_BUTTON, TEXT("次頁から"), WS_VISIBLE | WS_CHILD | BS_AUTORADIOBUTTON | BS_VCENTER, 265, iTfTop, 80, 23, hWnd, (HMENU)IDB_MAA_TXTFIND_NOW_GO, lcInst, NULL );
+	CheckDlgButton( hWnd, IDB_MAA_TXTFIND_TOP_GO, BST_CHECKED );
+	//	↓検索ボタン
+	CreateWindowEx( 0, WC_BUTTON, TEXT("↓検索"), WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON, 347, iTfTop, 65, 23, hWnd, (HMENU)IDB_MAA_TXTFIND_NEXT, lcInst, NULL );
+	//	メッセージ表示枠
+	CreateWindowEx( 0, WC_STATIC, TEXT(""), WS_VISIBLE | WS_CHILD | SS_CENTERIMAGE, 414, iTfTop, 120, 23, hWnd, (HMENU)IDS_MAA_TXTFIND_MSGBOX, lcInst, NULL );
+#endif
 
 	TreeInitialise( hWnd, lcInst, &rect );	//	ツリービューとお気にビュー作る
 
@@ -371,6 +508,7 @@ VOID Maa_OnCommand( HWND hWnd, INT id, HWND hwndCtl, UINT codeNotify )
 		//	サムネイルオーポン
 		case IDM_MAA_THUMBNAIL_OPEN:	DraughtWindowCreate( GetModuleHandle(NULL), ghMaaWnd, 1 );	break;
 
+		//	使用アイテム一覧のリストボックスで操作があった
 		case IDLB_FAVLIST:	FavListSelected( hWnd, codeNotify );	break;
 
 		case IDM_TOPMOST_TOGGLE:	//	常時最全面と通常ウインドウのトグル
@@ -400,8 +538,10 @@ VOID Maa_OnCommand( HWND hWnd, INT id, HWND hwndCtl, UINT codeNotify )
 #endif
 			break;
 
+		//	ＡＡタイトルコンボックスで操作があった
 		case IDCB_AAITEMTITLE:	AaTitleSelect( hWnd, codeNotify );	break;
 
+		//	フォーカスしてるタブを閉じる
 		case IDM_FILE_CLOSE:	TabMultipleSelDelete( hWnd );	break;
 
 
@@ -433,6 +573,11 @@ VOID Maa_OnCommand( HWND hWnd, INT id, HWND hwndCtl, UINT codeNotify )
 			TRACE( TEXT("Ctrl＋↑↓") );
 			break;
 
+#ifdef MAA_TEXT_FIND
+		case IDM_FIND_JUMP_NEXT:	AacFindTextEntry( hWnd, 0 );	break;
+		//	ＡＡ内容検索セヨ
+		case IDB_MAA_TXTFIND_NEXT:	AacFindTextEntry( hWnd, 1 );	break;
+#endif
 		default:	break;
 	}
 
@@ -517,6 +662,7 @@ VOID Maa_OnDestroy( HWND hWnd )
 VOID Maa_OnSize( HWND hWnd, UINT state, INT cx, INT cy )
 {
 	RECT	rect, sbRect, tbRect;
+	INT	iTfTop;
 
 	GetClientRect( hWnd, &rect );
 
@@ -524,7 +670,21 @@ VOID Maa_OnSize( HWND hWnd, UINT state, INT cx, INT cy )
 	GetClientRect( ghStsBarWnd, &sbRect );
 	rect.bottom -= sbRect.bottom;	//	ステータスバーの分の面倒見る
 
-	TabBarResize( hWnd, &rect );
+#ifdef MAA_TEXT_FIND
+	//	検索パーツ用エリア
+	rect.bottom -= TXTFIND_BARHEI;
+	iTfTop = rect.bottom + 1;
+
+	//	検索パーツの再配置
+	SetWindowPos( GetDlgItem(hWnd,IDS_MAA_TXTFIND_FIND),   HWND_TOP,   1, iTfTop, 0, 0, SWP_NOSIZE | SWP_NOZORDER );
+	SetWindowPos( GetDlgItem(hWnd,IDE_MAA_TXTFIND_TEXT),   HWND_TOP,  42, iTfTop, 0, 0, SWP_NOSIZE | SWP_NOZORDER );
+	SetWindowPos( GetDlgItem(hWnd,IDB_MAA_TXTFIND_TOP_GO), HWND_TOP, 183, iTfTop, 0, 0, SWP_NOSIZE | SWP_NOZORDER );
+	SetWindowPos( GetDlgItem(hWnd,IDB_MAA_TXTFIND_NOW_GO), HWND_TOP, 265, iTfTop, 0, 0, SWP_NOSIZE | SWP_NOZORDER );
+	SetWindowPos( GetDlgItem(hWnd,IDB_MAA_TXTFIND_NEXT),   HWND_TOP, 347, iTfTop, 0, 0, SWP_NOSIZE | SWP_NOZORDER );
+	SetWindowPos( GetDlgItem(hWnd,IDS_MAA_TXTFIND_MSGBOX), HWND_TOP, 414, iTfTop, 0, 0, SWP_NOSIZE | SWP_NOZORDER );
+#endif
+
+	TabBarResize( hWnd, &rect );	//	タブバー
 	MaaTabBarSizeGet( &tbRect );
 	rect.top = tbRect.bottom;
 	rect.bottom -= tbRect.bottom;	//	タブバーの分の面倒も見る

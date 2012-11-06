@@ -1452,7 +1452,7 @@ INT TreeSelItemProc( HWND hWnd, HTREEITEM hSelItem, UINT dMode )
 		if( 0 == dMode )
 		{
 			StringCchCopy( gatBaseName, MAX_PATH, PathFindFileName( atPath ) );
-			StatusBarMsgSet( SBMAA_FILENAME, atName );	//	ステータスバーにファイル名表示
+			StatusBarMsgSet( SBMAA_FILENAME , gatBaseName );	//	ステータスバーにファイル名表示
 		}
 		StringCchCopy( atBaseName, MAX_PATH, PathFindFileName( atPath ) );	//	いつでも記録で大丈夫か	20120530
 	}

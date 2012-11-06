@@ -106,26 +106,27 @@ static CONST GUID gcstGUID = { 0x66D3E881, 0x972B, 0x458B, { 0x93, 0x5E, 0x9E, 0
 //	ファイル開いた履歴
 //	プロフ開いた履歴
 #define  FRAME_MLINE	//	枠パーツ複数行
-#define AA_INVERSE		//	上下左右反転機能
 #define ACCELERATOR_EDIT//	キーのアレ編集
 #define USE_HOVERTIP
 //#define PGL_TOOLTIP
 //#define MAA_TOOLTIP
 #define EDGE_BLANK_STYLE	//	レイヤ合成するとき、白ヌキ領域を用意する
-
-
-//	作成中の機能
-//#define HUKUTAB_DRAGMOVE	
-#define MIDDLE_CLICK_CLOSE
-//#define FIND_STRINGS	//	文字列検索機能
-//#define PAGE_MULTISELECT//	頁一覧の複数選択
 #define PAGE_DELAY_LOAD	//	ファイル読み込んだ時は頁展開しない、ひつようになったら開く
-//#define PLUGIN_ENABLE	//	プラグイン機能
 #define UNICODE_USE_LOG
-//#define MINI_TEMPLATE	
+#define MIDDLE_CLICK_CLOSE
 
 #define MAA_IADD_PLUS	//	MAAへのアイテム追加機能拡張
 //	リソースの IDM_MAA_IADD_OPEN IDM_MAA_ITEM_INSERT に注意
+
+
+//	作成中の機能
+//#define FIND_STRINGS	//	文字列検索機能
+#define MAA_TEXT_FIND	//	ＭＡＡで、開いてるファイルから単語Search
+//#define HUKUTAB_DRAGMOVE	
+//#define PAGE_MULTISELECT//	頁一覧の複数選択
+//#define PLUGIN_ENABLE	//	プラグイン機能
+//#define MINI_TEMPLATE	
+#define DOT_SPLIT_MODE	//	真ん中から広げたり縮めたり
 
 //#define WORK_LOG_OUT	
 
@@ -171,13 +172,13 @@ LRESULT	ExceptionMessage( LPCSTR, LPCSTR, UINT, LPARAM );
 #define MAX_STRING	130
 #define BIG_STRING	520
 
-//	ウインドウサイズ
+//	メインウインドウサイズ
 #define W_WIDTH		480
 #define W_HEIGHT	400
 
-//	ウインドウサイズ
-#define WCL_WIDTH	480
-#define WCL_HEIGHT	370
+//	ウインドウサイズ・未使用
+//#define WCL_WIDTH	480
+//#define WCL_HEIGHT	370
 
 //	ドッキングサイズ
 #define PLIST_DOCK	190
@@ -298,6 +299,8 @@ LRESULT	ExceptionMessage( LPCSTR, LPCSTR, UINT, LPARAM );
 #define VS_UNI_USE_LOG	54	//!<	ユニコード文字の使用ログ
 #define VL_MAA_BKCOLOUR	55	//!<	ＭＡＡ窓の背景色変更
 #define VS_RGUIDE_MOZI	56	//!<	右揃え線の文字・壱文字限定
+#define VL_THUMB_HORIZ	57	//!<	ドラフト・サムネの幅
+#define VL_THUMB_VERTI	58	//!<	ドラフト・サムネの高さ
 
 //増やしたら、函数内に取扱つくっておくこと
 

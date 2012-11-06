@@ -24,6 +24,7 @@ typedef struct tagUNICODENAME
 {
 	UINT	dCode;
 	LPTSTR	ptNameStr;
+	UINT	dWidth;
 
 } UNICODENAME, *LPUNICODENAME;
 //-----------------------------
@@ -16150,3 +16151,50 @@ CONST UNICODENAME	gstUniMoziName[] = {
 	{ 0xFFFF, TEXT("<not a character> The value FFFF is guaranteed not to be a Unicode character at all.") }
 };
 
+/*
+
+VOID MoziWidthTableMake( HWND hWnd )
+{
+
+	SIZE	stSize;
+	HFONT	hFtOld, hAaFont;
+	TCHAR	ch;
+	UINT	d;
+	HDC		hdc= GetDC( hWnd );
+
+	HANDLE	hFile;
+	TCHAR	atText[MAX_PATH];
+	UINT_PTR	length;
+	DWORD	wrote;
+
+	hAaFont = CreateFont( 16, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE, DEFAULT_CHARSET, OUT_OUTLINE_PRECIS, CLIP_DEFAULT_PRECIS, PROOF_QUALITY, VARIABLE_PITCH, TEXT("‚l‚r ‚oƒSƒVƒbƒN") );
+	hFtOld = SelectFont( hdc, hAaFont );
+
+	hFile = CreateFile( TEXT("Unicode.txt"), GENERIC_WRITE, 0, NULL, CREATE_NEW, FILE_ATTRIBUTE_NORMAL, NULL );
+
+	for( d = 0x0020; UNINAME_MAX > d; d++ )
+	{
+		ch = gstUniMoziName[d].dCode;
+		if( 0xFFFE <= ch )	break;
+
+		stSize.cx = 0;
+		GetTextExtentPoint32( hdc, &ch, 1, &stSize );
+
+		ZeroMemory( atText, sizeof(atText) );
+		StringCchPrintf( atText, MAX_PATH, TEXT("\t{ 0x%04X, TEXT(\"%s\"), %d },\r\n"), ch, gstUniMoziName[d].ptNameStr, stSize.cx );
+		StringCchLength( atText, MAX_PATH, &length );
+
+		WriteFile( hFile, atText, length*2, &wrote, NULL );
+	}
+
+	SetEndOfFile( hFile );
+	CloseHandle( hFile );
+
+	SelectFont( hdc, hFtOld );
+	DeleteFont( hAaFont );
+	ReleaseDC( hWnd, hdc );
+
+}
+//-------------------------------------------------------------------------------------------------
+
+*/

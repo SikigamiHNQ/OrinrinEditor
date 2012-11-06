@@ -54,6 +54,12 @@
 #define IDM_AAFAVS_POPUP                233
 #define IDD_COLOUR_DLG                  234
 #define IDD_ACCEL_KEY_DLG               235
+#define IDS_MAA_TXTFIND_FIND			241
+#define IDE_MAA_TXTFIND_TEXT			242
+#define IDB_MAA_TXTFIND_TOP_GO			243
+#define IDB_MAA_TXTFIND_NOW_GO			244
+#define IDB_MAA_TXTFIND_NEXT			245
+#define IDS_MAA_TXTFIND_MSGBOX			246
 #define IDBMPQ_MAIN_TB_FIRST            301
 #define IDBMP_FILE_NEW                  301
 #define IDBMQ_FILE_NEW                  302
@@ -139,6 +145,12 @@
 #define IDBMQ_DRAUGHTBOARD              438
 #define IDBMP_THUMBNAIL                 439
 #define IDBMQ_THUMBNAIL                 440
+
+#define IDBMP_SPLIT_LEFT				441
+#define IDBMQ_SPLIT_LEFT				442
+#define IDBMP_SPLIT_RIGHT				443
+#define IDBMQ_SPLIT_RIGHT				444
+
 #define IDBMPQ_PAGE_TB_FIRST            461
 #define IDBMP_PAGECREATE                461
 #define IDBMQ_PAGECREATE                462
@@ -537,6 +549,11 @@
 #define IDM_FIND_JUMP_NEXT              32863
 #define IDM_FIND_JUMP_PREV              32864
 #define IDM_FIND_TARGET_SET             32865
+
+#define IDM_DOT_SPLIT_RIGHT				32871
+#define IDM_DOT_SPLIT_LEFT				32872
+
+#define IDM_POSITION_RESET				32898
 #define IDM_PAGEL_RETURN_FOCUS          32899
 #define IDM_PAGEL_DETAIL                32900
 #define IDM_PAGEL_ADD                   32901
@@ -650,6 +667,11 @@
 #define IDM_UPSET_INVERSE               33022
 #define IDM_MAAITEM_BKCOLOUR			33023
 #define IDM_PAGENAME_SELASSIGN			33024
+#define IDM_DB_THUMB_ULTRALIGHT			33032
+#define IDM_DB_THUMB_REGULAR			33034
+#define IDM_DB_THUMB_DEMIBOLD			33036
+#define IDM_DB_THUMB_ULTRABOLD			33038
+
 #define IDM_PLUGIN_ITEM_BASE            34000
 #define IDC_STATIC                      -1
 

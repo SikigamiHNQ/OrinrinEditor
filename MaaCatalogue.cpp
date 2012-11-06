@@ -76,7 +76,7 @@ HRESULT	AacItemOutput( HWND );
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	バックアップディレクトリーを確保
+	バックアップディレクトリーを確保・起動時に壱回呼ばれるだけ
 	@param[in]	ptCurrent	基準ディレクトリ
 */
 VOID AacBackupDirectoryInit( LPTSTR ptCurrent )
@@ -408,12 +408,13 @@ INT_PTR AacItemCount( UINT reserve )
 
 /*!
 	通し番号を受けて、HBITMAPとサイズを返す
+	@param[in]	hWnd	ウインドウハンドル
 	@param[in]	iNumber	通し番号０インデックス
 	@param[out]	pstSize	大きさ
 	@param[out]	pstArea	ドットｘライン
 	@return	HBITMAP	AAの内容のビットマップを返す。已にあるならそのまま、アイテムないならNULL
 */
-HBITMAP AacArtImageGet( INT iNumber, LPSIZE pstSize, LPSIZE pstArea )
+HBITMAP AacArtImageGet( HWND hWnd, INT iNumber, LPSIZE pstSize, LPSIZE pstArea )
 {
 	INT_PTR		iItems, i;
 	MAAM_ITR	itArts;
@@ -445,7 +446,7 @@ HBITMAP AacArtImageGet( INT iNumber, LPSIZE pstSize, LPSIZE pstArea )
 
 
 	//	未確保の場合
-	DraughtAaImageing( &(*itArts) );
+	DraughtAaImageing( hWnd, &(*itArts) );
 
 	pstSize->cx = itArts->stSize.cx;
 	pstSize->cy = itArts->stSize.cy;
@@ -466,6 +467,7 @@ LPSTR AacAsciiArtGet( DWORD iNumber )
 {
 	size_t	items;
 	LPSTR	pcBuff;
+//	MAAM_ITR	itMaam;
 
 	items = gvcArts.size( );
 	if( items <= iNumber )	return NULL;
@@ -613,6 +615,8 @@ LRESULT CALLBACK AacFavInflate( UINT dLength, UINT dummy, UINT fake, LPCVOID pcC
 }
 //-------------------------------------------------------------------------------------------------
 
+
+
 #ifdef MAA_IADD_PLUS
 
 #ifndef _ORRVW
@@ -681,18 +685,21 @@ INT_PTR CALLBACK AaItemAddDlgProc( HWND hDlg, UINT message, WPARAM wParam, LPARA
 					EndDialog(hDlg, 0 );
 					return (INT_PTR)TRUE;
 
-				case IDB_MAID_ADDGO:
+				case IDB_MAID_ADDGO:	//	追加実行
 					if( ptBuffer )
 					{
 						StringCchLength( ptBuffer, STRSAFE_MAX_CCH, &cchSize );
-						cchSize += 2;
+						cchSize += 4;
 						pstIaInfo->ptContent = (LPTSTR)malloc( cchSize * sizeof(TCHAR) );
 						StringCchCopy( pstIaInfo->ptContent, cchSize, ptBuffer );
+						//	スプリッタ用の改行
+						StringCchCat( pstIaInfo->ptContent, cchSize, CH_CRLFW );
 
-						if( !(pstIaInfo->bType) )
+						if( !(pstIaInfo->bType) )	//	ASTならタイトル頂く
 						{
 							GetDlgItemText( hDlg, IDE_MAID_ITEMNAME, atName, MAX_PATH );
-							StringCchPrintf( pstIaInfo->atSep, MAX_STRING, TEXT("[AA][%s]\r\n"), atName );
+					//		StringCchPrintf( pstIaInfo->atSep, MAX_STRING, TEXT("[AA][%s]\r\n"), atName );	//	このままではタグが多重に保存されてまう
+							StringCchCopy( pstIaInfo->atSep, MAX_STRING, atName );
 						}
 					}
 					FREE(ptBuffer);
@@ -799,11 +806,9 @@ HRESULT AacItemInsert( HWND hWnd, LONG iNumber )
 
 			FREE( stIaInfo.ptContent );
 
-			//	バックアップしておく
-			AacItemBackUpCreate( NULL );
+			AacItemBackUpCreate( NULL );	//	バックアップしておく
 
-			//	ここでファイルを出力更新
-			AacItemOutput( hWnd );
+			AacItemOutput( hWnd );	//	ここでファイルを出力更新
 
 			//追加処理したらリロードする・コンボックスクルヤーとか注意
 		//	AaTitleClear(  );	//	AaItemsDoShowの中でやってるからここには不要
@@ -872,29 +877,25 @@ HRESULT AacItemOutput( HWND hWnd )
 	//	全部出力していく
 	for( i = 0, itAamx = gvcArts.begin(); gvcArts.end() != itAamx; itAamx++, i++ )
 	{
-		//	区切りを出力
+		//	区切りを出力	余計な改行が本文にくっつくのを修正
 		ZeroMemory( acSep, sizeof(acSep) );	cbSize = 0;
 		if( isAST )	//	ASTファイルである
 		{
-			StringCchPrintfA( acSep, MAX_STRING, ("[AA][%s]%s"), itAamx->acAstName, CH_CRLFA );
-			StringCchLengthA( acSep, MAX_STRING, &cbSize );
+			StringCchPrintfA( acSep , MAX_STRING, ("[AA][%s]%s"), itAamx->acAstName, CH_CRLFA );
 		}
 		else	//	MLTである。TXTかもしれない。
 		{
-			if( 1 <= i )
+			if( 1 <= i )	//	ファイル先頭には不要
 			{
 				StringCchPrintfA( acSep, MAX_STRING, ("%s%s"), MLT_SEPARATERA, CH_CRLFA );
-				cbSize = MLT_SPRT_CCH + CH_CRLF_CCH;
 			}
 		}
-		WriteFile( hFile, acSep, cbSize, &wrote, NULL );
+		StringCchLengthA( acSep , MAX_STRING, &cbSize );	//	長さ確認、MLTの場合注意
+		if( cbSize ){	WriteFile( hFile, acSep, cbSize, &wrote, NULL );	}
 
 		//	本文出力
 		StringCchLengthA( itAamx->pcItem, STRSAFE_MAX_CCH, &cbSize );
 		WriteFile( hFile, itAamx->pcItem, cbSize, &wrote, NULL );
-
-		//	次への改行
-		if( (i+1) < iPage ){	WriteFile( hFile, CH_CRLFA, 2, &wrote, NULL );	}
 	}
 
 	SetEndOfFile( hFile );

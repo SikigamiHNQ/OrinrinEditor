@@ -98,7 +98,7 @@ BEGIN
         MENUITEM "選択文字列を頁名にする(&N)",			IDM_PAGENAME_SELASSIGN
         MENUITEM SEPARATOR
         MENUITEM "文字列検索(&F)",						IDM_FIND_DLG_OPEN
-        MENUITEM "検索ハイライト解除(&H)",				IDM_FIND_HIGHLIGHT_OFF
+        MENUITEM "検索設定リセット(&H)",				IDM_FIND_HIGHLIGHT_OFF
     END
     POPUP "挿入(&I)"
     BEGIN
@@ -161,8 +161,8 @@ BEGIN
     END
     POPUP "整形(&P)"
     BEGIN
-        MENUITEM "右揃え線(&R)",			IDM_RIGHT_GUIDE_SET
-        MENUITEM "行頭に全角空白追加(&I)",	IDM_INS_TOPSPACE
+        MENUITEM "右揃え線(&R)",						IDM_RIGHT_GUIDE_SET
+        MENUITEM "行頭に全角空白追加(&I)",				IDM_INS_TOPSPACE
         MENUITEM SEPARATOR
         MENUITEM "行頭空白削除(&U)",					IDM_DEL_TOPSPACE
         MENUITEM "行末空白削除(&G)",					IDM_DEL_LASTSPACE
@@ -181,6 +181,8 @@ BEGIN
         MENUITEM SEPARATOR
         MENUITEM "全体を１ドット右へ(&J)",				IDM_INCR_DOT_LINES
         MENUITEM "全体を１ドット左へ(&K)",				IDM_DECR_DOT_LINES
+        MENUITEM "指定位置から左に狭める(&Q)",			IDM_DOT_SPLIT_LEFT
+        MENUITEM "指定位置から右へ広げる(&P)",			IDM_DOT_SPLIT_RIGHT
         MENUITEM SEPARATOR
         POPUP "ドットずれ調整(&A)"
         BEGIN
@@ -246,8 +248,6 @@ BEGIN
         MENUITEM SEPARATOR
         MENUITEM "レイヤで開く(&L)",				IDM_MAA_SET_LAYERBOX
         MENUITEM SEPARATOR
-        MENUITEM "削除(&D)",						IDM_MAA_FAV_DELETE, GRAYED
-        MENUITEM SEPARATOR
         MENUITEM "サムネイル一覧表示(&H)",			IDM_MAA_THUMBNAIL_OPEN
         MENUITEM SEPARATOR
         MENUITEM "ＡＡポップアップ表示(&T)",		IDM_MAA_AATIP_TOGGLE
@@ -256,6 +256,7 @@ BEGIN
         MENUITEM "背景色変更(&K)",					IDM_MAAITEM_BKCOLOUR
         MENUITEM SEPARATOR
         MENUITEM "ここにアイテム追加(&A)",			IDM_MAA_ITEM_INSERT
+        MENUITEM "アイテムを削除(&D)",				IDM_MAA_FAV_DELETE
     END
 END
 
@@ -333,10 +334,16 @@ BEGIN
         MENUITEM "コピー(Shift&JIS)",			IDM_DRAUGHT_SJISCLIP
         MENUITEM SEPARATOR
         MENUITEM "アイテムを削除(&D)",			IDM_DRAUGHT_DELETE
-        MENUITEM SEPARATOR
-        MENUITEM "全内容をエクスポート(&E)",	IDM_DRAUGHT_EXPORT
-        MENUITEM SEPARATOR
         MENUITEM "全内容を削除(&K)",			IDM_DRAUGHT_ALLDELETE
+        MENUITEM SEPARATOR
+        POPUP "イメージサイズ"
+		BEGIN
+			MENUITEM "控えめ  80px",	IDM_DB_THUMB_ULTRALIGHT
+			MENUITEM "標準的 128px",	IDM_DB_THUMB_REGULAR
+			MENUITEM "大きめ 160px",	IDM_DB_THUMB_DEMIBOLD
+			MENUITEM "デカい 192px",	IDM_DB_THUMB_ULTRABOLD
+		END
+        MENUITEM "全内容をエクスポート(&E)",	IDM_DRAUGHT_EXPORT
         MENUITEM "ドラフトボードを閉じる(&Q)",	IDM_DRAUGHT_CLOSE
     END
 END
@@ -420,7 +427,7 @@ CAPTION "バージョン情報 - Orinrin Editor"
 FONT 9, "MS UI Gothic"
 BEGIN
     ICON            IDI_ORINRINEDITOR,IDC_MYICON,6,6,20,20
-    LTEXT           "Orinrin Editor, Version 0.31 Aurora (2012.910.2200.920)",IDC_STATIC,36,6,168,8,SS_NOPREFIX
+    LTEXT           "Orinrin Editor, Version 0.32 Aurora (2012.1105.2200.920)",IDC_STATIC,36,6,168,8,SS_NOPREFIX
     LTEXT           "Copyright (C) 2011 - 2012 Orinrin/SikigamiHNQ",IDC_STATIC,36,18,168,8
     LTEXT           "Site ： お燐ちゃんは俺の嫁．ｃｏｍ",IDC_STATIC,36,30,168,8
     DEFPUSHBUTTON   "OK",IDOK,84,180,48,12,WS_GROUP
@@ -905,8 +912,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 2012,910,2200,920
- PRODUCTVERSION 0,31,0,920
+ FILEVERSION 2012,1105,2200,920
+ PRODUCTVERSION 0,32,0,920
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -931,8 +938,8 @@ BEGIN
             VALUE "LegalTrademarks", "License : GPLv3"
             VALUE "PrivateBuild", "Build by Visual C++ 2008 Express"
             VALUE "SpecialBuild", "Not Speciality"
-            VALUE "FileVersion", "2012.910.2200.920"
-            VALUE "ProductVersion", "0.31.0.920"
+            VALUE "FileVersion", "2012.1105.2200.920"
+            VALUE "ProductVersion", "0.32.0.920"
             VALUE "FileDescription", "AsciiArt Story Editor by Orinrin!"
             VALUE "OriginalFilename", "OrinrinEditor.exe"
             VALUE "InternalName", "Orinrin Editor"
@@ -1062,6 +1069,12 @@ IDBMP_RIGHTGUIDE        BITMAP                  "resource\\RightGuide.bmp"
 IDBMQ_RIGHTGUIDE        BITMAP                  "resource\\RightGuide_q.bmp"
 IDBMP_RIGHTSLIDE        BITMAP                  "resource\\RightShift.bmp"
 IDBMQ_RIGHTSLIDE        BITMAP                  "resource\\RightShift_q.bmp"
+
+IDBMP_SPLIT_LEFT		BITMAP                  "resource\\DotSplitLeft.bmp"
+IDBMQ_SPLIT_LEFT		BITMAP                  "resource\\DotSplitLeft_q.bmp"
+IDBMP_SPLIT_RIGHT		BITMAP                  "resource\\DotSplitRight.bmp"
+IDBMQ_SPLIT_RIGHT		BITMAP                  "resource\\DotSplitRight_q.bmp"
+
 IDBMP_SETTING           BITMAP                  "resource\\Setting.bmp"
 IDBMQ_SETTING           BITMAP                  "resource\\Setting_q.bmp"
 IDBMP_SJISCOPY          BITMAP                  "resource\\SJIScopy.bmp"

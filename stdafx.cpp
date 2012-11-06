@@ -31,6 +31,15 @@ extern  UINT	gbUniRadixHex;	//	ユニコード数値参照が１６進数であるか
 #endif
 //------------------------------------------------------------------------------------------------------------------------
 
+//	文字列検索は簡易Boyer-Moore法
+typedef struct tagFINDPATTERN
+{
+	TCHAR	cchMozi;
+	INT		iDistance;
+
+} FINDPATTERN, *LPFINDPATTERN;
+//--------------------------------
+
 //	確認チェックメッセージダイヤログ用
 typedef struct tagMSGBOXMSG
 {
@@ -525,6 +534,99 @@ LPSTR SjisEncodeAlloc( LPCTSTR ptTexts )
 //-------------------------------------------------------------------------------------------------
 #endif
 
+
+/*!
+	BM検索テーブルつくる
+	@param[in]	ptPattern	検索パターン
+	@return	LPFINDPATTERN	作成した検索テーブル
+*/
+LPFINDPATTERN FindTableMake( LPCTSTR ptPattern )
+{
+	UINT		i;
+	UINT_PTR	dLength;
+	LPFINDPATTERN	pstPtrn;
+
+	//	テーブルをパターンの長さで初期化する
+	StringCchLength( ptPattern, STRSAFE_MAX_CCH, &dLength );
+	pstPtrn = (LPFINDPATTERN)malloc( (dLength+1) * sizeof(FINDPATTERN) );
+	ZeroMemory( pstPtrn, (dLength+1) * sizeof(FINDPATTERN) );
+
+	for( i = 0; dLength >= i; i++ ){	pstPtrn[i].iDistance =  dLength;	}
+
+	//	パターンの先頭から、文字に対応する位置に末尾からの長さを登録する
+	while( dLength > 0 )
+	{
+		i = 0;
+		while( pstPtrn[i].cchMozi )
+		{
+			if( pstPtrn[i].cchMozi ==  *ptPattern ){	break;	}
+			i++;
+		}
+		pstPtrn[i].cchMozi   = *ptPattern;
+		pstPtrn[i].iDistance = --dLength;
+
+		ptPattern++;
+	}
+
+	return pstPtrn;
+}
+//-------------------------------------------------------------------------------------------------
+
+/*!
+	BM検索する
+	@param[in]	ptText		検索対象文字列
+	@param[in]	ptPattern	検索パターン
+	@param[out]	pdCch		ヒットした文字位置数・なかったら0
+	@return		LPTSTR		ヒットした部分の開始・なかったらNULL
+*/
+LPTSTR FindStringProc( LPTSTR ptText, LPTSTR ptPattern, LPINT pdCch )
+{
+	UINT_PTR	dPtrnLen, dLength;
+	LPTSTR	ptTextEnd;
+	INT		i, j, k, jump, cch;
+
+	LPFINDPATTERN	pstPattern;
+
+	StringCchLength( ptText, STRSAFE_MAX_CCH, &dLength );
+
+	StringCchLength( ptPattern, STRSAFE_MAX_CCH, &dPtrnLen );
+	dPtrnLen--;
+
+	ptTextEnd = ptText + dLength - dPtrnLen;
+
+	pstPattern = FindTableMake( ptPattern );
+
+	cch = 0;
+	while( ptText < ptTextEnd )
+	{
+		for( i = dPtrnLen ; i >= 0 ; i-- )
+		{
+			if( ptText[i] != ptPattern[i] ){	break;	}
+		}
+
+		//	全て一致した
+		if( i < 0 ){	FREE( pstPattern  );	*pdCch = cch;	return( ptText );	}
+
+		//	テーブルから移動量を求める(負数なら移動量は２)
+		k = 0;
+		while( pstPattern[k].cchMozi )
+		{
+			if( pstPattern[k].cchMozi == ptText[i] ){	break;	}
+			k++;
+		}
+		j = pstPattern[k].iDistance - ( dPtrnLen - i );
+		jump = ( 0 < j ) ? j : 2;
+		ptText += jump;
+		cch += jump;
+	}
+
+	FREE( pstPattern );
+
+	*pdCch = 0;
+
+	return( NULL );
+}
+//-------------------------------------------------------------------------------------------------
 
 /*!
 	次から表示しないチェキボックス付きダイヤログボックスプロシージャ

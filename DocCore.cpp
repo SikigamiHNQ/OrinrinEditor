@@ -1160,6 +1160,12 @@ UINT DocDelayPageLoad( FILES_ITR itFile, INT iPage )
 	//	DocPageParamGet( NULL, NULL );	//	再計算しちゃう＜文字追加でやってるので問題無い
 
 		FREE( itFile->vcCont.at( iPage ).ptRawData  );	//	NULLか否かを見るので注意
+
+#ifdef FIND_STRINGS
+		//	検索内容が生きてたらハイライツ処理
+		FindDelayPageReSearch( iPage );
+#endif
+
 	}
 	else
 	{

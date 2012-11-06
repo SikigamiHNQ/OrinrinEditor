@@ -256,7 +256,7 @@ LONG SplitBarResize( HWND hSplitWnd, LPRECT ptRect )
 {
 	RECT	rect;
 
-	SplitBarPosGet( hSplitWnd, &rect );
+	SplitBarPosGet( hSplitWnd, &rect );	//	¶‚©‚ç‚ÌˆÊ’u‚ª•Ï‚í‚ç‚È‚¢
 
 	SetWindowPos( hSplitWnd, HWND_TOP, rect.left, ptRect->top, SPLITBAR_WIDTH, ptRect->bottom, 0 );
 

@@ -20,21 +20,45 @@ If not, see <http://www.gnu.org/licenses/>.
 
 //	注意・コマンドのリソースＩＤ番号は変更不可！
 
-//	TODO:	MAAファイルのコマの削除処理作ってる	MaaItems.cpp
+//	TODO:	ＯＫ？	MAAファイルのコマの削除処理作ってる	MaaItems.cpp
+//	TODO:	ＯＫ？	MAA表示中のヤツから文字列検索する機能
+//	TODO:	ＯＫ？	ドラフト・サムネのサイズ変更機能
+//	TODO:	ＯＫ？	最大化したり画面サイズかえると、右の頁一覧が見えなくなる
+//	TODO:	ＯＫ？	最大化して終わる＞起動して、最大化解除すると、メインスプリットバーが見えなくなる//右にイッちゃってるまま
+
+//	TODO:	ＯＫ？	位置情報のリセット機能・システムメニューに搭載する
+//	TODO:	ＯＫ？	メインスプリットバーの位置情報リセットが居るかも
+
+//	TODO:	ＯＫ？	本文の途中から左右にずらす機能。キャレット位置を基準に、そこから右を、左右にずらす。
+//			もしくは選択範囲のみ。開始位置に注意
+//			まんなかの空白を伸び縮みさせる感じか
+//	#ifdef DOT_SPLIT_MODE
+
+
+//	TODO:	ＯＫ？	MAA窓で、この欄で右クリックし「ここにアイテムを追加」でAAを追加した際、
+//			そのmltの他AA全ての末尾に改行が何個か勝手に追加される
+
+
+//本文検索、Ｆ３で表示更新？
+
+
+//直したのでチェキせよ
+//	TODO:	追加されるページセパレーターが「[AA][[AA][<追加時に入力したページタイトル>]<改行>]」ってなるみたい。
+//	TODO:	頁切り替えた時、最後の頁のところまで頁一覧をスクロール
+
+
+//	TODO:	ディレイロード・Ctrl Shift D の動作は問題無いか
+
+//	TODO:	保存時の拡張子指定選択・オート、MLT、AST＜TXTを使わなければそれでいい感じ
+//	TODO:	全文字の幅を先に計算しておけば速いかもだ＜さして影響ないかもだ
 
 //	TODO:	最小化から復帰すると、MAA非表示でも表示になっちゃう
 //	メイン窓のWM_ACTIVATEに来る前に表示されてる？MAA窓のACTIVATEを捕まえる必要があるか
-
-//	TODO:	選択範囲をASTの頁名にする機能	IDM_PAGENAME_SELASSIGN
-
-
-//	TODO:	ＯＫ？	プレビュー再描画しても、ALLと表示位置を維持する
+//	なぜか一瞬見える。どのタイミングか？
 
 //	TODO:	汎用ＡＡディレクトリにジャンプできるように、とか・ブックマーク機能？
 
 //	TODO:	右揃え線の文字変更できない？
-
-//	TODO:	保存時の拡張子指定選択・オート、MLT、AST、TXT
 
 //	TODO:	ＭＡＡテンプレ検索ショートカットつけとく
 
@@ -46,8 +70,8 @@ If not, see <http://www.gnu.org/licenses/>.
 
 //	TODO:	メニューのヘルプから、説明書ASTをいつでも呼べるようになってるといい
 
-
 //	TODO:	最終行の枠いれると落ちる？
+
 
 //検索について・文字入力とか削除あったら、ハイライト再計算を？
 //Ｆ５の描画リロードでハイライト付け直しするように
@@ -64,34 +88,6 @@ If not, see <http://www.gnu.org/licenses/>.
 
 //	TODO:	挿入にある色指定をカスタマイズ出来る
 
-
-//	TODO:	ＯＫ？	ＭＡＡテンプレのステータスバーページ番号の表示が０基準なので１にする
-
-//	TODO:	ＯＫ？	ツールバーにもAcceleratorキー表示する
-//	TODO:	ＯＫ？	バイト数警告の4096は調整出来るように
-//	TODO:	ＯＫ？	右ルーラーみたいな、行ルーラー（３０行とか）を	IDM_UNDER_RULER_TOGGLE
-//	TODO:	ＯＫ？	ユニコードリスト・使ったヤツの記録とか
-
-//	TODO:	ＯＫ？	ディレイロード・未ロード頁の全プレビューがおかしい
-//	TODO:	CtrlShiftD の動作は問題無いか
-//	TODO:	ＯＫ？	枠作るときはピリヲド幅を使う
-//	TODO:	ＯＫ？	最大化から戻したら、MAAが非表示でも表示になる
-//	TODO:	ＯＫ？	MAAと頁一覧、選択したらメイン窓にフォーカス戻すかどうか選択出来るようにする
-//					右クリメニューにON/OFF付ければいい
-//	TODO:	ＯＫ？	ドラッグ移動させた後、キャレットの位置がおかしい
-//	TODO:	ＯＫ？	ドラフトボード・サムネイル・移動出来るように
-//	TODO:	ＯＫ？	ユーザー定義をアクセラキーで設定出来る
-//	TODO:	ＯＫ？	セリフ改行、文章の途中で半角全角スペース一個あった場合、ソコは無視して文章の先端に行頭を揃える
-//	TODO:	ＯＫ？	ツールチップ、マウスカーソルが重なるとちらつくのは仕様。自作しかないか。
-//	TODO:	ＯＫ？	右クリメニューの個別枠やユーザアイテムに各個の名前を付けるように
-//	TODO:	ＯＫ？	副タブの名称編集出来るように
-//	TODO:	ＯＫ？	空白の表示非表示をメモリする
-//	TODO:	ＯＫ？	ドラフトボード、ウインドウサイズがおかしい・枠付けたので
-//	TODO:	ＯＫ？	合成するとき、上絵の周囲を白ヌキする機能
-//	TODO:	ＯＫ？	レイヤボックス白ヌキ、１６・２２とか、いくつかパヤーン作っておく
-//	TODO:	ＯＫ？	中CLICKで、開いてるファイル閉じる
-//	TODO:	ＯＫ？	MLT検索、文字列ないなら検索しないようにする
-//	TODO:	ＯＫ？	viewer側の表示色変更・背景とか
 
 //考え中
 
@@ -125,17 +121,25 @@ If not, see <http://www.gnu.org/licenses/>.
 
 //確認：Viewer側、↑↓PageUpDownつかえてるか
 
+//	ファイルを読み込むとランタイムエラーでることがある・なんか変更してから？
+//	スクロールが発生した場合、画面全体書換必要か
+
+//影響ないようにした
+//選択範囲がある状態でCtrlU＞アンドゥ＞選択範囲がおかしくなる。さらに切り取りとかすると落ちる
+//アンドゥリドゥしたら、選択範囲解除する・DocInsDelCtrl.cpp:559あたりでおかしい？
+
+//非ユニコードの埋めパターン、半角空白気にしない用にする？＜ちゅっと変更してみた
+
 
 
 
 //バグ
-//	TODO:	最大化したり画面サイズかえると、右の頁一覧が見えなくなる
-//	TODO:	最大化して終わる＞起動して、最大化解除すると、メインスプリットバーが見えなくなる//右にイッちゃってるまま
+
 //	TODO:	矩形選択範囲バイトカウントが遅い
 //	TODO:	描画更新タイミングがおかしい場合が多々ある
 //	TODO:	「矩形選択」と「部分抽出」の両方にチェックを入れた状態でドラッグするとエラー
 
-//	TODO:	複数行テンプレ窓の主タブでホイールスクロールが効かない？
+//	TODO:	複数行テンプレ窓の主タブでホイールスクロールが効かない？フォーカスの問題か？
 //			メイン窓の編集スペース、Page List、複数行テンプレ窓のAA一覧ツリーなど、他の場所では問題ない
 
 //	TODO:	Viewer、右クリメニューからのドラフトボードが開かない？・追加されない？
@@ -155,8 +159,6 @@ If not, see <http://www.gnu.org/licenses/>.
 
 //	TODO:	フリーカーソルモード
 //	TODO:	レイヤボックス自体の操作、上書き実行とかもキボドショトカトで出来るように
-//	TODO:	位置情報のリセット機能・システムメニューに搭載する
-//	TODO:	メインスプリットバーの位置情報リセットが居るかも
 
 //	TODO:	右揃え線消し
 //	TODO:	文字の検索・痴漢機能	ユニコード空白一括検索とか
@@ -175,7 +177,6 @@ If not, see <http://www.gnu.org/licenses/>.
 //	TODO:	切り抜きリファレンスAAを使って、文字のとこだけ切り抜き、ないところだけ切り抜き、とかできるようにしたい
 //	TODO:	バックアップメッセージ、ステータスバーに出せないか
 //	TODO:	全部保存作る
-//	TODO:	よく使うユニコードを纏めておけないか、ユーザ定義でいいんじゃね
 //	TODO:	テンプレのコンボックスを、リストボックス型と切り替えられるとか
 //	TODO:	プレビューをリヤルタイムに変更する
 //	TODO:	非ユニコのときは、ピリヲドの量の選択を？もしくは設定出来るようにするか
@@ -189,7 +190,6 @@ If not, see <http://www.gnu.org/licenses/>.
 //	TODO:	MLTのブックマーク機能・タブ増やすか、ツリーに増やすか・副タブじゃいけない？
 //	TODO:	viewの使用のグループ名の変更機能・グループ自体、単体両方で
 //	TODO:	Viewの右クリメニューも編集出来るように
-//	TODO:	ドラフトボード・サムネ、サイズ変更できるように
 //	TODO:	MMAビュー、AAのスクロールをアイテム区切りでなく行スクロールも出来るように
 //	TODO:	MAA窓も統合できないか
 
@@ -204,30 +204,9 @@ If not, see <http://www.gnu.org/licenses/>.
 //	TODO:	トレスモード、各入力値は直入力できるように
 //	TODO:	トレスモードボタンは、TOGGLEできるようにする
 
-
-
-
-
 //	TODO:	プロファイルのツリーの編集、もっと手軽にできないか
 
 
-
-
-
-
-
-
-
-
-
-//	ファイルを読み込むとランタイムエラーでることがある・なんか変更してから？
-//	スクロールが発生した場合、画面全体書換必要か
-
-//影響ないようにした
-//選択範囲がある状態でCtrlU＞アンドゥ＞選択範囲がおかしくなる。さらに切り取りとかすると落ちる
-//アンドゥリドゥしたら、選択範囲解除する・DocInsDelCtrl.cpp:559あたりでおかしい？
-
-//非ユニコードの埋めパターン、半角空白気にしない用にする？＜ちゅっと変更してみた
 
 
 //OK?
@@ -238,8 +217,34 @@ If not, see <http://www.gnu.org/licenses/>.
 //	トレス窓が、最大化してると隠れてしまう
 //	頁挿入ダイヤログのチェックボックス覚えておくように
 
-//	TODO:	使用のアレ、別MLTに同じAAが有ったらハッシュが同じってことでラリってまう。ベースネーム書換で対処するか
-//	TODO:	枠挿入BOX、縦幅がパーツ全体の高さに足りなくなると落ちる・横幅もか？
+
+//	TODO:	ＯＫ？	ＭＡＡテンプレのステータスバーページ番号の表示が０基準なので１にする
+
+//	TODO:	ＯＫ？	ツールバーにもAcceleratorキー表示する
+//	TODO:	ＯＫ？	バイト数警告の4096は調整出来るように
+//	TODO:	ＯＫ？	右ルーラーみたいな、行ルーラー（３０行とか）を	IDM_UNDER_RULER_TOGGLE
+//	TODO:	ＯＫ？	ユニコードリスト・使ったヤツの記録とか
+
+//	TODO:	ＯＫ？	ディレイロード・未ロード頁の全プレビューがおかしい
+//	TODO:	ＯＫ？	枠作るときはピリヲド幅を使う
+//	TODO:	ＯＫ？	最大化から戻したら、MAAが非表示でも表示になる
+//	TODO:	ＯＫ？	MAAと頁一覧、選択したらメイン窓にフォーカス戻すかどうか選択出来るようにする
+//					右クリメニューにON/OFF付ければいい
+//	TODO:	ＯＫ？	ドラッグ移動させた後、キャレットの位置がおかしい
+//	TODO:	ＯＫ？	ドラフトボード・サムネイル・移動出来るように
+//	TODO:	ＯＫ？	ユーザー定義をアクセラキーで設定出来る
+//	TODO:	ＯＫ？	セリフ改行、文章の途中で半角全角スペース一個あった場合、ソコは無視して文章の先端に行頭を揃える
+//	TODO:	ＯＫ？	ツールチップ、マウスカーソルが重なるとちらつくのは仕様。自作しかないか。
+//	TODO:	ＯＫ？	右クリメニューの個別枠やユーザアイテムに各個の名前を付けるように
+//	TODO:	ＯＫ？	副タブの名称編集出来るように
+//	TODO:	ＯＫ？	空白の表示非表示をメモリする
+//	TODO:	ＯＫ？	合成するとき、上絵の周囲を白ヌキする機能
+//	TODO:	ＯＫ？	レイヤボックス白ヌキ、１６・２２とか、いくつかパヤーン作っておく
+//	TODO:	ＯＫ？	中CLICKで、開いてるファイル閉じる
+//	TODO:	ＯＫ？	MLT検索、文字列ないなら検索しないようにする
+//	TODO:	ＯＫ？	viewer側の表示色変更・背景とか
+//	TODO:	ＯＫ？	選択範囲をASTの頁名にする機能	IDM_PAGENAME_SELASSIGN
+//	TODO:	ＯＫ？	プレビュー再描画しても、ALLと表示位置を維持する
 
 
 /*
@@ -457,7 +462,7 @@ ASDファイル　　壱行が壱コンテンツ
 					壱行テンプレで中クルックしたらレイヤボックスが開く
 					MAAツリーでファイル名を中クリックしたら、副タブに追加できる
 					バグ修正いろいろ
-2012/09/06	0.31	MAAに、ファイルの途中にアイテムを追加できるようにした
+2012/09/10	0.31	MAAに、ファイルの途中にアイテムを追加できるようにした
 					MAAの内容表示側にＤ＆Ｄすると、そのファイルを副タブで開く（Viewer込み）
 					※使用には入らないし復元もされない
 					MAAツリーにＤ＆Ｄすると、追加アイテムとしてツリーに追加（Viewer込み）
@@ -481,6 +486,14 @@ ASDファイル　　壱行が壱コンテンツ
 					ＭＡＡ窓の背景色変更出来るようにした
 					プレビューを再描画しても、そのとき開いていた位置と状態を維持できる、はず
 					選択範囲をAST頁名称にする機能追加
+2012/11/05	0.32	MAAのツリー側のAA頁を削除出来るようにした
+					新規保存時の拡張子を、MLTかASTを適用するようにした
+					ドラフトボード・サムネイルのサイズを４段階で変えれるようにした
+					MAA窓に、開いてる頁内の文字列検索を付けた・
+					ASTに追加するとセパレータがおかしくなるのを修正
+					頁切り替えた時、最後の頁のところまで頁一覧をスクロール
+					任意の場所から右の部分を、左右にずらす機能
+					MAAテンプレにアイテム追加したら全アイテムに改行が増えるのを修正
 
 
 更新日時注意
@@ -920,6 +933,7 @@ BOOL InitInstance( HINSTANCE hInstance, INT nCmdShow, LPTSTR ptArgv )
 	HMENU	hSubMenu;
 
 
+
 	ghInst = hInstance;	//	グローバル変数にインスタンス処理を格納します。
 
 	SplitBarClass( hInstance );	//	スプリットバーの準備
@@ -931,7 +945,7 @@ BOOL InitInstance( HINSTANCE hInstance, INT nCmdShow, LPTSTR ptArgv )
 	{
 		hWnd = GetDesktopWindow( );
 		GetWindowRect( hWnd, &rect );
-		rect.left   = ( rect.right  - W_WIDTH ) / 2;
+		rect.left   = ( rect.right  - W_WIDTH ) / 3;	//	左より
 		rect.top    = ( rect.bottom - W_HEIGHT ) / 2;
 		rect.right  = W_WIDTH;
 		rect.bottom = W_HEIGHT;
@@ -942,24 +956,24 @@ BOOL InitInstance( HINSTANCE hInstance, INT nCmdShow, LPTSTR ptArgv )
 
 	if( !hWnd ){	return FALSE;	}
 
-	gbUniPad      = InitParamValue( INIT_LOAD, VL_USE_UNICODE,  1 );	//	ユニコ空白　１使う　０使わない
+	gbUniPad      = InitParamValue( INIT_LOAD, VL_USE_UNICODE,  1 );	//	ユニコ空白使う
 
-	gbUniRadixHex = InitParamValue( INIT_LOAD, VL_UNIRADIX_HEX, 1 );
+	gbUniRadixHex = InitParamValue( INIT_LOAD, VL_UNIRADIX_HEX, 1 );	//	ユニコ表現１６進数
 
-	gdBUInterval  = InitParamValue( INIT_LOAD, VL_BACKUP_INTVL, 3 );
-	gbAutoBUmsg   = InitParamValue( INIT_LOAD, VL_BACKUP_MSGON, 1 );	//	
-	gbCrLfCode    = InitParamValue( INIT_LOAD, VL_CRLF_CODE, 0 );		//	０したらば　１YY
+	gdBUInterval  = InitParamValue( INIT_LOAD, VL_BACKUP_INTVL, 3 );	//	バックアップ３分毎
+	gbAutoBUmsg   = InitParamValue( INIT_LOAD, VL_BACKUP_MSGON, 1 );	//	バックアップメッセージ表示
+	gbCrLfCode    = InitParamValue( INIT_LOAD, VL_CRLF_CODE, 0 );		//	したらば改行
 
-	gbTmpltDock   = InitParamValue( INIT_LOAD, VL_PLS_LN_DOCK,  1 );	//	０独立　１くっつける
+	gbTmpltDock   = InitParamValue( INIT_LOAD, VL_PLS_LN_DOCK,  1 );	//	壱行ブラシテンプレ頁一覧くっつける
 
-	gdPageByteMax = InitParamValue( INIT_LOAD, VL_PAGEBYTE_MAX, PAGE_BYTE_MAX );	//	最大バイト数
+	gdPageByteMax = InitParamValue( INIT_LOAD, VL_PAGEBYTE_MAX, PAGE_BYTE_MAX );	//	最大バイト数４０９６
 
 	ghMainWnd = hWnd;
 
-	//	機能チェック
-	//hSubMenu = GetSystemMenu( hWnd, FALSE );
-	//DeleteMenu( hSubMenu, 1, MF_BYPOSITION );
-	//InsertMenu( hSubMenu, 0, MF_BYPOSITION | MF_SEPARATOR, 0, 0 );
+	//	システムメニューに機能追加
+	hSubMenu = GetSystemMenu( hWnd, FALSE );
+	InsertMenu( hSubMenu, 0, MF_BYPOSITION | MF_SEPARATOR, 0, 0 );
+	InsertMenu( hSubMenu, 0, MF_BYPOSITION, IDM_POSITION_RESET, TEXT("窓配置リセット") );
 
 	ghMenu = GetMenu( hWnd );
 
@@ -987,15 +1001,13 @@ BOOL InitInstance( HINSTANCE hInstance, INT nCmdShow, LPTSTR ptArgv )
 		DeleteMenu( hSubMenu, IDM_BRUSH_PALETTE, MF_BYCOMMAND );
 	}
 
-
-	AaFontCreate( 1 );
-
+	AaFontCreate( 1 );	//	
 
 	AppClientAreaCalc( &rect  );	//	
 
 	SqnSetting(  );
 
-	if( gbTmpltDock )
+	if( gbTmpltDock )	//	ドッキング設定であるか
 	{
 		//	設定からスプリットバーの位置を引っ張る
 		grdSplitPos = InitParamValue( INIT_LOAD, VL_MAIN_SPLIT, PLIST_DOCK );
@@ -1007,14 +1019,14 @@ BOOL InitInstance( HINSTANCE hInstance, INT nCmdShow, LPTSTR ptArgv )
 	else{	ghMainSplitWnd = NULL;	grdSplitPos = 0;	}
 
 
-	ghPgVwWnd = PageListInitialise( hInstance, hWnd, &rect );
+	ghPgVwWnd = PageListInitialise( hInstance, hWnd, &rect );	//	頁一覧
 
-	ghLnTmplWnd = LineTmpleInitialise( hInstance, hWnd, &rect );
+	ghLnTmplWnd = LineTmpleInitialise( hInstance, hWnd, &rect );	//	壱行テンプレ
 
-	ViewInitialise( hInstance, hWnd, &rect, ptArgv );
+	ViewInitialise( hInstance, hWnd, &rect, ptArgv );	//	編集ビュー作成
 	ViewMaaItemsModeSet( InitParamValue( INIT_LOAD, VL_MAA_LCLICK, MAA_INSERT ), InitParamValue( INIT_LOAD, VL_MAA_MCLICK, MAA_INSERT ) );
 
-	LayerBoxInitialise( hInstance, &rect );
+	LayerBoxInitialise( hInstance, &rect );	//	レイヤボックス作成
 	LayerBoxAlphaSet( InitParamValue( INIT_LOAD, VL_LAYER_TRANS, 192 ) );
 
 	UniDlgInitialise( hWnd, TRUE );
@@ -1031,8 +1043,10 @@ BOOL InitInstance( HINSTANCE hInstance, INT nCmdShow, LPTSTR ptArgv )
 
 	OpenProfileInitialise( hWnd );
 
-#ifdef AA_INVERSE
 	DocInverseInit( TRUE );
+
+#ifdef FIND_STRINGS
+	FindDialogueOpen( NULL, NULL );
 #endif
 
 #ifdef USE_HOVERTIP
@@ -1061,9 +1075,12 @@ BOOL InitInstance( HINSTANCE hInstance, INT nCmdShow, LPTSTR ptArgv )
 	{
 		ShowWindow( hWnd, SW_MAXIMIZE );
 		AppClientAreaCalc( &rect  );	//	
-		grdSplitPos = sptBuf;
-		SetWindowPos( ghMainSplitWnd, HWND_TOP, rect.right - grdSplitPos, rect.top, 0, 0, SWP_NOSIZE );
-		Cls_OnSize( hWnd, SIZE_MINIMIZED, rect.right, rect.top );
+		if( ghMainSplitWnd )
+		{
+			grdSplitPos = sptBuf;
+			SetWindowPos( ghMainSplitWnd, HWND_TOP, rect.right - grdSplitPos, rect.top, 0, 0, SWP_NOSIZE );
+		}
+		Cls_OnSize( hWnd, SIZE_MAXIMIZED, rect.right, rect.top );
 	}
 	else{	ShowWindow( hWnd, nCmdShow );	}
 
@@ -1255,6 +1272,14 @@ LRESULT CALLBACK WndProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam 
 
 		case WM_MBUTTONUP:	TRACE( TEXT("MIDDLE  UP") );	break;
 
+		case WM_SYSCOMMAND:
+			if( IDM_POSITION_RESET == LOWORD(wParam) )
+			{
+				WindowPositionReset( hWnd );
+				return 0;
+			}
+			break;
+
 #ifdef NDEBUG
 		case WM_CLOSE:
 			iRslt = DocFileCloseCheck( hWnd, TRUE );
@@ -1305,25 +1330,29 @@ WA_INACTIVE		0	ウィンドウが非アクティブになります。
 WA_ACTIVE		1	マウスをクリックする以外の方法 (ウィンドウの選択にキーボード インターフェイスを使用する方法など) で、ウィンドウがアクティブになります。
 WA_CLICKACTIVE	2	マウスクリックによって、ウィンドウがアクティブになります。
 */
-//	TRACE( TEXT("MAIN_WM_ACTIVATE STATE[%u] HWND[%X] MIN[%u]"), state, hWndActDeact, fMinimized );
+	TRACE( TEXT("MAIN ACTIVATE STATE[%u] HWND[%X] MIN[%u]"), state, hWndActDeact, fMinimized );
 
 	if( WA_INACTIVE == state )
 	{
 	}
 	else
 	{
+
 		rdExStyle = GetWindowLongPtr( ghPgVwWnd, GWL_EXSTYLE );
 		if( WS_EX_TOPMOST & rdExStyle )	hWorkWnd = HWND_TOPMOST;
 		else							hWorkWnd = hWnd;
 		SetWindowPos( ghPgVwWnd, hWorkWnd, 0, 0, 0, 0, SWP_NOACTIVATE | SWP_NOMOVE | SWP_NOSIZE );
 
-
-		if( InitParamValue( INIT_LOAD, VL_MAA_TOPMOST, 1 ) )	//	
+		if( InitParamValue( INIT_LOAD, VL_MAA_TOPMOST, 1 ) )	//	ＭＡＡ窓
 		{
-			rdExStyle = GetWindowLongPtr( ghMaaWnd, GWL_EXSTYLE );
+			rdExStyle = GetWindowLongPtr( ghMaaWnd, GWL_EXSTYLE );	//	常手前の処理は不要
 			if( WS_EX_TOPMOST & rdExStyle )	hWorkWnd = HWND_TOPMOST;
 			else							hWorkWnd = hWnd;
 			SetWindowPos( ghMaaWnd, hWorkWnd, 0, 0, 0, 0, SWP_NOACTIVATE | SWP_NOMOVE | SWP_NOSIZE );
+		}
+		else	//	明示的にＯＦＦ？
+		{
+			ShowWindow( ghMaaWnd, SW_HIDE );
 		}
 
 		if( IsWindowVisible(ghLnTmplWnd ) )
@@ -1342,7 +1371,6 @@ WA_CLICKACTIVE	2	マウスクリックによって、ウィンドウがアクティブになります。
 			SetWindowPos( ghBrTmplWnd, hWorkWnd, 0, 0, 0, 0, SWP_NOACTIVATE | SWP_NOMOVE | SWP_NOSIZE );
 		}
 
-		TRACE( TEXT("WINDOW ACTVATE") );
 		ViewFocusSet(  );
 	}
 
@@ -1543,9 +1571,11 @@ VOID Cls_OnSize( HWND hWnd, UINT state, INT cx, INT cy )
 
 	if( SIZE_MAXIMIZED == state )	//	最大化時
 	{
-		AppClientAreaCalc( &rect  );	//	右に併せて移動
-		SetWindowPos( ghMainSplitWnd, HWND_TOP, rect.right - grdSplitPos, rect.top, 0, 0, SWP_NOSIZE );
-
+		if( ghMainSplitWnd )
+		{
+			AppClientAreaCalc( &rect  );	//	右に併せて移動
+			SetWindowPos( ghMainSplitWnd, HWND_TOP, rect.right - grdSplitPos, rect.top, 0, 0, SWP_NOSIZE );
+		}
 		ccState = SIZE_MAXIMIZED;
 	}
 
@@ -1553,9 +1583,11 @@ VOID Cls_OnSize( HWND hWnd, UINT state, INT cx, INT cy )
 	{
 		if( !(IsZoomed( hWnd ) ) )	//	まだ最大化中なら、スプリットバー調整のはず
 		{
-			AppClientAreaCalc( &rect  );	//	右に併せて移動
-			SetWindowPos( ghMainSplitWnd, HWND_TOP, rect.right - grdSplitPos, rect.top, 0, 0, SWP_NOSIZE );
-
+			if( ghMainSplitWnd )
+			{
+				AppClientAreaCalc( &rect  );	//	右に併せて移動
+				SetWindowPos( ghMainSplitWnd, HWND_TOP, rect.right - grdSplitPos, rect.top, 0, 0, SWP_NOSIZE );
+			}
 			ccState = SIZE_RESTORED;
 		}
 	}
@@ -1622,9 +1654,7 @@ VOID Cls_OnDestroy( HWND hWnd )
 	Shell_NotifyIcon( NIM_DELETE, &nid );
 #endif
 
-#ifdef AA_INVERSE
 	DocInverseInit( FALSE );
-#endif
 
 #ifdef USE_HOVERTIP
 	HoverTipInitialise( NULL, NULL );
@@ -2281,6 +2311,8 @@ INT InitParamValue( UINT dMode, UINT dStyle, INT nValue )
 		case  VL_U_RULER_VIEW:	StringCchCopy( atKeyName, SUB_STRING, TEXT("UndRulerView") );	break;
 		case  VL_PAGEBYTE_MAX:	StringCchCopy( atKeyName, SUB_STRING, TEXT("PageByteMax") );	break;
 		case  VL_MAA_BKCOLOUR:	StringCchCopy( atKeyName, SUB_STRING, TEXT("MaaBkColour") );	break;
+		case  VL_THUMB_HORIZ:	StringCchCopy( atKeyName, SUB_STRING, TEXT("ThumbHoriz")  );	break;
+		case  VL_THUMB_VERTI:	StringCchCopy( atKeyName, SUB_STRING, TEXT("ThumbVerti")  );	break;
 
 		default:	return nValue;
 	}
@@ -2521,8 +2553,48 @@ HRESULT InitProfHistory( UINT dMode, UINT dNumber, LPTSTR ptFile )
 }
 //-------------------------------------------------------------------------------------------------
 
+/*!
+	各窓の表示位置と大きさをデフォルトに戻す
+	@param[in]	hWnd	ウインドウハンドル
+	@return	HRESULT	終了状態コード
+*/
+HRESULT WindowPositionReset( HWND hWnd )
+{
+	HWND	hWorkWnd;
+	RECT	rect;
 
+	TRACE(TEXT("★位置情報リセット") );
 
+	//	メイン窓
+	hWorkWnd = GetDesktopWindow( );
+	GetWindowRect( hWorkWnd, &rect );
+	rect.left   = ( rect.right  - W_WIDTH ) / 3;	//	左より
+	rect.top    = ( rect.bottom - W_HEIGHT ) / 2;
+	rect.right  = W_WIDTH;
+	rect.bottom = W_HEIGHT;
+	//	位置変更
+	SetWindowPos( ghMainWnd, HWND_TOP, rect.left, rect.top, rect.right, rect.bottom, SWP_SHOWWINDOW );
+
+	//	メインスプリットバー
+	if( ghMainSplitWnd )
+	{
+		AppClientAreaCalc( &rect  );	//	右に併せて移動
+		SetWindowPos( ghMainSplitWnd, HWND_TOP, rect.right - PLIST_DOCK, rect.top, 0, 0, SWP_NOSIZE );
+
+		ViewSizeMove( hWnd, &rect );	//	動かした位置で再計算とか
+	}
+	else	//	フローティングウインドウ
+	{
+		PageListPositionReset( ghMainWnd );
+		LineTmplePositionReset( ghMainWnd );
+		BrushTmplePositionReset( ghMainWnd );
+	}
+
+	MaaTmpltPositionReset( ghMainWnd );	//	ＭＡＡ窓
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
 
 /*!
 	ファイルから履歴取り込んだり書き込んだり

@@ -100,24 +100,32 @@ static BOOLEAN	gbLineSep;			//!<	AAの分けは線にする
 static BOOLEAN	gbMaaRetFocus;		//!<	項目を選択したら編集窓にフォーカス戻すか
 #endif
 
+#ifdef MAA_TEXT_FIND
+TCHAR	gatFindText[MAX_STRING];	//!<	検索用文字列の保存
+#endif
+
 extern  UINT	gbAAtipView;		//!<	非０で、ＡＡツールチップ表示
 
 extern  HWND	ghSplitaWnd;		//!<	スプリットバーハンドル
 
-static vector<VIEWORDER>	gvcViewOrder;	//!<	
+static vector<VIEWORDER>	gvcViewOrder;	//!<	今見えてるやつの内容
 static vector<AATITLE>		gvcAaTitle;		//!<	
 //-------------------------------------------------------------------------------------------------
 
 #ifdef MAA_TOOLTIP
-LRESULT	Aai_OnNotify( HWND , INT, LPNMHDR );				//!<	
+LRESULT	Aai_OnNotify( HWND , INT, LPNMHDR );			//!<	
 #endif
-VOID	Aai_OnMouseMove( HWND, INT, INT, UINT );			//!<	
-VOID	Aai_OnLButtonUp( HWND, INT, INT, UINT );			//!<	
-VOID	Aai_OnMButtonUp( HWND, INT, INT, UINT );			//!<	
-VOID	Aai_OnContextMenu( HWND, HWND, UINT, UINT );		//!<	
-VOID	Aai_OnDropFiles( HWND , HDROP );					//!<	
+VOID	Aai_OnMouseMove( HWND, INT, INT, UINT );		//!<	
+VOID	Aai_OnLButtonUp( HWND, INT, INT, UINT );		//!<	
+VOID	Aai_OnMButtonUp( HWND, INT, INT, UINT );		//!<	
+VOID	Aai_OnContextMenu( HWND, HWND, UINT, UINT );	//!<	
+VOID	Aai_OnDropFiles( HWND , HDROP );				//!<	
 
 HRESULT	AaItemsFavDelete( LPSTR, UINT );	//!<	
+
+#ifdef MAA_TEXT_FIND
+UINT	AacItemFindOnePage( HWND, LPTSTR, INT );	//!<	
+#endif
 
 LRESULT	CALLBACK gpfAaItemsProc( HWND, UINT, WPARAM, LPARAM );		//!<	
 LRESULT	CALLBACK gpfAaTitleCbxProc( HWND, UINT, WPARAM, LPARAM );	//!<	
@@ -127,7 +135,7 @@ INT_PTR	CALLBACK AaItemAddDlgProc( HWND, UINT, WPARAM, LPARAM );	//!<
 #endif
 
 #ifdef USE_HOVERTIP
-LPTSTR	CALLBACK AaItemsHoverTipInfo( LPVOID );
+LPTSTR	CALLBACK AaItemsHoverTipInfo( LPVOID  );	//!<	
 #endif
 //-------------------------------------------------------------------------------------------------
 
@@ -188,6 +196,9 @@ HRESULT AaItemsInitialise( HWND hWnd, HINSTANCE hInst, LPRECT ptRect )
 	gixNowToolTip = -1;
 #endif
 
+#ifdef MAA_TEXT_FIND
+	ZeroMemory( gatFindText, sizeof(gatFindText) );
+#endif
 
 #ifdef MAA_TOOLTIP
 	//	ツールチップ作る
@@ -196,14 +207,12 @@ HRESULT AaItemsInitialise( HWND hWnd, HINSTANCE hInst, LPRECT ptRect )
 	//	見出しコンボックス
 	ghComboxWnd = CreateWindowEx( 0, WC_COMBOBOX, TEXT(""), WS_VISIBLE | WS_CHILD | WS_BORDER | WS_VSCROLL | CBS_DROPDOWNLIST | CBS_NOINTEGRALHEIGHT, TREE_WIDTH + SPLITBAR_WIDTH, 0, ptRect->right - TREE_WIDTH - LSSCL_WIDTH, TITLECBX_HEI, hWnd, (HMENU)IDCB_AAITEMTITLE, hInst, NULL );
 	GetClientRect( ghComboxWnd, &rect );
-
 	//	サブクラス化
 	gpfOrgAaTitleCbxProc = SubclassWindow( ghComboxWnd, gpfAaTitleCbxProc );
 
 	//	AA一覧のスタティックつくる・オーナードローで描画
 	ghItemsWnd = CreateWindowEx( WS_EX_CLIENTEDGE | WS_EX_ACCEPTFILES, WC_STATIC, TEXT(""), WS_VISIBLE | WS_CHILD | SS_OWNERDRAW | SS_NOTIFY, TREE_WIDTH + SPLITBAR_WIDTH, rect.bottom, ptRect->right - TREE_WIDTH - LSSCL_WIDTH, ptRect->bottom - rect.bottom, hWnd, (HMENU)IDSO_AAITEMS, hInst, NULL );
 	//DragAcceptFiles( ghItemsWnd, TRUE );	WS_EX_ACCEPTFILESでおｋ
-
 	//	サブクラス化
 	gpfOrgAaItemsProc = SubclassWindow( ghItemsWnd, gpfAaItemsProc );
 
@@ -454,9 +463,9 @@ VOID AaItemsDrawItem( HWND hWnd, CONST DRAWITEMSTRUCT *pstDrawItem )
 	rdWidth  = rect.right;
 	rdDrawPxTop = 0;
 
-	SetBkMode( pstDrawItem->hDC, TRANSPARENT );	//	文字描画は背景透過で夜露死苦
+	SetBkMode( pstDrawItem->hDC , TRANSPARENT );	//	文字描画は背景透過で夜露死苦
 
-	FillRect( pstDrawItem->hDC, &rect, ghBkBrush );
+	FillRect( pstDrawItem->hDC, &rect, ghBkBrush );	//	一旦背景塗りつぶして
 
 	gvcViewOrder.clear();
 
@@ -468,13 +477,13 @@ VOID AaItemsDrawItem( HWND hWnd, CONST DRAWITEMSTRUCT *pstDrawItem )
 
 		stVwrder.index = rdNextItem;
 
-		ptConStr = SjisDecodeAlloc( pcConts );
+		ptConStr = SjisDecodeAlloc( pcConts );	//	表示内容ガメてくる
 		StringCchLength( ptConStr, STRSAFE_MAX_CCH, &rdLen );
 		rdLength = rdLen;
 
 		free( pcConts );
 #pragma message ("MAAの行間、ここで正しく計算するべき")
-		//	文字列に合わせてRECT確保
+		//	文字列に合わせてRECT確保・計算だけで、まだ書込してない
 		DrawText( pstDrawItem->hDC, ptConStr, rdLength, &rect, DT_LEFT | DT_EDITCONTROL | DT_NOPREFIX | DT_CALCRECT );
 		drawRect = rect;
 		rdHeight = drawRect.bottom;
@@ -494,9 +503,10 @@ VOID AaItemsDrawItem( HWND hWnd, CONST DRAWITEMSTRUCT *pstDrawItem )
 			else					FillRect( pstDrawItem->hDC, &drawRect, ghBkBrush );
 		}
 
+		//	ＡＡ描画
 		DrawText( pstDrawItem->hDC, ptConStr, rdLength, &drawRect, DT_LEFT | DT_EDITCONTROL | DT_NOPREFIX );
 
-		if( gbLineSep )
+		if( gbLineSep )	//	線を引く
 		{
 			hOldPen = SelectPen( pstDrawItem->hDC, ghSepPen );
 			MoveToEx( pstDrawItem->hDC, drawRect.left, drawRect.bottom-1, NULL );
@@ -513,7 +523,7 @@ VOID AaItemsDrawItem( HWND hWnd, CONST DRAWITEMSTRUCT *pstDrawItem )
 	InvalidateRect( ghScrollWnd, NULL, TRUE );
 	UpdateWindow( ghScrollWnd );
 
-	//	カーソル位置確保し直し
+	//	カーソル位置確保し直し・ポッパップ表示用
 	GetCursorPos( &stPoint );
 	ScreenToClient( ghItemsWnd, &stPoint );
 	Aai_OnMouseMove( hWnd, stPoint.x, stPoint.y, 0 );
@@ -860,9 +870,11 @@ VOID Aai_OnContextMenu( HWND hWnd, HWND hWndContext, UINT xPos, UINT yPos )
 	hMenu = LoadMenu( GetModuleHandle(NULL), MAKEINTRESOURCE(IDM_AALIST_POPUP) );
 	hSubMenu = GetSubMenu( hMenu, 0 );
 
+#ifdef _ORRVW
 	//	使用リストのみ、削除を有効に、変更すること・標準で無効にしておく
-	if( ACT_FAVLIST == dOpen )
-	{	EnableMenuItem( hSubMenu, IDM_MAA_FAV_DELETE , MF_ENABLED );	}
+	if( ACT_FAVLIST ==  dOpen ){	EnableMenuItem( hSubMenu, IDM_MAA_FAV_DELETE , MF_ENABLED );	}
+	//	一般アイテムも削除出来るようにする
+#endif
 
 	//	ツールチップの表示・非表示のトゴゥ
 	if( gbAAtipView ){	CheckMenuItem( hSubMenu, IDM_MAA_AATIP_TOGGLE, MF_CHECKED );	}
@@ -892,10 +904,12 @@ VOID Aai_OnContextMenu( HWND hWnd, HWND hWndContext, UINT xPos, UINT yPos )
 				AaItemsFavDelete( pcConts, rdLength );	//	削除Commando発行
 				FavContsRedrawRequest( hWnd );	//	再描画しなきゃだね
 			}
+#ifndef _ORRVW
 			else	//	それ以外なら、主タブか副タブ
 			{
-		//		AacItemDelete( hWnd, gixNowSel );
+				AacItemDelete( hWnd, gixNowSel );
 			}
+#endif
 			break;
 
 #ifndef _ORRVW
@@ -1161,7 +1175,7 @@ UINT AaItemsDoSelect( HWND hWnd, UINT dMode, UINT dDirct )
 
 	rdLength = strlen( pcConts );	//	文字列の長さ取得
 
-	uRslt = ViewMaaMaterialise( pcConts , rdLength, dMode );	//	本体に飛ばす
+	uRslt = ViewMaaMaterialise( hWnd, pcConts, rdLength, dMode );	//	本体に飛ばす
 	//	EditorとViewerで本体が異なるので注意
 
 	//	ここでお気に入りに入れる
@@ -1236,6 +1250,125 @@ LPTSTR CALLBACK AaItemsHoverTipInfo( LPVOID pVoid )
 }
 //-------------------------------------------------------------------------------------------------
 #endif
+
+
+#ifdef MAA_TEXT_FIND
+
+
+/*!
+	検索開始ボタン押され・初回と弐回目以降の区別に注意
+	@param[in]	hWnd	親ウインドウのハンドル
+	@param[in]	bMode	非０ボタンによる検索開始　０前の条件で次の頁から検索開始
+	@return		HRESULT	終了状態コード
+*/
+HRESULT AacFindTextEntry( HWND hWnd, UINT bMode )
+{
+	TCHAR	atString[MAX_STRING];
+	UINT	isNowPage, dRslt;
+	INT		iPage, i;
+
+	TRACE( TEXT("MAA：検索始め") );
+	//	Ｆ３なら、今の頁から。既存の文字列で
+	//	ボタンなら、文字列が異なっていたら指定に従う・同じならつづきから
+
+	ZeroMemory( atString, sizeof(atString) );
+
+	SetDlgItemText( hWnd, IDS_MAA_TXTFIND_MSGBOX, TEXT("") );
+
+	if( bMode )	//	ボタンから
+	{
+		GetDlgItemText( hWnd, IDE_MAA_TXTFIND_TEXT, atString, MAX_STRING );
+		//	エディットボッキスが空ならなんもせん
+		if( NULL == atString[0] )	return E_NOTIMPL;
+
+		//	０ファイル先頭から　１今の天辺頁から
+		isNowPage = IsDlgButtonChecked( hWnd, IDB_MAA_TXTFIND_TOP_GO ) ? FALSE : TRUE;
+	}
+	else	//	Ｆ３で
+	{
+		//	検索条件が無いときはなにもしない
+		if( NULL == gatFindText[0] )	return E_NOTIMPL;
+
+		//	バッファからコピーしておく・これにより前回と同じ条件扱いになる
+		StringCchCopy( atString, MAX_STRING, gatFindText );
+	}
+
+//初回と弐回目以降の区別どうするか
+	if( StrCmp( gatFindText, atString ) )	//	異なるから、今回初めてといえる
+	{
+		//	バッファにコピー
+		StringCchCopy( gatFindText, MAX_STRING, atString );
+
+		//	検索開始位置
+		if( !(isNowPage)  ){	iPage = 0;	}	//	先頭
+		else{	iPage =  gixTopItem + 1;	}	//	今の次の頁から
+		if( gixMaxItem <= iPage ){	iPage = 0;	}	//	振り切ったら先頭に戻る
+
+	}
+	else	//	同じなら１度処理した後のはず・続きから処理を続ける
+	{
+		iPage =  gixTopItem + 1;	//	今の次の頁から
+		if( gixMaxItem <= iPage ){	iPage = 0;	}	//	振り切ったら先頭に戻る
+	}
+
+	dRslt = FALSE;
+	//	頁を順番にみていく
+	for( i = 0; gixMaxItem > i; i++ )	//	全頁回したら終わり
+	{
+		dRslt = AacItemFindOnePage( hWnd, atString, iPage );
+		if( dRslt ){	break;	}	//	ヒット
+
+		//	今見た頁には無かった場合
+		iPage++;
+		if( gixMaxItem <= iPage ){	iPage = 0;	}	//	振り切ったら先頭に戻る
+	}
+
+	if( dRslt )
+	{
+		Aai_OnVScroll( hWnd, ghScrollWnd, SBP_DIRECT, iPage );	//	該当する位置へジャンプ
+	}
+	else
+	{
+		SetDlgItemText( hWnd, IDS_MAA_TXTFIND_MSGBOX, TEXT("見つからないよ") );
+		//MessageBox( hWnd, TEXT("見つからなかったよ"), TEXT("お燐からのお知らせ"), MB_OK );
+	}
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+
+/*!
+	指定の頁を、指定条件を受けて検索する
+	@param[in]	hWnd		ウインドウハンドル
+	@param[in]	ptFindText	検索したい文字列
+	@param[in]	iTargetPage	検索頁
+	@return	UINT	非０その頁に文字列があった　０なかった
+*/
+UINT AacItemFindOnePage( HWND hWnd, LPTSTR ptFindText, INT iTargetPage )
+{
+	LPSTR	pcItem;
+	LPTSTR	ptTarget, ptFindPos;
+	INT		iMoziPos;
+	UINT	dFound = FALSE;
+
+	//	中身もってくる
+	pcItem = AacAsciiArtGet( iTargetPage );
+	//	ユニコードに直して比較する
+	ptTarget = SjisDecodeAlloc( pcItem );
+	FREE( pcItem );
+
+	ptFindPos = FindStringProc( ptTarget, ptFindText, &iMoziPos );
+	if( ptFindPos ){	dFound = TRUE;	}	//	存在してるか？
+
+	FREE( ptTarget );
+
+	return dFound;
+}
+//-------------------------------------------------------------------------------------------------
+
+
+#endif
+
 
 
 

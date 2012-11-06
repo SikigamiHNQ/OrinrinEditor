@@ -1968,12 +1968,13 @@ UINT ViewMaaItemsModeGet( PUINT pdSubMode )
 
 /*!
 	MAAからSJISを受け取って処理する
+	@param[in]	hWnd	ウインドウハンドル
 	@param[in]	pcCont	AAの文字列
 	@param[in]	cbSize	バイト数・末端NULLは含まない
 	@param[in]	dMode	使用モード・デフォもしくは個別指定
 	@return		非０デフォ動作した　０指定モードだった
 */
-UINT ViewMaaMaterialise( LPSTR pcCont, UINT cbSize, UINT dMode )
+UINT ViewMaaMaterialise( HWND hWnd, LPSTR pcCont, UINT cbSize, UINT dMode )
 {
 	LPTSTR		ptString;
 	UINT_PTR	cchSize;
@@ -1994,7 +1995,7 @@ UINT ViewMaaMaterialise( LPSTR pcCont, UINT cbSize, UINT dMode )
 
 	if( MAA_DRAUGHT == dMode )	//	ドラフトボードに追加
 	{
-		DraughtItemAdding( pcCont );
+		DraughtItemAdding( hWnd, pcCont );
 		return uRslt;
 	}
 
@@ -2246,8 +2247,8 @@ VOID OperationOnCommand( HWND hWnd, INT id, HWND hWndCtl, UINT codeNotify )
 		case  IDM_FIND_DLG_OPEN:		FindDialogueOpen( ghInst, hWnd );	break;
 		case IDM_FIND_HIGHLIGHT_OFF:	FindHighlightOff(  );	break;
 
-		case IDM_FIND_JUMP_NEXT:	FindStringJump( 0, &gdDocXdot, &gdDocLine, &gdDocMozi );	break;
-		case IDM_FIND_JUMP_PREV:	FindStringJump( 1, &gdDocXdot, &gdDocLine, &gdDocMozi );	break;
+//		case IDM_FIND_JUMP_NEXT:	FindStringJump( 0, &gdDocXdot, &gdDocLine, &gdDocMozi );	break;
+//		case IDM_FIND_JUMP_PREV:	FindStringJump( 1, &gdDocXdot, &gdDocLine, &gdDocMozi );	break;
 
 #endif
 		case IDM_PAGENAME_SELASSIGN:	DocSelText2PageName(  );	break;
@@ -2291,7 +2292,7 @@ VOID OperationOnCommand( HWND hWnd, INT id, HWND hWndCtl, UINT codeNotify )
 		case IDM_SJISCOPY_ALL:	DocPageAllCopy( D_SJIS );	break;
 
 		//	選択範囲をドラフトボードへ
-		case IDM_COPY_TO_DRAUGHT:	DraughtItemAddFromSelect( gbSqSelect  );	break;
+		case IDM_COPY_TO_DRAUGHT:	DraughtItemAddFromSelect( hWnd, gbSqSelect  );	break;
 
 		//	貼付　カーソル位置の操作も必要・ポインタ渡しして中で弄る
 		case IDM_PASTE:			DocInputFromClipboard( &gdDocXdot, &gdDocLine, &gdDocMozi , 0 );	break;
@@ -2408,6 +2409,16 @@ VOID OperationOnCommand( HWND hWnd, INT id, HWND hWndCtl, UINT codeNotify )
 		//	全体１ドット左へ
 		case IDM_DECR_DOT_LINES:	DocPositionShift( VK_LEFT,  &gdDocXdot, gdDocLine );	break;
 
+#ifdef DOT_SPLIT_MODE
+		//	真ん中から広げる
+		case IDM_DOT_SPLIT_RIGHT:	DocCentreWidthShift( VK_RIGHT, &gdDocXdot, gdDocLine );	break;
+
+		//	真ん中に縮める
+		case IDM_DOT_SPLIT_LEFT:	DocCentreWidthShift( VK_LEFT,  &gdDocXdot, gdDocLine );	break;
+#else
+		case IDM_DOT_SPLIT_RIGHT:
+		case IDM_DOT_SPLIT_LEFT:	MessageBox( hWnd, TEXT("まだ出来てないよ"), TEXT("Coming Soon ! !"), MB_OK );	break;
+#endif
 		//	自動調整位置決定
 		case IDM_DOTDIFF_LOCK:
 			gdAutoDiffBase = DocDiffAdjBaseSet( gdDocLine );
@@ -2506,10 +2517,9 @@ VOID OperationOnCommand( HWND hWnd, INT id, HWND hWndCtl, UINT codeNotify )
 		//	DOCKING時の、壱行・BRUSHテンプレを表示/非表示
 		case IDM_LINE_BRUSH_TMPL_VIEW:	DockingTmplViewToggle(  0 );	break;
 
-#ifdef AA_INVERSE
+		//	ＡＡの上下・左右反転
 		case IDM_MIRROR_INVERSE:	DocInverseTransform( gbSqSelect, 1, &gdDocXdot, gdDocLine );	break;
 		case IDM_UPSET_INVERSE:		DocInverseTransform( gbSqSelect, 0, &gdDocXdot, gdDocLine );	break;
-#endif
 
 		case IDM_TESTCODE:
 			TRACE( TEXT("機能テスト") );

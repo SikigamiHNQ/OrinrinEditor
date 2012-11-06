@@ -36,7 +36,7 @@ extern HFONT	ghNameFont;		//	ファイルタブ用フォント
 extern INT		gbTmpltDock;	//	頁・壱行テンプレのドッキング
 extern BOOLEAN	gbDockTmplView;	//	くっついてるテンプレは見えているか
 
-extern  HWND	ghMainSplitWnd;	//	メインのスプリットバーハンドル
+//extern  HWND	ghMainSplitWnd;	//	メインのスプリットバーハンドル
 extern  LONG	grdSplitPos;	//	スプリットバーの、左側の、画面右からのオフセット
 
 
@@ -331,6 +331,27 @@ HWND DockingTabGet( VOID )
 	if( gbTmpltDock )	return ghDockTabWnd;
 
 	return NULL;
+}
+//-------------------------------------------------------------------------------------------------
+
+/*!
+	フローティング壱行テンプレの位置リセット
+	@param[in]	hMainWnd	メインウインドウハンドル
+	@return	HRESULT	終了状態コード
+*/
+HRESULT LineTmplePositionReset( HWND hMainWnd )
+{
+	RECT	wdRect, rect;
+
+	GetWindowRect( hMainWnd, &wdRect );
+	rect.left   = wdRect.right;
+	rect.top    = wdRect.top;
+	rect.right  = LT_WIDTH;
+	rect.bottom = LT_HEIGHT;
+
+	SetWindowPos( ghTmpleWnd, HWND_TOP, rect.left, rect.top, rect.right, rect.bottom, SWP_SHOWWINDOW | SWP_NOZORDER );
+
+	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 

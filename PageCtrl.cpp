@@ -71,7 +71,7 @@ extern BOOLEAN	gbDockTmplView;	//	くっついてるテンプレは見えているか
 
 extern  UINT	gdPageByteMax;	//	壱レスの最大バイト数
 
-extern  HWND	ghMainSplitWnd;	//	メインのスプリットバーハンドル
+//extern  HWND	ghMainSplitWnd;	//	メインのスプリットバーハンドル
 extern  LONG	grdSplitPos;	//	スプリットバーの、左側の、画面右からのオフセット
 //-------------------------------------------------------------------------------------------------
 
@@ -687,6 +687,27 @@ VOID Plt_OnContextMenu( HWND hWnd, HWND hWndContext, UINT xPos, UINT yPos )
 }
 //-------------------------------------------------------------------------------------------------
 
+/*!
+	フローティング頁一覧の位置リセット
+	@param[in]	hMainWnd	メインウインドウハンドル
+	@return	HRESULT	終了状態コード
+*/
+HRESULT PageListPositionReset( HWND hMainWnd )
+{
+	RECT	wdRect, rect;
+
+	GetWindowRect( hMainWnd, &wdRect );
+	rect.left   = wdRect.left - PL_WIDTH;
+	rect.top    = wdRect.top;
+	rect.right  = PL_WIDTH;
+	rect.bottom = PL_HEIGHT;
+
+	SetWindowPos( ghPageWnd, HWND_TOP, rect.left, rect.top, rect.right, rect.bottom, SWP_SHOWWINDOW | SWP_NOZORDER );
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+
 /* !
 	親ウインドウが移動したり大きさ変わったら
 	@param[in]	hPrntWnd	親ウインドウハンドル
@@ -961,10 +982,10 @@ HRESULT PageListInsert( INT iBefore )
 */
 HRESULT PageListBuild( LPVOID pVoid )
 {
-	INT	i;
+	INT			i, iLastPage;
 	PAGE_ITR	itPage;
-	LVITEM	stLvi;
-	TCHAR	atBuffer[MIN_STRING];
+	LVITEM		stLvi;
+	TCHAR		atBuffer[MIN_STRING];
 
 	ZeroMemory( &stLvi, sizeof(stLvi) );
 	stLvi.mask  = LVIF_TEXT;
@@ -995,6 +1016,10 @@ HRESULT PageListBuild( LPVOID pVoid )
 
 		i++;
 	}
+
+	//	見てた頁をリストに露出させる
+	iLastPage = (*gitFileIt).dNowPage;
+	ListView_EnsureVisible( ghPageListWnd, iLastPage, FALSE );	//	対象頁のラインまでスクロールさせちゃう
 
 	return S_OK;
 }
@@ -1515,7 +1540,6 @@ LRESULT Plv_OnNotify( HWND hWnd, INT idFrom, LPNMHDR pstNmhdr )
 }
 //-------------------------------------------------------------------------------------------------
 #endif
-
 
 #ifdef USE_HOVERTIP
 /*!

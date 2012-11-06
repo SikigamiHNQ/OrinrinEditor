@@ -51,24 +51,24 @@ typedef LRESULT (CALLBACK *BUFFERBACK)(UINT, UINT, UINT, LPCVOID);
 // このコード モジュールに含まれる関数の宣言
 UINT		Maa_OnMouseWheel( HWND, INT, INT, INT, UINT );	//!<	
 VOID		Maa_OnContextMenu( HWND, HWND, UINT, UINT );	//!<	
-VOID		Maa_OnChar( HWND, TCHAR, INT );
-VOID		Maa_OnSize( HWND , UINT, INT, INT );		//!<	
+VOID		Maa_OnChar( HWND , TCHAR, INT );				//!<	
+VOID		Maa_OnSize( HWND , UINT, INT, INT );			//!<	
 VOID		Maa_OnCommand( HWND , INT, HWND, UINT );		//!<	WM_COMMAND の処理
 
 #ifdef _ORRVW
-INT_PTR	CALLBACK OptionDlgProc( HWND, UINT, WPARAM, LPARAM );
+INT_PTR	CALLBACK OptionDlgProc( HWND, UINT, WPARAM, LPARAM );	//!<	
 #endif
 
 VOID		StatusBarMsgSet( UINT, LPTSTR );	//!<	
 
 LRESULT		TabBarNotify( HWND, LPNMHDR );		//!<	
-VOID		TabBarResize( HWND, LPRECT );
+VOID		TabBarResize( HWND, LPRECT );		//!<	
 
 HRESULT		TreeInitialise( HWND, HINSTANCE, LPRECT );	//!<	
-HRESULT		TreeResize( HWND , LPRECT );		//!<	
+HRESULT		TreeResize( HWND , LPRECT );				//!<	
 HRESULT		TreeConstruct( HWND, LPCTSTR, BOOLEAN );	//!<	
-LRESULT		TreeNotify( HWND, LPNMTREEVIEW );	//!<	
-LPTSTR		TreeBaseNameGet( VOID );			//!<	
+LRESULT		TreeNotify( HWND, LPNMTREEVIEW );			//!<	
+LPTSTR		TreeBaseNameGet( VOID );					//!<	
 UINT		TreeFavIsUnderCursor( HWND, HWND, INT, INT, INT, UINT );	//!<	
 LPARAM		TreeItemInfoGet( HTREEITEM, LPTSTR, size_t );	//!<	
 INT			TreeSelItemProc( HWND, HTREEITEM, UINT );	//!<	
@@ -87,7 +87,7 @@ INT			TabMultipleTopMemory( INT );		//!<
 INT			TabMultipleNowSel( VOID );			//!<	
 HRESULT		TabMultipleDropAdd( HWND, LPCTSTR );	//!<	
 
-HRESULT		TabMultipleCtrlFromFind( HWND );
+HRESULT		TabMultipleCtrlFromFind( HWND );	//!<	
 
 
 HRESULT		AaItemsInitialise( HWND, HINSTANCE, LPRECT );		//!<	
@@ -95,21 +95,25 @@ VOID		AaItemsResize( HWND, LPRECT );						//!<
 VOID		AaItemsDrawItem( HWND, CONST DRAWITEMSTRUCT * );	//!<	
 //VOID		AaItemsMeasureItem( HWND, LPMEASUREITEMSTRUCT );	//!<	
 HRESULT		AaItemsDoShow( HWND, LPTSTR, UINT );		//!<	
-HRESULT		AaItemsFavUpload( LPSTR, UINT );	//!<	
+HRESULT		AaItemsFavUpload( LPSTR, UINT );			//!<	
 UINT		AaItemsIsUnderCursor( HWND, HWND, INT );	//!<	
 VOID		AaTitleClear( VOID );
-INT			AaTitleAddString( UINT, LPSTR );
+INT			AaTitleAddString( UINT, LPSTR );			//!<	
 VOID		AaTitleSelect( HWND, UINT );
 UINT		AaItemsDoSelect( HWND, UINT, UINT );		//!<	
 
-VOID		Aai_OnKey( HWND, UINT, BOOL, INT, UINT );
+VOID		Aai_OnKey( HWND, UINT, BOOL, INT, UINT );	//!<	
 VOID		Aai_OnVScroll( HWND , HWND, UINT, INT );	//!<	
 
-DWORD		AacAssembleFile( HWND, LPTSTR );	//!<	
-HRESULT		AacMatrixClear( VOID  );			//!<	
-DWORD		AacAssembleSql( HWND, LPCTSTR );	//!<	
+DWORD		AacAssembleFile( HWND, LPTSTR );		//!<	
+HRESULT		AacMatrixClear( VOID  );				//!<	
+DWORD		AacAssembleSql( HWND, LPCTSTR );		//!<	
 
-HRESULT		OpenProfileLoad( HWND, INT );	//!<	
+#ifdef MAA_TEXT_FIND
+HRESULT		AacFindTextEntry( HWND , UINT );	//!<	
+#endif
+
+HRESULT		OpenProfileLoad( HWND, INT );			//!<	
 HRESULT		OpenProfileLogging( HWND, LPCTSTR );	//!<	
 
 #ifndef _ORRVW

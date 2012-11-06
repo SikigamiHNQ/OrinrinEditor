@@ -22,44 +22,42 @@ If not, see <http://www.gnu.org/licenses/>.
 //-------------------------------------------------------------------------------------------------
 
 /*
-検索したら、ファイル名・頁番号・位置を全部覚えておく必要がある
 Ctrl+Fで検索窓オーポン
-Ctrl+F3で、選択範囲を検索範囲に・範囲なかったら無視
-Ｆ３でジャンプ、Shift+F3で逆送り
 
-検索状態なら、文字列に変更があったら検索し直し。その行だけでいいか？
-F3用ジャンプテーブルも修正・編集はいったら、該当行のデータ全部けして、その行だけ再検索
+Ctrl＋Ｆ３で、選択範囲を検索範囲に・範囲なかったら無視
+Ｆ３で次の検索文字列のある頁へジャンプ
+Ｆ５でリフレッシュ＜簡易対応
+
+
+検索したら、ファイル名・頁番号・位置を全部覚えておく必要がある＜不要？
 
 イテレータ、eraseの返り値は、削除したやつの次の位置
-
 
 F3ジャンプの記録、頁移動したら、その頁に合わせる
 新規検索したらそれに合わせる
 
 検索位置に文字を追加削除したときの処理は？
+壱文字追加削除・その行だけもう一度サーチすればいい
+改行まではいったら、再描画範囲注意
+
+ペーストとか、選択削除みたいな大技はいったら
+削除は,終わった後のカーソル位置でいけるか？ペーストは、始めた行と,ペースト範囲行だけで？
+
 */
 
 #ifdef FIND_STRINGS
 
 
-//	文字列検索は簡易Boyer-Moore法
-typedef struct tagFINDPATTERN
-{
-	TCHAR	cchMozi;
-	INT		iDistance;
-
-} FINDPATTERN, *LPFINDPATTERN;
-//--------------------------------
 
 //	ヒット位置を記録
-typedef struct tagFINDPOSITION
-{
-	LPARAM	dUnique;	//!<	ファイル通し番号・１インデックス
-	INT		iPage;		//!<	属してる頁
-	INT		iLine;		//!<	該当行
-	INT		iCaret;		//!<	行内での文字位置
-
-} FINDPOSITION, *LPFINDPOSITION;
+//typedef struct tagFINDPOSITION
+//{
+//	LPARAM	dUnique;	//!<	ファイル通し番号・１インデックス
+//	INT		iPage;		//!<	属してる頁
+//	INT		iLine;		//!<	該当行
+//	INT		iCaret;		//!<	行内での文字位置
+//
+//} FINDPOSITION, *LPFINDPOSITION;
 
 //-------------------------------------------------------------------------------------------------
 
@@ -72,115 +70,26 @@ extern INT		gixFocusPage;			//		注目中のページ・とりあえず０・０インデックス
 
 EXTERNED HWND	ghFindDlg;				//!<	検索ダイヤログのハンドル
 
-static TCHAR	gatNowPtn[MAX_PATH];	//!<	最新の検索文字列
-static INT		gixFindMode;			//!<	検索モード　０頁のみ　１単ファイル　２全ファイル
 
-static FINDPOSITION	gstFindPos;			//!<	検索ジャンプ位置
+static TCHAR	gatNowPtn[MAX_PATH];	//!<	最新の検索文字列
+static INT		gixFindMode;			//!<	最新の検索モード　０頁のみ　１単ファイル　キャンセル＞２全ファイル
+static INT		giCrLfCnt;				//!<	検索文字列中に改行がいくつあるか
+
+
+//static FINDPOSITION	gstFindPos;			//!<	検索ジャンプ位置
 
 //static list<FINDPOSITION>	gltFindPosition;	//!<	検索結果保持
 //-------------------------------------------------------------------------------------------------
 
 
-INT_PTR	CALLBACK FindStrDlgProc( HWND, UINT, WPARAM, LPARAM );
-HRESULT	FindExecute( HWND );
-HRESULT	FindPageSearch( LPTSTR, INT, FILES_ITR );
-INT		FindPageHighlightOff( INT, FILES_ITR );
-HRESULT	FindPageHitHighlight( INT, INT, INT, FILES_ITR );
-HRESULT FindLineHighlightOff( UINT, LINE_ITR );
+INT_PTR	CALLBACK FindStrDlgProc( HWND, UINT, WPARAM, LPARAM );	//!<	
+HRESULT	FindExecute( HWND );	//!<	
+HRESULT	FindPageSearch( LPTSTR, INT, FILES_ITR );	//!<	
+INT		FindPageHighlightOff( INT , FILES_ITR );	//!<	
+HRESULT	FindPageHighlightSet( INT, INT, INT, FILES_ITR );	//!<	
+HRESULT FindLineHighlightOff( UINT , LINE_ITR );	//!<	
 //-------------------------------------------------------------------------------------------------
 
-
-/*!
-	BM検索テーブルつくる
-	@param[in]	ptPattern	検索パターン
-	@return	LPFINDPATTERN	作成した検索テーブル
-*/
-LPFINDPATTERN FindTableMake( LPTSTR ptPattern )
-{
-	UINT		i;
-	UINT_PTR	dLength;
-	LPFINDPATTERN	pstPtrn;
-
-	//	テーブルをパターンの長さで初期化する
-	StringCchLength( ptPattern, STRSAFE_MAX_CCH, &dLength );
-	pstPtrn = (LPFINDPATTERN)malloc( (dLength+1) * sizeof(FINDPATTERN) );
-	ZeroMemory( pstPtrn, (dLength+1) * sizeof(FINDPATTERN) );
-
-	for( i = 0; dLength >= i; i++ ){	pstPtrn[i].iDistance =  dLength;	}
-
-	//	パターンの先頭から、文字に対応する位置に末尾からの長さを登録する
-	while( dLength > 0 )
-	{
-		i = 0;
-		while( pstPtrn[i].cchMozi )
-		{
-			if( pstPtrn[i].cchMozi ==  *ptPattern ){	break;	}
-			i++;
-		}
-		pstPtrn[i].cchMozi   = *ptPattern;
-		pstPtrn[i].iDistance = --dLength;
-
-		ptPattern++;
-	}
-
-	return pstPtrn;
-}
-//-------------------------------------------------------------------------------------------------
-
-/*!
-	BM検索する
-	@param[in]	ptText		検索対象文字列
-	@param[in]	ptPattern	検索パターン
-	@return		LPTSTR		ヒットした部分の開始・なかったらNULL
-*/
-LPTSTR FindStringProc( LPTSTR ptText, LPTSTR ptPattern, LPINT pdCch )
-{
-	UINT_PTR	dPtrnLen, dLength;
-	LPTSTR	ptTextEnd;
-	INT		i, j, k, jump, cch;
-
-	LPFINDPATTERN	pstPattern;
-
-	StringCchLength( ptText, STRSAFE_MAX_CCH, &dLength );
-
-	StringCchLength( ptPattern, STRSAFE_MAX_CCH, &dPtrnLen );
-	dPtrnLen--;
-
-	ptTextEnd = ptText + dLength - dPtrnLen;
-
-	pstPattern = FindTableMake( ptPattern );
-
-	cch = 0;
-	while( ptText < ptTextEnd )
-	{
-		for( i = dPtrnLen ; i >= 0 ; i-- )
-		{
-			if( ptText[i] != ptPattern[i] ){	break;	}
-		}
-
-		//	全て一致した
-		if( i < 0 ){	FREE( pstPattern  );	*pdCch = cch;	return( ptText );	}
-
-		//	テーブルから移動量を求める(負数なら移動量は２)
-		k = 0;
-		while( pstPattern[k].cchMozi )
-		{
-			if( pstPattern[k].cchMozi == ptText[i] ){	break;	}
-			k++;
-		}
-		j = pstPattern[k].iDistance - ( dPtrnLen - i );
-		jump = ( 0 < j ) ? j : 2;
-		ptText += jump;
-		cch += jump;
-	}
-
-	FREE( pstPattern );
-
-	*pdCch = 0;
-
-	return( NULL );
-}
-//-------------------------------------------------------------------------------------------------
 
 /*!
 	検索ダイヤログを開く・モーダレスで
@@ -190,10 +99,18 @@ LPTSTR FindStringProc( LPTSTR ptText, LPTSTR ptPattern, LPINT pdCch )
 */
 HRESULT FindDialogueOpen( HINSTANCE hInst, HWND hWnd )
 {
+
+	if( !(hInst) || !(hWnd) )	//	変数初期化しておくだけ
+	{
+		ZeroMemory( gatNowPtn, sizeof(gatNowPtn) );
+		gixFindMode = 0;
+		giCrLfCnt = 0;
+	}
+
 	if( ghFindDlg )
 	{
 		SetForegroundWindow( ghFindDlg );
-		return S_OK;
+		return S_FALSE;
 	}
 
 	ghFindDlg = CreateDialogParam( hInst, MAKEINTRESOURCE(IDD_FIND_STRING_DLG), hWnd, FindStrDlgProc, 0 );
@@ -229,13 +146,15 @@ INT_PTR CALLBACK FindStrDlgProc( HWND hDlg, UINT message, WPARAM wParam, LPARAM 
 			hWorkWnd = GetDlgItem( hDlg, IDCB_FIND_TARGET );
 			ComboBox_InsertString( hWorkWnd, 0, TEXT("現在の頁") );
 			ComboBox_InsertString( hWorkWnd, 1, TEXT("現在のファイル") );
-	//		ComboBox_InsertString( hWorkWnd, 2, TEXT("開いている全てのファイル") );無しでいいかも
-			ComboBox_SetCurSel( hWorkWnd, 0 );
-			ComboBox_Enable( hWorkWnd , FALSE );	//	機能出来るまで凍結
+	//		ComboBox_InsertString( hWorkWnd, 2, TEXT("開いている全てのファイル") );無しで
+			ComboBox_SetCurSel( hWorkWnd, gixFindMode );	//	今の検索モードを反映する
+	//		ComboBox_Enable( hWorkWnd , FALSE );	//	機能出来るまで凍結
+
 			hWorkWnd = GetDlgItem( hDlg, IDE_FIND_TEXT );
-			Edit_SetText( hWorkWnd, gatNowPtn );
+			Edit_SetText( hWorkWnd, gatNowPtn );	//	今の検索内容があれば転写する
 			SetFocus( hWorkWnd );
 			return (INT_PTR)FALSE;
+
 
 		case WM_COMMAND:
 			id = LOWORD(wParam);
@@ -255,6 +174,7 @@ INT_PTR CALLBACK FindStrDlgProc( HWND hDlg, UINT message, WPARAM wParam, LPARAM 
 				default:	break;
 			}
 			break;
+
 
 		case WM_CLOSE:
 			DestroyWindow( hDlg );
@@ -278,25 +198,25 @@ INT_PTR CALLBACK FindStrDlgProc( HWND hDlg, UINT message, WPARAM wParam, LPARAM 
 HRESULT FindExecute( HWND hDlg )
 {
 //	HWND	hWorkWnd;
-	INT		dRange;	//	検索範囲　０頁　１ファイル　２全開きファイル
+	UINT_PTR	dPage, d, h;
+	INT		dRange;	//	検索範囲　０頁　１ファイル 　キャンセル＞２全開きファイル
 	BOOLEAN	bModCrlf;
-	UINT	d, h;
 
 	TCHAR	atPattern[MAX_PATH], atBuf[MAX_PATH];
 
-	FindHighlightOff(  );	//	先のパヤーン破棄
-	ZeroMemory( &gstFindPos, sizeof(FINDPOSITION) );
 
 	//	￥ｎを改行、￥￥を￥にするか
 	bModCrlf = IsDlgButtonChecked( hDlg, IDCB_MOD_CRLF_YEN );
 
-	//	検索範囲
+	//	検索範囲	０頁　１ファイル
 	dRange = ComboBox_GetCurSel( GetDlgItem(hDlg,IDCB_FIND_TARGET) );
-	//	０頁　１ファイル　２全オーポンファイル
-	gixFindMode = dRange;
-
+	//
 	//検索パヤーン
 	Edit_GetText( GetDlgItem(hDlg,IDE_FIND_TEXT), atBuf, MAX_PATH );
+
+	if( atBuf[0] )	return  E_ABORT;	//	空文字列なら何もしない
+
+	giCrLfCnt = 0;	//	改行カウント・通常0かな
 	ZeroMemory( atPattern, sizeof(atPattern) );
 	if( bModCrlf )	//	エスケープシーケンスを展開
 	{
@@ -310,6 +230,7 @@ HRESULT FindExecute( HWND hDlg )
 				{
 					atPattern[h] = TEXT('\r');	h++;
 					atPattern[h] = TEXT('\n');
+					giCrLfCnt++;	//	改行カウント増やす
 				}
 			}
 		}
@@ -319,24 +240,50 @@ HRESULT FindExecute( HWND hDlg )
 		StringCchCopy( atPattern, MAX_PATH, atBuf );
 	}
 
-	//	とりあえず頁Search
-	FindPageSearch( atPattern, gixFocusPage, gitFileIt );
+//検索条件が前と変わらず、全頁検索なら、次のヒット頁に移動する
+//変わっているか、単頁検索なら、普通に検索
+	if( !( StrCmp(atPattern,gatNowPtn) ) && gixFindMode == dRange )
+	{
+		//	次ヒット頁に移動
+#error 作成中
+	}
+	else
+	{
+		//	条件通りに検索
+
+		gixFindMode = dRange;
+
+		FindHighlightOff(  );	//	先のパヤーン破棄
+
+		//	とりあえず頁Search
+		if( dRange )	//	全頁検索しちゃったりして
+		{
+			dPage = gitFileIt->vcCont.size( );
+			for( d = 0; dPage > d; d++ )
+			{
+				FindPageSearch( atPattern, d, gitFileIt );
+			}
+		}
+		else	//	なう頁のみ
+		{
+			FindPageSearch( atPattern, gixFocusPage, gitFileIt );
+		}
+	}
 
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 
-
 /*!
 	指定パヤーンを、指定ファイルの、指定頁で検索
-	@param[in]	ptPattern	検索パヤーン
+	@param[in]	ptPattern	検索パヤーン・NULLなら最後の検索文字列を使用する
 	@param[in]	iTgtPage	対象頁
 	@param[in]	itFile		ファイルイテレータ
-	@return		HRESULT	終了状態コード
+	@return		HRESULT	終了状態コード・ヒットしたらS_OK
 */
 HRESULT FindPageSearch( LPTSTR ptPattern, INT iTgtPage, FILES_ITR itFile )
 {
-
+	HRESULT		hRslt;
 	INT			dCch, dLeng;
 	INT_PTR		dBytes;
 	UINT_PTR	cchSize, cchSzPtn;
@@ -344,13 +291,15 @@ HRESULT FindPageSearch( LPTSTR ptPattern, INT iTgtPage, FILES_ITR itFile )
 
 	TCHAR	ttBuf;
 
+	TRACE( TEXT("PAGE[%d] SEARCH"), iTgtPage );
+
+	if( ptPattern ){	StringCchCopy( gatNowPtn, MAX_PATH, ptPattern );	}	//	ラストメモリー
+
+	StringCchLength( gatNowPtn, MAX_PATH, &cchSzPtn );
+
 	//	ディレイしていればチェックしなくていい
 	if( PageIsDelayed( itFile, iTgtPage ) ){	return  E_ABORT;	}
-
-	//	ラストメモリー
-	StringCchCopy( gatNowPtn, MAX_PATH, ptPattern );
-
-	StringCchLength( ptPattern, MAX_PATH, &cchSzPtn );
+	//	ヒットがあるかどうかだけ返す、でもいいか
 
 	//	頁全体確保
 	dBytes = DocPageTextGetAlloc( itFile, iTgtPage, D_UNI, (LPVOID *)(&ptPage), FALSE );
@@ -359,17 +308,20 @@ HRESULT FindPageSearch( LPTSTR ptPattern, INT iTgtPage, FILES_ITR itFile )
 	ptCaret = ptPage;
 
 	//	検索する
+	hRslt = E_NOTIMPL;
 	dLeng = 0;
 	do
 	{
-		ptFind = FindStringProc( ptCaret, ptPattern, &dCch );	//	ヒットしたら先頭部分かえる
-		if( !(ptFind) ){	break;	}
+		ptFind = FindStringProc( ptCaret, gatNowPtn, &dCch );	//	ヒットしたら先頭部分かえる
+		if( !(ptFind) ){	break;	}	//	ヒットしなかった
 
 		dLeng += dCch;	//	文字位置・０インデックス
 		ttBuf = ptPage[dLeng];
 
 		//	ヒットした部分に色を付ける
-		FindPageHitHighlight( dLeng, cchSzPtn, iTgtPage, itFile );
+		FindPageHighlightSet( dLeng, cchSzPtn, iTgtPage, itFile );	//	中で該当領域の再描画まで指定してる
+
+		hRslt = S_OK;
 
 		ptCaret = ptFind;
 		ptCaret++;
@@ -380,7 +332,7 @@ HRESULT FindPageSearch( LPTSTR ptPattern, INT iTgtPage, FILES_ITR itFile )
 
 	FREE(ptPage);
 
-	return S_OK;
+	return hRslt;
 }
 //-------------------------------------------------------------------------------------------------
 
@@ -392,7 +344,7 @@ HRESULT FindPageSearch( LPTSTR ptPattern, INT iTgtPage, FILES_ITR itFile )
 	@param[in]	itFile	ファイルイテレータ
 	@return		HRESULT	終了状態コード
 */
-HRESULT FindPageHitHighlight( INT iOffset, INT iRange, INT iPage, FILES_ITR itFile )
+HRESULT FindPageHighlightSet( INT iOffset, INT iRange, INT iPage, FILES_ITR itFile )
 {
 	UINT_PTR	ln, iLetters;//, iLines;
 	INT_PTR		dMozis;
@@ -487,7 +439,111 @@ HRESULT FindPageHitHighlight( INT iOffset, INT iRange, INT iPage, FILES_ITR itFi
 }
 //-------------------------------------------------------------------------------------------------
 
+/*!
+	全部ハイライトＯＦＦ
+	@return	HRESULT	終了状態コード
+*/
+HRESULT FindHighlightOff( VOID )
+{
+	UINT_PTR	dPage, d;
 
+	dPage = gitFileIt->vcCont.size( );
+
+	for( d = 0; dPage > d; d++ )
+	{
+		FindPageHighlightOff( d, gitFileIt );
+	}
+
+	//	現在内容も初期化
+	FindDialogueOpen( NULL, NULL );
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+
+/*!
+	指定ファイルの指定頁の検索ハイライトをOFFする
+	@param[in]	iPage	対象頁
+	@param[in]	itFile	ファイルイテレータ
+	@return		特にない
+*/
+INT FindPageHighlightOff( INT iPage, FILES_ITR itFile )
+{
+	UINT_PTR	ln;//, iLines, iLetters, mz;
+//	UINT		dStyle;
+//	INT			iDot, iWid;
+//	RECT		inRect;
+
+	LINE_ITR	itLine, itLnEnd;
+
+
+	if( 0 >  iPage )	return 0;	//	特殊な状況下では処理しない
+
+	ZeroMemory( gatNowPtn, sizeof(gatNowPtn) );
+
+	itLine  = itFile->vcCont.at( iPage ).ltPage.begin();
+	itLnEnd = itFile->vcCont.at( iPage ).ltPage.end();
+
+	for( ln = 0; itLnEnd != itLine; itLine++, ln++ )
+	{
+		FindLineHighlightOff( ln, itLine );	//	中でREDRAW処理してる
+	}
+
+//	ViewRedrawSetLine( -1 );	//	画面表示更新
+
+	return 1;
+}
+//-------------------------------------------------------------------------------------------------
+
+/*!
+	指定行の検索ハイライトをOFFする
+	@param[in]	iLine	行数・０インデックス
+	@param[in]	itFile	行イテレータ
+	@return	HRESULT	終了状態コード
+*/
+HRESULT FindLineHighlightOff( UINT iLine, LINE_ITR itLine )
+{
+	UINT_PTR	iLetters, mz;//, iLines, ln;
+	UINT		dStyle;
+	INT			iDot, iWid;
+	RECT		inRect;
+
+
+	iDot = 0;	//	そこまでのドット数をため込む
+	inRect.top    = iLine * LINE_HEIGHT;
+	inRect.bottom = inRect.top + LINE_HEIGHT;
+
+	iLetters = itLine->vcLine.size();
+	//	壱文字ずつ、全部をチェキっていく
+	for( mz = 0; iLetters > mz; mz++ )
+	{
+		//	直前の状態
+		dStyle = itLine->vcLine.at( mz ).mzStyle;
+		iWid   = itLine->vcLine.at( mz ).rdWidth;
+
+		inRect.left  = iDot;
+		inRect.right = iDot + iWid;
+
+		itLine->vcLine.at( mz ).mzStyle &= ~CT_FINDED;
+		if( dStyle & CT_FINDED )	ViewRedrawSetRect( &inRect );
+
+		iDot += iWid;
+	}
+
+	//	壱行終わったら末尾状況確認。改行・本文末端に改行はない・選択のときのみ
+	dStyle = itLine->dStyle;
+	inRect.left  = iDot;
+	inRect.right = iDot + 20;	//	改行描画エリア・大体これくらい
+
+	itLine->dStyle &=  ~CT_FINDRTN;
+	if( dStyle & CT_FINDRTN )	ViewRedrawSetRect( &inRect );
+
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+
+#if 0
 /*!
 	検索位置へジャンプ
 	@param[in]	dMode	０次へ　１前へ
@@ -569,110 +625,11 @@ INT FindStringJump( UINT dMode, PINT pXdot, PINT pYline, PINT pMozi )
 	return 0;
 }
 //-------------------------------------------------------------------------------------------------
+#endif
 
 /*!
-	全部ハイライトＯＦＦ
-	@return		HRESULT	終了状態コード
-*/
-HRESULT FindHighlightOff( VOID )
-{
-	UINT_PTR	dPage, d;
-
-	dPage = gitFileIt->vcCont.size( );
-
-	for( d = 0; dPage > d; d++ )
-	{
-		FindPageHighlightOff( d, gitFileIt );
-	}
-
-	return S_OK;
-}
-//-------------------------------------------------------------------------------------------------
-
-/*!
-	指定ファイルの指定頁の検索ハイライトをOFFする
-	@param[in]	iPage	対象頁
-	@param[in]	itFile	ファイルイテレータ
-	@return		特にない
-*/
-INT FindPageHighlightOff( INT iPage, FILES_ITR itFile )
-{
-	UINT_PTR	ln;//, iLines, iLetters, mz;
-//	UINT		dStyle;
-//	INT			iDot, iWid;
-//	RECT		inRect;
-
-	LINE_ITR	itLine, itLnEnd;
-
-
-	if( 0 >  iPage )	return 0;	//	特殊な状況下では処理しない
-
-	ZeroMemory( gatNowPtn, sizeof(gatNowPtn) );
-
-	itLine  = itFile->vcCont.at( iPage ).ltPage.begin();
-	itLnEnd = itFile->vcCont.at( iPage ).ltPage.end();
-
-	for( ln = 0; itLnEnd != itLine; itLine++, ln++ )
-	{
-		FindLineHighlightOff( ln, itLine );	//	中でREDRAW処理してる
-	}
-
-//	ViewRedrawSetLine( -1 );	//	画面表示更新
-
-	return 1;
-}
-//-------------------------------------------------------------------------------------------------
-
-/*!
-	指定行の検索ハイライトをOFFする
-	@param[in]	iLine	行数・０インデックス
-	@param[in]	itFile	行イテレータ
-	@return		特にない
-*/
-HRESULT FindLineHighlightOff( UINT iLine, LINE_ITR itLine )
-{
-	UINT_PTR	iLetters, mz;//, iLines, ln;
-	UINT		dStyle;
-	INT			iDot, iWid;
-	RECT		inRect;
-
-
-	iDot = 0;	//	そこまでのドット数をため込む
-	inRect.top    = iLine * LINE_HEIGHT;
-	inRect.bottom = inRect.top + LINE_HEIGHT;
-
-	iLetters = itLine->vcLine.size();
-	//	壱文字ずつ、全部をチェキっていく
-	for( mz = 0; iLetters > mz; mz++ )
-	{
-		//	直前の状態
-		dStyle = itLine->vcLine.at( mz ).mzStyle;
-		iWid   = itLine->vcLine.at( mz ).rdWidth;
-
-		inRect.left  = iDot;
-		inRect.right = iDot + iWid;
-
-		itLine->vcLine.at( mz ).mzStyle &= ~CT_FINDED;
-		if( dStyle & CT_FINDED )	ViewRedrawSetRect( &inRect );
-
-		iDot += iWid;
-	}
-
-	//	壱行終わったら末尾状況確認。改行・本文末端に改行はない・選択のときのみ
-	dStyle = itLine->dStyle;
-	inRect.left  = iDot;
-	inRect.right = iDot + 20;	//	改行描画エリア・大体これくらい
-
-	itLine->dStyle &=  ~CT_FINDRTN;
-	if( dStyle & CT_FINDRTN )	ViewRedrawSetRect( &inRect );
-
-
-	return S_OK;
-}
-//-------------------------------------------------------------------------------------------------
-
-/*!
-	今頁を再検索
+	今頁を再検索・画面再描画とか
+	@return	HRESULT	終了状態コード
 */
 HRESULT FindNowPageReSearch( VOID )
 {
@@ -684,4 +641,45 @@ HRESULT FindNowPageReSearch( VOID )
 }
 //-------------------------------------------------------------------------------------------------
 
+/*!
+	遅延読込頁を開くときに、検索ハイライツの面倒見る
+	@param[in]	iTgtPage	対象頁番号
+	@return	HRESULT	終了状態コード
+*/
+HRESULT FindDelayPageReSearch( INT iTgtPage )
+{
+
+	//	全体検索でないか、検索文字列が空なら無視してよろし
+	if(  1 != gixFindMode || NULL == gatNowPtn[0] ){	return  E_ABORT;	}
+
+
+	//	とりあえず頁Search
+	FindPageSearch( NULL, iTgtPage, gitFileIt );
+
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+
+#if 0
+/*!
+	文字が挿入削除されたときに、その部分のCheckをする
+	@param[in]	iTgtLine	対象行番号
+	@return	HRESULT	終了状態コード
+*/
+HRESULT FindTextModifyLine( INT iTgtLine )
+{
+//該当行と改行が及ぶ範囲の行のみ、いったんチェック外して、該当範囲の行だけチェキ
+//コピペされた場合は？　挿入削除処理が行われてからチェックするなら、影響半亥注意
+
+	//	giCrLfCnt
+
+	//行数確認・はみ出さないように
+
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
 #endif
+
+#endif	//	FIND_STRINGS

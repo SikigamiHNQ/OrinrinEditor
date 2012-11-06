@@ -368,9 +368,13 @@ HRESULT DocFileSave( HWND hWnd, UINT bStyle )
 
 	isAST = PageListIsNamed( gitFileIt );	//	頁に名前が付いてる？
 
-	if( isAST ){		idExten = 0;	}	//	AST
-	else if( isMLT ){	idExten = 1;	}	//	MLT
-	else{				idExten = 2;	}	//	TXT
+	//if( isAST ){		idExten = 0;	}	//	AST
+	//else if( isMLT ){	idExten = 1;	}	//	MLT
+	//else{				idExten = 2;	}	//	TXT
+	//	txtは使用しないことにする
+	if( isAST ){	idExten = 0;	}	//	AST
+	else{			idExten = 1;	}	//	MLT
+
 
 	GetLocalTime( &stSysTile );
 
@@ -394,8 +398,9 @@ HRESULT DocFileSave( HWND hWnd, UINT bStyle )
 //		stSaveFile.lpstrInitialDir = 
 		stSaveFile.lpstrTitle      = TEXT("保存するファイル名を指定するですぅ");
 		stSaveFile.Flags           = OFN_EXPLORER | OFN_OVERWRITEPROMPT | OFN_HIDEREADONLY;
-		//if( 1 >= iPages )	stSaveFile.lpstrDefExt = TEXT("txt");
-		//else				stSaveFile.lpstrDefExt = TEXT("mlt");
+		//デフォルト拡張子の指定・あとで面倒見てるからここではしない方が良い
+		//	stSaveFile.lpstrDefExt = TEXT("ast");
+		//	stSaveFile.lpstrDefExt = TEXT("mlt");
 
 		bOpened = GetSaveFileName( &stSaveFile );
 
@@ -420,8 +425,8 @@ HRESULT DocFileSave( HWND hWnd, UINT bStyle )
 		//	特殊フォーマットの場合はエクスポートとし、内部状態には影響しないようにする
 	}
 
-	//	拡張子を確認・ドット込みだよ～ん
-	ptExten = PathFindExtension( atFilePath );	//	拡張子が無いならNULL、というか末端になる
+	//	拡張子を確認・ドット込みだよ～ん・拡張子の位置のポインタ確保
+	ptExten = PathFindExtension( atFilePath );	//	拡張子が無いなら末端になる
 	if( 0 == *ptExten )
 	{
 		//	拡張子指定がないならそのまま対応のをくっつける

@@ -154,9 +154,11 @@ CONST TCHAR gaatPaddingSpDotW[11][3] = {
 UINT	SpaceWidthAdjust( INT, PINT, PINT );	//!<	
 LPTSTR	SpaceStrAlloc( INT, INT );	//!<	
 
+UINT	DocSpaceDifference( UINT, PINT, INT, UINT );	//!<	
+
 HRESULT	DocRightGuideSet( INT, INT );	//!<	
 
-LPTSTR	DocPaddingSpace( INT, PINT, PINT );
+LPTSTR	DocPaddingSpace( INT , PINT, PINT );	//!<	
 //-------------------------------------------------------------------------------------------------
 
 
@@ -439,7 +441,7 @@ INT DocLineStateCheckWithDot( INT dDot, INT rdLine, PINT pLeft, PINT pRight, PIN
 	//	中身が無いならエラー
 	if( 0 >= iCount ){	*pIsSp =  FALSE;	*pLeft =  0;	*pRight = 0;	return 0;	}
 
-	dMozis = DocLetterPosGetAdjust( &dDot, rdLine, 0 );	//	今の文字位置を確認
+	dMozis = DocLetterPosGetAdjust( &dDot , rdLine, 0 );	//	今の文字位置を確認
 
 	if( 1 <= dMozis ){	itMozi += (dMozis-1);	}	//	キャレットの位置の左文字で判定
 	//	最初から先頭ならなにもしなくておｋ
@@ -502,9 +504,10 @@ INT DocLineStateCheckWithDot( INT dDot, INT rdLine, PINT pLeft, PINT pRight, PIN
 	@param[in]	vk		方向・右か左か
 	@param[in]	pXdot	今のドット位置を受けて戻す
 	@param[in]	dLine	今の行数
+	@param[in]	dFirst	アンドゥグループ・非０なら最初の一発　０続き
 	@return	UINT	非０ズレ値　０失敗
 */
-UINT DocSpaceDifference( UINT vk, PINT pXdot, INT dLine )
+UINT DocSpaceDifference( UINT vk, PINT pXdot, INT dLine, UINT dFirst )
 {
 	INT			dTgtDot, dNowDot;
 	INT			dBgnDot, dEndDot;
@@ -586,8 +589,8 @@ UINT DocSpaceDifference( UINT vk, PINT pXdot, INT dLine )
 //	ptOldSp = (LPTSTR)malloc( cchSize * sizeof(TCHAR) );
 //	StringCchCopy( ptOldSp, cchSize, wsBuffer.c_str( ) );
 
-	SqnAppendString( &((*gitFileIt).vcCont.at( gixFocusPage ).stUndoLog), DO_DELETE, wsBuffer.c_str( ), dBgnDot, dLine, TRUE );
-	SqnAppendString( &((*gitFileIt).vcCont.at( gixFocusPage ).stUndoLog), DO_INSERT, ptSpace, dBgnDot, dLine, FALSE );
+	SqnAppendString( &((*gitFileIt).vcCont.at( gixFocusPage ).stUndoLog), DO_DELETE, wsBuffer.c_str( ), dBgnDot, dLine, dFirst );
+	SqnAppendString( &((*gitFileIt).vcCont.at( gixFocusPage ).stUndoLog), DO_INSERT, ptSpace, dBgnDot, dLine, FALSE );	//	弐回目なので確定でよろし
 
 //	FREE( ptOldSp );
 
@@ -612,7 +615,7 @@ INT DocSpaceShiftProc( UINT vk, PINT pXdot, INT dLine )
 	dDot = DocLineParamGet( dLine, &dMozi, &dPreByte );
 	if( 0 >= dMozi )	return 0;
 
-	dDot = DocSpaceDifference( vk, pXdot, dLine );
+	dDot = DocSpaceDifference( vk, pXdot, dLine, TRUE );
 
 	DocLetterPosGetAdjust( pXdot, dLine, 0 );	//	この中のDocLineParamGetでバイト数が計算されてる
 
@@ -1633,4 +1636,171 @@ HRESULT DocHeadHalfSpaceExchange( HWND hWnd )
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
+
+#ifdef DOT_SPLIT_MODE
+/*!
+	キャレット位置から、左右に１dotずつずらす。文字なら空白に置き換えながら
+	@param[in]	vk		方向・右か左か
+	@param[in]	pXdot	今のドット位置を受けて戻す
+	@param[in]	dLine	今の行数
+	@return		HRESULT	終了状態コード
+*/
+HRESULT DocCentreWidthShift( UINT vk, PINT pXdot, INT dLine )
+{
+	UINT_PTR	iLines, cchSz;
+	UINT		dRslt, dFirst;
+	INT			iBaseDot, iTop, iBottom, iBufDot;
+	INT			wid, iDot, iLin, iMzCnt;
+	INT			iFnlDot;
+	BOOLEAN		bSeled = FALSE;
+	BOOLEAN		bRight;	//	非０右へ　０左へ
+	LPTSTR		ptRepl;
+	TCHAR		ch, chOneSp;
+
+	LPUNDOBUFF	pstUndoBuff;	
+
+	LETR_ITR	vcLtrItr;
+	LINE_ITR	itLine;
+
+	chOneSp = gaatPaddingSpDotW[1][0];	//	幅1dot・文字間に挿入
+
+	//中心部分が空白なら、その空白を伸び縮みさせる。
+	//文字と文字の間開けるなら、抽芯になってる字の左側を開けるようにする
+	//潰すときは、抽芯字を空白に置き換えて、それを縮める
+
+	pstUndoBuff = &((*gitFileIt).vcCont.at( gixFocusPage ).stUndoLog);
+
+	iBaseDot = *pXdot;	//	基準点、なるべく動かないようにせないかん
+	TRACE( TEXT("中間ずらし %dDOT"), iBaseDot );
+
+	iFnlDot = iBaseDot;
+
+	if( VK_RIGHT == vk )		bRight = TRUE;
+	else if( VK_LEFT == vk )	bRight = FALSE;
+	else	return E_INVALIDARG;
+
+	if(  0 == iBaseDot )	//	基準が０なら、全体左右ずらしってこと
+	{
+		return DocPositionShift( vk, pXdot, dLine );
+	}
+
+	//	範囲確認
+	iLines  = DocNowFilePageLineCount( );
+	iTop    = (*gitFileIt).vcCont.at( gixFocusPage ).dSelLineTop;
+	iBottom = (*gitFileIt).vcCont.at( gixFocusPage ).dSelLineBottom;
+	if( 0 <= iTop &&  0 <= iBottom )	bSeled = TRUE;
+
+	if( 0 > iTop )		iTop = 0;
+	if( 0 > iBottom )	iBottom = iLines - 1;
+
+	//	そのままだと容量が狂う・一旦選択状態を解除して計算しなおす
+	if( bSeled ){	DocPageSelStateToggle( -1 );	}
+
+	//	壱行ずつ面倒見ていく
+	itLine = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.begin();
+	std::advance( itLine, iTop );	//	位置合わせ
+
+//なんか時々連続空白ができる
+
+	dFirst = TRUE;
+	//	順番に処理していく
+	for( iLin = iTop; iBottom >= iLin; iLin++, itLine++ )
+	{
+		iDot = itLine->iDotCnt;
+		if( iBaseDot >=  iDot ){	continue;	}
+		//	操作位置に満たないのなら、何もする必要は無い
+
+		//	操作開始
+		iDot = iBaseDot;	//	調整位置確定
+		iMzCnt = DocLetterPosGetAdjust( &iDot, iLin, -1 );	//	常に左側をみる
+		//	操作する位置の文字確認
+
+		//	該当位置が空白なら、伸び縮み兼用
+		iBufDot = iDot;	//	値ズレるのでそのまま使うとイケない
+		dRslt = DocSpaceDifference( vk, &iBufDot, iLin, dFirst );	//	iBufDotはズラしたら使えない
+		if( dRslt  )	//	ズラし成功
+		{
+			if( iLin == dLine ){	iFnlDot =  iBaseDot;	}	//	ずらした後の位置の面倒見る
+			dFirst = FALSE;
+		}
+		else	//	返り値０なら、文字なので処理を
+		{
+			vcLtrItr = itLine->vcLine.begin( );
+			std::advance( vcLtrItr, iMzCnt );	//	注目位置の文字まで移動して
+			ch  = vcLtrItr->cchMozi;
+			wid = vcLtrItr->rdWidth;	//	該当の文字の幅を確認
+
+			if( bRight )	//	右に動かす
+			{
+				if( iswspace( ch ) )	//	右側の文字は空白であったら
+				{
+					iBufDot = iDot + wid;	//	その空白を延ばす
+					DocSpaceDifference( vk, &iBufDot, iLin, dFirst );	//	iBufDotは使えない
+					if( iLin == dLine ){	iFnlDot =  iBaseDot;	}	//	ずらした後の位置の面倒見る
+				}
+				else
+				{
+					DocInputLetter( iDot, iLin, chOneSp );	//	その場所に1dotスペース足せばおｋ
+					SqnAppendLetter( pstUndoBuff, DO_INSERT, chOneSp, iDot, iLin, dFirst );
+					if( iLin == dLine ){	iFnlDot = iDot +  1;	}	//	ずらした後の位置の面倒見る
+				}
+				dFirst = FALSE;
+			}
+			else	//	左に動かす
+			{
+				if( iLin == dLine ){	iFnlDot =  iDot;	}	//	ずらす前の位置の面倒見る
+
+				//	今の文字を削除
+				SqnAppendLetter( pstUndoBuff, DO_DELETE, ch, iDot, iLin, dFirst );	dFirst = FALSE;
+				DocIterateDelete( vcLtrItr , iLin );
+				if( 2 <= wid )	//	幅が１なら、削除だけでおｋ
+				{
+					ptRepl = DocPaddingSpaceMake( wid-1 );	//	必要な空白確保
+					StringCchLength( ptRepl , STRSAFE_MAX_CCH, &cchSz );	//	文字数確認
+					DocStringAdd( &iDot, &iLin, ptRepl, cchSz );	//	そして先頭に空白をアッー！
+					SqnAppendString( pstUndoBuff, DO_INSERT, ptRepl, iDot, iLin, dFirst );	dFirst = FALSE;
+					FREE(ptRepl);	//	開放忘れないように
+				}
+			}
+		}
+
+		if( bSeled )	//	選択状態でヤッてたのなら、選択状態を維持する
+		{
+			if( iLin == iTop )
+			{
+				iDot = iBaseDot;
+				DocLetterPosGetAdjust( &iDot, iLin, 0 );	//	キャレット位置適当に調整
+				DocRangeSelStateToggle( iDot, -1, iLin , 1 );	//	該当行全体を選択状態にする
+			}
+			else
+			{
+				DocRangeSelStateToggle( -1, -1, iLin , 1 );	//	該当行全体を選択状態にする
+			}
+
+			//	次の行があるなら改行も選択で
+			if( iBottom > iLin )	DocReturnSelStateToggle( iLin, 1 );
+		}
+
+		DocBadSpaceCheck( iLin );	//	状態をリセット
+		ViewRedrawSetLine( iLin );
+	}
+
+	if( bSeled )	//	選択範囲はり直し
+	{
+		(*gitFileIt).vcCont.at( gixFocusPage ).dSelLineTop    = iTop;
+		(*gitFileIt).vcCont.at( gixFocusPage ).dSelLineBottom = iBottom;
+	}
+
+	//	キャレット位置調整
+	DocLetterPosGetAdjust( &iFnlDot, dLine, 0 );	//	キャレット位置適当に調整
+	*pXdot = iFnlDot;	//	位置を戻す
+	ViewDrawCaret( iFnlDot, dLine, 1 );
+	//	再描画
+	DocPageByteCount( gitFileIt, gixFocusPage, NULL, NULL );
+	DocPageInfoRenew( -1, 1 );
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+#endif
 
