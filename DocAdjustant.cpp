@@ -1740,8 +1740,8 @@ HRESULT DocCentreWidthShift( UINT vk, PINT pXdot, INT dLine )
 				}
 				else
 				{
-					DocInputLetter( iDot, iLin, chOneSp );	//	その場所に1dotスペース足せばおｋ
 					SqnAppendLetter( pstUndoBuff, DO_INSERT, chOneSp, iDot, iLin, dFirst );
+					DocInputLetter( iDot, iLin, chOneSp );	//	その場所に1dotスペース足せばおｋ
 					if( iLin == dLine ){	iFnlDot = iDot +  1;	}	//	ずらした後の位置の面倒見る
 				}
 				dFirst = FALSE;
@@ -1757,8 +1757,8 @@ HRESULT DocCentreWidthShift( UINT vk, PINT pXdot, INT dLine )
 				{
 					ptRepl = DocPaddingSpaceMake( wid-1 );	//	必要な空白確保
 					StringCchLength( ptRepl , STRSAFE_MAX_CCH, &cchSz );	//	文字数確認
-					DocStringAdd( &iDot, &iLin, ptRepl, cchSz );	//	そして先頭に空白をアッー！
 					SqnAppendString( pstUndoBuff, DO_INSERT, ptRepl, iDot, iLin, dFirst );	dFirst = FALSE;
+					DocStringAdd( &iDot, &iLin, ptRepl, cchSz );	//	そして先頭に空白をアッー！
 					FREE(ptRepl);	//	開放忘れないように
 				}
 			}
