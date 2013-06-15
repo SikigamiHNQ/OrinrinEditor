@@ -257,7 +257,35 @@
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
 			<File
+				RelativePath=".\resource\dir_extra.ico"
+				>
+			</File>
+			<File
+				RelativePath=".\resource\dir_open.ico"
+				>
+			</File>
+			<File
+				RelativePath=".\resource\directory.ico"
+				>
+			</File>
+			<File
+				RelativePath=".\resource\file_ast.ico"
+				>
+			</File>
+			<File
+				RelativePath=".\resource\file_etc.ico"
+				>
+			</File>
+			<File
+				RelativePath=".\resource\file_mlt.ico"
+				>
+			</File>
+			<File
 				RelativePath=".\OrinrinEditor.ico"
+				>
+			</File>
+			<File
+				RelativePath=".\OrinrinViewer.ico"
 				>
 			</File>
 			<File

@@ -7,7 +7,7 @@
 
 /*
 Orinrin Editor : AsciiArt Story Editor for Japanese Only
-Copyright (C) 2011 - 2012 Orinrin/SikigamiHNQ
+Copyright (C) 2011 - 2013 Orinrin/SikigamiHNQ
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
@@ -1133,7 +1133,7 @@ HRESULT DocPageDelete( INT iPage, INT iBack )
 /*!
 	ディレイしてる頁の読込
 	@param[in]	itFile	対象のファイル
-	@param[in]	iPage	そのファイルの頁
+	@param[in]	iPage	そのファイルの頁・じっしつ意味ない
 	@return		非０ロードした　０ロード済であった
 */
 UINT DocDelayPageLoad( FILES_ITR itFile, INT iPage )
@@ -1152,6 +1152,7 @@ UINT DocDelayPageLoad( FILES_ITR itFile, INT iPage )
 		if( 0 < cchSize )	//	空行でないのなら
 		{
 			DocStringAdd( &dmyX, &dmyY, itFile->vcCont.at( iPage ).ptRawData, cchSize );	//	この中で改行とか面倒見る
+			//	これでは、今のページロード専用になってる
 		}
 
 		//	アンドゥは一旦リセットすべき＜頁開けただけなので
@@ -1834,7 +1835,7 @@ HRESULT DocPageDivide( HWND hWnd, HINSTANCE hInst, INT iNow )
 
 	ZeroONELINE( &stLine );
 
-	//mRslt = MessageBox( hWnd, TEXT("分割しちゃったら復帰できないのですよ・・・\r\n本当にバラしていいのですか？"), TEXT("確認なのです。あぅあぅ"), MB_YESNO | MB_ICONQUESTION | MB_DEFBUTTON2 );
+	//mRslt = MessageBox( hWnd, TEXT("分割しちゃったら復帰できないよ・・・\r\n本当にバラしていい？"), TEXT("確認です"), MB_YESNO | MB_ICONQUESTION | MB_DEFBUTTON2 );
 	mRslt = MessageBoxCheckBox( hWnd, hInst, 1 );
 	if( IDNO == mRslt ){	return  E_ABORT;	}
 
@@ -1908,7 +1909,7 @@ HRESULT DocThreadDropCopy( VOID )
 	ZeroMemory( atInfo, sizeof(atInfo) );
 	MultiByteToWideChar( CP_ACP, 0, acBuf, (INT)strlen(acBuf), atInfo, 256 );
 
-	StringCchPrintf( atTitle, 64, TEXT("%d 頁をコピーしたのです。あぅ"), gixDropPage + 1 );
+	StringCchPrintf( atTitle, 64, TEXT("%d 頁をコピーしたよ"), gixDropPage + 1 );
 
 	NotifyBalloonExist( atInfo, atTitle, NIIF_INFO );
 

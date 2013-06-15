@@ -7,7 +7,7 @@
 
 /*
 Orinrin Editor : AsciiArt Story Editor for Japanese Only
-Copyright (C) 2011 - 2012 Orinrin/SikigamiHNQ
+Copyright (C) 2011 - 2013 Orinrin/SikigamiHNQ
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
@@ -689,7 +689,7 @@ VOID Maa_OnSize( HWND hWnd, UINT state, INT cx, INT cy )
 	rect.top = tbRect.bottom;
 	rect.bottom -= tbRect.bottom;	//	タブバーの分の面倒も見る
 
-	SplitBarResize( ghSplitaWnd, &rect );	//	スプリットバー
+	SplitBarResize( ghSplitaWnd, &rect );	//	ＭＡＡ窓のサイズ変更によるスプリットバー
 
 	TreeResize( hWnd, &rect );		//	ツリービュー
 	AaItemsResize( hWnd, &rect );	//	一覧ビュー
@@ -832,7 +832,7 @@ INT TreeProfileMake( HWND hWnd, LPTSTR ptProf )
 		stOpenFile.lpstrFileTitle  = atFileName;
 		stOpenFile.nMaxFileTitle   = MAX_STRING;
 	//	stOpenFile.lpstrInitialDir = 
-		stOpenFile.lpstrTitle      = TEXT("ファイル名を指定するか、作成したい名前を入力するかしらー");
+		stOpenFile.lpstrTitle      = TEXT("ファイル名を指定するか、作成したいファイル名を入力してね");
 		stOpenFile.Flags           = OFN_EXPLORER | OFN_HIDEREADONLY;
 		stOpenFile.lpstrDefExt     = TEXT("qor");
 

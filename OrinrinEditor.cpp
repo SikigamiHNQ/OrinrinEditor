@@ -7,7 +7,7 @@
 
 /*
 Orinrin Editor : AsciiArt Story Editor for Japanese Only
-Copyright (C) 2011 - 2012 Orinrin/SikigamiHNQ
+Copyright (C) 2011 - 2013 Orinrin/SikigamiHNQ
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
@@ -19,6 +19,10 @@ If not, see <http://www.gnu.org/licenses/>.
 //-------------------------------------------------------------------------------------------------
 
 //	注意・コマンドのリソースＩＤ番号は変更不可！
+
+//	TODO:	ＯＫ？	保存したときのバルーンメッセージもON/OFFできるように
+//	TODO:	ＯＫ？	MLTの副タブ、多段とスクロール、選択出来るように
+//	TODO:	ＯＫ？	MLTの副タブ、ダブルクリックで名称変更が出せるように
 
 //	TODO:	ＯＫ？	MAAファイルのコマの削除処理作ってる	MaaItems.cpp
 //	TODO:	ＯＫ？	MAA表示中のヤツから文字列検索する機能
@@ -40,6 +44,27 @@ If not, see <http://www.gnu.org/licenses/>.
 
 
 //本文検索、Ｆ３で表示更新？
+
+
+//	TODO:	起動中に外部からのコマンドでもう一つファイルを開けるようにできない？
+//プロセスがあるときに「"～\OrinrinEditor.exe" "～.mlt"」というコマンドラインが実行されると
+//エラーが出て、こういう場合に起動中の別タブに読み込むか、もう一つ別に立ち上がって欲しい
+//今の仕様だと、関連付けでエディターとして登録してもファイルからは一つしか開けないし、
+//Ayaya ViewerやMLTViewで外部編集プログラムとして登録しても起動中だと使用できないので、
+//投下用ASTの編集と作品用自分まとめMLTのメンテナンスが不便ですので。
+
+//ノート（1280*800）と外付け（1920*1080）の2画面構成でノートを
+//メインディスプレイにしたときサブディスプレイで文字AA変換ボックス、
+//縦書き変換ボックスを表示するとメインディスプレイ側の移動できない位置に
+//ボックスが表示され使えなくなります。
+
+//それとエディタの横幅を狭めた時にブラシなどが表示されているパレットが
+//移動されず消えてしまうのでそちらも表示され続ける設定ができるようにお願いします
+
+//MonitorFromPoint
+//multimon.h
+//#define COMPILE_MULTIMON_STUBS
+//GetSystemMetrics(SM_CMONITORS)
 
 
 //直したのでチェキせよ
@@ -486,7 +511,7 @@ ASDファイル　　壱行が壱コンテンツ
 					ＭＡＡ窓の背景色変更出来るようにした
 					プレビューを再描画しても、そのとき開いていた位置と状態を維持できる、はず
 					選択範囲をAST頁名称にする機能追加
-2012/11/13	0.32	MAAのツリー側のAA頁を削除出来るようにした
+2013/05/31	0.32	MAAのツリー側のAA頁を削除出来るようにした
 					新規保存時の拡張子を、MLTかASTを適用するようにした
 					ドラフトボード・サムネイルのサイズを４段階で変えれるようにした
 					MAA窓に、開いてる頁内の文字列検索を付けた・
@@ -494,6 +519,12 @@ ASDファイル　　壱行が壱コンテンツ
 					頁切り替えた時、最後の頁のところまで頁一覧をスクロール
 					任意の場所から右の部分を、左右にずらす機能
 					MAAテンプレにアイテム追加したら全アイテムに改行が増えるのを修正
+					二つ目を起動したとき、引数に渡されてたら、既存のやつでそれを開くようにした
+					多重起動を選択できるようにしたが・検証が必要
+					保存したときのバルーンメッセージの表示のON/OFF出来るようにした
+					MAA窓の副タブを、多段表示と壱行表示を切り替えられるようにした
+					メイン窓サイズ変えたときに、スプリットバーが追随するようになったかな
+					未ロードの頁を統合したら、内容が消えるのを修正
 
 
 更新日時注意
@@ -562,6 +593,8 @@ static  HBRUSH		ghStsRedBrush;	//!<	ステータスバー用紅ブラシ
 
 static HANDLE		ghMutex;		//!<	多重起動防止用Mutex
 
+static INT			giResizeWide;	//!<	ウインドウサイズ変更したとき、変更前との差分・使ってない
+
 #ifdef WORK_LOG_OUT
 static HANDLE		ghLogFlie;		//!<	ログ出力
 #endif
@@ -583,6 +616,8 @@ EXTERNED UINT		gbUniRadixHex;	//!<	ユニコード数値参照が１６進数であるか
 static   UINT		gdBUInterval;	//!<	バックアップ感覚・デフォ３分くらい？
 EXTERNED UINT		gbAutoBUmsg;	//!<	自動バックアップメッセージ出すか？
 EXTERNED UINT		gbCrLfCode;		//!<	改行コード：０したらば・非０ＹＹ 
+
+EXTERNED UINT		gbSaveMsgOn;	//!<	保存メッセージ出すか？
 
 EXTERNED UINT		gdPageByteMax;	//!<	壱レスの最大バイト数
 
@@ -641,15 +676,21 @@ VOID	Cls_OnContextMenu(HWND,HWND,UINT,UINT );		//!<
 VOID	Cls_OnHotKey(HWND, INT, UINT, UINT );			//!<	
 VOID	Cls_OnDrawItem( HWND, CONST DRAWITEMSTRUCT * );	//!<	
 
+BOOL	Cls_OnWindowPosChanging( HWND, LPWINDOWPOS );	//!<	
+
+#ifdef MULTIACT_RELAY
+void	Cls_OnCopyData( HWND, HWND, PCOPYDATASTRUCT );	//!<	
+#endif
+
 INT_PTR	CALLBACK OptionDlgProc( HWND, UINT, WPARAM, LPARAM );	//!<	
 
 LRESULT	CALLBACK gpfFileTabProc( HWND, UINT, WPARAM, LPARAM );	//!<	複数ファイルタブのサブクラスプロシージャ
 VOID	Ftb_OnMButtonUp( HWND, INT, INT, UINT );	//!<	
 
-HRESULT	ViewingFontNameLoad( VOID );
+HRESULT	ViewingFontNameLoad( VOID );	//!<	
 
 #ifdef USE_NOTIFYICON
-VOID	TaskTrayIconEvent( HWND, UINT, UINT );
+VOID	TaskTrayIconEvent( HWND, UINT, UINT );	//!<	
 #endif
 //-------------------------------------------------------------------------------------------------
 
@@ -674,13 +715,17 @@ INT APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 	TCHAR	atArgv[MAX_PATH];
 	LPTSTR	*pptArgs;
 
-	INT		iCode;
+	INT		iCode, dMultiEna;
 
 	LPACCEL	pstAccel;
 	INT	iEntry;
 
 #ifdef WORK_LOG_OUT
 	SYSTEMTIME	stTime;
+#endif
+#ifdef MULTIACT_RELAY
+	HWND	hWndActed;	//	起動済のやつのハンドル確保
+	COPYDATASTRUCT	stCopyData;
 #endif
 
 #ifdef _DEBUG
@@ -697,15 +742,16 @@ INT APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 	//	結構奥の方だから注意
 #endif
 
-	//	多重起動防止
-	ghMutex = CreateMutex( NULL , TRUE, TEXT("OrinrinEditor") );	//	すでに起動しているか判定
-	if( GetLastError() == ERROR_ALREADY_EXISTS )	//	すでに起動している
-	{
-		MessageBox( NULL, TEXT("已にアプリは起動してるよ！"), TEXT("お燐からのお知らせ"), MB_OK|MB_ICONINFORMATION );
-		ReleaseMutex( ghMutex );
-		CloseHandle( ghMutex );
-		return 0;
-	}
+	INITCOMMONCONTROLSEX	iccex;
+	iccex.dwSize = sizeof(INITCOMMONCONTROLSEX);
+	iccex.dwICC  = ICC_WIN95_CLASSES | ICC_USEREX_CLASSES | ICC_COOL_CLASSES;
+	InitCommonControlsEx( &iccex );
+
+
+	// グローバル文字列を初期化しています。
+	LoadString(hInstance, IDS_APP_TITLE, gszTitle, MAX_STRING);
+	LoadString(hInstance, IDC_ORINRINEDITOR, gszWindowClass, MAX_STRING);
+
 
 	//	コマンドライン引数を確認・０は実行ファイル名、１以降に引数入ってる
 	ZeroMemory( atArgv, sizeof(atArgv) );
@@ -714,24 +760,64 @@ INT APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 	if( 2 <= iArgc ){	StringCchCopy( atArgv, MAX_PATH, pptArgs[1] );	}
 	LocalFree( pptArgs );
 
+	ghMutex = NULL;
 
-
-	INITCOMMONCONTROLSEX	iccex;
-	iccex.dwSize = sizeof(INITCOMMONCONTROLSEX);
-	iccex.dwICC  = ICC_WIN95_CLASSES | ICC_USEREX_CLASSES | ICC_COOL_CLASSES;
-	InitCommonControlsEx( &iccex );
-
-	// グローバル文字列を初期化しています。
-	LoadString(hInstance, IDS_APP_TITLE, gszTitle, MAX_STRING);
-	LoadString(hInstance, IDC_ORINRINEDITOR, gszWindowClass, MAX_STRING);
-	InitWndwClass( hInstance );
-
-	//	設定ファイル位置確認
+	//	実行ファイル位置確認
 	GetModuleFileName( hInstance, gatExePath, MAX_PATH );
 	PathRemoveFileSpec( gatExePath );
 
+	//	設定ファイル位置確認
 	StringCchCopy( gatIniPath, MAX_PATH, gatExePath );
 	PathAppend( gatIniPath, INI_FILE );
+
+#ifdef MULTIACT_RELAY
+	dMultiEna = InitParamValue( INIT_LOAD, VL_MULTI_ACT_E, 0 );
+	if( !(dMultiEna) )	//	多重起動有効ならミューテックスチェック不要
+	{
+#endif
+
+		//	フルアクセス
+		SECURITY_DESCRIPTOR	stSeqDes;
+		SECURITY_ATTRIBUTES	secAttribute;
+		InitializeSecurityDescriptor( &stSeqDes, SECURITY_DESCRIPTOR_REVISION );
+		SetSecurityDescriptorDacl( &stSeqDes, TRUE, 0, FALSE );
+		secAttribute.nLength				= sizeof( secAttribute );
+		secAttribute.lpSecurityDescriptor	= &stSeqDes;
+		secAttribute.bInheritHandle			= TRUE; 
+
+		//	多重起動防止
+		ghMutex = CreateMutex( &secAttribute, TRUE, TEXT("OrinrinEditor") );	//	すでに起動しているか判定
+		if( !(ghMutex) )
+		{
+			//	オープン失敗、とりあえず起動
+		}
+		else if( GetLastError() == ERROR_ALREADY_EXISTS )	//	すでに起動している
+		{
+	#ifdef MULTIACT_RELAY
+			hWndActed = FindWindow( gszWindowClass, NULL );
+			SetForegroundWindow( hWndActed );	//	先に起動のやつをフォアグラウンドにする
+
+			//	コマンド引数（ファイル名）あったら、ファイル名を送る
+			if( 0 != atArgv[0] )
+			{
+				stCopyData.dwData = 1;
+				stCopyData.cbData = sizeof(atArgv);
+				stCopyData.lpData = atArgv;
+
+				SendMessage( hWndActed, WM_COPYDATA, NULL, (LPARAM)(&stCopyData) );
+			}
+	#else
+			MessageBox( NULL, TEXT("已にアプリは起動してるよ！"), TEXT("お燐からのお知らせ"), MB_OK|MB_ICONINFORMATION );
+	#endif
+			ReleaseMutex( ghMutex );
+			CloseHandle( ghMutex );
+			return 0;
+		}
+#ifdef MULTIACT_RELAY
+	}
+#endif
+
+	InitWndwClass( hInstance );
 
 	DocBackupDirectoryInit( gatExePath );
 	FrameInitialise( gatExePath, hInstance );
@@ -862,8 +948,11 @@ INT APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 
 	UnregisterHotKey( ghMainWnd, IDHK_THREAD_DROP );
 
-	ReleaseMutex( ghMutex );
-	CloseHandle( ghMutex );
+	if( ghMutex )
+	{
+		ReleaseMutex( ghMutex );
+		CloseHandle( ghMutex );
+	}
 
 	TRACE( TEXT("Program Terminate") );
 
@@ -963,6 +1052,8 @@ BOOL InitInstance( HINSTANCE hInstance, INT nCmdShow, LPTSTR ptArgv )
 	gdBUInterval  = InitParamValue( INIT_LOAD, VL_BACKUP_INTVL, 3 );	//	バックアップ３分毎
 	gbAutoBUmsg   = InitParamValue( INIT_LOAD, VL_BACKUP_MSGON, 1 );	//	バックアップメッセージ表示
 	gbCrLfCode    = InitParamValue( INIT_LOAD, VL_CRLF_CODE, 0 );		//	したらば改行
+
+	gbSaveMsgOn   = InitParamValue( INIT_LOAD, VL_SAVE_MSGON, 1 );		//	保存メッセージ表示
 
 	gbTmpltDock   = InitParamValue( INIT_LOAD, VL_PLS_LN_DOCK,  1 );	//	壱行ブラシテンプレ頁一覧くっつける
 
@@ -1264,11 +1355,15 @@ LRESULT CALLBACK WndProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam 
 		HANDLE_MSG( hWnd, WM_HOTKEY,		Cls_OnHotKey  );	//	ホットキーが押された
 
 		HANDLE_MSG( hWnd, WM_DRAWITEM,		Cls_OnDrawItem );	//	オーナードロー
-
+#ifdef MULTIACT_RELAY
+		HANDLE_MSG( hWnd, WM_COPYDATA,		Cls_OnCopyData );
+#endif
 		HANDLE_MSG( hWnd, WM_KEYDOWN,		Evw_OnKey );		//	
 		HANDLE_MSG( hWnd, WM_KEYUP,			Evw_OnKey );		//	
 		HANDLE_MSG( hWnd, WM_CHAR,			Evw_OnChar );		//	
 		HANDLE_MSG( hWnd, WM_MOUSEWHEEL,	Evw_OnMouseWheel );	//	
+
+		HANDLE_MSG( hWnd, WM_WINDOWPOSCHANGING,	Cls_OnWindowPosChanging );	
 
 		case WM_MBUTTONUP:	TRACE( TEXT("MIDDLE  UP") );	break;
 
@@ -1530,6 +1625,32 @@ VOID Cls_OnTimer( HWND hWnd, UINT id )
 //-------------------------------------------------------------------------------------------------
 
 /*!
+	ウィンドウのサイズ変更が完了する前に送られてくる
+	@param[in]	hWnd	ウインドウハンドル
+	@param[in]	pstWpos	新しい位置と大きさが入ってる
+	@return		このMessageを処理したら０
+*/
+BOOL Cls_OnWindowPosChanging( HWND hWnd, LPWINDOWPOS pstWpos )
+{
+	RECT	winPos;
+
+	GetWindowRect( hWnd, &winPos );	//	サイズ変更前のがゲッツできる
+	winPos.right  = winPos.right - winPos.left;
+	winPos.bottom = winPos.bottom - winPos.top;	//	左上位置と、幅高さにしておく
+
+	TRACE( TEXT("MAIN WM_WINDOWPOSCHANGING [%d %d %d %d][%d %d %d %d]"), winPos.left, winPos.top, winPos.right, winPos.bottom, pstWpos->x, pstWpos->y, pstWpos->cx, pstWpos->cy );
+
+	giResizeWide = pstWpos->cx - winPos.right;	//	プラマイ方向注意。＋で幅広がってる
+	//	高さもとっとく
+
+	//	今のところ意味の無い処理
+
+	return TRUE;
+}
+//-------------------------------------------------------------------------------------------------
+
+
+/*!
 	ウインドウがサイズ変更されたとき
 	@param[in]	hWnd	親ウインドウのハンドル
 	@param[in]	state	変更の状態・SIZE_MINIMIZED とか
@@ -1571,11 +1692,13 @@ VOID Cls_OnSize( HWND hWnd, UINT state, INT cx, INT cy )
 
 	if( SIZE_MAXIMIZED == state )	//	最大化時
 	{
+#ifndef SPLIT_BAR_POS_FIX
 		if( ghMainSplitWnd )
 		{
 			AppClientAreaCalc( &rect  );	//	右に併せて移動
 			SetWindowPos( ghMainSplitWnd, HWND_TOP, rect.right - grdSplitPos, rect.top, 0, 0, SWP_NOSIZE );
 		}
+#endif
 		ccState = SIZE_MAXIMIZED;
 	}
 
@@ -1583,11 +1706,13 @@ VOID Cls_OnSize( HWND hWnd, UINT state, INT cx, INT cy )
 	{
 		if( !(IsZoomed( hWnd ) ) )	//	まだ最大化中なら、スプリットバー調整のはず
 		{
+#ifndef SPLIT_BAR_POS_FIX
 			if( ghMainSplitWnd )
 			{
 				AppClientAreaCalc( &rect  );	//	右に併せて移動
 				SetWindowPos( ghMainSplitWnd, HWND_TOP, rect.right - grdSplitPos, rect.top, 0, 0, SWP_NOSIZE );
 			}
+#endif
 			ccState = SIZE_RESTORED;
 		}
 	}
@@ -1596,9 +1721,17 @@ VOID Cls_OnSize( HWND hWnd, UINT state, INT cx, INT cy )
 
 	ToolBarOnSize( hWnd, state, cx, cy );
 
-	AppClientAreaCalc( &rect  );	//	
+	AppClientAreaCalc( &rect  );	//	右に併せて移動
 
-	ViewSizeMove( hWnd, &rect );
+#ifdef SPLIT_BAR_POS_FIX
+	if( ghMainSplitWnd && (SIZE_SPLITBAR_MOVED != state) )	//	ここでスプリットバー調整？	
+	{
+		SetWindowPos( ghMainSplitWnd, HWND_TOP, rect.right - grdSplitPos, rect.top, 0, 0, SWP_NOSIZE );
+	}
+#endif
+	ViewSizeMove( hWnd, &rect );	//	メイン窓のサイズ変更調整
+
+
 
 	return;
 }
@@ -1917,6 +2050,29 @@ LRESULT Cls_OnNotify( HWND hWnd, INT idFrom, LPNMHDR pstNmhdr )
 	return 0;	//	何もないなら０を戻す
 }
 //-------------------------------------------------------------------------------------------------
+
+#ifdef MULTIACT_RELAY
+
+/*!
+	別に起動したやつからの送信を受け取る
+	@param[in]	hWnd		親ウインドウのハンドル
+	@param[in]	hWndFrom	発生源のハンドル
+	@param[in]	pstCopyData	トンできた内容
+*/
+void Cls_OnCopyData( HWND hWnd, HWND hWndFrom, PCOPYDATASTRUCT pstCopyData )
+{
+	TCHAR	atBuff[MAX_PATH];
+
+	StringCchCopy( atBuff, MAX_PATH, (LPTSTR)(pstCopyData->lpData) );
+
+	TRACE( TEXT("COPYDATA[%s]"), atBuff );
+
+	DocDoOpenFile( hWnd, atBuff );	//	それを開く
+
+	return;
+}
+//-------------------------------------------------------------------------------------------------
+#endif
 
 /*!
 	ドラッグンドロップの受け入れ
@@ -2313,6 +2469,9 @@ INT InitParamValue( UINT dMode, UINT dStyle, INT nValue )
 		case  VL_MAA_BKCOLOUR:	StringCchCopy( atKeyName, SUB_STRING, TEXT("MaaBkColour") );	break;
 		case  VL_THUMB_HORIZ:	StringCchCopy( atKeyName, SUB_STRING, TEXT("ThumbHoriz")  );	break;
 		case  VL_THUMB_VERTI:	StringCchCopy( atKeyName, SUB_STRING, TEXT("ThumbVerti")  );	break;
+		case  VL_MULTI_ACT_E:	StringCchCopy( atKeyName, SUB_STRING, TEXT("MultiAct") );		break;
+		case  VL_SAVE_MSGON:	StringCchCopy( atKeyName, SUB_STRING, TEXT("SaveMsgOn") );		break;
+		case  VL_MAATAB_SNGL:	StringCchCopy( atKeyName, SUB_STRING, TEXT("MaaTabSingle") );	break;
 
 		default:	return nValue;
 	}
@@ -2581,7 +2740,7 @@ HRESULT WindowPositionReset( HWND hWnd )
 		AppClientAreaCalc( &rect  );	//	右に併せて移動
 		SetWindowPos( ghMainSplitWnd, HWND_TOP, rect.right - PLIST_DOCK, rect.top, 0, 0, SWP_NOSIZE );
 
-		ViewSizeMove( hWnd, &rect );	//	動かした位置で再計算とか
+		ViewSizeMove( hWnd, &rect );	//	位置情報リセットした
 	}
 	else	//	フローティングウインドウ
 	{
@@ -2833,9 +2992,10 @@ INT_PTR CALLBACK OptionDlgProc( HWND hDlg, UINT message, WPARAM wParam, LPARAM l
 			//	スライダ初期値・小さいほど薄くなる
 			SendDlgItemMessage( hDlg, IDSL_LAYERBOX_TRANCED, TBM_SETRANGE, TRUE, MAKELPARAM( 0, 0xE0 ) );	//	0xE0
 
-			Edit_SetText( GetDlgItem(hDlg,IDE_AA_DIRECTORY), TEXT("ＡＡディレクトリはプロファイルから設定してね") );
-			EnableWindow( GetDlgItem(hDlg,IDE_AA_DIRECTORY), FALSE );
-			ShowWindow( GetDlgItem(hDlg,IDB_AADIR_SEARCH), SW_HIDE );
+			//	アイテム削除
+			//Edit_SetText( GetDlgItem(hDlg,IDE_AA_DIRECTORY), TEXT("ＡＡディレクトリはプロファイルから設定してね") );
+			//EnableWindow( GetDlgItem(hDlg,IDE_AA_DIRECTORY), FALSE );
+			//ShowWindow( GetDlgItem(hDlg,IDB_AADIR_SEARCH), SW_HIDE );
 
 			//	MAAポップアップについて
 			dValue = InitParamValue( INIT_LOAD, VL_MAATIP_SIZE, 16 );	//	サイズ確認
@@ -2877,8 +3037,11 @@ INT_PTR CALLBACK OptionDlgProc( HWND hDlg, UINT message, WPARAM wParam, LPARAM l
 			StringCchPrintf( atBuff, SUB_STRING, TEXT("%d"), dValue );
 			Edit_SetText( GetDlgItem(hDlg,IDE_AUTO_BU_INTVL), atBuff );
 
-			//	自動保存メッセージ
+			//	バックアップメッセージ
 			CheckDlgButton( hDlg, IDCB_AUTOBU_MSG_ON, gbAutoBUmsg ? BST_CHECKED : BST_UNCHECKED );
+
+			//	保存メッセージ
+			CheckDlgButton( hDlg, IDCB_SAVE_MSG_ON, gbSaveMsgOn ? BST_CHECKED : BST_UNCHECKED );
 
 			//	改行コード選択
 			CheckRadioButton( hDlg, IDRB_CRLF_STRB, IDRB_CRLF_2CH_YY, gbCrLfCode ? IDRB_CRLF_2CH_YY : IDRB_CRLF_STRB );
@@ -2893,7 +3056,12 @@ INT_PTR CALLBACK OptionDlgProc( HWND hDlg, UINT message, WPARAM wParam, LPARAM l
 			dValue = InitParamValue( INIT_LOAD, VL_GROUP_UNDO, 1 );
 			CheckDlgButton( hDlg, IDCB_GROUPUNDO_SET, dValue ? BST_CHECKED : BST_UNCHECKED );
 
-			EnableWindow( GetDlgItem(hDlg,IDCB_COPY_STYLE_SWAP), FALSE );
+			//	多重起動有効
+			dValue = InitParamValue( INIT_LOAD, VL_MULTI_ACT_E, 0 );
+			CheckDlgButton( hDlg, IDCB_MULTIACT_ENA, dValue ? BST_CHECKED : BST_UNCHECKED );
+
+			//	アイテム削除
+			//EnableWindow( GetDlgItem(hDlg,IDCB_COPY_STYLE_SWAP), FALSE );
 
 			//	ドッキングスタイル
 			dValue = InitParamValue( INIT_LOAD, VL_PLS_LN_DOCK, 1 );
@@ -3027,10 +3195,15 @@ INT_PTR CALLBACK OptionDlgProc( HWND hDlg, UINT message, WPARAM wParam, LPARAM l
 					Edit_GetText( GetDlgItem(hDlg,IDE_AUTO_BU_INTVL), atBuff, SUB_STRING );
 					gdBUInterval = StrToInt( atBuff );
 					InitParamValue( INIT_SAVE, VL_BACKUP_INTVL, gdBUInterval );
-					//	自動保存メッセージ
+					//	バックアップメッセージ
 					dValue = IsDlgButtonChecked( hDlg, IDCB_AUTOBU_MSG_ON );
 					gbAutoBUmsg = dValue ? 1 : 0;
 					InitParamValue( INIT_SAVE, VL_BACKUP_MSGON, gbAutoBUmsg );
+
+					//	保存メッセージ
+					dValue = IsDlgButtonChecked( hDlg, IDCB_SAVE_MSG_ON );
+					gbSaveMsgOn = dValue ? 1 : 0;
+					InitParamValue( INIT_SAVE, VL_SAVE_MSGON, gbSaveMsgOn );
 
 					//	改行コード選択
 					gbCrLfCode = 0;
@@ -3050,6 +3223,10 @@ INT_PTR CALLBACK OptionDlgProc( HWND hDlg, UINT message, WPARAM wParam, LPARAM l
 					//	グループアンドゥ
 					dValue = IsDlgButtonChecked( hDlg, IDCB_GROUPUNDO_SET );
 					InitParamValue( INIT_SAVE, VL_GROUP_UNDO, dValue ? 1 : 0 );
+
+					//	20130116	多重起動有効
+					dValue = IsDlgButtonChecked( hDlg, IDCB_MULTIACT_ENA );
+					InitParamValue( INIT_SAVE, VL_MULTI_ACT_E, dValue ? 1 : 0 );
 
 					//	ドッキングスタイル・変更しても、再起動するまでは無効
 					dValue = IsDlgButtonChecked( hDlg, IDCB_DOCKING_STYLE );
@@ -3593,7 +3770,7 @@ HRESULT DockingTmplViewToggle( UINT bMode )
 		gbDockTmplView = TRUE;
 
 		//	位置合わせ
-		ViewSizeMove( ghMainWnd, &rect );
+		ViewSizeMove( ghMainWnd, &rect );	//	ドッキングしてる壱行ブラシテンプレを表示/非表示
 
 		//	今の状態に合わせて復帰
 		curSel = TabCtrl_GetCurSel( hDockWnd );

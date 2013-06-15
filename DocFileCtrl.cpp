@@ -7,7 +7,7 @@
 
 /*
 Orinrin Editor : AsciiArt Story Editor for Japanese Only
-Copyright (C) 2011 - 2012 Orinrin/SikigamiHNQ
+Copyright (C) 2011 - 2013 Orinrin/SikigamiHNQ
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
@@ -27,10 +27,12 @@ If not, see <http://www.gnu.org/licenses/>.
 
 
 extern list<ONEFILE>	gltMultiFiles;	//!<	複数ファイル保持
-extern FILES_ITR	gitFileIt;		//!<	今見てるファイルの本体
-extern INT		gixFocusPage;		//!<	注目中のページ・とりあえず０・０インデックス
+extern FILES_ITR	gitFileIt;			//!<	今見てるファイルの本体
+extern INT		gixFocusPage;			//!<	注目中のページ・とりあえず０・０インデックス
 
-extern  UINT	gbAutoBUmsg;		//	自動バックアップメッセージ出すか？
+extern  UINT	gbAutoBUmsg;			//		自動バックアップメッセージ出すか？
+
+extern  UINT	gbSaveMsgOn;			//		保存メッセージ出すか？
 
 static TCHAR	gatBackUpDirty[MAX_PATH];
 
@@ -88,7 +90,7 @@ HRESULT DocFileOpen( HWND hWnd )
 	stOpenFile.lpstrFileTitle  = atFileName;
 	stOpenFile.nMaxFileTitle   = MAX_STRING;
 //	stOpenFile.lpstrInitialDir = 
-	stOpenFile.lpstrTitle      = TEXT("開くファイルを指定するかしらー");
+	stOpenFile.lpstrTitle      = TEXT("開くファイルを指定しておくれ");
 	stOpenFile.Flags           = OFN_EXPLORER | OFN_HIDEREADONLY;
 	stOpenFile.lpstrDefExt     = TEXT("mlt");
 
@@ -254,7 +256,7 @@ HRESULT DocFileBackup( HWND hWnd )
 		hFile = CreateFile( atFilePath, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL );
 		if( INVALID_HANDLE_VALUE == hFile )
 		{
-			NotifyBalloonExist( TEXT("あぅあぅ、バックアップ出来なかったのです。あぅあぅ"), TEXT("あぅあぅ"), NIIF_ERROR );
+			NotifyBalloonExist( TEXT("バックアップが出来なかったよ・・・"), TEXT("異常発生"), NIIF_ERROR );
 			//	gbAutoBUmsg	バックアップ出来なかったメッセージは常に表示がいいか
 			return E_HANDLE;
 		}
@@ -396,7 +398,7 @@ HRESULT DocFileSave( HWND hWnd, UINT bStyle )
 		stSaveFile.lpstrFileTitle  = atFileName;
 		stSaveFile.nMaxFileTitle   = MAX_STRING;
 //		stSaveFile.lpstrInitialDir = 
-		stSaveFile.lpstrTitle      = TEXT("保存するファイル名を指定するですぅ");
+		stSaveFile.lpstrTitle      = TEXT("保存するファイル名を指定してね");
 		stSaveFile.Flags           = OFN_EXPLORER | OFN_OVERWRITEPROMPT | OFN_HIDEREADONLY;
 		//デフォルト拡張子の指定・あとで面倒見てるからここではしない方が良い
 		//	stSaveFile.lpstrDefExt = TEXT("ast");
@@ -565,7 +567,7 @@ HRESULT DocFileSave( HWND hWnd, UINT bStyle )
 	if( !(bUnic) &&  !(bUtf8) ){	DocModifyContent( FALSE );	}
 
 	//	なんかメッセージ
-	if( bExtChg )
+	if( bExtChg )	//	拡張子変更した場合
 	{
 		//InitLastOpen( INIT_SAVE, atFilePath );	//	ラストオーポンを書換
 		MultiFileTabRename( (*gitFileIt).dUnique, atFilePath );	//	タブ名称変更
@@ -593,7 +595,7 @@ HRESULT DocFileSave( HWND hWnd, UINT bStyle )
 		}
 		else
 		{
-			NotifyBalloonExist( TEXT("ファイルを保存したよ。"), TEXT("お燐からのお知らせ"), NIIF_INFO );
+			if( gbSaveMsgOn ){	NotifyBalloonExist( TEXT("ファイルを保存したよ。"), TEXT("お燐からのお知らせ"), NIIF_INFO );	}
 		}
 	}
 
@@ -726,7 +728,7 @@ HRESULT DocImageSave( HWND hWnd, UINT bStyle, HFONT hFont )
 	stSaveFile.lpstrFileTitle  = atFileName;
 	stSaveFile.nMaxFileTitle   = MAX_STRING;
 //		stSaveFile.lpstrInitialDir = 
-	stSaveFile.lpstrTitle      = TEXT("保存するファイル名と形式を指定するですぅ");
+	stSaveFile.lpstrTitle      = TEXT("保存するファイル名と形式を指定しておくれ");
 	stSaveFile.Flags           = OFN_EXPLORER | OFN_OVERWRITEPROMPT | OFN_HIDEREADONLY;
 
 	bOpened = GetSaveFileName( &stSaveFile );

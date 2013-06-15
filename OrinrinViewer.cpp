@@ -8,7 +8,7 @@
 
 /*
 Orinrin Viewer : AsciiArt Viewer for Japanese Only
-Copyright (C) 2011 - 2012 Orinrin/SikigamiHNQ
+Copyright (C) 2011 - 2013 Orinrin/SikigamiHNQ
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
@@ -253,10 +253,11 @@ INT InitParamValue( UINT dMode, UINT dStyle, INT nValue )
 		case  VL_MAA_BKCOLOUR:	StringCchCopy( atKeyName, SUB_STRING, TEXT("MaaBkColour") );	break;
 		case  VL_THUMB_HORIZ:	StringCchCopy( atKeyName, SUB_STRING, TEXT("ThumbHoriz")  );	break;
 		case  VL_THUMB_VERTI:	StringCchCopy( atKeyName, SUB_STRING, TEXT("ThumbVerti")  );	break;
+		case  VL_MAATAB_SNGL:	StringCchCopy( atKeyName, SUB_STRING, TEXT("MaaTabSingle") );	break;	//	20130521
 		default:	return nValue;
 	}
 
-	if( dMode )	//	ロード
+	if( dMode  )	//	ロード
 	{
 		StringCchPrintf( atBuff, MIN_STRING, TEXT("%d"), nValue );
 		GetPrivateProfileString( TEXT("General"), atKeyName, atBuff, atBuff, MIN_STRING, gatIniPath );
@@ -543,10 +544,10 @@ INT_PTR CALLBACK OptionDlgProc( HWND hDlg, UINT message, WPARAM wParam, LPARAM l
 	switch( message )
 	{
 		case WM_INITDIALOG:
-			//	MAA一覧
-			Edit_SetText( GetDlgItem(hDlg,IDE_AA_DIRECTORY), TEXT("ＡＡディレクトリはプロファイルから設定してね") );
-			EnableWindow( GetDlgItem(hDlg,IDE_AA_DIRECTORY), FALSE );
-			ShowWindow( GetDlgItem(hDlg,IDB_AADIR_SEARCH), SW_HIDE );
+			//	 MAA一覧	アイテム削除
+			//Edit_SetText( GetDlgItem(hDlg,IDE_AA_DIRECTORY), TEXT("ＡＡディレクトリはプロファイルから設定してね") );
+			//EnableWindow( GetDlgItem(hDlg,IDE_AA_DIRECTORY), FALSE );
+			//ShowWindow( GetDlgItem(hDlg,IDB_AADIR_SEARCH), SW_HIDE );
 
 			//	MAAポップアップについて
 			dValue = InitParamValue( INIT_LOAD, VL_MAATIP_SIZE, 16 );	//	サイズ確認

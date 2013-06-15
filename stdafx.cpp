@@ -7,7 +7,7 @@
 
 /*
 Orinrin Editor : AsciiArt Story Editor for Japanese Only
-Copyright (C) 2011 - 2012 Orinrin/SikigamiHNQ
+Copyright (C) 2011 - 2013 Orinrin/SikigamiHNQ
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
@@ -679,20 +679,20 @@ INT_PTR MessageBoxCheckBox( HWND hWnd, HINSTANCE hInst, UINT dStyle )
 	switch( dStyle )
 	{
 		case  0:	//	統合確認
-			StringCchCopy( stMsg.atMsg1, MAX_PATH, TEXT("統合しちゃったら復帰できないのですよ・・・") );
-			StringCchCopy( stMsg.atMsg2, MAX_PATH, TEXT("本当にくっつけていいのですか？") );
+			StringCchCopy( stMsg.atMsg1, MAX_PATH, TEXT("統合しちゃったら復帰できないよ") );
+			StringCchCopy( stMsg.atMsg2, MAX_PATH, TEXT("本当にくっつけていい？") );
 			number = VL_PCOMBINE_NM;
 			break;
 
 		case  1:	//	分離確認
-			StringCchCopy( stMsg.atMsg1, MAX_PATH, TEXT("分割しちゃったら復帰できないのですよ・・・") );
-			StringCchCopy( stMsg.atMsg2, MAX_PATH, TEXT("本当にバラしていいのですか？") );
+			StringCchCopy( stMsg.atMsg1, MAX_PATH, TEXT("分割しちゃったら復帰できないよ") );
+			StringCchCopy( stMsg.atMsg2, MAX_PATH, TEXT("本当にバラしていい？") );
 			number = VL_PDIVIDE_NM;
 			break;
 
 		case  2:	//	削除確認
-			StringCchCopy( stMsg.atMsg1, MAX_PATH, TEXT("削除しちゃったら復帰できないのですよ・・・") );
-			StringCchCopy( stMsg.atMsg2, MAX_PATH, TEXT("本当にあぼーんしていいのですか？") );
+			StringCchCopy( stMsg.atMsg1, MAX_PATH, TEXT("削除しちゃったら復帰できないよ") );
+			StringCchCopy( stMsg.atMsg2, MAX_PATH, TEXT("本当にあぼーんしていい？") );
 			number = VL_PDELETE_NM;
 			break;
 

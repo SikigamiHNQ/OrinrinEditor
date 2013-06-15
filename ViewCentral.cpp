@@ -7,7 +7,7 @@
 
 /*
 Orinrin Editor : AsciiArt Story Editor for Japanese Only
-Copyright (C) 2011 - 2012 Orinrin/SikigamiHNQ
+Copyright (C) 2011 - 2013 Orinrin/SikigamiHNQ
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
@@ -536,7 +536,7 @@ HRESULT ViewSizeMove( HWND hPrntWnd, LPRECT pstFrame )
 
 	if( gbTmpltDock )
 	{
-		iLeftPos = SplitBarResize( ghMainSplitWnd, pstFrame );	//	スプリットバー
+		iLeftPos = SplitBarResize( ghMainSplitWnd, pstFrame );	//	メイン窓のスプリットバー
 		grdSplitPos = rect.right - iLeftPos;
 
 		PageListResize( hPrntWnd, pstFrame );

@@ -7,7 +7,7 @@
 
 /*
 Orinrin Editor : AsciiArt Story Editor for Japanese Only
-Copyright (C) 2011 - 2012 Orinrin/SikigamiHNQ
+Copyright (C) 2011 - 2013 Orinrin/SikigamiHNQ
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
@@ -49,7 +49,7 @@ ttp://www.microsoft.com/download/en/details.aspx?displaylang=en&id=11800
 #include <atlbase.h>
 
 #ifndef _ATL
-#error IEコンポつかうにはATLが要るのです。あぅあぅ
+#error IEコンポつかうにはATLが要る。
 #endif
 
 //	DDKのATL使うなら必要なようだ
@@ -73,7 +73,7 @@ extern CComModule	_Module;
 #if _ATL_VER == 0x0800
 #define ATL_AX_WIN	TEXT("AtlAxWin80")
 #else
-#error ATLバージョンに合わせて定義する必要があるのです。あぅ。
+#error ATLバージョンに合わせて定義する必要がある
 #endif
 
 //	ATLAXWIN_CLASS	定義されてるけどTEXTになってない

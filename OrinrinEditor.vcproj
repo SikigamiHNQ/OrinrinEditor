@@ -595,6 +595,22 @@
 					>
 				</File>
 				<File
+					RelativePath=".\resource\DotSplitLeft.bmp"
+					>
+				</File>
+				<File
+					RelativePath=".\resource\DotSplitLeft_q.bmp"
+					>
+				</File>
+				<File
+					RelativePath=".\resource\DotSplitRight.bmp"
+					>
+				</File>
+				<File
+					RelativePath=".\resource\DotSplitRight_q.bmp"
+					>
+				</File>
+				<File
 					RelativePath=".\resource\DraughtBoard.bmp"
 					>
 				</File>

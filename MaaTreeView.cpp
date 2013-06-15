@@ -7,7 +7,7 @@
 
 /*
 Orinrin Editor : AsciiArt Story Editor for Japanese Only
-Copyright (C) 2011 - 2012 Orinrin/SikigamiHNQ
+Copyright (C) 2011 - 2013 Orinrin/SikigamiHNQ
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
@@ -128,6 +128,8 @@ INT		TabMultipleAppend( HWND );					//!<	タブを増やす
 
 HRESULT	TabMultipleNameChange( HWND , INT );		//!<	タブ名前変更ダイヤログ開く
 
+HRESULT	TabLineMultiSingleToggle( HWND );			//!<	タブの多段表示・一行表示を切り替える
+
 UINT	TabMultipleIsFavTab( INT, LPTSTR, UINT_PTR );	//!<	副タブはお気にリストのであるか
 
 LRESULT	CALLBACK gpfFavListProc(  HWND , UINT, WPARAM, LPARAM );	//!<	使用リストのサブクラスプロシージャ
@@ -135,6 +137,8 @@ LRESULT	CALLBACK gpfTreeViewProc( HWND , UINT, WPARAM, LPARAM );	//!<	ツリービュ
 LRESULT	CALLBACK gpfTabMultiProc( HWND , UINT, WPARAM, LPARAM );	//!<	タブのサブクラスプロシージャ
 
 VOID	Mtb_OnMButtonUp( HWND, INT, INT, UINT );	//!<	
+
+VOID	Mtb_OnLButtonDblclk( HWND, BOOL, INT, INT, UINT );	//!<	
 
 #ifdef HUKUTAB_DRAGMOVE
 VOID	TabMultipleOnLButtonDown( HWND, INT, INT, UINT );	//!<	
@@ -144,7 +148,7 @@ VOID	TabMultipleOnLButtonUp(   HWND, INT, INT, UINT );	//!<
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	ツリービューとかを作る
+	ツリービュー・表示選択タグとかを作る
 	@param[in]	hWnd	親ウインドウハンドル・NULLで破壊処理
 	@param[in]	hInst	アプリの実存
 	@param[in]	ptRect	メインウインドウの位置と大きさ
@@ -156,6 +160,8 @@ HRESULT TreeInitialise( HWND hWnd, HINSTANCE hInst, LPRECT ptRect )
 	RECT		itRect, clRect;
 
 //	SHFILEINFO	stShFileInfo;
+
+	DWORD		dwStyles;
 
 	HIMAGELIST	hTreeImgList;				//!<	
 	HICON	hIcon;
@@ -191,9 +197,11 @@ HRESULT TreeInitialise( HWND hWnd, HINSTANCE hInst, LPRECT ptRect )
 #endif
 
 //表示選択タブ
-	ghTabWnd = CreateWindowEx( 0, WC_TABCONTROL, TEXT("treetab"),
-		WS_VISIBLE | WS_CHILD | WS_CLIPSIBLINGS | TCS_RIGHTJUSTIFY | TCS_MULTILINE,
-		0, 0, TREE_WIDTH, 0, hWnd, (HMENU)IDTB_TREESEL, hInst, NULL );	//	TCS_SINGLELINE
+	dwStyles = WS_VISIBLE | WS_CHILD | WS_CLIPSIBLINGS | TCS_RIGHTJUSTIFY;
+	//	多段モードなら、スタイルをくっつけておく
+	if( !(InitParamValue( INIT_LOAD, VL_MAATAB_SNGL, 0 )) ){	dwStyles |= TCS_MULTILINE;	}
+
+	ghTabWnd = CreateWindowEx( 0, WC_TABCONTROL, TEXT("treetab"), dwStyles, 0, 0, TREE_WIDTH, 0, hWnd, (HMENU)IDTB_TREESEL, hInst, NULL );
 	SetWindowFont( ghTabWnd, ghTabFont, FALSE );
 
 	ZeroMemory( &stTcItem, sizeof(stTcItem) );
@@ -404,6 +412,8 @@ LRESULT	CALLBACK gpfTabMultiProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPa
 
 		HANDLE_MSG( hWnd, WM_MBUTTONUP, Mtb_OnMButtonUp );
 
+		HANDLE_MSG( hWnd, WM_LBUTTONDBLCLK, Mtb_OnLButtonDblclk );
+
 #ifdef HUKUTAB_DRAGMOVE
 		case WM_LBUTTONDOWN:	TabMultipleOnLButtonDown( hWnd, (INT)(SHORT)LOWORD(lParam), (INT)(SHORT)HIWORD(lParam), (UINT)(wParam) );	break;	//	
 		case WM_MOUSEMOVE:		TabMultipleOnMouseMove(   hWnd, (INT)(SHORT)LOWORD(lParam), (INT)(SHORT)HIWORD(lParam), (UINT)(wParam) );	break;	//	
@@ -414,6 +424,37 @@ LRESULT	CALLBACK gpfTabMultiProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPa
 	}
 
 	return CallWindowProc( gpfOriginTabMultiProc, hWnd, msg, wParam, lParam );
+}
+//-------------------------------------------------------------------------------------------------
+
+/*!
+	タブをダブルクルックしたとき
+	@param[in]	hWnd			ウインドウハンドル
+	@param[in]	fDoubleClick	非０ダブルクルック
+	@param[in]	x				発生したクライヤントＸ座標値
+	@param[in]	y				発生したクライヤントＹ座標値
+	@param[in]	keyFlags		他に押されてるキーについて
+*/
+VOID Mtb_OnLButtonDblclk( HWND hWnd, BOOL fDoubleClick, INT x, INT y, UINT keyFlags )
+{
+	INT	curSel;
+	//TCHITTESTINFO	stTcHitInfo;
+
+	//stTcHitInfo.pt.x = x;
+	//stTcHitInfo.pt.y = y;
+	//curSel = TabCtrl_HitTest( ghTabWnd, &stTcHitInfo );
+	//そのときアクティブになっているタブを選択する
+	curSel = TabCtrl_GetCurSel( ghTabWnd );
+
+	TRACE( TEXT("TAB DBLCLICK [%d] [%d x %d]"), curSel, x, y );
+
+	if( 1 >= curSel ){	 return;	}	//	タブ　０ツリー、１使用のときは何もしない
+
+	TabMultipleNameChange( hWnd, curSel );	//	名称変更
+
+#pragma message ("ダブルクルックの機能を設定出来るようにするとおいしいかも")
+
+	return;
 }
 //-------------------------------------------------------------------------------------------------
 
@@ -607,6 +648,7 @@ VOID Maa_OnContextMenu( HWND hWnd, HWND hWndContext, UINT xPos, UINT yPos )
 	INT		curSel, iRslt;
 	TCHAR	atText[MAX_PATH], atName[MAX_PATH];
 	LPARAM	lPrm;
+	DWORD	dwStyles;
 #ifdef EXTRA_NODE_STYLE
 	LPARAM	iSelID = 0;
 #endif
@@ -807,10 +849,11 @@ VOID Maa_OnContextMenu( HWND hWnd, HWND hWndContext, UINT xPos, UINT yPos )
 		SetMenuItemInfo( hSubMenu, IDM_AATABS_DELETE, FALSE, &stMenuItemInfo );
 
 		//もし、お気にタブなら、編集で開くは無効にする
-		if( TabMultipleIsFavTab( curSel, NULL, 0 ) )
-		{
-			EnableMenuItem( hSubMenu, IDM_AATREE_GOEDIT, MF_GRAYED );
-		}
+		if( TabMultipleIsFavTab( curSel, NULL, 0 ) ){	EnableMenuItem( hSubMenu, IDM_AATREE_GOEDIT, MF_GRAYED );	}
+
+		//	もし壱行表示スタイルなら、チェックマークいれとく
+		dwStyles = GetWindowStyle( ghTabWnd );
+		if( !(TCS_MULTILINE & dwStyles) ){	CheckMenuItem( hSubMenu, IDM_AATABS_SINGLETAB, MF_CHECKED );	}
 
 		dRslt = TrackPopupMenu( hSubMenu, TPM_RETURNCMD, stPost.x, stPost.y, 0, hWnd, NULL );
 		DestroyMenu( hMenu );
@@ -825,6 +868,9 @@ VOID Maa_OnContextMenu( HWND hWnd, HWND hWndContext, UINT xPos, UINT yPos )
 
 			//	リネーム
 			case IDM_AATABS_RENAME:	TabMultipleNameChange( hWnd, curSel );	break;
+
+			//	副タブの、多段・シングル切替	20130521
+			case IDM_AATABS_SINGLETAB:	TabLineMultiSingleToggle( hWnd );	break;
 
 			default:	break;
 		}
@@ -2230,6 +2276,39 @@ HRESULT TabMultipleNameChange( HWND hWnd, INT iTabSel )
 	}
 
 	return E_OUTOFMEMORY;
+}
+//-------------------------------------------------------------------------------------------------
+
+/*!
+	タブの多段表示・一行表示を切り替える
+	@param[in]	hWnd	ウインドウハンドル
+	@return		HRESULT	終了状態コード
+*/
+HRESULT TabLineMultiSingleToggle( HWND hWnd )
+{
+	 INT	doSingle;
+	DWORD	dWndwStyle;
+
+	dWndwStyle = GetWindowStyle( ghTabWnd );
+
+	if( TCS_MULTILINE & dWndwStyle )	//	多段モード中・シングルスタイルにする
+	{
+		doSingle = 1;
+		dWndwStyle &= ~TCS_MULTILINE;	//	スタイルを外す
+	}
+	else	//	シングルモード中・多段スタイルにする
+	{
+		doSingle = 0;
+		dWndwStyle |= TCS_MULTILINE;	//	スタイルをくっつける
+	}
+
+	SetWindowLong( ghTabWnd, GWL_STYLE, dWndwStyle );	//	スタイル書き戻す
+	//	再描画とか？なくてよさそう
+	InitParamValue( INIT_SAVE, VL_MAATAB_SNGL, doSingle );	//	記録
+
+	Maa_OnSize( hWnd, 0, 0, 0 );	//	引数は使ってなかったか
+
+	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 

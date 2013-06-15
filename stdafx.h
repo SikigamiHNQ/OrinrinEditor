@@ -7,7 +7,7 @@
 
 /*
 Orinrin Editor : AsciiArt Story Editor for Japanese Only
-Copyright (C) 2011 - 2012 Orinrin/SikigamiHNQ
+Copyright (C) 2011 - 2013 Orinrin/SikigamiHNQ
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
@@ -128,7 +128,11 @@ static CONST GUID gcstGUID = { 0x66D3E881, 0x972B, 0x458B, { 0x93, 0x5E, 0x9E, 0
 //#define MINI_TEMPLATE	
 #define DOT_SPLIT_MODE	//	真ん中から広げたり縮めたり
 
+#define SPLIT_BAR_POS_FIX	//	画面サイズ変えてもスプリットバーの位置が変わらない問題
+
 //#define WORK_LOG_OUT	
+
+#define MULTIACT_RELAY	//	アイコンにＤＤで多重起動したら、開いてるヤツにおくる
 
 #define DO_TRY_CATCH	//	例外対策してみる
 #define USE_NOTIFYICON	//	タスクトレイアイコンを有効
@@ -301,6 +305,9 @@ LRESULT	ExceptionMessage( LPCSTR, LPCSTR, UINT, LPARAM );
 #define VS_RGUIDE_MOZI	56	//!<	右揃え線の文字・壱文字限定
 #define VL_THUMB_HORIZ	57	//!<	ドラフト・サムネの幅
 #define VL_THUMB_VERTI	58	//!<	ドラフト・サムネの高さ
+#define VL_MULTI_ACT_E	59	//!<	多重起動有効
+#define VL_SAVE_MSGON	60	//!<	保存したときのメッセージを表示するか？
+#define VL_MAATAB_SNGL	61	//!<	MAA窓のタブ、壱行表示にする
 
 //増やしたら、函数内に取扱つくっておくこと
 

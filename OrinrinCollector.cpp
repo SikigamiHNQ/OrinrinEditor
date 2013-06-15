@@ -731,8 +731,8 @@ VOID Cls_OnCommand( HWND hWnd, INT id, HWND hwndCtl, UINT codeNotify )
 		FileTypeCheck( gatClipFile );
 		//	取り込みファイルとして登録する
 		PathStripPath( atPath );
-		StringCchPrintf( atBuff, MAX_PATH, TEXT("%s に保存していくのです。あぅあぅ。"), atPath );
-		TaskTrayIconBalloon( hWnd, atBuff, TEXT("保存先を変更したのです。"), NIIF_INFO );
+		StringCchPrintf( atBuff, MAX_PATH, TEXT("%s に保存していくよ"), atPath );
+		TaskTrayIconBalloon( hWnd, atBuff, TEXT("保存先を変更したよ"), NIIF_INFO );
 	}
 
 	return;

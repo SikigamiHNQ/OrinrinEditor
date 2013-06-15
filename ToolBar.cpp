@@ -7,7 +7,7 @@
 
 /*
 Orinrin Editor : AsciiArt Story Editor for Japanese Only
-Copyright (C) 2011 - 2012 Orinrin/SikigamiHNQ
+Copyright (C) 2011 - 2013 Orinrin/SikigamiHNQ
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
@@ -744,7 +744,7 @@ LRESULT ToolBarOnNotify( HWND hWnd, INT idFrom, LPNMHDR pstNmhdr )
 		if( RBN_HEIGHTCHANGE == pstNmhdr->code )
 		{
 			if( !( AppClientAreaCalc( &rect ) ) )	return 0;
-			ViewSizeMove( hWnd, &rect );
+			ViewSizeMove( hWnd, &rect );	//	メインのツールバーで変化があった
 			InvalidateRect( hWnd, NULL, TRUE );
 			InvalidateRect( ghRebarWnd, NULL, TRUE );
 		}
