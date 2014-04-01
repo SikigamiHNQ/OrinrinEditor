@@ -1175,7 +1175,7 @@ UINT DraughtItemAddFromSelect( HWND hWnd, UINT bSqSel )
 	FREE(ptString);
 	FREE(pstPos);
 
-	pcArts =  SjisEncodeAlloc( wsString.c_str() );
+	pcArts =  SjisEncodeAlloc( wsString.c_str() );	//	選択範囲をドラフトボードに移すとき
 
 	DraughtItemAdding( hWnd, pcArts );
 

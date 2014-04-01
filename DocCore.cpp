@@ -637,7 +637,7 @@ LPARAM DocFileInflate( LPTSTR ptFileName )
 	{
 		pcText = (LPSTR)pBuffer;
 		//	シフトJISを開く場合、&#0000;の部分をどうにかせんといかん
-		ptString = SjisDecodeAlloc( pcText );	//	SJISの内容をユニコードにする
+		ptString = SjisDecodeAlloc( pcText );	//	ファイルを開くとき
 
 		FREE( pBuffer );	//	こっちで開放
 		pBuffer = ptString;	//	ポイントするところを変更
@@ -1163,8 +1163,10 @@ UINT DocDelayPageLoad( FILES_ITR itFile, INT iPage )
 		FREE( itFile->vcCont.at( iPage ).ptRawData  );	//	NULLか否かを見るので注意
 
 #ifdef FIND_STRINGS
+#ifdef SEARCH_HIGHLIGHT
 		//	検索内容が生きてたらハイライツ処理
 		FindDelayPageReSearch( iPage );
+#endif
 #endif
 
 	}
@@ -1398,7 +1400,7 @@ INT DocPageTextGetAlloc( FILES_ITR itFile, INT dPage, UINT bStyle, LPVOID *pText
 		}
 		else	//	ShiftJISである
 		{
-			pcStr = SjisEncodeAlloc( itFile->vcCont.at( dPage ).ptRawData );
+			pcStr = SjisEncodeAlloc( itFile->vcCont.at( dPage ).ptRawData );	//	ページ全体を文字列で確保
 			if( pcStr )
 			{
 				srString = string( pcStr );
@@ -1408,7 +1410,7 @@ INT DocPageTextGetAlloc( FILES_ITR itFile, INT dPage, UINT bStyle, LPVOID *pText
 			}
 		}
 	}
-	else
+	else	//	ロード済みなら
 	{
 #endif
 		//	全文字を頂く
@@ -1724,7 +1726,7 @@ LPSTR DocPageTextPreviewAlloc( INT iPage, PINT pdBytes )
 
 		widString += wstring( TEXT("<br>") );	//	末尾に改行あっておｋ？
 
-		pcText = SjisEncodeAlloc( widString.c_str() );
+		pcText = SjisEncodeAlloc( widString.c_str() );	//	Preview用
 		iSize = strlen( pcText );
 	}
 	else

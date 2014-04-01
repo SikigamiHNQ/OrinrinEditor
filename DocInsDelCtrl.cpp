@@ -86,7 +86,17 @@ BOOLEAN DocIsSjisTrance( TCHAR cchMozi, LPSTR pcSjis )
 		else{					StringCchPrintfA( acSjis, 10, ("&#%d;"),  cchMozi );	}
 	}
 
-	StringCchCopyA( pcSjis, 10, acSjis );
+#ifdef SPMOZI_ENCODE
+	if( IsSpMozi( cchMozi ) )	//	機種依存文字変換
+	{
+		if( gbUniRadixHex ){	StringCchPrintfA( acSjis, 10, ("&#x%X;"), cchMozi );	}
+		else{					StringCchPrintfA( acSjis, 10, ("&#%d;"),  cchMozi );	}
+
+		bCant = TRUE;	//	ユニコードのみ文字として扱う
+	}
+#endif
+
+	StringCchCopyA( pcSjis, 10, acSjis );	//	変換結果を戻す
 
 	return bCant ? FALSE : TRUE;
 }
@@ -600,16 +610,7 @@ INT DocInputLetter( INT nowDot, INT rdLine, TCHAR ch )
 	iCount = itLine->vcLine.size( );
 
 	//	データ作成
-	DocLetterDataCheck( &stLetter, ch );
-	//ZeroMemory( &stLetter, sizeof(LETTER) );
-	//stLetter.cchMozi = ch;
-	//stLetter.rdWidth = ViewLetterWidthGet( ch );
-	//stLetter.mzStyle = CT_NORMAL;
-	//if( iswspace( ch ) )	stLetter.mzStyle |= CT_SPACE;
-	////	非シフトJIS文字を確認
-	//if( !( DocIsSjisTrance(ch,stLetter.acSjis) ) )	stLetter.mzStyle |= CT_CANTSJIS;
-	//DocLetterByteCheck( &stLetter );	//	文字のバイトサイズ確認
-
+	DocLetterDataCheck( &stLetter, ch );	//	指定行のドット位置(キャレット位置)に壱文字追加するとき
 
 	if( iLetter >=  iCount )	//	文字数同じなら末端に追加ということ
 	{

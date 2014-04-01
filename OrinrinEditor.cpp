@@ -7,7 +7,7 @@
 
 /*
 Orinrin Editor : AsciiArt Story Editor for Japanese Only
-Copyright (C) 2011 - 2013 Orinrin/SikigamiHNQ
+Copyright (C) 2011 - 2014 Orinrin/SikigamiHNQ
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
@@ -19,6 +19,9 @@ If not, see <http://www.gnu.org/licenses/>.
 //-------------------------------------------------------------------------------------------------
 
 //	注意・コマンドのリソースＩＤ番号は変更不可！
+
+//	TODO:	カーソル位置から左右を入れ替える。左右配置に使う。
+//改行のみの行で囲まれた範囲を対象。
 
 //	TODO:	ＯＫ？	保存したときのバルーンメッセージもON/OFFできるように
 //	TODO:	ＯＫ？	MLTの副タブ、多段とスクロール、選択出来るように
@@ -98,8 +101,6 @@ If not, see <http://www.gnu.org/licenses/>.
 //	TODO:	最終行の枠いれると落ちる？
 
 
-//検索について・文字入力とか削除あったら、ハイライト再計算を？
-//Ｆ５の描画リロードでハイライト付け直しするように
 
 
 //	TODO:	メインのファイルタブに、このファイル意外を閉じる機能をつける
@@ -525,6 +526,9 @@ ASDファイル　　壱行が壱コンテンツ
 					MAA窓の副タブを、多段表示と壱行表示を切り替えられるようにした
 					メイン窓サイズ変えたときに、スプリットバーが追随するようになったかな
 					未ロードの頁を統合したら、内容が消えるのを修正
+2014/04/01	0.33	今日のヒント機能を追加
+					本文の単語検索機能を実装。多分イケてる。
+					文字化けする機種依存文字を、ユニコード数値参照としてコピー出来るようにしてみた（場当たり的対応）
 
 
 更新日時注意
@@ -645,6 +649,10 @@ extern  UINT	gdGridXpos;		//	グリッド線のＸ間隔
 extern  UINT	gdGridYpos;		//	グリッド線のＹ間隔
 extern  UINT	gdRightRuler;	//	右線の位置ドット
 extern  UINT	gdUnderRuler;	//	下線の位置行数
+
+#ifdef SPMOZI_ENCODE
+extern  UINT	gbSpMoziEnc;	//!<	機種依存文字を数値参照コピーする
+#endif
 //-------------------------------------------------------------------------------------------------
 
 #ifdef PLUGIN_ENABLE
@@ -875,6 +883,11 @@ INT APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 	ToolBarInfoChange( pstAccel, iEntry );	//	ツールバーのツールチップテキストにもキーを表示せる
 	FREE( pstAccel );
 
+#ifdef TODAY_HINT_STYLE
+	TodayHintPopup( ghMainWnd, ghInst, gatExePath );
+#endif
+
+
 #ifdef PLUGIN_ENABLE
 	//---------------------------------------
 	//[_16in] Add - 2012/04/30
@@ -1059,6 +1072,10 @@ BOOL InitInstance( HINSTANCE hInstance, INT nCmdShow, LPTSTR ptArgv )
 
 	gdPageByteMax = InitParamValue( INIT_LOAD, VL_PAGEBYTE_MAX, PAGE_BYTE_MAX );	//	最大バイト数４０９６
 
+#ifdef SPMOZI_ENCODE
+	gbSpMoziEnc   = InitParamValue( INIT_LOAD, VL_SPMOZI_ENC, 0 );	//	機種依存文字を数値参照コピーする
+#endif
+
 	ghMainWnd = hWnd;
 
 	//	システムメニューに機能追加
@@ -1076,9 +1093,11 @@ BOOL InitInstance( HINSTANCE hInstance, INT nCmdShow, LPTSTR ptArgv )
 #endif
 
 	hSubMenu = GetSubMenu( ghMenu , 1 );	//	編集
+#ifndef SEARCH_HIGHLIGHT
+	DeleteMenu( hSubMenu, IDM_FIND_HIGHLIGHT_OFF, MF_BYCOMMAND );
+#endif
 #ifndef FIND_STRINGS
 	DeleteMenu( hSubMenu, IDM_FIND_DLG_OPEN, MF_BYCOMMAND );
-	DeleteMenu( hSubMenu, IDM_FIND_HIGHLIGHT_OFF, MF_BYCOMMAND );
 //	DeleteMenu( hSubMenu, 19, MF_BYPOSITION );	//	削除順番注意
 #endif
 
@@ -2418,7 +2437,7 @@ INT InitParamValue( UINT dMode, UINT dStyle, INT nValue )
 	TCHAR	atKeyName[MIN_STRING], atBuff[MIN_STRING];
 	INT	iBuff = 0;
 
-	switch( dStyle )
+	switch( dStyle )	//	INIT_LOAD
 	{
 		case  VL_CLASHCOVER:	StringCchCopy( atKeyName, SUB_STRING, TEXT("ClashCover") );		break;
 		case  VL_GROUP_UNDO:	StringCchCopy( atKeyName, SUB_STRING, TEXT("GroupUndo") );		break;
@@ -2472,7 +2491,8 @@ INT InitParamValue( UINT dMode, UINT dStyle, INT nValue )
 		case  VL_MULTI_ACT_E:	StringCchCopy( atKeyName, SUB_STRING, TEXT("MultiAct") );		break;
 		case  VL_SAVE_MSGON:	StringCchCopy( atKeyName, SUB_STRING, TEXT("SaveMsgOn") );		break;
 		case  VL_MAATAB_SNGL:	StringCchCopy( atKeyName, SUB_STRING, TEXT("MaaTabSingle") );	break;
-
+		case  VL_HINT_ENABLE:	StringCchCopy( atKeyName, SUB_STRING, TEXT("HintPopup") );		break;
+		case  VL_SPMOZI_ENC:	StringCchCopy( atKeyName, SUB_STRING, TEXT("SpMoziEnc") );		break;	//	SPMOZI_ENCODE
 		default:	return nValue;
 	}
 
@@ -3071,6 +3091,16 @@ INT_PTR CALLBACK OptionDlgProc( HWND hDlg, UINT message, WPARAM wParam, LPARAM l
 			dValue = InitParamValue( INIT_LOAD, VL_LAST_OPEN, LASTOPEN_DO );
 			CheckRadioButton( hDlg, IDRB_LASTOPEN_DO, IDRB_LASTOPEN_ASK, (IDRB_LASTOPEN_DO + dValue) );
 
+#ifdef TODAY_HINT_STYLE
+			//	今日のヒント
+			dValue = InitParamValue( INIT_LOAD, VL_HINT_ENABLE, 1 );
+			CheckDlgButton( hDlg, IDCB_POPHINT_VIEW, dValue ? BST_CHECKED : BST_UNCHECKED );
+#endif
+#ifdef SPMOZI_ENCODE
+			//	機種依存文字を数値参照コピー
+			dValue = InitParamValue( INIT_LOAD, VL_SPMOZI_ENC, 0 );
+			CheckDlgButton( hDlg, IDCB_SPMOZI_ENCODE, dValue ? BST_CHECKED : BST_UNCHECKED );
+#endif
 			//	レイヤボックスの透明度
 			dValue = InitParamValue( INIT_LOAD, VL_LAYER_TRANS, 192 );
 			SendDlgItemMessage( hDlg, IDSL_LAYERBOX_TRANCED, TBM_SETPOS, TRUE, (dValue - 0x1F) );
@@ -3232,6 +3262,17 @@ INT_PTR CALLBACK OptionDlgProc( HWND hDlg, UINT message, WPARAM wParam, LPARAM l
 					dValue = IsDlgButtonChecked( hDlg, IDCB_DOCKING_STYLE );
 					InitParamValue( INIT_SAVE, VL_PLS_LN_DOCK, dValue ? 1 : 0 );
 
+#ifdef TODAY_HINT_STYLE
+					//	今日のヒント
+					dValue = IsDlgButtonChecked( hDlg, IDCB_POPHINT_VIEW );
+					InitParamValue( INIT_SAVE, VL_HINT_ENABLE, dValue );
+#endif
+#ifdef SPMOZI_ENCODE
+					//	機種依存文字を数値参照コピーする
+					dValue = IsDlgButtonChecked( hDlg, IDCB_SPMOZI_ENCODE );
+					gbSpMoziEnc = dValue ? 1 : 0;
+					InitParamValue( INIT_SAVE, VL_SPMOZI_ENC, gbSpMoziEnc );
+#endif
 					//	起動時オーポン
 					if( IsDlgButtonChecked( hDlg, IDRB_LASTOPEN_NON ) ){	dValue = LASTOPEN_NON;	}
 					else if( IsDlgButtonChecked( hDlg, IDRB_LASTOPEN_ASK ) ){	dValue = LASTOPEN_ASK;	}
@@ -3788,25 +3829,28 @@ HRESULT DockingTmplViewToggle( UINT bMode )
 //-------------------------------------------------------------------------------------------------
 
 #if defined(_DEBUG) || defined(WORK_LOG_OUT)
-VOID OutputDebugStringPlus( DWORD rixError, LPSTR pcFile, INT rdLine, LPSTR pcFunc, LPTSTR ptFormat, ... )
+VOID OutputDebugStringPlus( DWORD rixError, LPTSTR ptFile, INT rdLine, LPTSTR ptFunc, LPTSTR ptFormat, ... )
+//VOID OutputDebugStringPlus( DWORD rixError, LPSTR pcFile, INT rdLine, LPSTR pcFunc, LPTSTR ptFormat, ... )
 {
 	va_list	argp;
 	TCHAR	atBuf[MAX_PATH], atOut[MAX_PATH], atFiFu[MAX_PATH], atErrMsg[MAX_PATH];
-	CHAR	acFile[MAX_PATH], acFiFu[MAX_PATH];
-	UINT	length;
+//	CHAR	acFile[MAX_PATH], acFiFu[MAX_PATH];
+//	UINT	length;
 #ifdef WORK_LOG_OUT
 	UINT_PTR	cchLen;
 	DWORD	wrote;
 #endif
 
-	StringCchCopyA( acFile, MAX_PATH, pcFile );
-	PathStripPathA( acFile );
+	StringCchCopy( atFiFu, MAX_PATH, ptFile );
+	PathStripPath( atFiFu );
+//	StringCchCopyA( acFile, MAX_PATH, pcFile );
+//	PathStripPathA( acFile );
 
-	StringCchPrintfA( acFiFu, MAX_PATH, ("%s %d %s"), acFile, rdLine, pcFunc );
-	length = (UINT)strlen( acFiFu );
+//	StringCchPrintfA( acFiFu, MAX_PATH, ("%s %d %s"), acFile, rdLine, pcFunc );
+//	length = (UINT)strlen( acFiFu );
 
-	ZeroMemory( atFiFu, sizeof(atFiFu) );
-	MultiByteToWideChar( CP_ACP, MB_PRECOMPOSED, acFiFu, length, atFiFu, MAX_PATH );
+//	ZeroMemory( atFiFu, sizeof(atFiFu) );
+//	MultiByteToWideChar( CP_ACP, MB_PRECOMPOSED, acFiFu, length, atFiFu, MAX_PATH );
 	//	コードページ,文字の種類を指定するフラグ,マップ元文字列のアドレス,マップ元文字列のバイト数,
 	//	マップ先ワイド文字列を入れるバッファのアドレス,バッファのサイズ
 
@@ -3814,7 +3858,8 @@ VOID OutputDebugStringPlus( DWORD rixError, LPSTR pcFile, INT rdLine, LPSTR pcFu
 	StringCchVPrintf( atBuf, MAX_PATH, ptFormat, argp );
 	va_end( argp );
 
-	StringCchPrintf( atOut, MAX_PATH, TEXT("%s @ %s\r\n"), atBuf, atFiFu );//
+	StringCchPrintf( atOut, MAX_PATH, TEXT("%s @ %s %d %s\r\n"), atBuf, atFiFu, rdLine, ptFunc );//
+//	StringCchPrintf( atOut, MAX_PATH, TEXT("%s @ %s\r\n"), atBuf, atFiFu );//
 
 #ifdef _DEBUG
 	OutputDebugString( atOut );

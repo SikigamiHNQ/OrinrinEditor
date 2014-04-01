@@ -7,7 +7,7 @@
 
 /*
 Orinrin Editor : AsciiArt Story Editor for Japanese Only
-Copyright (C) 2011 - 2013 Orinrin/SikigamiHNQ
+Copyright (C) 2011 - 2014 Orinrin/SikigamiHNQ
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
@@ -75,6 +75,7 @@ If not, see <http://www.gnu.org/licenses/>.
 #endif
 #include <memory.h>
 #include <tchar.h>
+#include <time.h>
 
 #define STRSAFE_NO_CB_FUNCTIONS
 #include <strsafe.h>
@@ -118,21 +119,27 @@ static CONST GUID gcstGUID = { 0x66D3E881, 0x972B, 0x458B, { 0x93, 0x5E, 0x9E, 0
 #define MAA_IADD_PLUS	//	MAAへのアイテム追加機能拡張
 //	リソースの IDM_MAA_IADD_OPEN IDM_MAA_ITEM_INSERT に注意
 
+#define MULTIACT_RELAY	//	アイコンにＤＤで多重起動したら、開いてるヤツにおくる
+#define DOT_SPLIT_MODE	//	真ん中から広げたり縮めたり
+#define SPLIT_BAR_POS_FIX	//	画面サイズ変えてもスプリットバーの位置が変わらない問題
+
+
 
 //	作成中の機能
-//#define FIND_STRINGS	//	文字列検索機能
+#define TODAY_HINT_STYLE	//	今日のヒント機能
+#define SPMOZI_ENCODE		//	機種依存文字を数値参照コピー
+
+#define FIND_STRINGS	//	文字列検索機能
+//#define SEARCH_HIGHLIGHT	//	検索ヒット位置をハイライトする
+//面倒なので無しで
+
 #define MAA_TEXT_FIND	//	ＭＡＡで、開いてるファイルから単語Search
 //#define HUKUTAB_DRAGMOVE	
 //#define PAGE_MULTISELECT//	頁一覧の複数選択
 //#define PLUGIN_ENABLE	//	プラグイン機能
 //#define MINI_TEMPLATE	
-#define DOT_SPLIT_MODE	//	真ん中から広げたり縮めたり
-
-#define SPLIT_BAR_POS_FIX	//	画面サイズ変えてもスプリットバーの位置が変わらない問題
 
 //#define WORK_LOG_OUT	
-
-#define MULTIACT_RELAY	//	アイコンにＤＤで多重起動したら、開いてるヤツにおくる
 
 #define DO_TRY_CATCH	//	例外対策してみる
 #define USE_NOTIFYICON	//	タスクトレイアイコンを有効
@@ -144,8 +151,10 @@ static CONST GUID gcstGUID = { 0x66D3E881, 0x972B, 0x458B, { 0x93, 0x5E, 0x9E, 0
 
 
 #if defined(_DEBUG) || defined(WORK_LOG_OUT)
-	#define TRACE(str,...)	OutputDebugStringPlus( GetLastError(), __FILE__, __LINE__, __FUNCTION__, str, __VA_ARGS__ )
-	VOID	OutputDebugStringPlus( DWORD, LPSTR, INT, LPSTR, LPTSTR, ... );	//!<	
+	#define TRACE(str,...)	OutputDebugStringPlus( GetLastError(), _CRT_WIDE(__FILE__), __LINE__, _CRT_WIDE(__FUNCTION__), str, __VA_ARGS__ )
+	VOID	OutputDebugStringPlus( DWORD, LPTSTR, INT, LPTSTR, LPTSTR, ... );	//!<	
+	//#define TRACE(str,...)	OutputDebugStringPlus( GetLastError(), __FILE__, __LINE__, __FUNCTION__, str, __VA_ARGS__ )
+	//VOID	OutputDebugStringPlus( DWORD, LPSTR, INT, LPSTR, LPTSTR, ... );	//!<	
 #else
 	#define TRACE(x,...)
 #endif
@@ -230,6 +239,7 @@ LRESULT	ExceptionMessage( LPCSTR, LPCSTR, UINT, LPARAM );
 #define FRAME_INI_FILE	TEXT("Satori.ini")
 #define MZCX_INI_FILE	TEXT("Koisi.ini")
 
+#define HINT_FILE		TEXT("Today_Hint.txt")
 
 
 #define INIT_LOAD		1
@@ -308,6 +318,8 @@ LRESULT	ExceptionMessage( LPCSTR, LPCSTR, UINT, LPARAM );
 #define VL_MULTI_ACT_E	59	//!<	多重起動有効
 #define VL_SAVE_MSGON	60	//!<	保存したときのメッセージを表示するか？
 #define VL_MAATAB_SNGL	61	//!<	MAA窓のタブ、壱行表示にする
+#define VL_HINT_ENABLE	62	//!<	今日のヒントを表示するか？
+#define VL_SPMOZI_ENC	63	//!<	機種依存文字を数値参照コピー	SPMOZI_ENCODE
 
 //増やしたら、函数内に取扱つくっておくこと
 

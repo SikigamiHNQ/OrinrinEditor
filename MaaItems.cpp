@@ -581,7 +581,7 @@ VOID AaItemsMeasureItem( HWND hWnd, LPMEASUREITEMSTRUCT pstMeasureItem )
 */
 VOID Aai_OnKey( HWND hWnd, UINT vk, BOOL fDown, INT cRepeat, UINT flags )
 {
-	TRACE( TEXT("KEY[%u]"), vk );
+	TRACE( TEXT("KEY[%u][%u]"), vk, cRepeat );
 
 	if( !(fDown) )	 return;	//	とりあえずキーアップはすることない
 
@@ -1357,7 +1357,7 @@ UINT AacItemFindOnePage( HWND hWnd, LPTSTR ptFindText, INT iTargetPage )
 	ptTarget = SjisDecodeAlloc( pcItem );
 	FREE( pcItem );
 
-	ptFindPos = FindStringProc( ptTarget, ptFindText, &iMoziPos );
+	ptFindPos = FindStringProc( ptTarget, ptFindText, &iMoziPos );	//	Viewer側
 	if( ptFindPos ){	dFound = TRUE;	}	//	存在してるか？
 
 	FREE( ptTarget );

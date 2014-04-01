@@ -7,7 +7,7 @@
 
 /*
 Orinrin Editor : AsciiArt Story Editor for Japanese Only
-Copyright (C) 2011 - 2013 Orinrin/SikigamiHNQ
+Copyright (C) 2011 - 2014 Orinrin/SikigamiHNQ
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
@@ -420,6 +420,10 @@ INT_PTR		MessageBoxCheckBox( HWND, HINSTANCE, UINT );	//!<
 VOID		WndTagSet( HWND, LONG_PTR );	//!<	
 LONG_PTR	WndTagGet( HWND );	//!<	
 
+#ifdef SPMOZI_ENCODE
+UINT		IsSpMozi( TCHAR );
+#endif
+
 HRESULT		InitWindowPos( UINT, UINT, LPRECT );	//!<	
 INT			InitParamValue( UINT, UINT, INT );		//!<	
 HRESULT		InitParamString( UINT, UINT, LPTSTR );	//!<	
@@ -556,6 +560,10 @@ INT			InitMultiFileTabOpen( UINT, INT, LPTSTR );	//!<
 VOID		OperationOnCommand( HWND, INT, HWND, UINT );	//!<	
 
 VOID		AaFontCreate( UINT );	//!<	
+
+#ifdef TODAY_HINT_STYLE
+VOID		TodayHintPopup( HWND, HINSTANCE, LPTSTR );
+#endif
 
 HWND		ViewInitialise( HINSTANCE, HWND, LPRECT, LPTSTR );	//!<	
 HRESULT		ViewSizeMove( HWND, LPRECT );	//!<	
@@ -870,10 +878,13 @@ HRESULT		VertMoveFromView( HWND , UINT );		//!<
 
 #ifdef FIND_STRINGS
 HRESULT		FindDialogueOpen( HINSTANCE, HWND );		//!<	
-HRESULT		FindHighlightOff( VOID );					//!<	
+HRESULT		FindDirectly( HINSTANCE, HWND, INT );
 //INT			FindStringJump( UINT, PINT, PINT, PINT );	//!<	
+#ifdef SEARCH_HIGHLIGHT
 HRESULT		FindNowPageReSearch( VOID );				//!<	
 HRESULT		FindDelayPageReSearch( INT );				//!<	
+HRESULT		FindHighlightOff( VOID );					//!<	
+#endif
 #endif
 
 #endif	//	NOT _ORRVW

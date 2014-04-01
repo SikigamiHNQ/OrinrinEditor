@@ -1733,16 +1733,7 @@ INT LayerInputLetter( LAYER_ITR itLyr, INT nowDot, INT rdLine, TCHAR ch )
 	try{
 #endif
 	//	データ作成
-	DocLetterDataCheck( &stLetter, ch );
-	//ZeroMemory( &stLetter, sizeof(LETTER) );
-	//stLetter.cchMozi = ch;
-	//stLetter.rdWidth = ViewLetterWidthGet( ch );
-	//stLetter.mzStyle = CT_NORMAL;
-	//if( iswspace( ch ) ){	stLetter.mzStyle |= CT_SPACE;	}
-	////	非シフトJIS文字を確認
-	//if( !( DocIsSjisTrance(ch,stLetter.acSjis) ) ){	stLetter.mzStyle |= CT_CANTSJIS;	}
-	//DocLetterByteCheck( &stLetter );	//	バイト数確認
-
+	DocLetterDataCheck( &stLetter, ch );	//	指定行のドット位置(キャレット位置)に壱文字追加する・レイヤボックス
 
 	itLyr->vcLyrImg.at( rdLine ).vcLine.push_back( stLetter );
 

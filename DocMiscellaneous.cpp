@@ -254,13 +254,7 @@ UINT DocRawDataParamGet( LPCTSTR ptRaw, PINT piMozi, PINT piByte )
 			continue;
 		}
 
-		//	その文字のバイト数を確認
-		iBy = DocLetterDataCheck( NULL, ptRaw[d] );
-		//ZeroMemory( &stLetter, sizeof(LETTER) );
-		//stLetter.cchMozi = ptRaw[d];
-		////	非シフトJIS文字を確認
-		//if( !( DocIsSjisTrance( stLetter.cchMozi, stLetter.acSjis ) ) ){	stLetter.mzStyle |= CT_CANTSJIS;	}
-		//iBy = DocLetterByteCheck( &stLetter );	//	バイト数確認
+		iBy = DocLetterDataCheck( NULL , ptRaw[d] );	//	その文字のバイト数を確認
 
 		iBytes += iBy;
 		iMozis++;

@@ -223,15 +223,7 @@ HRESULT UserDefSetString( vector<ONELINE> *pvcUnits, LPCTSTR ptText, UINT cchSiz
 		}
 		else
 		{
-			DocLetterDataCheck( &stLetter, ptText[i] );
-			//ZeroMemory( &stLetter, sizeof(LETTER) );
-			//stLetter.cchMozi = ptText[i];
-			//stLetter.rdWidth = ViewLetterWidthGet( ptText[i] );
-			//stLetter.mzStyle = CT_NORMAL;
-			//if( iswspace( ptText[i] ) ){	stLetter.mzStyle |= CT_SPACE;	}
-			////	非シフトJIS文字を確認
-			//if( !( DocIsSjisTrance( ptText[i], stLetter.acSjis ) ) ){	stLetter.mzStyle |= CT_CANTSJIS;	}
-			//DocLetterByteCheck( &stLetter );	//	バイト数確認
+			DocLetterDataCheck( &stLetter, ptText[i] );	//	保持構造体に文字列を記録するとき
 
 			pvcUnits->at( yLine ).vcLine.push_back( stLetter );
 

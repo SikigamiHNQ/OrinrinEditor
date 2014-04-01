@@ -52,6 +52,37 @@ typedef struct tagMSGBOXMSG
 
 //------------------------------------------------------------------------------------------------------------------------
 
+#ifdef SPMOZI_ENCODE
+
+EXTERNED UINT	gbSpMoziEnc;	//!<	機種依存文字を数値参照コピーする
+
+//	機種依存文字
+static CONST TCHAR	gatSpMoziList[] = { TEXT("①②③④⑤⑥⑦⑧⑨⑩⑪⑫⑬⑭⑮⑯⑰⑱⑲⑳ⅠⅡⅢⅣⅤⅥⅦⅧⅨⅩ㍉㌔㌢㍍㌘㌧㌃㌶㍑㍗㌍㌦㌣㌫㍊㌻㎜㎝㎞㎎㎏㏄㎡㍻〝〟№㏍℡㊤㊥㊦㊧㊨㈱㈲㈹㍾㍽㍼≒≡∫∮∑√⊥∠∟⊿∵∩∪") };
+#define SPMOZI_CNT	83	//	文字数
+#endif
+//------------------------------------------------------------------------------------------------------------------------
+
+#ifdef SPMOZI_ENCODE
+/*!
+	対象のユニコード文字はSJISの機種依存文字であるか
+	@param[in]	tMozi	チェックするユニコード文字
+	@return	非０該当する　０しない
+*/
+UINT IsSpMozi( TCHAR tMozi )
+{
+	UINT	i;
+
+	if( !(gbSpMoziEnc) )	return 0;	//	未使用ならいつでも該当しない
+
+	for( i = 0; SPMOZI_CNT > i; i++ )
+	{
+		if( gatSpMoziList[i] == tMozi )	return 1;
+	}
+
+	return 0;
+}
+//------------------------------------------------------------------------------------------------------------------------
+#endif
 
 /*!
 	ウインドウにユーザデータを書き込む
@@ -207,7 +238,11 @@ TCHAR UniRefCheck( LPSTR pcStr )
 	if( 10 <= i ){	return 0x0000;	}	//	なんか振り切ってる
 
 	code = strtoul( acValue, &pcEnd, radix );	//	進数に合わせて変換しちゃう
-	
+
+//	機種依存文字変換　ユニコードとして扱っているので、ここで一律処理で問題無い
+//	SPMOZI_ENCODE
+
+
 	if( 0xFFFF < code ){	code = 0x0000;	}	//	明らかにおかしい場合
 
 	return (TCHAR)code;
@@ -318,9 +353,9 @@ LPTSTR SjisDecodeAlloc( LPSTR pcBuff )
 
 	if( !(pcBuff) ){	return NULL;	}	//	データおかしかったら終わり
 
+	//	出力用ユニコードバッファを確保する。必要なサイズを求める
 	cchSize = MultiByteToWideChar( CP_ACP, MB_PRECOMPOSED, pcBuff, -1, NULL, 0 );
 
-	//	出力用ユニコードバッファ
 	cchSize += 2;	//	バッファ自体の量なのでここで変更しておｋ
 	ptBuffer = (LPTSTR)malloc( cchSize * sizeof(TCHAR) );
 	ZeroMemory( ptBuffer, cchSize * sizeof(TCHAR) );
@@ -508,7 +543,7 @@ LPSTR SjisEncodeAlloc( LPCTSTR ptTexts )
 	sString.clear( );
 
 	atMozi[1] = 0;
-	for( d = 0; cchSize > d; d++ )
+	for( d = 0; cchSize > d; d++ )	//	壱文字ずつ変換していく
 	{
 		atMozi[0] = ptTexts[d];
 		ZeroMemory( acSjis, sizeof(acSjis) );
@@ -520,6 +555,14 @@ LPSTR SjisEncodeAlloc( LPCTSTR ptTexts )
 			if( gbUniRadixHex ){	StringCchPrintfA( acSjis, 10 , ("&#x%X;"), ptTexts[d] );	}
 			else{					StringCchPrintfA( acSjis, 10 , ("&#%d;"),  ptTexts[d] );	}
 		}
+
+#ifdef SPMOZI_ENCODE
+		if( IsSpMozi( ptTexts[d] ) )	//	機種依存文字変換
+		{
+			if( gbUniRadixHex ){	StringCchPrintfA( acSjis, 10 , ("&#x%X;"), ptTexts[d] );	}
+			else{					StringCchPrintfA( acSjis, 10 , ("&#%d;"),  ptTexts[d] );	}
+		}
+#endif
 
 		sString += string( acSjis );
 	}

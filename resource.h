@@ -31,6 +31,7 @@
 #define IDD_FIND_MAA_DLG                134
 #define IDD_FRAME_EDIT_DLG_2            135
 #define IDD_UNICODE_PALETTE_DLG_2       136
+#define IDD_TODAY_HINT_DLG              137
 #define IDC_AAVIEWER                    209
 #define IDD_PATH_SET                    210
 #define IDSB_STATUSBAR                  211
@@ -422,6 +423,12 @@
 #define IDLV_MT_ITEMSTATIC              1252
 #define IDCB_MULTIACT_ENA               1253
 #define IDCB_SAVE_MSG_ON                1254
+#define IDS_CHAR_IMAGE                  1255
+#define IDS_HINT_VIEWER                 1256
+#define IDCB_NEVER_VIEWING              1257
+#define IDB_NEXT_HINT                   1258
+#define IDCB_POPHINT_VIEW               1260
+#define IDCB_SPMOZI_ENCODE              1261
 #define IDTV_ITEMTREE                   2000
 #define IDTB_TREESEL                    2001
 #define IDSO_AAITEMS                    2002
@@ -661,7 +668,7 @@
 #define IDM_MAA_ITEM_INSERT             33014
 #define IDM_MAA_ITEM_DELETE             33015
 #define IDM_AATABS_RENAME               33016
-#define IDM_AATABS_SINGLETAB			33017
+#define IDM_AATABS_SINGLETAB            33017
 #define IDM_MIRROR_INVERSE              33021
 #define IDM_UPSET_INVERSE               33022
 #define IDM_MAAITEM_BKCOLOUR            33023
@@ -680,7 +687,7 @@
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        236
 #define _APS_NEXT_COMMAND_VALUE         33040
-#define _APS_NEXT_CONTROL_VALUE         1255
+#define _APS_NEXT_CONTROL_VALUE         1262
 #define _APS_NEXT_SYMED_VALUE           120
 #endif
 #endif

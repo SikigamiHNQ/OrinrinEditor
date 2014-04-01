@@ -661,6 +661,7 @@ VOID Maa_OnContextMenu( HWND hWnd, HWND hWndContext, UINT xPos, UINT yPos )
 	TCHITTESTINFO	stTcHitInfo;
 	TCITEM			stTcItem;
 	MENUITEMINFO	stMenuItemInfo;
+
 	HTREEITEM		hTvHitItem;
 
 	stPost.x = (SHORT)xPos;	//	画面座標はマイナスもありうる

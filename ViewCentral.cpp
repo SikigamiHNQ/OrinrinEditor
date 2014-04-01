@@ -7,7 +7,7 @@
 
 /*
 Orinrin Editor : AsciiArt Story Editor for Japanese Only
-Copyright (C) 2011 - 2013 Orinrin/SikigamiHNQ
+Copyright (C) 2011 - 2014 Orinrin/SikigamiHNQ
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
@@ -263,6 +263,180 @@ VOID AaFontCreate( UINT bMode )
 	return;
 }
 //-------------------------------------------------------------------------------------------------
+
+#ifdef TODAY_HINT_STYLE
+
+//	乱数発生・他に必要なところあるか？
+UINT XorShift( UINT seed )
+{
+	static  UINT	x = 123456789;
+	static  UINT	y = 362436069;
+	static  UINT	z = 521288629;
+	static  UINT	w =  88675123;
+
+	UINT	t;
+
+	if( 0 != seed ){	x = seed;	}
+
+	t = x ^ (x << 11);
+	x = y;
+	y = z;
+	z = w;
+
+	w = (w ^ (w >> 19)) ^ (t ^ (t >> 8));
+
+	return w;
+}
+//------------------------------------------------------------------------------------------------------------------------
+
+/*!
+	ヒントデータの読込
+	@param[in]	ptStr	内容をいれるバッファ
+	@param[in]	cchLen	バッファの文字数
+*/
+UINT HintStringLoad( LPTSTR ptString, UINT_PTR cchLen, LPCTSTR ptHintPath )
+{
+	static  UINT	cdPreSel = 0;
+
+	UINT	randVle, maxCnt, target;
+	UINT	de;
+	TCHAR	atKeyName[MIN_STRING];
+
+	de = 0;
+	maxCnt  = GetPrivateProfileInt( TEXT("HINT"), TEXT("count"), 0, ptHintPath );
+	if( 2 <= maxCnt )
+	{
+		do
+		{
+			randVle = XorShift( 0 );
+			target  = (randVle % maxCnt) + 1;	//	１つ選出
+			de++;
+
+			if( 5 <= de )	break;	//	無限ループ阻止
+		}
+		while( cdPreSel == target );	//	前と同じならやり直し
+	}
+	else
+	{
+		target = 1;
+	}
+	cdPreSel = target;
+
+	StringCchPrintf( atKeyName, MIN_STRING, TEXT("text%u"), target );
+
+	GetPrivateProfileString( TEXT("HINT"), atKeyName, TEXT(""), ptString, cchLen, ptHintPath );
+
+	if( 0 == ptString[0] )
+	{
+		StringCchCopy( ptString, cchLen, TEXT("ヒントが見つからない・・・") );
+	}
+
+	return target;
+}
+//-------------------------------------------------------------------------------------------------
+
+/*!
+	今日のヒントダイヤログーのウインドウプロシージャ
+	@param[in]	hDlg	ダイヤログハンドル
+	@param[in]	message	ウインドウメッセージの識別番号
+	@param[in]	wParam	追加の情報１
+	@param[in]	lParam	追加の情報２
+	@retval 0	メッセージに対して何もしなかった
+	@retval no0	なんか処理した
+*/
+INT_PTR CALLBACK TodayHintDlgProc( HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam )
+{
+	static TCHAR	catHintPath[MAX_PATH];
+
+	 INT	id;
+	HWND	hWndCtl;
+	UINT	codeNotify;
+	TCHAR	atHintStr[BIG_STRING];
+
+	UINT	dRslt;
+	time_t	tmValue;
+
+	switch( message )
+	{
+		default:	break;
+
+		case WM_INITDIALOG:
+			time( &tmValue );
+			XorShift( (UINT)tmValue );
+			StringCchCopy( catHintPath, MAX_PATH, (LPCTSTR)lParam );
+
+			SetWindowFont( GetDlgItem(hDlg,IDS_CHAR_IMAGE),  ghAaFont, TRUE );
+			SetDlgItemText( hDlg, IDS_CHAR_IMAGE, TEXT("　　　　,、\r\n　　　//l_,....,_／l\r\n　　　|:ﾚ´　　｀く|\r\n　　 {><}ﾉﾉﾊﾉ)ﾉ）\r\n　　 〈ｦ|ﾘ ﾟ ヮﾟﾉ§\r\n　　 {X(*i:E`:';l]つ\r\n　　　,(ﾝi_ｦ;:V:>、\r\n　　　｀^'i_ﾌ'i_ｦ'´") );
+
+			//	ヒント描画のアレが必要
+			HintStringLoad( atHintStr, BIG_STRING, catHintPath );
+			SetWindowFont( GetDlgItem(hDlg,IDS_HINT_VIEWER), ghAaFont, TRUE );
+			SetDlgItemText( hDlg, IDS_HINT_VIEWER, atHintStr );
+			return (INT_PTR)TRUE;
+
+
+		case WM_COMMAND:
+			id = (INT)(LOWORD(wParam));
+			hWndCtl = (HWND)(lParam);
+			codeNotify = (UINT)HIWORD(wParam);
+			switch( id )
+			{
+				case IDOK:
+					dRslt = IsDlgButtonChecked( hDlg , IDCB_NEVER_VIEWING );	//	チェック確認して反映
+					if( dRslt ){	InitParamValue( INIT_SAVE, VL_HINT_ENABLE,  0 );	}	//	表示しないようにする
+				case IDCANCEL:
+					DestroyWindow( hDlg );	break;
+
+				case IDB_NEXT_HINT:
+					HintStringLoad( atHintStr, BIG_STRING, catHintPath );
+					SetDlgItemText( hDlg, IDS_HINT_VIEWER, atHintStr );
+					break;
+
+				default:	break;
+			}
+			return (INT_PTR)TRUE;
+
+
+		case WM_CLOSE:	DestroyWindow( hDlg );	return (INT_PTR)TRUE;
+	}
+
+	return (INT_PTR)FALSE;
+}
+//-------------------------------------------------------------------------------------------------
+
+/*!
+	今日のヒントを表示する
+	@param[in]	hWnd	メインウインドウハンドル
+	@param[in]	hInst	インスタンス
+	@param[in]	ptPath	実行ファイルのパス
+*/
+VOID TodayHintPopup( HWND hWnd, HINSTANCE hInst, LPTSTR ptPath )
+{
+	HWND	hDlgWnd;
+	TCHAR	atHintPath[MAX_PATH];
+	HANDLE	hFile;
+
+	//	表示しない設定なら何もせず終わり
+	if( !( InitParamValue( INIT_LOAD, VL_HINT_ENABLE, 1 ) ) )	return;
+
+	//	ヒントファイルを確保・なかったら終わり
+	StringCchCopy( atHintPath, MAX_PATH, ptPath );
+	PathAppend( atHintPath, HINT_FILE );
+
+	hFile = CreateFile( atHintPath, GENERIC_READ, 0, NULL,OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL );
+	if( INVALID_HANDLE_VALUE ==  hFile )	return;
+	CloseHandle( hFile );	//	存在してればいいので、ここでは閉じる
+
+	//	モーダレスで表示
+	hDlgWnd = CreateDialogParam( hInst, MAKEINTRESOURCE(IDD_TODAY_HINT_DLG), hWnd, TodayHintDlgProc, (LPARAM)atHintPath );
+	if( hDlgWnd ){	ShowWindow( hDlgWnd , SW_SHOW );	}
+
+	return;
+}
+//-------------------------------------------------------------------------------------------------
+
+#endif
+
 
 /*!
 	ビューウインドウの作成
@@ -1129,7 +1303,7 @@ HRESULT ViewNowPosStatus( VOID )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	指定文字の幅を首都苦
+	指定文字の幅を取得
 	@param[in]	ch	幅を計りたい文字
 	@return		幅ドット数
 */
@@ -2245,12 +2419,18 @@ VOID OperationOnCommand( HWND hWnd, INT id, HWND hWndCtl, UINT codeNotify )
 #ifdef FIND_STRINGS
 		//	文字列検索
 		case  IDM_FIND_DLG_OPEN:		FindDialogueOpen( ghInst, hWnd );	break;
+#ifdef SEARCH_HIGHLIGHT
 		case IDM_FIND_HIGHLIGHT_OFF:	FindHighlightOff(  );	break;
+#endif
 
 //		case IDM_FIND_JUMP_NEXT:	FindStringJump( 0, &gdDocXdot, &gdDocLine, &gdDocMozi );	break;
 //		case IDM_FIND_JUMP_PREV:	FindStringJump( 1, &gdDocXdot, &gdDocLine, &gdDocMozi );	break;
 
-#endif
+		case IDM_FIND_JUMP_NEXT:	FindDirectly( ghInst, hWnd, IDM_FIND_JUMP_NEXT );	break;
+
+		case IDM_FIND_TARGET_SET:	FindDirectly( ghInst, hWnd, IDM_FIND_TARGET_SET );	break;
+
+#endif	//	FIND_STRINGS
 		case IDM_PAGENAME_SELASSIGN:	DocSelText2PageName(  );	break;
 
 
@@ -2284,9 +2464,7 @@ VOID OperationOnCommand( HWND hWnd, INT id, HWND hWndCtl, UINT codeNotify )
 			break;
 
 		//	SJISコピー
-		case IDM_SJISCOPY:
-			DocExClipSelect( D_SJIS | gbSqSelect  );
-			break;
+		case IDM_SJISCOPY:	DocExClipSelect( D_SJIS | gbSqSelect  );	break;
 
 		//	全SJISコピー
 		case IDM_SJISCOPY_ALL:	DocPageAllCopy( D_SJIS );	break;
@@ -2318,7 +2496,7 @@ VOID OperationOnCommand( HWND hWnd, INT id, HWND hWndCtl, UINT codeNotify )
 
 		//	画面の再描画
 		case IDM_NOW_PAGE_REFRESH:
-#ifdef FIND_STRINGS
+#if defined(FIND_STRINGS) && defined(SEARCH_HIGHLIGHT)
 			FindNowPageReSearch(  );
 #endif
 			ViewRedrawSetLine( -1 );

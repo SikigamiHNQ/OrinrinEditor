@@ -264,18 +264,18 @@ IDM_AATREE_POPUP MENU
 BEGIN
     POPUP "複数行テンプレツリーのアレ"
     BEGIN
-        MENUITEM "プロファイル作成／開く(&N)",	IDM_MAA_PROFILE_MAKE
-        MENUITEM "AA一覧ツリーを再構築(&T)",	IDM_TREE_RECONSTRUCT
-        MENUITEM "プロファイル使用履歴(&H)",	IDM_OPEN_HISTORY
+        MENUITEM "プロファイル作成／開く(&N)",             IDM_MAA_PROFILE_MAKE
+        MENUITEM "AA一覧ツリーを再構築(&T)",             IDM_TREE_RECONSTRUCT
+        MENUITEM "プロファイル使用履歴(&H)",              IDM_OPEN_HISTORY
         MENUITEM SEPARATOR
-        MENUITEM "ファイル名で検索(&F)",	IDM_FINDMAA_DLG_OPEN
+        MENUITEM "ファイル名で検索(&F)",                IDM_FINDMAA_DLG_OPEN
         MENUITEM SEPARATOR
-        MENUITEM "（名称未設定）",			IDM_DUMMY, GRAYED
-        MENUITEM "主タブで開く(&M)",		IDM_AATREE_MAINOPEN
-        MENUITEM "副タブを追加(&S)",		IDM_AATREE_SUBADD
-        MENUITEM "編集ビューに開く(&E)",	IDM_AATREE_GOEDIT
+        MENUITEM "（名称未設定）",                     IDM_DUMMY, GRAYED
+        MENUITEM "主タブで開く(&M)",                  IDM_AATREE_MAINOPEN
+        MENUITEM "副タブを追加(&S)",                  IDM_AATREE_SUBADD
+        MENUITEM "編集ビューに開く(&E)",                IDM_AATREE_GOEDIT
         MENUITEM SEPARATOR
-        MENUITEM "このアイテムを削除(&D)",	IDM_MAA_ITEM_DELETE, GRAYED
+        MENUITEM "このアイテムを削除(&D)",               IDM_MAA_ITEM_DELETE, GRAYED
     END
 END
 
@@ -283,14 +283,14 @@ IDM_AATABS_POPUP MENU
 BEGIN
     POPUP "複数行テンプレタブのアレ"
     BEGIN
-        MENUITEM "このタブを閉じる(&Q)",		IDM_AATABS_DELETE
-        MENUITEM "全ての副タブを閉じる(&A)",	IDM_AATABS_ALLDELETE
+        MENUITEM "このタブを閉じる(&Q)",                IDM_AATABS_DELETE
+        MENUITEM "全ての副タブを閉じる(&A)",              IDM_AATABS_ALLDELETE
         MENUITEM SEPARATOR
-        MENUITEM "編集ビューに開く(&E)",		IDM_AATREE_GOEDIT
+        MENUITEM "編集ビューに開く(&E)",                IDM_AATREE_GOEDIT
         MENUITEM SEPARATOR
-        MENUITEM "表示名称の変更(&N)",			IDM_AATABS_RENAME
+        MENUITEM "表示名称の変更(&N)",                 IDM_AATABS_RENAME
         MENUITEM SEPARATOR
-        MENUITEM "副タブを壱行表示",			IDM_AATABS_SINGLETAB
+        MENUITEM "副タブを壱行表示",                    IDM_AATABS_SINGLETAB
     END
 END
 
@@ -429,8 +429,8 @@ CAPTION "バージョン情報 - Orinrin Editor"
 FONT 9, "MS UI Gothic"
 BEGIN
     ICON            IDI_ORINRINEDITOR,IDC_MYICON,6,6,20,20
-    LTEXT           "Orinrin Editor, Version 0.32 Aurora (2013.610.2200.920)",IDC_STATIC,36,6,168,8,SS_NOPREFIX
-    LTEXT           "Copyright (C) 2011 - 2013 Orinrin/SikigamiHNQ",IDC_STATIC,36,18,168,8
+    LTEXT           "Orinrin Editor, Version 0.33 Aurora (2014.401.2200.920)",IDC_STATIC,36,6,168,8,SS_NOPREFIX
+    LTEXT           "Copyright (C) 2011 - 2014 Orinrin/SikigamiHNQ",IDC_STATIC,36,18,168,8
     LTEXT           "Site ： お燐ちゃんは俺の嫁．ｃｏｍ",IDC_STATIC,36,30,168,8
     DEFPUSHBUTTON   "OK",IDOK,84,180,48,12,WS_GROUP
     EDITTEXT        IDE_ABOUT_DISP,6,42,204,132,ES_MULTILINE | ES_READONLY | NOT WS_BORDER,WS_EX_STATICEDGE
@@ -477,11 +477,11 @@ BEGIN
     LTEXT           "0x0070",IDS_UA_HOTEL,63,148,30,8
 END
 
-IDD_UNICODE_PALETTE_DLG_2 DIALOGEX 0, 0, 438, 218
+IDD_UNICODE_PALETTE_DLG_2 DIALOG 0, 0, 438, 218
 STYLE DS_SETFONT | DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_TOOLWINDOW
 CAPTION "ユニコード一覧表"
-FONT 11, "MS UI Gothic", 0, 0, 0x0
+FONT 11, "MS UI Gothic"
 BEGIN
     COMBOBOX        IDCB_UNI_GROUPSEL,96,6,336,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     CONTROL         "",IDLV_UNI_CATALOGUE,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_OWNERDATA | LVS_NOCOLUMNHEADER | LVS_NOSORTHEADER | WS_BORDER,96,36,336,126
@@ -592,11 +592,11 @@ BEGIN
     EDITTEXT        IDE_PAGENAME,6,18,156,12,ES_AUTOHSCROLL
 END
 
-IDD_GENERAL_OPTION_DLG DIALOGEX 0, 0, 342, 322
+IDD_GENERAL_OPTION_DLG DIALOG 0, 0, 342, 322
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_TOOLWINDOW
 CAPTION "設定いろいろ"
-FONT 9, "MS UI Gothic", 0, 0, 0x0
+FONT 9, "MS UI Gothic"
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,174,306,42,12
     PUSHBUTTON      "キャンセル",IDCANCEL,234,306,42,12
@@ -621,11 +621,14 @@ BEGIN
     CTEXT           "Y",IDC_STATIC,252,18,8,12,SS_CENTERIMAGE
     EDITTEXT        IDE_GRID_Y_POS,264,18,24,12,ES_CENTER | ES_AUTOHSCROLL | ES_NUMBER
     LTEXT           "※壱行は\r\n18ドットです",IDC_STATIC,294,15,36,18
-    CONTROL         "ドット数調整にユニコード空白を使う",IDCB_USE_UNISPACE_SET,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,72,150,8
-    CONTROL         "ユニコードの数値参照を１６進数で扱う",IDCB_UNIRADIX_HEX,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,84,150,8
-    CONTROL         "アンドゥ・リドゥの同じタイミング操作をまとめて行う",IDCB_GROUPUNDO_SET,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,96,150,8
-    CONTROL         "多重起動を許可する（非推奨）",IDCB_MULTIACT_ENA,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,120,150,8
-    CONTROL         "テンプレ窓をメイン窓に統合（再起動後に有効）",IDCB_DOCKING_STYLE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,132,150,8
+    CONTROL         "ドット数調整にユニコード空白を使う",IDCB_USE_UNISPACE_SET,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,42,150,12
+    CONTROL         "ユニコードの数値参照を１６進数で扱う",IDCB_UNIRADIX_HEX,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,54,150,12
+    CONTROL         "アンドゥ・リドゥの同じタイミング操作をまとめて行う",IDCB_GROUPUNDO_SET,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,66,150,12
+    CONTROL         "多重起動を許可する（非推奨）",IDCB_MULTIACT_ENA,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,90,150,12
+    CONTROL         "テンプレ窓をメイン窓に統合（再起動後に有効）",IDCB_DOCKING_STYLE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,102,150,12
+    CONTROL         "保存したらメッセージを表示する",IDCB_SAVE_MSG_ON,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,78,150,12
+    CONTROL         "起動時に「今日のヒント」を表示する",IDCB_POPHINT_VIEW,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,114,150,12
+    CONTROL         "機種依存文字を数値参照コピーする（仮機能）",IDCB_SPMOZI_ENCODE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,126,150,12
     GROUPBOX        "起動時に、前回開いていたファイルを",IDC_STATIC,204,84,132,24
     CONTROL         "開く",IDRB_LASTOPEN_DO,"Button",BS_AUTORADIOBUTTON | WS_GROUP,210,96,24,8
     CONTROL         "開かない",IDRB_LASTOPEN_NON,"Button",BS_AUTORADIOBUTTON,240,96,42,8
@@ -668,7 +671,6 @@ BEGIN
     LTEXT           "※行数",IDC_STATIC,312,162,22,12,SS_CENTERIMAGE
     GROUPBOX        "壱レス最大バイト数",IDC_STATIC,270,186,66,30
     EDITTEXT        IDE_PAGE_BYTE_MAX,288,198,30,12,ES_CENTER | ES_AUTOHSCROLL | ES_NUMBER
-    CONTROL         "保存したらメッセージを表示する",IDCB_SAVE_MSG_ON,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,108,150,8
 END
 
 IDD_TRACEADJUST_DLG DIALOG  0, 0, 139, 281
@@ -905,6 +907,19 @@ BEGIN
     PUSHBUTTON      "初期化",IDB_FUNCKEY_INIT,258,6,30,12
 END
 
+IDD_TODAY_HINT_DLG DIALOG  0, 0, 239, 119
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_TOOLWINDOW
+CAPTION "今日のヒント"
+FONT 10, "MS UI Gothic"
+BEGIN
+    DEFPUSHBUTTON   "閉じる",IDOK,186,102,48,12
+    LTEXT           "スタティック",IDS_CHAR_IMAGE,6,6,72,90
+    LTEXT           "テキスト",IDS_HINT_VIEWER,84,6,150,90,SS_SUNKEN
+    CONTROL         "次から表示しない",IDCB_NEVER_VIEWING,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,102,96,12
+    PUSHBUTTON      "次のヒント",IDB_NEXT_HINT,132,102,48,12
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -912,8 +927,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 2013,610,2200,920
- PRODUCTVERSION 0,32,0,920
+ FILEVERSION 2014,401,2200,920
+ PRODUCTVERSION 0,33,0,920
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -934,12 +949,12 @@ BEGIN
         BEGIN
             VALUE "Comments", "Japanese Only, Perfectly No Warranty"
             VALUE "CompanyName", "I love 2ch, Yaruo and TohoProject"
-            VALUE "LegalCopyright", "Copyright (C) 2011 - 2013 Orinrin/SikigamiHNQ"
+            VALUE "LegalCopyright", "Copyright (C) 2011 - 2014 Orinrin/SikigamiHNQ"
             VALUE "LegalTrademarks", "License : GPLv3"
             VALUE "PrivateBuild", "Build by Visual C++ 2008 Express"
             VALUE "SpecialBuild", "Not Speciality"
-            VALUE "FileVersion", "2013.610.2200.920"
-            VALUE "ProductVersion", "0.32.0.920"
+            VALUE "FileVersion", "2014.401.2200.920"
+            VALUE "ProductVersion", "0.33.0.920"
             VALUE "FileDescription", "AsciiArt Story Editor by Orinrin!"
             VALUE "OriginalFilename", "OrinrinEditor.exe"
             VALUE "InternalName", "Orinrin Editor"

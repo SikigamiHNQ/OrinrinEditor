@@ -43,8 +43,8 @@ extern  LONG	grdSplitPos;	//	スプリットバーの、左側の、画面右からのオフセット
 static  ATOM	gTmpleAtom;		//!<	
 static  HWND	ghTmpleWnd;		//!<	このウインドウハンドル
 
-static  HWND	ghCtgryBxWnd;	//!<	
-static  HWND	ghLvItemWnd;	//!<	
+static  HWND	ghCtgryBxWnd;	//!<	カテゴリコンボックス
+static  HWND	ghLvItemWnd;	//!<	アイテム一覧リストビュー
 static  HWND	ghLnLvTipWnd;	//!<	壱行リストツールチップ
 
 static  HWND	ghDockTabWnd;	//!<	ドッキングしたときの選択肢タブ
@@ -1021,7 +1021,7 @@ LRESULT CALLBACK gpfLineCtgryProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lP
 			}
 			break;
 
-		case WM_MOUSEWHEEL:
+		case WM_MOUSEWHEEL:	//	カテゴリコンボックスでのWHEELでページ送りなると面倒なのでリストビューに送る
 			SendMessage( ghLvItemWnd, WM_MOUSEWHEEL, wParam, lParam );
 			return 0;
 
@@ -1042,6 +1042,8 @@ LRESULT CALLBACK gpfLineCtgryProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lP
 LRESULT CALLBACK gpfLineItemProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
 {
 	INT	id;
+
+//	Ctrl押しながらマウスホイール廻るとまずい？
 
 	switch( msg )
 	{
