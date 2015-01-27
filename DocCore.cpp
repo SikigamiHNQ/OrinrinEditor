@@ -75,11 +75,9 @@ UINT	CALLBACK DocPageLoad( LPTSTR, LPCTSTR, INT );
 */
 HRESULT DocInitialise( UINT dMode )
 {
-#ifdef PAGE_DELAY_LOAD
 	FILES_ITR	itFile;
 	PAGE_ITR	itPage;
 
-#endif
 
 	if( dMode )	//	作成時
 	{
@@ -87,7 +85,6 @@ HRESULT DocInitialise( UINT dMode )
 	}
 	else
 	{
-#ifdef PAGE_DELAY_LOAD
 		for( itFile = gltMultiFiles.begin( ); itFile != gltMultiFiles.end(); itFile++ )
 		{
 			for( itPage = itFile->vcCont.begin( ); itPage != itFile->vcCont.end(); itPage++ )
@@ -95,7 +92,6 @@ HRESULT DocInitialise( UINT dMode )
 				FREE( itPage->ptRawData );
 			}
 		}
-#endif
 	}
 
 	return S_OK;
@@ -319,10 +315,8 @@ LPARAM DocMultiFileClose( HWND hWnd, LPARAM uqNumber )
 	iCount = gltMultiFiles.size();
 	if( 1 >= iCount )	return 0;
 
-	//	MIDDLE_CLICK_CLOSE で、対象は今のファイル以外かもしれない
-	//そういうときはそのファイルに移動して処理する。
-	//閉じたら、元ファイルにフォーカスする。
-	//開いているファイルを閉じたら、隣のファイルにフォーカスする
+	//	対象は今のファイル以外かもしれない。そういうときはそのファイルに移動して処理する。
+	//	閉じたら、元ファイルにフォーカスする。開いているファイルを閉じたら、隣のファイルにフォーカスする
 
 	dNowNum = gitFileIt->dUnique;	//	今開いてるヤツの番号
 
@@ -371,9 +365,8 @@ LPARAM DocMultiFileClose( HWND hWnd, LPARAM uqNumber )
 		}
 		itNow->vcCont.at( i ).ltPage.clear( );	//	行を全消し
 
-#ifdef PAGE_DELAY_LOAD
 		FREE( itNow->vcCont.at( i ).ptRawData );
-#endif
+
 		SqnFreeAll( &(itNow->vcCont.at( i ).stUndoLog) );
 	}
 	itNow->vcCont.clear(  );	//	ページを全消し
@@ -502,7 +495,7 @@ VOID DocCaretPosMemory( UINT dMode, LPPOINT pstPos )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	編集中のを破棄して新しいの作る・新しいファイルを開く
+	新しいファイルを開く
 	@param[in]	hWnd	親にするウインドウハンドル
 	@return		HRESULT	終了状態コード
 */
@@ -514,7 +507,7 @@ HRESULT DocOpenFromNull( HWND hWnd )
 	//	複数ファイル扱うなら、破棄は不要、新しいファイルインスタンス作って対応
 
 	//	新しいファイル置き場の準備
-	dNumber = DocMultiFileCreate( atDummyName );
+	dNumber = DocMultiFileCreate( atDummyName );	//	ファイルを新規作成するとき
 
 	MultiFileTabAppend( dNumber, (*gitFileIt).atDummyName );	//	ファイルの新規作成した
 
@@ -569,6 +562,138 @@ INT DocFileCloseCheck( HWND hWnd, UINT dMode )
 }
 //-------------------------------------------------------------------------------------------------
 
+#ifdef BIG_TEXT_SEPARATE
+//	2014/05/28
+/*!
+	ファイル内容を確認して、分割が必要かどうか確認する
+	@param[in]	ptStr	対象文字列へのポインター
+	@param[in]	cchSize	その文字列の文字数
+	@return	０なにもしない　１分割モード　２読込中止
+*/
+UINT DocFileHugeCheck( LPTSTR ptStr, UINT_PTR cchSize )
+{
+	LPTSTR		ptBuff;
+//	UINT_PTR	d;
+	UINT_PTR	dCount;
+	UINT		dRslt;
+
+	//	ＡＳＴなら何もする必要は無い
+	if( 0 == StrCmpN( AST_SEPARATERW , ptStr, 4 ) ){	return 0;	}
+
+	ptBuff = StrStr( ptStr, MLT_SEPARATERW );	//	セパレータを探す
+	if( ptBuff ){	return 0;	}	//	有るなら問題無い
+
+	//	行数を確認・１００行以上あるなら分割が必要とみなす
+	dCount = 0;
+
+	do{
+		ptBuff = StrStr( ptStr , TEXT("\r\n") );	//	改行を探す
+		if( ptBuff ){	dCount++;	}else{	break;	}
+
+		ptStr = ptBuff+2;	//	改行分進んだ位置が必要
+	}while( ptBuff );
+
+	//	改行がなく１０００文字以上もある場合はエラーとする
+	if( 0 == dCount && 1000 <= cchSize )
+	{
+		DocHugeFileTreatment( 2 );
+		return 2;
+	}
+
+	if( 100 >= dCount ){	return 0;	}	//	１００行以下なら問題無い
+
+	//	ここで、大型ファイルなのでどうするかの確認・そのまま／分割／やめる
+	dRslt = DocHugeFileTreatment( 1 );
+
+	return dRslt;
+}
+//-------------------------------------------------------------------------------------------------
+
+/*!
+	ファイル内容を分割する
+	@param[in]	ptSource	対象文字列へのポインター・終端NULLが２つ以上確保されていること
+	@param[in]	cchSource	その文字列の文字数
+	@return	分割結果の入ったポインター・開放は呼んだ方でやる・NULLなら失敗
+*/
+LPTSTR DocFileHugeSeparate( LPTSTR ptSource, UINT_PTR cchSource )
+{
+	LPTSTR		ptDest, ptBuff;
+	UINT_PTR	dd, ds, dLineCnt, dEmptyCnt, cchDest;
+
+	cchDest = cchSource;	//	とりあえず現状で確保・足りなくなったらreallocするか
+	ptDest = (LPTSTR)malloc( sizeof(TCHAR) * cchDest );
+	if( !(ptDest) ){	return NULL;	}	//	なんかエラー・普通は無い
+	ZeroMemory( ptDest, sizeof(TCHAR) * cchDest );
+
+	dd = 0;
+	dLineCnt = 0;	//	この行数は、頁更新があったらリセットする
+	dEmptyCnt = 0;
+	for( ds = 0; cchSource > ds; ds++ )
+	{
+		if( NULL == ptSource[ds] )	break;
+
+		ptDest[dd] = ptSource[ds];	//	とりあえず文字を写していく
+		dd++;	//	こっちは進めておｋ
+		ptDest[dd] = NULL;	//	ターミネート
+
+		if( 0xD == ptSource[ds] && 0xA == ptSource[ds+1] )	//	改行があった場合
+		{
+			ds++;	//	その改行をうつす
+			ptDest[dd] = ptSource[ds];
+			dd++;	//	こっちは進めておｋ
+			ptDest[dd] = NULL;	//	ターミネート
+
+			if( cchDest <= (dd+12) )	//	残り少なくなってきたら
+			{
+				ptBuff = (LPTSTR)realloc( ptDest, sizeof(TCHAR) * (cchDest + 0x800) );	//	適当に拡張
+				if( !(ptBuff)  )	//	もしエラーになったら
+				{
+					free( ptDest );	//	使用領域は開放する
+					return NULL;	//	エラー戻り
+				}
+				ptDest = ptBuff;	//	付け替える
+				cchDest += 0x800;	//	サイズ拡張
+			}//ここには要らないかも
+
+			dLineCnt++;	//	行数増える
+			if( 40 <= dLineCnt ){	dEmptyCnt++;	}	//	規定行数超えたら空行カウント開始
+
+			//	４０行以降で４行以上の空きがあるか、１００行以降で１行以上の空きがあるか、２５６行以上続いている
+			if( (5 <= dEmptyCnt) || (100 <= dLineCnt && 2 <= dEmptyCnt) || (256 <= dLineCnt) )
+			{
+				StringCchCat( ptDest, cchDest, MLT_SEPARATERW );
+				StringCchCat( ptDest, cchDest, TEXT("\r\n") );
+				StringCchLength( ptDest, cchDest, &dd );	//	位置合わせ
+
+				dLineCnt = 0;
+				dEmptyCnt = 0;
+			}
+		}
+		else
+		{
+			dEmptyCnt = 0;	//	改行以外ならリセット・５０行超えてても、通常の文字列が続くなら空カウントは進まない
+		}
+
+		if( cchDest <= (dd+12) )	//	残り少なくなってきたら
+		{
+			ptBuff = (LPTSTR)realloc( ptDest, sizeof(TCHAR) * (cchDest + 0x800) );	//	適当に拡張
+			if( !(ptBuff)  )	//	もしエラーになったら
+			{
+				free( ptDest );	//	使用領域は開放する
+				return NULL;	//	エラー戻り
+			}
+			ptDest = ptBuff;	//	付け替える
+			cchDest += 0x800;	//	サイズ拡張
+		}
+
+	}
+
+	return ptDest;
+}
+//-------------------------------------------------------------------------------------------------
+
+#endif
+
 /*!
 	ファイルを確保
 	@param[in]	ptFileName	指定されたファイル名で開く
@@ -587,9 +712,14 @@ LPARAM DocFileInflate( LPTSTR ptFileName )
 
 	LPTSTR	ptString;
 	LPSTR	pcText;
-	UINT	cchSize;
+	UINT_PTR	cchSize;
 
 	LPARAM	dNumber;
+
+#ifdef BIG_TEXT_SEPARATE	//	頁区切りのないTXTかどうかを確認する
+	UINT	dSepRslt;
+	LPTSTR	ptSepBuff;
+#endif
 
 #ifdef _DEBUG
 	DWORD	dTcStart, dTcEnd;
@@ -612,19 +742,15 @@ LPARAM DocFileInflate( LPTSTR ptFileName )
 
 	//InitLastOpen( INIT_SAVE, ptFileName );	//	複数ファイルでは意味が無い
 
-	//	新しいファイル置き場の準備
-	dNumber = DocMultiFileCreate( NULL );
-	if( 0 >= dNumber )	return 0;
+	//	処理順番入替
 
 	iByteSize = GetFileSize( hFile, NULL );
-	pBuffer = malloc( iByteSize + 4 );
+	pBuffer = malloc( iByteSize + 4 );	//	バッファは少し大きめに取る
 	ZeroMemory( pBuffer, iByteSize + 4 );
 
 	SetFilePointer( hFile, 0, NULL, FILE_BEGIN );
 	ReadFile( hFile, pBuffer, iByteSize, &readed, NULL );
 	CloseHandle( hFile );	//	内容全部取り込んだから開放
-
-	StringCchCopy( (*gitFileIt).atFileName, MAX_PATH, ptFileName );
 
 	//	ユニコードチェック
 	CopyMemory( &rtUniBuf, pBuffer, 2 );
@@ -646,7 +772,32 @@ LPARAM DocFileInflate( LPTSTR ptFileName )
 
 	StringCchLength( ptString, STRSAFE_MAX_CCH, &cchSize );
 
-	//	ファイルの内容を全確認して、先にメモリ確保しておく？
+#ifdef BIG_TEXT_SEPARATE	//	頁区切りのないTXTかどうかを確認する
+	dSepRslt = DocFileHugeCheck( ptString, cchSize );
+	if(  1 == dSepRslt )	//	分割処理する
+	{
+		ptSepBuff = DocFileHugeSeparate( ptString, cchSize );
+		if( !(ptSepBuff)  ){	return 0;	}	//	なんかミスってるなら中止
+
+		FREE( pBuffer );	//	大本を一旦開放
+		pBuffer = ptSepBuff;	//	最後に開放する領域としてポイントするところを変更
+		ptString = ptSepBuff;	//	読込処理を続ける位置としてセット
+
+		StringCchLength( ptString, STRSAFE_MAX_CCH , &cchSize );	//	サイズ読込直し
+	}
+	else if( 2 == dSepRslt )	//	読込中止
+	{
+		FREE( pBuffer );	//	大本を開放
+		return 0;
+	}
+	//	０なら何もしない
+#endif
+
+	//	新しいファイル置き場の準備	2014/05/28↑にあったのを移動した
+	dNumber = DocMultiFileCreate( NULL );	//	実際のファイルを開くとき
+	if( 0 >= dNumber )	return 0;
+
+	StringCchCopy( (*gitFileIt).atFileName, MAX_PATH, ptFileName );
 
 
 	//	もしASTなら、先頭は[AA]になってるはず・分割は中でやる
@@ -687,17 +838,12 @@ LPARAM DocFileInflate( LPTSTR ptFileName )
 */
 UINT CALLBACK DocPageLoad( LPTSTR ptName, LPCTSTR ptCont, INT cchSize )
 {
-#ifndef PAGE_DELAY_LOAD
-	INT	dmyX = 0, dmyY = 0;
-#endif
-
 	gixFocusPage = DocPageCreate(  -1 );	//	頁を作成
 	PageListInsert( gixFocusPage  );	//	ページリストビューに追加
 
 	//	新しく作ったページにうつる
 
 	if( ptName ){	DocPageNameSet( ptName );	}	//	名前をセットしておく
-#ifdef PAGE_DELAY_LOAD
 	(*gitFileIt).vcCont.at( gixFocusPage ).ptRawData = (LPTSTR)malloc( (cchSize+2) * sizeof(TCHAR) );
 	ZeroMemory( (*gitFileIt).vcCont.at( gixFocusPage ).ptRawData, (cchSize+2) * sizeof(TCHAR) );
 
@@ -705,12 +851,6 @@ UINT CALLBACK DocPageLoad( LPTSTR ptName, LPCTSTR ptCont, INT cchSize )
 	StringCchCopy( (*gitFileIt).vcCont.at( gixFocusPage ).ptRawData, (cchSize+2), ptCont );
 
 	//	バッファに文字列を保存だけしておく
-#else
-	if( 0 < cchSize )	//	空行でないのなら
-	{
-		DocStringAdd( &dmyX, &dmyY, ptCont, cchSize );	//	この中で改行とか面倒見る
-	}
-#endif
 
 	DocPageParamGet( NULL, NULL );	//	再計算しちゃう・遅延読込ヒット
 
@@ -1022,16 +1162,11 @@ INT DocPageCreate( INT iAdding )
 	ZeroMemory( stPage.atPageName, sizeof(stPage.atPageName) );
 //	stPage.dDotCnt = 0;
 	stPage.dByteSz = 0;
-
 	stPage.ltPage.clear(  );
 	stPage.ltPage.push_back( stLine );	//	１頁の枠を作って
-
 	stPage.dSelLineTop    =  -1;		//	無効は－１を注意
 	stPage.dSelLineBottom =  -1;		//	
-
-#ifdef PAGE_DELAY_LOAD
 	stPage.ptRawData = NULL;
-#endif
 	SqnInitialise( &(stPage.stUndoLog) );
 
 	//	今の頁の次に作成
@@ -1096,9 +1231,8 @@ HRESULT DocPageDelete( INT iPage, INT iBack )
 	itPage = (*gitFileIt).vcCont.begin(  );
 	for( i = 0; iPage > i; i++ ){	itPage++;	}
 
-#ifdef PAGE_DELAY_LOAD
 	FREE( itPage->ptRawData );
-#endif
+
 	SqnFreeAll( &(itPage->stUndoLog)  );	//	アンドゥログ削除
 	(*gitFileIt).vcCont.erase( itPage  );	//	さっくり削除
 	gixFocusPage = -1;	//	頁選択無効にする
@@ -1127,8 +1261,6 @@ HRESULT DocPageDelete( INT iPage, INT iBack )
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-
-#ifdef PAGE_DELAY_LOAD
 
 /*!
 	ディレイしてる頁の読込
@@ -1179,10 +1311,6 @@ UINT DocDelayPageLoad( FILES_ITR itFile, INT iPage )
 }
 //-------------------------------------------------------------------------------------------------
 
-
-
-#endif
-
 /*!
 	ページを変更・ファイルコア函数
 	@param[in]	dPageNum	変更したい頁番号
@@ -1191,11 +1319,6 @@ UINT DocDelayPageLoad( FILES_ITR itFile, INT iPage )
 HRESULT DocPageChange( INT dPageNum )
 {
 	INT	iPrePage;
-
-//#ifdef PAGE_DELAY_LOAD
-//	INT	dmyX = 0, dmyY = 0;
-//	UINT_PTR	cchSize;
-//#endif
 
 	//	今の表示内容破棄とかいろいろある
 #ifdef DO_TRY_CATCH
@@ -1209,10 +1332,8 @@ HRESULT DocPageChange( INT dPageNum )
 
 	(*gitFileIt).dNowPage = dPageNum;	//	記録
 
-#ifdef PAGE_DELAY_LOAD
 	//	まだ展開されてないなら
 	DocDelayPageLoad( gitFileIt, dPageNum );
-#endif
 
 	PageListViewChange( dPageNum, iPrePage );
 
@@ -1248,18 +1369,14 @@ HRESULT DocPageInfoRenew( INT dPage, UINT bMode )
 		MainSttBarSetByteCount( dBytes );
 	}
 
-#ifdef PAGE_DELAY_LOAD
 	if( gitFileIt->vcCont.at( dPage ).ptRawData )
 	{
 		dLines = gitFileIt->vcCont.at( dPage ).iLineCnt;
 	}
 	else
 	{
-#endif
 		dLines = gitFileIt->vcCont.at( dPage ).ltPage.size( );
-#ifdef PAGE_DELAY_LOAD
 	}
-#endif
 
 	PageListInfoSet( dPage, dBytes, dLines );
 
@@ -1370,9 +1487,7 @@ INT DocPageTextGetAlloc( FILES_ITR itFile, INT dPage, UINT bStyle, LPVOID *pText
 	UINT_PTR	i;
 	UINT_PTR	cchSize;
 
-#ifdef PAGE_DELAY_LOAD
 	LPSTR		pcStr;
-#endif
 
 	string	srString;
 	wstring	wsString;
@@ -1390,7 +1505,6 @@ INT DocPageTextGetAlloc( FILES_ITR itFile, INT dPage, UINT bStyle, LPVOID *pText
 	if( 0 > dPage ){	dPage = gixFocusPage;	}
 
 
-#ifdef PAGE_DELAY_LOAD
 	if( itFile->vcCont.at( dPage ).ptRawData )	//	生データ状態なら
 	{
 		if( bStyle & D_UNI )	//	ユニコードである
@@ -1412,7 +1526,6 @@ INT DocPageTextGetAlloc( FILES_ITR itFile, INT dPage, UINT bStyle, LPVOID *pText
 	}
 	else	//	ロード済みなら
 	{
-#endif
 		//	全文字を頂く
 		iLines = itFile->vcCont.at( dPage ).ltPage.size( );
 
@@ -1443,10 +1556,7 @@ INT DocPageTextGetAlloc( FILES_ITR itFile, INT dPage, UINT bStyle, LPVOID *pText
 			srString +=  string( CH_CRLFA );
 			wsString += wstring( CH_CRLFW );
 		}
-
-#ifdef PAGE_DELAY_LOAD
 	}
-#endif
 
 	if( bStyle & D_UNI )
 	{
@@ -1559,10 +1669,8 @@ INT DocPageTextAllGetAlloc( UINT bStyle, LPVOID *pText )
 	UINT_PTR	cchSize;
 	INT_PTR		iSize;
 
-#ifdef PAGE_DELAY_LOAD
 	LPTSTR		ptData;
 	LPSTR		pcStr;
-#endif
 
 	string	srString;	//	ユニコード・シフトJISで確保
 	wstring	wsString;
@@ -1573,7 +1681,6 @@ INT DocPageTextAllGetAlloc( UINT bStyle, LPVOID *pText )
 	srString.clear( );
 	wsString.clear( );
 
-#ifdef PAGE_DELAY_LOAD
 	if( gitFileIt->vcCont.at( gixFocusPage ).ptRawData )	//	生データ状態なら
 	{
 		ptData = (*gitFileIt).vcCont.at( gixFocusPage ).ptRawData;
@@ -1605,7 +1712,6 @@ INT DocPageTextAllGetAlloc( UINT bStyle, LPVOID *pText )
 	}
 	else
 	{
-#endif
 		//	ページ全体の行数
 		iLines = DocNowFilePageLineCount( );
 
@@ -1659,9 +1765,7 @@ INT DocPageTextAllGetAlloc( UINT bStyle, LPVOID *pText )
 				StringCchCopyA( (LPSTR)(*pText), iSize, srString.c_str( ) );
 			}
 		}
-#ifdef PAGE_DELAY_LOAD
 	}
-#endif
 
 	return iSize;
 }
@@ -1687,11 +1791,9 @@ LPSTR DocPageTextPreviewAlloc( INT iPage, PINT pdBytes )
 	LINE_ITR	itLine, itLineEnd;
 	LETR_ITR	itLtr;
 
-#ifdef PAGE_DELAY_LOAD
 	TCHAR	atEntity[10];
 	wstring	widString;
 	LPTSTR	ptCaret;
-#endif
 
 	srString.clear( );
 
@@ -1699,7 +1801,6 @@ LPSTR DocPageTextPreviewAlloc( INT iPage, PINT pdBytes )
 
 	if( DocRangeIsError( gitFileIt, iPage, 0 ) )	return NULL;
 
-#ifdef PAGE_DELAY_LOAD
 	widString.clear();
 
 	if(  (*gitFileIt).vcCont.at( iPage ).ptRawData )	//	生データ状態なら
@@ -1731,8 +1832,6 @@ LPSTR DocPageTextPreviewAlloc( INT iPage, PINT pdBytes )
 	}
 	else
 	{
-#endif
-
 		//	ページ全体の行数
 		iLines    = (*gitFileIt).vcCont.at( iPage ).ltPage.size( );
 
@@ -1766,10 +1865,7 @@ LPSTR DocPageTextPreviewAlloc( INT iPage, PINT pdBytes )
 		pcText = (LPSTR)malloc( iSize );
 		ZeroMemory( pcText, iSize );
 		StringCchCopyA( pcText, iSize, srString.c_str( ) );
-
-#ifdef PAGE_DELAY_LOAD
 	}
-#endif
 
 	if( pdBytes )	*pdBytes = iSize;
 

@@ -44,21 +44,6 @@ INIファイルは、文字列先頭の半角は無視するらしい？
 #define TRANCE_COLOUR	RGB(0x66,0x77,0x88)
 //-------------------------------------------------------------------------------------------------
 
-#ifndef FRAME_MLINE
-
-typedef struct tagFRAMEINSINFO
-{
-	UINT	dRfItem;	//!<	天井・上のパーツ数
-	UINT	dLftRfDot;	//!<	左上＋上のドット数・中の右オフセット開始地点
-	UINT	dMidLines;	//!<	間の行数
-	UINT	dFlrItem;	//!<	床・下のパーツ数
-
-	LPTSTR	ptRoof;		//!<	天井の文字列
-	LPTSTR	ptMiddle;	//!<	間の文字列・複数型だと使わないか？
-	LPTSTR	ptFloor;	//!<	床の文字列
-
-} FRMINSINFO, *LPFRMINSINFO;
-#endif
 //-------------------------------------------------------------------------------------------------
 
 #define TB_ITEMS	26
@@ -132,14 +117,10 @@ static INT			gdToolBarHei;	//!<	ツールバー太さ
 static  UINT		gdSelect;		//!<	選択した枠番号０～９
 static BOOLEAN		gbQuickClose;	//!<	貼り付けたら直ぐ閉じる
 
-#ifndef FRAME_MLINE
-static FRMINSINFO	gstFrmInsInfo;	//!<	表示中のヤツの情報
-#endif
 extern HFONT		ghAaFont;		//	AA用フォント
 
 static  RECT		gstOrigRect;	//!<	ダイヤログ起動時、つまり最小ウインドウサイズ
 
-#ifdef FRAME_MLINE
 static LPTSTR		gptFrmSample;	//!<	枠設定ダイヤログの見本用
 static  RECT		gstSamplePos;	//!<	見本窓の左上位置と、幅高さのオフセット量
 static FRAMEINFO	gstNowFrameInfo;
@@ -147,7 +128,6 @@ static FRAMEINFO	gstNowFrameInfo;
 static LPTSTR		gptFrmBox;		//!<	挿入枠用の文字列
 
 static  UINT		gbMultiPaddTemp;	//!<	外周に沿うようにパディングするか・挿入BOX用
-#endif
 
 static FRAMEINFO	gstFrameInfo[FRAME_MAX];	//!<	配列で必要数確保でいいか
 //-------------------------------------------------------------------------------------------------
@@ -166,7 +146,6 @@ HRESULT	FramePartsUpdate( HWND, HWND, LPFRAMEITEM );	//!<
 HRESULT	FrameDataGet( UINT, LPFRAMEINFO );	//!<	
 HRESULT	FrameInfoDisp( HWND );	//!<	
 
-#ifdef FRAME_MLINE
 VOID	FrameDataTranslate( LPTSTR, UINT );	//!<	
 //INT		FramePartsSizeCalc( LPTSTR, PINT );
 
@@ -176,19 +155,13 @@ INT		FrameMultiSizeGet( LPFRAMEINFO, PINT, PINT );	//!<
 LPTSTR	FrameMakeOutsideBoundary( CONST INT, CONST INT, LPFRAMEINFO );	//!<	
 LPTSTR	FrameMakeInsideBoundary( UINT , PINT, LPFRAMEINFO );	//!<	
 
-#endif
-
-
-
 
 INT		FrameInsBoxSizeGet( LPRECT );
 VOID	FrameInsBoxFrmDraw( HDC );
 VOID	FrameDrawItem( HDC, INT, LPTSTR );
 INT_PTR	Frm_OnSize( HWND, UINT, INT, INT );
 INT_PTR	Frm_OnWindowPosChanging( HWND, LPWINDOWPOS );
-#ifndef FRAME_MLINE
-HRESULT	FrameInsBoxInfoCheck( VOID );
-#endif
+
 HRESULT	FrameInsBoxDoInsert( HWND );
 
 LRESULT	CALLBACK FrameInsProc( HWND, UINT, WPARAM, LPARAM );
@@ -248,10 +221,8 @@ HRESULT FrameInitialise( LPTSTR ptCurrent, HINSTANCE hInstance )
 
 	ghFrInbxWnd = NULL;
 
-#ifdef FRAME_MLINE
 	gptFrmBox = NULL;
 
-#endif
 	gdSelect = 0;
 
 	gbQuickClose = TRUE;
@@ -395,9 +366,7 @@ HRESULT FrameNameLoad( UINT dNumber, LPTSTR ptNamed, UINT_PTR cchSize )
 HRESULT InitFrameItem( UINT dMode, UINT dNumber, LPFRAMEINFO pstInfo )
 {
 	TCHAR	atAppName[MIN_STRING], atBuff[MIN_STRING];
-#ifdef FRAME_MLINE
 	TCHAR	atBuffer[PARTS_CCH];
-#endif
 
 	//	所定のAPP名を作る
 	StringCchPrintf( atAppName, MIN_STRING, TEXT("Frame%u"), dNumber );
@@ -416,7 +385,7 @@ HRESULT InitFrameItem( UINT dMode, UINT dNumber, LPFRAMEINFO pstInfo )
 		GetPrivateProfileString( atAppName, TEXT("Twilight"),  TEXT("┘"), pstInfo->stTwilight.atParts, PARTS_CCH, gatFrameIni );
 		GetPrivateProfileString( atAppName, TEXT("Midnight"),  TEXT("─"), pstInfo->stMidnight.atParts, PARTS_CCH, gatFrameIni );
 		GetPrivateProfileString( atAppName, TEXT("Dawn"),      TEXT("└"), pstInfo->stDawn.atParts, PARTS_CCH, gatFrameIni );
-#ifdef FRAME_MLINE
+
 		FrameDataTranslate( pstInfo->stDaybreak.atParts , 1 );
 		FrameDataTranslate( pstInfo->stMorning.atParts , 1 );
 		FrameDataTranslate( pstInfo->stNoon.atParts , 1 );
@@ -425,7 +394,7 @@ HRESULT InitFrameItem( UINT dMode, UINT dNumber, LPFRAMEINFO pstInfo )
 		FrameDataTranslate( pstInfo->stTwilight.atParts , 1 );
 		FrameDataTranslate( pstInfo->stMidnight.atParts , 1 );
 		FrameDataTranslate( pstInfo->stDawn.atParts , 1 );
-#endif
+
 		GetPrivateProfileString( atAppName, TEXT("LEFTOFFSET"),  TEXT("0"), atBuff, MIN_STRING, gatFrameIni );
 		pstInfo->dLeftOffset  = StrToInt( atBuff );
 		GetPrivateProfileString( atAppName, TEXT("RIGHTOFFSET"), TEXT("0"), atBuff, MIN_STRING, gatFrameIni );
@@ -440,7 +409,6 @@ HRESULT InitFrameItem( UINT dMode, UINT dNumber, LPFRAMEINFO pstInfo )
 	{
 		WritePrivateProfileString( atAppName, TEXT("Name"), pstInfo->atFrameName, gatFrameIni );
 
-#ifdef FRAME_MLINE
 		StringCchCopy( atBuffer, PARTS_CCH, pstInfo->stDaybreak.atParts );	FrameDataTranslate( atBuffer, 0 );
 		WritePrivateProfileString( atAppName, TEXT("Daybreak"),  atBuffer, gatFrameIni );
 		StringCchCopy( atBuffer, PARTS_CCH, pstInfo->stMorning.atParts );	FrameDataTranslate( atBuffer, 0 );
@@ -457,16 +425,6 @@ HRESULT InitFrameItem( UINT dMode, UINT dNumber, LPFRAMEINFO pstInfo )
 		WritePrivateProfileString( atAppName, TEXT("Midnight"),  atBuffer, gatFrameIni );
 		StringCchCopy( atBuffer, PARTS_CCH, pstInfo->stDawn.atParts );		FrameDataTranslate( atBuffer, 0 );
 		WritePrivateProfileString( atAppName, TEXT("Dawn"),      atBuffer, gatFrameIni );
-#else
-		WritePrivateProfileString( atAppName, TEXT("Daybreak"),  pstInfo->stDaybreak.atParts, gatFrameIni );
-		WritePrivateProfileString( atAppName, TEXT("Morning"),   pstInfo->stMorning.atParts, gatFrameIni );
-		WritePrivateProfileString( atAppName, TEXT("Noon"),      pstInfo->stNoon.atParts, gatFrameIni );
-		WritePrivateProfileString( atAppName, TEXT("Afternoon"), pstInfo->stAfternoon.atParts, gatFrameIni );
-		WritePrivateProfileString( atAppName, TEXT("Nightfall"), pstInfo->stNightfall.atParts, gatFrameIni );
-		WritePrivateProfileString( atAppName, TEXT("Twilight"),  pstInfo->stTwilight.atParts, gatFrameIni );
-		WritePrivateProfileString( atAppName, TEXT("Midnight"),  pstInfo->stMidnight.atParts, gatFrameIni );
-		WritePrivateProfileString( atAppName, TEXT("Dawn"),      pstInfo->stDawn.atParts, gatFrameIni );
-#endif
 
 		StringCchPrintf( atBuff, MIN_STRING, TEXT("%d"), pstInfo->dLeftOffset );
 		WritePrivateProfileString( atAppName, TEXT("LEFTOFFSET"), atBuff, gatFrameIni );
@@ -484,6 +442,25 @@ HRESULT InitFrameItem( UINT dMode, UINT dNumber, LPFRAMEINFO pstInfo )
 //-------------------------------------------------------------------------------------------------
 
 /*!
+	割り算する。０除算なら０を返す
+	@param[in]	iLeft	割られる数
+	@param[in]	iRight	割る数
+	@return	INT	計算結果
+*/
+INT Divinus( INT iLeft, INT iRight )
+{
+	 INT	iAnswer;
+
+	if( 0 == iRight )	return 0;
+
+	iAnswer = iLeft / iRight;
+
+	return iAnswer;
+}
+//-------------------------------------------------------------------------------------------------
+
+
+/*!
 	枠設定のダイヤログを開く
 	@param[in]	hInst	アプリの実存
 	@param[in]	hWnd	本体のウインドウハンドルであるようにすること
@@ -496,11 +473,8 @@ INT_PTR FrameEditDialogue( HINSTANCE hInst, HWND hWnd, UINT dRsv )
 
 	gNowSel = 0;
 
-#ifdef FRAME_MLINE
 	iRslt = DialogBoxParam( hInst, MAKEINTRESOURCE(IDD_FRAME_EDIT_DLG_2), hWnd, FrameEditDlgProc, 0 );
-#else
-	iRslt = DialogBoxParam( hInst, MAKEINTRESOURCE(IDD_FRAME_EDIT_DLG), hWnd, FrameEditDlgProc, 0 );
-#endif
+
 	//	処理結果によっては、ここでメニューの内容書換
 	if( IDYES == iRslt ){	FrameNameModifyMenu( hWnd );	}
 
@@ -682,11 +656,11 @@ INT_PTR Frm_OnCommand( HWND hDlg, INT id, HWND hWndCtl, UINT codeNotify )
 		case IDB_FRM_PADDING:
 			iRslt = Button_GetCheck( hWndCtl );
 			gstFrameInfo[gNowSel].dRestPadd = (BST_CHECKED == iRslt) ? TRUE : FALSE;
-#ifdef FRAME_MLINE
+
 			GetClientRect( GetDlgItem(hDlg,IDS_FRAME_IMAGE), &rect );
 			FREE( gptFrmSample );
 			gptFrmSample = FrameMakeOutsideBoundary( rect.right, rect.bottom, &(gstFrameInfo[gNowSel]) );
-#endif
+
 			InvalidateRect( GetDlgItem(hDlg,IDS_FRAME_IMAGE), NULL, TRUE );
 			return (INT_PTR)TRUE;
 
@@ -700,11 +674,11 @@ INT_PTR Frm_OnCommand( HWND hDlg, INT id, HWND hWndCtl, UINT codeNotify )
 			{
 				gNowSel = ComboBox_GetCurSel( hWndCtl );
 				FrameInfoDisp( hDlg );
-#ifdef FRAME_MLINE
+
 				GetClientRect( GetDlgItem(hDlg,IDS_FRAME_IMAGE), &rect );
 				FREE( gptFrmSample );
 				gptFrmSample = FrameMakeOutsideBoundary( rect.right, rect.bottom, &(gstFrameInfo[gNowSel]) );
-#endif
+
 				InvalidateRect( GetDlgItem(hDlg,IDS_FRAME_IMAGE), NULL, TRUE );
 			}
 			return (INT_PTR)TRUE;
@@ -737,12 +711,9 @@ HRESULT FramePartsUpdate( HWND hDlg, HWND hWndCtl, LPFRAMEITEM pstItem )
 	}
 
 	//	ドット数確認して
-#ifdef FRAME_MLINE
 	//pstItem->dDot = FramePartsSizeCalc( pstItem->atParts, &(pstItem->iLine) );
 	pstItem->iLine = DocStringInfoCount( pstItem->atParts, 0, &(pstItem->dDot), NULL );
-#else
-	pstItem->dDot = ViewStringWidthGet( pstItem->atParts );
-#endif
+
 	//	ついでに再描画
 	InvalidateRect( GetDlgItem(hDlg,IDS_FRAME_IMAGE), NULL, TRUE );
 
@@ -816,107 +787,27 @@ INT_PTR Frm_OnDrawItem( HWND hDlg, CONST LPDRAWITEMSTRUCT pstDrawItem )
 {
 //	HFONT	hFtOld;
 
-#ifdef FRAME_MLINE
 //	LPTSTR	ptMultiStr;
-#else
-	LPFRAMEINFO	pstInfo;
-
-	TCHAR	atStr[BIG_STRING];	//	足りるか？
-
-	UINT	cchSize;
-	INT	xMaxDot, i, xNoonLen, mzNoonCnt, xNightPos, xMidLen, mzMidCnt;
-	INT	yPos = (LINE_HEIGHT/2);
-	INT	j, iL;
-#endif
 
 	if( IDS_FRAME_IMAGE != pstDrawItem->CtlID ){	return (INT_PTR)FALSE;	}
-
-
 
 //	hFtOld = SelectFont( pstDrawItem->hDC, ghAaFont );	//	フォント設定
 
 	FillRect( pstDrawItem->hDC, &(pstDrawItem->rcItem), GetSysColorBrush( COLOR_WINDOW ) );
 	SetBkMode( pstDrawItem->hDC, TRANSPARENT );
 //ここから複数行処理すればいいか
-#ifdef FRAME_MLINE
+
 //	ptMultiStr = FrameMakeOutsideBoundary( pstDrawItem->rcItem.right, pstDrawItem->rcItem.bottom, &(gstFrameInfo[gNowSel]) );
 
 	DrawText( pstDrawItem->hDC, gptFrmSample, -1, &(pstDrawItem->rcItem), DT_LEFT | DT_NOPREFIX | DT_NOCLIP | DT_WORDBREAK );
 							//	ptMultiStr
 //	FREE( ptMultiStr );
-#else
-	//	枠描画領域を確保
-	xMaxDot = pstDrawItem->rcItem.right - (SPACE_ZEN * 2);
-
-	iL = pstDrawItem->rcItem.bottom - LINE_HEIGHT * 3;
-	iL /= LINE_HEIGHT;
-
-	pstInfo = &(gstFrameInfo[gNowSel]);	//	対象枠確認
-
-	//	上線の文字数
-	xNoonLen  = xMaxDot - ( pstInfo->stMorning.dDot + pstInfo->stAfternoon.dDot );
-	mzNoonCnt = xNoonLen  / pstInfo->stNoon.dDot;
-
-	//	下線の文字数
-	xMidLen  = xMaxDot - ( pstInfo->stTwilight.dDot + pstInfo->stDawn.dDot );
-	mzMidCnt = xMidLen  / pstInfo->stMidnight.dDot;
-
-	//	天井の描画
-	ZeroMemory( atStr, sizeof(atStr) );
-	StringCchCopy( atStr, BIG_STRING, pstInfo->stMorning.atParts );
-	for( i = 0; mzNoonCnt > i; i++ ){	StringCchCat( atStr, BIG_STRING, pstInfo->stNoon.atParts );	}
-	//	ここまでのドット数・右上の描画開始位置が右の縦の開始位置
-	xNightPos  = ViewStringWidthGet( atStr );
-	xNightPos += pstInfo->dRightOffset;	//	オフセット分ずらしておく
-	//	右上部分くっつけておｋ
-	StringCchCat( atStr, BIG_STRING, pstInfo->stAfternoon.atParts );
-	StringCchLength( atStr, BIG_STRING, &cchSize );
-	ExtTextOut( pstDrawItem->hDC, SPACE_ZEN, yPos, 0, NULL, atStr, cchSize, NULL );
-
-	for( j = 0; iL > j; j++ )
-	{
-		yPos += LINE_HEIGHT;
-		//	左柱の描画
-		ZeroMemory( atStr, sizeof(atStr) );
-		StringCchCopy( atStr, BIG_STRING, pstInfo->stDaybreak.atParts );
-		StringCchLength( atStr, BIG_STRING, &cchSize );
-		ExtTextOut( pstDrawItem->hDC, SPACE_ZEN, yPos, 0, NULL, atStr, cchSize, NULL );
-
-		//	右柱の描画
-		StringCchCopy( atStr, BIG_STRING, pstInfo->stNightfall.atParts );
-		StringCchLength( atStr, BIG_STRING, &cchSize );
-		ExtTextOut( pstDrawItem->hDC, SPACE_ZEN + xNightPos, yPos, 0, NULL, atStr, cchSize, NULL );
-	}
-
-	//yPos += LINE_HEIGHT;
-	////	左柱の描画
-	//ZeroMemory( atStr, sizeof(atStr) );
-	//StringCchCopy( atStr, BIG_STRING, pstInfo->stDaybreak.atParts );
-	//StringCchLength( atStr, BIG_STRING, &cchSize );
-	//ExtTextOut( pstDrawItem->hDC, SPACE_ZEN, yPos, 0, NULL, atStr, cchSize, NULL );
-
-	////	右柱の描画
-	//StringCchCopy( atStr, BIG_STRING, pstInfo->stNightfall.atParts );
-	//StringCchLength( atStr, BIG_STRING, &cchSize );
-	//ExtTextOut( pstDrawItem->hDC, SPACE_ZEN + xNightPos, yPos, 0, NULL, atStr, cchSize, NULL );
-
-
-	yPos += LINE_HEIGHT;
-	ZeroMemory( atStr, sizeof(atStr) );
-	StringCchCopy( atStr, BIG_STRING, pstInfo->stDawn.atParts );
-	for( i = 0; mzMidCnt > i; i++ ){	StringCchCat( atStr, BIG_STRING, pstInfo->stMidnight.atParts );	}
-	StringCchCat( atStr, BIG_STRING, pstInfo->stTwilight.atParts );
-	StringCchLength( atStr, BIG_STRING, &cchSize );
-	ExtTextOut( pstDrawItem->hDC, SPACE_ZEN, yPos, 0, NULL, atStr, cchSize, NULL );
-#endif
 
 //	SelectFont( pstDrawItem->hDC, hFtOld );
 
 	return (INT_PTR)TRUE;
 }
 //-------------------------------------------------------------------------------------------------
-
-#ifdef FRAME_MLINE
 
 /*
 描画幅は決まっている。枠指定なら外から、範囲指定なら、文字列＋左右の幅がＭＡＸ幅
@@ -1140,14 +1031,16 @@ LPTSTR FrameMakeOutsideBoundary( CONST INT iWidth, CONST INT iHeight, LPFRAMEINF
 		//iRitOff = iWidth - pstInfo->stAfternoon.dDot;	//	右上の占有分
 	iRoofDot  = iRitOff - pstInfo->stMorning.dDot;	//	天井に使えるドット幅
 	if( 1 <= pstInfo->dLeftOffset ){	iRoofDot -= pstInfo->dLeftOffset;	}
-	iRoofCnt  = iRoofDot / pstInfo->stNoon.dDot;	//	占有ドットを確認して、個数出す。切り捨てでおｋ
+	iRoofCnt  = Divinus( iRoofDot, pstInfo->stNoon.dDot );	//	占有ドットを確認して、個数出す。切り捨てでおｋ
 	iRfRstDot = iRoofDot - (iRoofCnt * pstInfo->stNoon.dDot);
+
+//零除算発生
 
 	//	左下と右下と床
 		//iRitOff = iWidth - pstInfo->stTwilight.dDot;	//	右下の占有分
 	iFloorDot = iRitOff - pstInfo->stDawn.dDot;	//	床に使えるドット幅
 	if( 1 <= pstInfo->dLeftOffset ){	iFloorDot -= pstInfo->dLeftOffset;	}
-	iFloorCnt = iFloorDot / pstInfo->stMidnight.dDot;	//	占有ドットを確認して、個数出す。
+	iFloorCnt = Divinus( iFloorDot , pstInfo->stMidnight.dDot );	//	占有ドットを確認して、個数出す。
 	iFlRstDot = iFloorDot - (iFloorCnt * pstInfo->stMidnight.dDot);
 
 	//	右柱開始位置・パディングを考慮セヨ
@@ -1196,7 +1089,7 @@ LPTSTR FrameMakeOutsideBoundary( CONST INT iWidth, CONST INT iHeight, LPFRAMEINF
 		else	bEnable = FALSE;
 		FrameMakeMultiSubLine( bEnable, &(pstInfo->stNoon), atSubStr, MAX_PATH );
 		//	必要個数繰り返す
-		for( ic = 0; iRoofCnt > ic; ic++ ){	vcString.at( iOfsLine ).append( atSubStr );	}
+		for( ic = 0; iRoofCnt >  ic; ic++ ){	vcString.at( iOfsLine ).append( atSubStr  );	}
 		//	余ってるドット埋める
 		if( (1 <= iRfRstDot) && bMultiPadd )
 		{
@@ -1344,14 +1237,14 @@ LPTSTR FrameMakeInsideBoundary( UINT dType, PINT piValue, LPFRAMEINFO pstInfo )
 		//	天井に使えるドット数をゲット
 		iRoofDot  = iRitOff - pstInfo->stMorning.dDot;	//	天井に使えるドット幅
 		if( 1 <= pstInfo->dLeftOffset ){	iRoofDot -= pstInfo->dLeftOffset;	}
-		iRoofCnt  = iRoofDot / pstInfo->stNoon.dDot;	//	占有ドットを確認して、個数出す。切り捨てでおｋ
-		iRfRstDot = iRoofDot - (iRoofCnt * pstInfo->stNoon.dDot);
+		iRoofCnt  = Divinus( iRoofDot, pstInfo->stNoon.dDot );	//	占有ドットを確認して、個数出す。切り捨てでおｋ
+		iRfRstDot = iRoofDot - (iRoofCnt * pstInfo->stNoon.dDot);	//	パーツを入れていったら余るドット数
 
 		//	左下と右下と床
 		iFloorDot = iRitOff - pstInfo->stDawn.dDot;	//	床に使えるドット幅
 		if( 1 <= pstInfo->dLeftOffset ){	iFloorDot -= pstInfo->dLeftOffset;	}
-		iFloorCnt = iFloorDot / pstInfo->stMidnight.dDot;	//	占有ドットを確認して、個数出す。
-		iFlRstDot = iFloorDot - (iFloorCnt * pstInfo->stMidnight.dDot);
+		iFloorCnt = Divinus( iFloorDot , pstInfo->stMidnight.dDot );	//	占有ドットを確認して、個数出す。
+		iFlRstDot = iFloorDot - (iFloorCnt * pstInfo->stMidnight.dDot);	//	パーツを入れていったら余るドット数
 
 		if( !(bMultiPadd) )
 		{
@@ -1490,9 +1383,6 @@ LPTSTR FrameMakeInsideBoundary( UINT dType, PINT piValue, LPFRAMEINFO pstInfo )
 }
 //-------------------------------------------------------------------------------------------------
 
-#endif
-
-
 /*!
 	ノーティファイメッセージの処理
 	@param[in]	hDlg		ダイヤロゲハンドゥ
@@ -1523,11 +1413,10 @@ INT_PTR Frm_OnNotify( HWND hDlg, INT idFrom, LPNMHDR pstNmhdr )
 			StringCchPrintf( atBuff, MIN_STRING, TEXT("%d"), gstFrameInfo[gNowSel].dLeftOffset );
 			Edit_SetText( GetDlgItem(hDlg,IDE_LEFT_OFFSET), atBuff );
 
-#ifdef FRAME_MLINE
 			GetClientRect( GetDlgItem(hDlg,IDS_FRAME_IMAGE), &rect );
 			FREE( gptFrmSample );
 			gptFrmSample = FrameMakeOutsideBoundary( rect.right, rect.bottom, &(gstFrameInfo[gNowSel]) );
-#endif
+
 			InvalidateRect( GetDlgItem(hDlg,IDS_FRAME_IMAGE), NULL, TRUE );
 		}
 		return (INT_PTR)TRUE;
@@ -1545,11 +1434,10 @@ INT_PTR Frm_OnNotify( HWND hDlg, INT idFrom, LPNMHDR pstNmhdr )
 			StringCchPrintf( atBuff, MIN_STRING, TEXT("%d"), gstFrameInfo[gNowSel].dRightOffset );
 			Edit_SetText( GetDlgItem(hDlg,IDE_RIGHT_OFFSET), atBuff );
 
-#ifdef FRAME_MLINE
 			GetClientRect( GetDlgItem(hDlg,IDS_FRAME_IMAGE), &rect );
 			FREE( gptFrmSample );
 			gptFrmSample = FrameMakeOutsideBoundary( rect.right, rect.bottom, &(gstFrameInfo[gNowSel]) );
-#endif
+
 			InvalidateRect( GetDlgItem(hDlg,IDS_FRAME_IMAGE), NULL, TRUE );
 		}
 		return (INT_PTR)TRUE;
@@ -1569,7 +1457,6 @@ HRESULT FrameDataGet( UINT dNumber, LPFRAMEINFO pstFrame )
 {
 	InitFrameItem( INIT_LOAD, dNumber, pstFrame );
 
-#ifdef FRAME_MLINE
 	pstFrame->stDaybreak.iLine  = DocStringInfoCount( pstFrame->stDaybreak.atParts,  0, &(pstFrame->stDaybreak.dDot), NULL );
 	pstFrame->stMorning.iLine   = DocStringInfoCount( pstFrame->stMorning.atParts,   0, &(pstFrame->stMorning.dDot), NULL );
 	pstFrame->stNoon.iLine      = DocStringInfoCount( pstFrame->stNoon.atParts,      0, &(pstFrame->stNoon.dDot), NULL );
@@ -1579,16 +1466,6 @@ HRESULT FrameDataGet( UINT dNumber, LPFRAMEINFO pstFrame )
 	pstFrame->stMidnight.iLine  = DocStringInfoCount( pstFrame->stMidnight.atParts,  0, &(pstFrame->stMidnight.dDot), NULL );
 	pstFrame->stDawn.iLine      = DocStringInfoCount( pstFrame->stDawn.atParts,      0, &(pstFrame->stDawn.dDot), NULL );
 
-#else
-	pstFrame->stDaybreak.dDot  = ViewStringWidthGet( pstFrame->stDaybreak.atParts );
-	pstFrame->stMorning.dDot   = ViewStringWidthGet( pstFrame->stMorning.atParts );
-	pstFrame->stNoon.dDot      = ViewStringWidthGet( pstFrame->stNoon.atParts );
-	pstFrame->stAfternoon.dDot = ViewStringWidthGet( pstFrame->stAfternoon.atParts );
-	pstFrame->stNightfall.dDot = ViewStringWidthGet( pstFrame->stNightfall.atParts );
-	pstFrame->stTwilight.dDot  = ViewStringWidthGet( pstFrame->stTwilight.atParts );
-	pstFrame->stMidnight.dDot  = ViewStringWidthGet( pstFrame->stMidnight.atParts );
-	pstFrame->stDawn.dDot      = ViewStringWidthGet( pstFrame->stDawn.atParts );
-#endif
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
@@ -1645,16 +1522,9 @@ HRESULT DocFrameInsert( INT dMode, INT dStyle )
 
 	FRAMEINFO	stInfo;
 
-#ifdef FRAME_MLINE
 	INT			iMidLine, iUpLine, iDnLine;
 	LPFRAMEITEM	pstItem;
 	TCHAR		atSubStr[MAX_PATH];	//	足りるか？
-#else
-	UINT		cchSize;
-	INT			xNoonLen, mzNoonCnt, xNightPos, mzMidCnt;
-	TCHAR		atStr[BIG_STRING];	//	足りるか？
-#endif
-
 
 #ifdef DO_TRY_CATCH
 	try{
@@ -1682,9 +1552,8 @@ HRESULT DocFrameInsert( INT dMode, INT dStyle )
 	baseDot = DocPageMaxDotGet( iTop, iBtm );
 
 //天井の行数、左の幅、床の行数を確保
-#ifdef FRAME_MLINE
-	iMidLine = (iBtm - iTop) + 1;	//	間の行数確保
 
+	iMidLine = (iBtm - iTop) + 1;	//	間の行数確保
 
 	xMidLen = baseDot;
 	FrameMakeInsideBoundary( 0, &xMidLen, &stInfo );
@@ -1747,72 +1616,6 @@ HRESULT DocFrameInsert( INT dMode, INT dStyle )
 	DocInsertString( &iInX, &iLns, NULL, ptString, 0, FALSE );
 	FREE( ptString );
 
-#else
-	baseDot += 16;	//	値は適当
-
-	iBtm++;	//	天井の改行が入るので、この行の末端でまた改行すれば床の分確保
-
-	DocCrLfAdd( 0 , iTop, TRUE );	//	まず天井を入れるために改行
-
-	//天井追加
-	//	上線の文字数
-	xNoonLen  = baseDot  + stInfo.stNoon.dDot;	//	壱組分余裕を持たせる
-	mzNoonCnt = xNoonLen / stInfo.stNoon.dDot;
-
-	//	下線の文字数
-	xMidLen  = xNoonLen;
-	if( stInfo.stNoon.dDot == stInfo.stMidnight.dDot )	//	上下同じ計算できるなら
-	{
-		mzMidCnt = mzNoonCnt;
-	}
-	else
-	{
-		xMidLen += (stInfo.stMidnight.dDot / 2);
-		mzMidCnt = xMidLen  / stInfo.stMidnight.dDot;
-	}
-
-	//	天井の描画
-	ZeroMemory( atStr, sizeof(atStr) );
-	StringCchCopy( atStr, BIG_STRING, stInfo.stMorning.atParts );
-	for( i = 0; mzNoonCnt > i; i++ ){	StringCchCat( atStr, BIG_STRING, stInfo.stNoon.atParts );	}
-	//	ここまでのドット数・右上の描画開始位置が右の縦の開始位置
-	xNightPos  = ViewStringWidthGet( atStr );
-	xNightPos += stInfo.dRightOffset;	//	オフセット分ずらしておく
-	//	右上部分くっつけておｋ
-	StringCchCat( atStr, BIG_STRING, stInfo.stAfternoon.atParts );
-	//	天井書込
-	iInX = 0;
-	DocInsertString( &iInX, &iTop, NULL, atStr, 0, FALSE );
-
-	//左右柱追加
-	for( i = iTop+1; iBtm >= i; i++ )
-	{
-		iInX = 0;	//	左追加
-		DocInsertString( &iInX, &i, NULL, stInfo.stDaybreak.atParts, 0, FALSE );
-		iEndot = DocLineParamGet( i, NULL, NULL );
-		iPadding  = xNightPos - iEndot;	//	右追加
-		ptPadding = DocPaddingSpaceWithPeriod( iPadding, NULL, NULL, NULL, TRUE );
-		iInX = iEndot;
-		DocInsertString( &iInX, &i, NULL, ptPadding, 0, FALSE );
-		FREE(ptPadding);
-		DocInsertString( &iInX, &i, NULL, stInfo.stNightfall.atParts, 0, FALSE );
-	}
-
-	//床挿入改行
-	iInX = DocLineParamGet( iBtm, NULL, NULL );
-	DocCrLfAdd( iInX , iBtm, FALSE );
-	iBtm++;
-
-	//床追加
-	ZeroMemory( atStr, sizeof(atStr) );
-	StringCchCopy( atStr, BIG_STRING, stInfo.stDawn.atParts );
-	for( i = 0; mzMidCnt > i; i++ ){	StringCchCat( atStr, BIG_STRING, stInfo.stMidnight.atParts );	}
-	StringCchCat( atStr, BIG_STRING, stInfo.stTwilight.atParts );
-	StringCchLength( atStr, BIG_STRING, &cchSize );
-	iInX = 0;
-	DocInsertString( &iInX, &iBtm, NULL, atStr, 0, FALSE );
-
-#endif
 
 #ifdef DO_TRY_CATCH
 	}
@@ -1851,7 +1654,6 @@ HRESULT DocFrameInsert( INT dMode, INT dStyle )
 }
 //-------------------------------------------------------------------------------------------------
 
-#ifdef FRAME_MLINE
 /*!
 	複数行Frameの、￥￥・￥ｎ・￥ｓ＜＝＞￥・0x0D0A・半角空白の相互変換
 	@param[in,out]	ptData	変換元バッファで、変換後文字列入れる。PARTS_CCHサイズであること
@@ -1978,9 +1780,6 @@ UINT FrameMultiSubstring( LPCTSTR ptSrc, CONST UINT dLine, LPTSTR ptDest, CONST 
 	return iLnCnt;
 }
 //-------------------------------------------------------------------------------------------------
-#endif
-
-
 
 //挿入ウインドウについて
 
@@ -1997,10 +1796,8 @@ HWND FrameInsBoxCreate( HINSTANCE hInst, HWND hPrWnd )
 	RECT		rect, vwRect;
 //	TBADDBITMAP	stToolBmp;
 
-#ifdef FRAME_MLINE
 	RECT	stFrmRct;
 	INT		topOst;
-#endif
 
 	if( ghFrInbxWnd )
 	{
@@ -2008,9 +1805,6 @@ HWND FrameInsBoxCreate( HINSTANCE hInst, HWND hPrWnd )
 		return ghFrInbxWnd;
 	}
 
-#ifndef FRAME_MLINE
-	ZeroMemory( &gstFrmInsInfo, sizeof(FRMINSINFO) );
-#endif
 	//	本体ウインドウ
 	ghFrInbxWnd = CreateWindowEx( WS_EX_LAYERED | WS_EX_TOOLWINDOW,
 		FRAMEINSERTBOX_CLASS, TEXT("枠挿入ボックス"),
@@ -2067,9 +1861,7 @@ HWND FrameInsBoxCreate( HINSTANCE hInst, HWND hPrWnd )
 
 	//	直ぐ閉じるかどうか
 	SendMessage( ghFIBtlbrWnd, TB_CHECKBUTTON, IDM_FRMINSBOX_QCLOSE, gbQuickClose );
-	
 
-#ifdef FRAME_MLINE
 	FrameDataGet( gdSelect , &gstNowFrameInfo );	//	枠パーツ情報確保
 
 	//	埋めるかどうか
@@ -2078,10 +1870,6 @@ HWND FrameInsBoxCreate( HINSTANCE hInst, HWND hPrWnd )
 
 	topOst = FrameInsBoxSizeGet( &stFrmRct );	//	FRAME当てはめ枠のサイズ
 	gptFrmBox = FrameMakeOutsideBoundary( stFrmRct.right, stFrmRct.bottom, &gstNowFrameInfo );
-
-#else
-	FrameInsBoxInfoCheck(  );	//	初期状態データ作成
-#endif
 
 	//	ウインドウ位置を確定させる
 	GetWindowRect( ghViewWnd, &vwRect );
@@ -2124,150 +1912,19 @@ INT FrameInsBoxSizeGet( LPRECT pstRect )
 }
 //-------------------------------------------------------------------------------------------------
 
-#ifndef FRAME_MLINE
-
-/*!
-	枠情報に合わせてデータ作る
-*/
-HRESULT FrameInsBoxInfoCheck( VOID )
-{
-/*
-専用文字列
-左上＋真ん中、ここまでの長さが真ん中の右オフセット開始地点
-右上・幅からはみ出さないように、超えない最大を求める
-左下＋真ん中＋右下、数数えて並べるだけ
-*/
-	LPTSTR		ptBuffer;
-	INT			dWid, dLftTopWid, dHei, iMidDot;
-	UINT_PTR	cchLeft, cchCentre, cchRight, dCnt, d;
-	RECT		stFrmRct;
-
-	FRAMEINFO	stInfo;
-
-
-	FrameInsBoxSizeGet( &stFrmRct );
-
-	FREE( gstFrmInsInfo.ptRoof );
-	FREE( gstFrmInsInfo.ptMiddle );
-	FREE( gstFrmInsInfo.ptFloor );
-
-	//	枠パーツ情報確保
-	FrameDataGet( gdSelect, &stInfo );
-
-	//	上の幅
-	dWid  = stFrmRct.right - stInfo.stMorning.dDot;	//	左上引いて
-	dWid -= stInfo.stAfternoon.dDot;	//	右上も引くと、上のMAXドット数
-	//	上のパーツ数・小数点切り捨てでおｋ
-	gstFrmInsInfo.dRfItem = dWid / stInfo.stNoon.dDot;
-
-	//	各パーツの文字数確認
-	StringCchLength( stInfo.stMorning.atParts, PARTS_CCH, &cchLeft );
-	StringCchLength( stInfo.stNoon.atParts, PARTS_CCH, &cchCentre );
-	StringCchLength( stInfo.stAfternoon.atParts, PARTS_CCH, &cchRight );
-	//	文字列作成
-	dCnt = cchLeft + (cchCentre * gstFrmInsInfo.dRfItem) + cchRight + 2;
-	gstFrmInsInfo.ptRoof = (LPTSTR)malloc( dCnt * sizeof(TCHAR) );
-	ZeroMemory( gstFrmInsInfo.ptRoof, dCnt * sizeof(TCHAR) );
-	StringCchCopy( gstFrmInsInfo.ptRoof, dCnt, stInfo.stMorning.atParts );
-	for( d = 0; gstFrmInsInfo.dRfItem > d; d++ ){	StringCchCat( gstFrmInsInfo.ptRoof, dCnt, stInfo.stNoon.atParts );	}
-	StringCchCat( gstFrmInsInfo.ptRoof, dCnt, stInfo.stAfternoon.atParts );
-
-
-	//	左上＋上のドット数・真ん中の幅
-	dLftTopWid  = gstFrmInsInfo.dRfItem * stInfo.stNoon.dDot;
-	gstFrmInsInfo.dLftRfDot = dLftTopWid + stInfo.stMorning.dDot;
-	//	真ん中の空白の幅
-	iMidDot  = gstFrmInsInfo.dLftRfDot - stInfo.stDaybreak.dDot;	//	左ひいて
-	iMidDot += stInfo.dRightOffset;	//	右オフセット足す
-	ptBuffer = DocPaddingSpaceMake( iMidDot );	//	空白作成
-	//	各パーツの文字数確認
-	StringCchLength( stInfo.stDaybreak.atParts, PARTS_CCH, &cchLeft );
-	StringCchLength( ptBuffer, STRSAFE_MAX_CCH, &cchCentre );	//	作った空白
-	StringCchLength( stInfo.stNightfall.atParts, PARTS_CCH, &cchRight );
-	//	文字列作成
-	dCnt = cchLeft + cchCentre + cchRight + 2;
-	gstFrmInsInfo.ptMiddle = (LPTSTR)malloc( dCnt * sizeof(TCHAR) );
-	ZeroMemory( gstFrmInsInfo.ptMiddle, dCnt * sizeof(TCHAR) );
-	StringCchCopy( gstFrmInsInfo.ptMiddle, dCnt, stInfo.stDaybreak.atParts );
-	StringCchCat( gstFrmInsInfo.ptMiddle, dCnt, ptBuffer );
-	StringCchCat( gstFrmInsInfo.ptMiddle, dCnt, stInfo.stNightfall.atParts );
-	FREE(ptBuffer);
-
-
-	//	下の幅
-	dWid  = stFrmRct.right - stInfo.stDawn.dDot;	//	左下引いて
-	dWid -= stInfo.stTwilight.dDot;	//	右下も引くと、下のMAXドット数
-	//	下のパーツ数・小数点切り捨てでおｋ
-	gstFrmInsInfo.dFlrItem = dWid / stInfo.stMidnight.dDot;
-
-	//	各パーツの文字数確認
-	StringCchLength( stInfo.stDawn.atParts, PARTS_CCH, &cchLeft );
-	StringCchLength( stInfo.stMidnight.atParts, PARTS_CCH, &cchCentre );
-	StringCchLength( stInfo.stTwilight.atParts, PARTS_CCH, &cchRight );
-	//	文字列作成
-	dCnt = cchLeft + (cchCentre * gstFrmInsInfo.dFlrItem) + cchRight + 2;
-	gstFrmInsInfo.ptFloor = (LPTSTR)malloc( dCnt * sizeof(TCHAR) );
-	ZeroMemory( gstFrmInsInfo.ptFloor, dCnt * sizeof(TCHAR) );
-	StringCchCopy( gstFrmInsInfo.ptFloor, dCnt, stInfo.stDawn.atParts );
-	for( d = 0; gstFrmInsInfo.dFlrItem > d; d++ ){	StringCchCat( gstFrmInsInfo.ptFloor, dCnt, stInfo.stMidnight.atParts );	}
-	StringCchCat( gstFrmInsInfo.ptFloor, dCnt, stInfo.stTwilight.atParts );
-
-
-	//	行数
-	dHei =  stFrmRct.bottom - (LINE_HEIGHT * 2);	//	縦ドット数
-	if( 0 >= dHei ){	gstFrmInsInfo.dMidLines = 0;	}
-	else{	gstFrmInsInfo.dMidLines = dHei / LINE_HEIGHT;	}
-
-	return S_OK;
-}
-//-------------------------------------------------------------------------------------------------
-#endif
-
 /*!
 	挿入実行
 	@param[in]	hWnd	ウインドウハンドル
 */
 HRESULT FrameInsBoxDoInsert( HWND hWnd )
 {
-#ifndef FRAME_MLINE
-	LPTSTR		ptBuffer;
-	UINT_PTR	cchRoof = 0, cchMidd = 0, cchFlor = 0, cchTotal;
-	UINT		d;
-#endif
 	INT			iX, iY;
 	HWND		hLyrWnd;
 	RECT		rect;
 
-#ifdef FRAME_MLINE
-
 	//	挿入処理には、レイヤボックスを非表示処理で使う
 	hLyrWnd = LayerBoxVisibalise( GetModuleHandle(NULL), gptFrmBox, 0x10 );
 
-#else
-
-	//	挿入用文字列を作成
-	StringCchLength( gstFrmInsInfo.ptRoof,   STRSAFE_MAX_CCH, &cchRoof );
-	StringCchLength( gstFrmInsInfo.ptMiddle, STRSAFE_MAX_CCH, &cchMidd );
-	StringCchLength( gstFrmInsInfo.ptFloor,  STRSAFE_MAX_CCH, &cchFlor );
-
-	//	各行に改行、最終行には不要、ヌルターミネータ用の余裕
-	cchTotal = (cchRoof + 2) + (cchMidd + 2) * gstFrmInsInfo.dMidLines + cchFlor + 2;
-
-	ptBuffer = (LPTSTR)malloc( cchTotal * sizeof(TCHAR) );
-	ZeroMemory( ptBuffer, cchTotal * sizeof(TCHAR) );
-
-	StringCchPrintf( ptBuffer, cchTotal, TEXT("%s\r\n"), gstFrmInsInfo.ptRoof );
-	for( d = 0; gstFrmInsInfo.dMidLines > d; d++ )
-	{
-		StringCchCat( ptBuffer, cchTotal, gstFrmInsInfo.ptMiddle );
-		StringCchCat( ptBuffer, cchTotal, TEXT("\r\n") );
-	}
-	StringCchCat( ptBuffer, cchTotal, gstFrmInsInfo.ptFloor );
-
-	//	挿入処理には、レイヤボックスを非表示処理で使う
-	hLyrWnd = LayerBoxVisibalise( GetModuleHandle(NULL), ptBuffer, 0x10 );
-	FREE(ptBuffer);
-#endif
 	//	レイヤの位置を変更
 	GetWindowRect( hWnd, &rect );
 	LayerBoxPositionChange( hLyrWnd, (rect.left + gstFrmSz.x), (rect.top + gstFrmSz.y) );
@@ -2324,10 +1981,8 @@ LRESULT CALLBACK FrameInsProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lP
 */
 VOID Fib_OnCommand( HWND hWnd, INT id, HWND hWndCtl, UINT codeNotify )
 {
-#ifdef FRAME_MLINE
 	RECT	stFrmRct;
 	INT		topOst, iRslt = -1;
-#endif
 
 	switch( id )
 	{
@@ -2357,14 +2012,11 @@ VOID Fib_OnCommand( HWND hWnd, INT id, HWND hWndCtl, UINT codeNotify )
 
 		case IDM_FRMINSBOX_QCLOSE:	gbQuickClose = SendMessage( ghFIBtlbrWnd, TB_ISBUTTONCHECKED, IDM_FRMINSBOX_QCLOSE, 0 );	return;
 
-#ifdef FRAME_MLINE
 		case IDM_FRMINSBOX_PADDING:	iRslt = SendMessage( ghFIBtlbrWnd, TB_ISBUTTONCHECKED, IDM_FRMINSBOX_PADDING, 0 );	break;
-#endif
 
 		default:	return;
 	}
 
-#ifdef FRAME_MLINE
 	FrameDataGet( gdSelect, &gstNowFrameInfo );	//	枠パーツ情報確保
 
 	if( 0 <= iRslt ){	gstNowFrameInfo.dRestPadd = iRslt;	gbMultiPaddTemp = iRslt;	}
@@ -2377,9 +2029,7 @@ VOID Fib_OnCommand( HWND hWnd, INT id, HWND hWndCtl, UINT codeNotify )
 	topOst = FrameInsBoxSizeGet( &stFrmRct );	//	FRAME当てはめ枠のサイズ
 	FREE( gptFrmBox );
 	gptFrmBox = FrameMakeOutsideBoundary( stFrmRct.right, stFrmRct.bottom, &gstNowFrameInfo );
-#else
-	FrameInsBoxInfoCheck(  );	//	初期状態データ作成
-#endif
+
 	InvalidateRect( hWnd, NULL, TRUE );
 
 	return;
@@ -2458,28 +2108,16 @@ VOID FrameInsBoxFrmDraw( HDC hDC )
 	INT		topOst, iYpos;
 	RECT	stFrmRct;
 
-#ifndef FRAME_MLINE
-	UINT	i;
-	FRAMEINFO	stInfo;
-#endif
-
-#ifdef FRAME_MLINE
 	UINT	dLines, d;
 //	LPTSTR	ptMultiStr;
 	TCHAR	atBuffer[MAX_PATH];
-#endif
+
 //	SetBkMode( hDC, OPAQUE );
 	SetBkColor( hDC, ViewBackColourGet( NULL ) );	//	
-
-#ifndef FRAME_MLINE
-	FrameDataGet( gdSelect, &stInfo );	//	枠パーツ情報確保
-#endif
 
 	hOldFnt = SelectFont( hDC, ghAaFont );	//	フォントくっつける
 
 	topOst = FrameInsBoxSizeGet( &stFrmRct );	//	FRAME当てはめ枠のサイズ
-
-#ifdef FRAME_MLINE
 
 //	ptMultiStr = FrameMakeOutsideBoundary( stFrmRct.right, stFrmRct.bottom, &gstNowFrameInfo );
 
@@ -2499,22 +2137,6 @@ VOID FrameInsBoxFrmDraw( HDC hDC )
 	}
 
 //	FREE( ptMultiStr );
-
-#else
-
-	//	天井描画
-	iYpos = topOst;
-	FrameDrawItem( hDC, iYpos, gstFrmInsInfo.ptRoof );
-	iYpos += LINE_HEIGHT;
-	//	間描画
-	for( i = 0; gstFrmInsInfo.dMidLines > i; i++ )
-	{
-		FrameDrawItem( hDC, iYpos, gstFrmInsInfo.ptMiddle );
-		iYpos += LINE_HEIGHT;
-	}
-	//	床描画
-	FrameDrawItem( hDC, iYpos, gstFrmInsInfo.ptFloor );
-#endif
 
 	SelectFont( hDC , hOldFnt );	//	フォント戻す
 
@@ -2572,14 +2194,7 @@ VOID FrameDrawItem( HDC hDC, INT iY, LPTSTR ptLine )
 */
 VOID Fib_OnDestroy( HWND hWnd )
 {
-
-#ifdef FRAME_MLINE
 	FREE( gptFrmBox );
-#else
-	FREE( gstFrmInsInfo.ptRoof );
-	FREE( gstFrmInsInfo.ptMiddle );
-	FREE( gstFrmInsInfo.ptFloor );
-#endif
 
 	MainStatusBarSetText( SB_LAYER, TEXT("") );
 
@@ -2681,23 +2296,18 @@ BOOL Fib_OnWindowPosChanging( HWND hWnd, LPWINDOWPOS pstWpos )
 VOID Fib_OnWindowPosChanged( HWND hWnd, const LPWINDOWPOS pstWpos )
 {
 	RECT	vwRect;
-#ifdef FRAME_MLINE
 	RECT	stFrmRct;
 	INT		topOst;
-#endif
 
 	MoveWindow( ghFIBtlbrWnd, 0, 0, 0, 0, TRUE );	//	ツールバーは数値なくても勝手に合わせてくれる
 
-#ifdef FRAME_MLINE
 	FrameDataGet( gdSelect, &gstNowFrameInfo );	//	枠パーツ情報確保
 	gstNowFrameInfo.dRestPadd = gbMultiPaddTemp;	//	一時設定
 
 	topOst = FrameInsBoxSizeGet( &stFrmRct );	//	FRAME当てはめ枠のサイズ
 	FREE( gptFrmBox );
 	gptFrmBox = FrameMakeOutsideBoundary( stFrmRct.right, stFrmRct.bottom, &gstNowFrameInfo );
-#else
-	FrameInsBoxInfoCheck(  );	//	表示具合を変更して再描画する
-#endif
+
 	InvalidateRect( hWnd, NULL, TRUE );
 
 	//	移動がなかったときは何もしないでおｋ

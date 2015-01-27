@@ -826,7 +826,6 @@ LRESULT PageListNotify( HWND hWnd, LPNMLISTVIEW pstLv )
 				pstDraw->clrTextBk = 0xFF000000;	//	これでデフォ色指定・多分
 			}
 
-#ifdef PAGE_DELAY_LOAD
 			if( 0 == lvClmn )
 			{
 				if( NowPageInfoGet( lvLine, NULL ) )
@@ -838,7 +837,6 @@ LRESULT PageListNotify( HWND hWnd, LPNMLISTVIEW pstLv )
 				//	pstDraw->clrTextBk = 0xFF000000;
 				//}
 			}
-#endif
 
 			//	再描画せずともリヤルに変わる・バイト数計算のところで再描画してる？
 			if( 2 == lvClmn )
@@ -1362,10 +1360,7 @@ HRESULT PageListDuplicate( HWND hWnd, INT iNowPage )
 */
 HRESULT PageListCombine( HWND hWnd, INT iNowPage )
 {
-
-#ifdef PAGE_DELAY_LOAD
 	 INT	iLastLine, iLastDot;
-#endif
 	 INT	iNext;
 	INT_PTR	iTotal;
 	ONELINE	stLine;
@@ -1387,7 +1382,6 @@ HRESULT PageListCombine( HWND hWnd, INT iNowPage )
 	//	区切りとして改行入れて
 	(*gitFileIt).vcCont.at( iNowPage ).ltPage.push_back( stLine );
 
-#ifdef PAGE_DELAY_LOAD
 	//	先に状況チェックして、未ロードなら、キャレット位置を末端にしてロードして、元に戻す
 	if( (*gitFileIt).vcCont.at( iNext ).ptRawData )	//	生データ状態だったら
 	{
@@ -1399,14 +1393,11 @@ HRESULT PageListCombine( HWND hWnd, INT iNowPage )
 	}
 	else
 	{
-#endif
 		//	次の頁の全体をコピーしちゃう
 		std::copy(	(*gitFileIt).vcCont.at( iNext ).ltPage.begin(),
 					(*gitFileIt).vcCont.at( iNext ).ltPage.end(),
 					back_inserter( (*gitFileIt).vcCont.at( iNowPage ).ltPage ) );
-#ifdef PAGE_DELAY_LOAD
 	}
-#endif
 
 	SqnFreeAll( &((*gitFileIt).vcCont.at( iNowPage ).stUndoLog) );	//	アンドゥログ削除
 

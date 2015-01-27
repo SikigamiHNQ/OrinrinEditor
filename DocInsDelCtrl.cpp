@@ -50,9 +50,7 @@ HRESULT	DocInputReturn( INT, INT );
 INT		DocSquareAddPreMod( INT, INT, INT, BOOLEAN );
 INT		DocLetterErase( INT, INT, INT );
 
-#ifdef PAGE_DELAY_LOAD
 HRESULT	DocDelayPageNumInsert( FILES_ITR, INT, LPPAGENUMINFO, LPCTSTR );
-#endif
 //-------------------------------------------------------------------------------------------------
 
 /*!
@@ -1444,7 +1442,6 @@ HRESULT DocPageNumInsert( HINSTANCE hInst, HWND hWnd )
 		{
 			StringCchPrintf( atText, MAX_PATH, stInfo.atStyle, ixNumber );
 
-#ifdef PAGE_DELAY_LOAD
 			if( NowPageInfoGet( iNow, NULL ) )	//	ディレってないなら０
 			{
 				//	ディレイ文字列を操作するか
@@ -1455,8 +1452,6 @@ HRESULT DocPageNumInsert( HINSTANCE hInst, HWND hWnd )
 			}
 			else
 			{
-#endif
-
 				gixFocusPage = iNow;	//	内部操作
 				if( stInfo.bInUnder )	//	頁最下部に挿入
 				{
@@ -1488,9 +1483,7 @@ HRESULT DocPageNumInsert( HINSTANCE hInst, HWND hWnd )
 
 				//	頁番号の内容挿入
 				DocInsertString( &iDot, &iLine, NULL, atText, 0, bFirst );	bFirst = FALSE;
-#ifdef PAGE_DELAY_LOAD
 			}
-#endif
 		}
 
 		//	頁元に戻す
@@ -1502,8 +1495,6 @@ HRESULT DocPageNumInsert( HINSTANCE hInst, HWND hWnd )
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-
-#ifdef PAGE_DELAY_LOAD
 
 /*!
 	ディレイしてる頁に頁番号を挿入
@@ -1587,6 +1578,5 @@ HRESULT DocDelayPageNumInsert( FILES_ITR itFile, INT iPage, LPPAGENUMINFO pstInf
 }
 //-------------------------------------------------------------------------------------------------
 
-#endif
 
 

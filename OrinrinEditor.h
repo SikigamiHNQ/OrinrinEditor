@@ -162,20 +162,16 @@ typedef vector<LETTER>::iterator	LETR_ITR;
 
 #ifndef _ORRVW
 
-#ifdef FRAME_MLINE
 #define PARTS_CCH	130
-#else
-#define PARTS_CCH	32
-#endif
+
 //!	枠パーツデータ	20120105	複数行に向けて調整
 typedef struct tagFRAMEITEM
 {
 	TCHAR	atParts[PARTS_CCH];	//!<	パーツ文字列・９字まで
 	INT		dDot;	//!<	横幅ドット数
-#ifdef FRAME_MLINE
 	INT		iLine;	//!<	使用行数
 	INT		iNowLn;	//!<	使用行番号・配置時に使う
-#endif
+
 } FRAMEITEM, *LPFRAMEITEM;
 //----------------
 //!	枠処理用
@@ -283,11 +279,9 @@ typedef struct tagONEPAGE
 
 	list<ONELINE>	ltPage;	//!<	行全体
 
-#ifdef PAGE_DELAY_LOAD
 	LPTSTR	ptRawData;		//!<	頁の生データ
 	INT		iLineCnt;		//!<	行数・生データ用
 	INT		iMoziCnt;		//!<	文字数・生データ用
-#endif
 
 } ONEPAGE, *LPONEPAGE;
 typedef vector<ONEPAGE>::iterator	PAGE_ITR;
@@ -497,6 +491,8 @@ INT			InitTraceValue( UINT, LPTRACEPARAM );	//!<
 //HRESULT	InitLastOpen( UINT, LPTSTR );			//	
 INT			InitWindowTopMost( UINT, UINT, INT );	//!<	
 HRESULT		InitToolBarLayout( UINT, INT, LPREBARLAYOUTINFO );	//!<	
+
+UINT		DocHugeFileTreatment( UINT );
 
 #ifdef ACCELERATOR_EDIT
 LPACCEL		AccelKeyTableGetAlloc( LPINT  );	//!<	
@@ -714,9 +710,7 @@ INT			DocPageCreate( INT );	//!<
 HRESULT		DocPageDelete( INT, INT );	//!<	
 HRESULT		DocPageChange( INT );	//!<	
 
-#ifdef PAGE_DELAY_LOAD
 UINT		DocDelayPageLoad( FILES_ITR , INT );	//!<	ディレイ頁のロード
-#endif
 
 HRESULT		DocModifyContent( UINT );	//!<	
 
@@ -799,6 +793,8 @@ HRESULT		DocFileOpen( HWND );				//!<
 HRESULT		DocDoOpenFile( HWND, LPTSTR );		//!<	
 HRESULT		DocImageSave( HWND, UINT, HFONT );	//!<	
 
+HRESULT		DocHtmlExport( HWND );
+
 UINT		DocStringSplitMLT( LPTSTR, INT, PAGELOAD );	//!<	
 UINT		DocStringSplitAST( LPTSTR, INT, PAGELOAD );	//!<	
 
@@ -833,9 +829,7 @@ INT			DocStringInfoCount( LPCTSTR, UINT_PTR, PINT, PINT );	//!<
 
 BOOLEAN		NowPageInfoGet( UINT, LPPAGEINFOS );	//!<	
 
-#ifdef PAGE_DELAY_LOAD
 BOOLEAN		PageIsDelayed( FILES_ITR, UINT );	//!<	
-#endif
 
 UINT		DocRangeDeleteByMozi( INT, INT, INT, INT, PBOOLEAN );	//!<	
 

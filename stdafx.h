@@ -106,15 +106,12 @@ static CONST GUID gcstGUID = { 0x66D3E881, 0x972B, 0x458B, { 0x93, 0x5E, 0x9E, 0
 //	行の保持をリストにしてみる
 //	ファイル開いた履歴
 //	プロフ開いた履歴
-#define  FRAME_MLINE	//	枠パーツ複数行
+//	枠パーツ複数行
+
 #define ACCELERATOR_EDIT//	キーのアレ編集
 #define USE_HOVERTIP
-//#define PGL_TOOLTIP
-//#define MAA_TOOLTIP
 #define EDGE_BLANK_STYLE	//	レイヤ合成するとき、白ヌキ領域を用意する
-#define PAGE_DELAY_LOAD	//	ファイル読み込んだ時は頁展開しない、ひつようになったら開く
-#define UNICODE_USE_LOG
-#define MIDDLE_CLICK_CLOSE
+//	ファイル読み込んだ時は頁展開しない、ひつようになったら開く
 
 #define MAA_IADD_PLUS	//	MAAへのアイテム追加機能拡張
 //	リソースの IDM_MAA_IADD_OPEN IDM_MAA_ITEM_INSERT に注意
@@ -126,6 +123,8 @@ static CONST GUID gcstGUID = { 0x66D3E881, 0x972B, 0x458B, { 0x93, 0x5E, 0x9E, 0
 
 
 //	作成中の機能
+#define BIG_TEXT_SEPARATE	//	巨大テキストの分割をしてみる
+
 #define TODAY_HINT_STYLE	//	今日のヒント機能
 #define SPMOZI_ENCODE		//	機種依存文字を数値参照コピー
 
@@ -320,6 +319,7 @@ LRESULT	ExceptionMessage( LPCSTR, LPCSTR, UINT, LPARAM );
 #define VL_MAATAB_SNGL	61	//!<	MAA窓のタブ、壱行表示にする
 #define VL_HINT_ENABLE	62	//!<	今日のヒントを表示するか？
 #define VL_SPMOZI_ENC	63	//!<	機種依存文字を数値参照コピー	SPMOZI_ENCODE
+#define VS_EXT_M2H_PATH	64	//!<	MLT2HTMLのパス
 
 //増やしたら、函数内に取扱つくっておくこと
 

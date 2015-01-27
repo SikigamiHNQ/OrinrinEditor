@@ -1567,7 +1567,7 @@ INT TreeSelItemProc( HWND hWnd, HTREEITEM hSelItem, UINT dMode )
 			break;
 #ifndef _ORRVW
 		case  2:	//	編集ビューで開く場合
-			DocDoOpenFile( hWnd , atPath );	//	開いて中身展開
+			DocDoOpenFile( hWnd, atPath );	//	開いて中身展開
 			break;
 
   #ifndef MAA_IADD_PLUS
@@ -1796,7 +1796,7 @@ INT TabMultipleSelect( HWND hWnd, INT tabSel, UINT dMode )
 #ifndef _ORRVW
 			else	//	ファイル名を確保して、さらに編集ビュー側で開く処理をする
 			{
-				DocDoOpenFile( hWnd, itNulti->atFilePath );
+				DocDoOpenFile( hWnd, itNulti->atFilePath );	//	ビューワ側の副タブから編集ウインドウに開くとき
 			}
 #endif
 			return 1;

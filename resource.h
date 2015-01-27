@@ -429,6 +429,8 @@
 #define IDB_NEXT_HINT                   1258
 #define IDCB_POPHINT_VIEW               1260
 #define IDCB_SPMOZI_ENCODE              1261
+#define IDE_EXTERNAL_M2H_PATH           1262
+#define IDB_EXTERNAL_M2H_SEL            1263
 #define IDTV_ITEMTREE                   2000
 #define IDTB_TREESEL                    2001
 #define IDSO_AAITEMS                    2002
@@ -677,6 +679,7 @@
 #define IDM_DB_THUMB_REGULAR            33034
 #define IDM_DB_THUMB_DEMIBOLD           33036
 #define IDM_DB_THUMB_ULTRABOLD          33038
+#define IDM_HTML_EXPORTE				33039
 #define IDM_PLUGIN_ITEM_BASE            34000
 #define IDC_STATIC                      -1
 
@@ -687,7 +690,7 @@
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        236
 #define _APS_NEXT_COMMAND_VALUE         33040
-#define _APS_NEXT_CONTROL_VALUE         1262
+#define _APS_NEXT_CONTROL_VALUE         1264
 #define _APS_NEXT_SYMED_VALUE           120
 #endif
 #endif

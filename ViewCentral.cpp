@@ -599,7 +599,7 @@ HWND ViewInitialise( HINSTANCE hInstance, HWND hParentWnd, LPRECT pstFrame, LPTS
 		if( iFiles == i ){	StringCchCopy( atFile, MAX_PATH, ptArgv );	}
 		else{				InitMultiFileTabOpen( INIT_LOAD, i, atFile );	}
 
-		dNumber = DocFileInflate( atFile  );
+		dNumber = DocFileInflate( atFile  );	//	起動時に最後のファイルを開く場合
 		if( 0 < dNumber )	//	有効なら
 		{
 			if( !(bOpen) )
@@ -611,6 +611,7 @@ HWND ViewInitialise( HINSTANCE hInstance, HWND hParentWnd, LPRECT pstFrame, LPTS
 			{
 				MultiFileTabAppend( dNumber, atFile );	//	起動時の前回オーポンを開く
 			}
+
 			AppTitleChange( atFile );
 		}
 	}
@@ -622,12 +623,12 @@ HWND ViewInitialise( HINSTANCE hInstance, HWND hParentWnd, LPRECT pstFrame, LPTS
 		PathRemoveFileSpec( atFirstStep );		//	同じ所に
 		PathAppend( atFirstStep, FIRST_STEP );	//	説明ＡＳＴを置いておく
 
-		dNumber = DocFileInflate( atFirstStep );
+		dNumber = DocFileInflate( atFirstStep );	//	起動時に、説明ＡＳＴを開くとき
 		if( 0 < dNumber )	//	有効なら
 		{
 			if( !(bOpen) )
 			{
-				MultiFileTabFirst( atFirstStep );	//	最初のいっこ
+				MultiFileTabFirst( atFirstStep );	//	説明ＡＳＴを開く
 				bOpen = TRUE;
 			}
 			else
@@ -2381,6 +2382,9 @@ VOID OperationOnCommand( HWND hWnd, INT id, HWND hWndCtl, UINT codeNotify )
 
 		//	画像として保存
 		case IDM_IMAGE_SAVE:		DocImageSave( hWnd, 0, ghAaFont );	break;
+
+		//	ファイルをHTMLで出力
+		case IDM_HTML_EXPORTE:		DocHtmlExport( hWnd );	break;
 
 		//	枠挿入しちゃったりして
 		case IDM_INSFRAME_ALPHA:	ViewFrameInsert( 0 );	break;

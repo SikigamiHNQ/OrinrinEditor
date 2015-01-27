@@ -49,28 +49,21 @@ static TCHAR	gtSelMozi;	//!<
 static  UINT	gSelRow;	//!<	
 static INT		gSelClm;	//!<	
 
-#ifdef UNICODE_USE_LOG
 //	使用ログ・１６個保持
 #define UNIUSELOG_MAX	16
 static list<TCHAR>	gltUseMozi;
 typedef list<TCHAR>::iterator	UUSE_LITR;
-#endif
 //-------------------------------------------------------------------------------------------------
 
-#ifdef UNICODE_USE_LOG
 HRESULT UniUseLogging( HWND, TCHAR );
-#endif
 
 INT_PTR	CALLBACK UniPaletteDlgProc( HWND, UINT, WPARAM, LPARAM );	//!<	
 
-INT_PTR	Uni_OnInitDialog( HWND , HWND, LPARAM );	//!<	
-INT_PTR	Uni_OnCommand( HWND , INT, HWND, UINT );	//!<	
-INT_PTR	Uni_OnClose( HWND );	//!<	
-INT_PTR	Uni_OnNotify( HWND , INT, LPNMHDR );	//!<	
-#ifdef UNICODE_USE_LOG
+INT_PTR	Uni_OnInitDialog( HWND , HWND, LPARAM );			//!<	
+INT_PTR	Uni_OnCommand( HWND , INT, HWND, UINT );			//!<	
+INT_PTR	Uni_OnClose( HWND );								//!<	
+INT_PTR	Uni_OnNotify( HWND , INT, LPNMHDR );				//!<	
 INT_PTR	Uni_OnDrawItem( HWND , CONST LPDRAWITEMSTRUCT );	//!<	
-#endif
-
 
 LRESULT	CALLBACK gpfUniListProc( HWND, UINT, WPARAM, LPARAM );	//!<	
 //-------------------------------------------------------------------------------------------------
@@ -82,7 +75,6 @@ LRESULT	CALLBACK gpfUniListProc( HWND, UINT, WPARAM, LPARAM );	//!<
 */
 HRESULT UniDlgInitialise( HWND hWnd, UINT dMode )
 {
-#ifdef UNICODE_USE_LOG
 	ULONG	d;
 	TCHAR	tMozi;
 	TCHAR	atBuff[MAX_PATH], atStr[MIN_STRING];
@@ -123,13 +115,11 @@ HRESULT UniDlgInitialise( HWND hWnd, UINT dMode )
 
 		InitParamString( INIT_SAVE, VS_UNI_USE_LOG, atBuff );
 	}
-#endif
 
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 
-#ifdef UNICODE_USE_LOG
 /*!
 	使用したやつをリストに追加
 	@param[in]	hDlg		ダイヤログハンドル
@@ -199,8 +189,6 @@ HRESULT UniUseFromLog( HWND hDlg, HWND hWndCtl, LONG x, LONG y )
 }
 //-------------------------------------------------------------------------------------------------
 
-#endif
-
 /*!
 	ユニコードパレットダイヤログーを開く処理
 	@param[in]	hInst	インスタンスハンドル
@@ -219,11 +207,7 @@ HRESULT UniDialogueEntry( HINSTANCE hInst, HWND hWnd )
 	gtSelMozi = NULL;
 
 	//	ダイヤログーはモーダレスでありんす
-#ifdef UNICODE_USE_LOG
 	ghUniPltWnd = CreateDialogParam( hInst, MAKEINTRESOURCE(IDD_UNICODE_PALETTE_DLG_2), hWnd, UniPaletteDlgProc, 0 );
-#else
-	ghUniPltWnd = CreateDialogParam( hInst, MAKEINTRESOURCE(IDD_UNICODE_PALETTE_DLG), hWnd, UniPaletteDlgProc, 0 );
-#endif
 
 	if( ghUniPltWnd )
 	{
@@ -255,9 +239,7 @@ INT_PTR CALLBACK UniPaletteDlgProc( HWND hDlg, UINT message, WPARAM wParam, LPAR
 		case WM_COMMAND:	return Uni_OnCommand( hDlg, (INT)(LOWORD(wParam)), (HWND)(lParam), (UINT)HIWORD(wParam) );
 		case WM_CLOSE:		return Uni_OnClose( hDlg  );
 		case WM_NOTIFY:		return Uni_OnNotify( hDlg, (INT)(wParam), (LPNMHDR)(lParam) );
-#ifdef UNICODE_USE_LOG
 		case WM_DRAWITEM:	return Uni_OnDrawItem( hDlg, (LPDRAWITEMSTRUCT)(lParam) );
-#endif
 	}
 
 	return (INT_PTR)FALSE;
@@ -381,9 +363,7 @@ INT_PTR Uni_OnCommand( HWND hDlg, INT id, HWND hWndCtl, UINT codeNotify )
 			if( gtSelMozi )
 			{
 				Evw_OnChar( ghMainWnd, gtSelMozi, 0 );
-#ifdef UNICODE_USE_LOG
 				UniUseLogging( hDlg, gtSelMozi );
-#endif
 			}
 			return (INT_PTR)TRUE;
 
@@ -391,13 +371,10 @@ INT_PTR Uni_OnCommand( HWND hDlg, INT id, HWND hWndCtl, UINT codeNotify )
 			if( gtSelMozi )
 			{
 				DocClipLetter( gtSelMozi  );
-#ifdef UNICODE_USE_LOG
 				UniUseLogging( hDlg, gtSelMozi );
-#endif
 			}
 			return (INT_PTR)TRUE;
 
-#ifdef UNICODE_USE_LOG
 		case IDS_UNI_USE_LOG:
 			if( STN_DBLCLK == codeNotify )	//	ダブルクルック
 			{
@@ -406,7 +383,6 @@ INT_PTR Uni_OnCommand( HWND hDlg, INT id, HWND hWndCtl, UINT codeNotify )
 				UniUseFromLog( hDlg, hWndCtl, point.x, point.y );
 			}
 			return (INT_PTR)TRUE;
-#endif
 
 	//	case IDOK:
 		case IDCANCEL:
@@ -538,9 +514,7 @@ INT_PTR Uni_OnNotify( HWND hDlg, INT idFrom, LPNMHDR pstNmhdr )
 		if( gtSelMozi )
 		{
 			Evw_OnChar( ghMainWnd, gtSelMozi, 0 );
-#ifdef UNICODE_USE_LOG
 			UniUseLogging( hDlg, gtSelMozi );
-#endif
 		}
 	}
 
@@ -632,7 +606,6 @@ return( CDRF_DODEFAULT );
 }
 //-------------------------------------------------------------------------------------------------
 
-#ifdef UNICODE_USE_LOG
 /*!
 	スタティックのオーナードローの処理
 	@param[in]	hWnd		ウインドウハンドル
@@ -673,7 +646,6 @@ INT_PTR Uni_OnDrawItem( HWND hDlg, CONST LPDRAWITEMSTRUCT pstDrawItem )
 	return (INT_PTR)TRUE;
 }
 //-------------------------------------------------------------------------------------------------
-#endif
 
 /*!
 	ユニコード一覧のサブクラスプロシージャ

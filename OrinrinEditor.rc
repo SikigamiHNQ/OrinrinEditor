@@ -51,162 +51,163 @@ IDC_ORINRINEDITOR MENU
 BEGIN
     POPUP "ファイル(&F)"
     BEGIN
-        MENUITEM "新規作成(&N)",                    IDM_NEWFILE
-        MENUITEM "ファイル開く(&O)",                  IDM_OPEN
-        MENUITEM "ファイル使用履歴(&H)",                IDM_OPEN_HISTORY
+        MENUITEM "新規作成(&N)",				IDM_NEWFILE
+        MENUITEM "ファイル開く(&O)",			IDM_OPEN
+        MENUITEM "ファイル使用履歴(&H)",		IDM_OPEN_HISTORY
         MENUITEM SEPARATOR
-        MENUITEM "上書き保存(&S)",                   IDM_OVERWRITESAVE
-        MENUITEM "名前を付けて保存(&M)",                IDM_RENAMESAVE
-        MENUITEM "現在頁を画像にして保存(&I)",             IDM_IMAGE_SAVE
+        MENUITEM "上書き保存(&S)",				IDM_OVERWRITESAVE
+        MENUITEM "名前を付けて保存(&M)",		IDM_RENAMESAVE
+        MENUITEM "現在頁を画像にして保存(&I)",	IDM_IMAGE_SAVE
+		MENUITEM "ファイルをHTMLで出力",		IDM_HTML_EXPORTE
         MENUITEM SEPARATOR
-        MENUITEM "ファイルを閉じる(&C)",                IDM_FILE_CLOSE
+        MENUITEM "ファイルを閉じる(&C)",		IDM_FILE_CLOSE
         MENUITEM SEPARATOR
-        MENUITEM "一般設定(&G)",                    IDM_GENERAL_OPTION
-        MENUITEM "右クリックメニュー編集(&E)",             IDM_MENUEDIT_DLG_OPEN
-        MENUITEM "編集エリアの配色編集(&L)",              IDM_COLOUR_EDIT_OPEN
-        MENUITEM "アクセルキー設定の編集(&K)",             IDM_ACCELKEY_EDIT_DLG_OPEN
-        MENUITEM "AA一覧ツリーを再構築(&T)",             IDM_TREE_RECONSTRUCT
+        MENUITEM "一般設定(&G)",				IDM_GENERAL_OPTION
+        MENUITEM "右クリックメニュー編集(&E)",	IDM_MENUEDIT_DLG_OPEN
+        MENUITEM "編集エリアの配色編集(&L)",	IDM_COLOUR_EDIT_OPEN
+        MENUITEM "アクセルキー設定の編集(&K)",	IDM_ACCELKEY_EDIT_DLG_OPEN
+        MENUITEM "AA一覧ツリーを再構築(&T)",	IDM_TREE_RECONSTRUCT
         MENUITEM SEPARATOR
-        MENUITEM "バージョン情報(&A)",                 IDM_ABOUT
+        MENUITEM "バージョン情報(&A)",			IDM_ABOUT
         MENUITEM SEPARATOR
-        MENUITEM "終了(&Q)",                      IDM_EXIT
+        MENUITEM "終了(&Q)",					IDM_EXIT
     END
     POPUP "編集(&E)"
     BEGIN
-        MENUITEM "元に戻す(&U)",                    IDM_UNDO
-        MENUITEM "やり直し(&R)",                    IDM_REDO
+        MENUITEM "元に戻す(&U)",					IDM_UNDO
+        MENUITEM "やり直し(&R)",					IDM_REDO
         MENUITEM SEPARATOR
-        MENUITEM "切り取り(&T)",                    IDM_CUT
-        MENUITEM "Unicodeコピー(&C)",              IDM_COPY
-        MENUITEM "貼付(&P)",                      IDM_PASTE
-        MENUITEM "削除(&D)",                      IDM_DELETE
+        MENUITEM "切り取り(&T)",					IDM_CUT
+        MENUITEM "Unicodeコピー(&C)",				IDM_COPY
+        MENUITEM "貼付(&P)",						IDM_PASTE
+        MENUITEM "削除(&D)",						IDM_DELETE
         MENUITEM SEPARATOR
-        MENUITEM "SJISコピー(&J)",                 IDM_SJISCOPY
-        MENUITEM "全体をSJISコピー(&S)",              IDM_SJISCOPY_ALL
-        MENUITEM "選択範囲をドラフトボードへ(&G)",           IDM_COPY_TO_DRAUGHT
+        MENUITEM "SJISコピー(&J)",					IDM_SJISCOPY
+        MENUITEM "全体をSJISコピー(&S)",			IDM_SJISCOPY_ALL
+        MENUITEM "選択範囲をドラフトボードへ(&G)",	IDM_COPY_TO_DRAUGHT
         MENUITEM SEPARATOR
-        MENUITEM "全選択(&A)",                     IDM_ALLSEL
+        MENUITEM "全選択(&A)",						IDM_ALLSEL
         MENUITEM SEPARATOR
-        MENUITEM "矩形選択(&B)",                    IDM_SQSELECT
-        MENUITEM "矩形貼付(&Q)",                    IDM_SQUARE_PASTE
+        MENUITEM "矩形選択(&B)",					IDM_SQSELECT
+        MENUITEM "矩形貼付(&Q)",					IDM_SQUARE_PASTE
         MENUITEM SEPARATOR
-        MENUITEM "レイヤボックス(&L)",                 IDM_LAYERBOX
-        MENUITEM "部分抽出モード(&E)",                 IDM_EXTRACTION_MODE
+        MENUITEM "レイヤボックス(&L)",				IDM_LAYERBOX
+        MENUITEM "部分抽出モード(&E)",				IDM_EXTRACTION_MODE
         MENUITEM SEPARATOR
-        MENUITEM "次の行以降を新頁に分割(&V)",             IDM_PAGEL_DIVIDE
+        MENUITEM "次の行以降を新頁に分割(&V)",		IDM_PAGEL_DIVIDE
         MENUITEM SEPARATOR
-        MENUITEM "選択文字列を頁名にする(&N)",             IDM_PAGENAME_SELASSIGN
+        MENUITEM "選択文字列を頁名にする(&N)",		IDM_PAGENAME_SELASSIGN
         MENUITEM SEPARATOR
-        MENUITEM "文字列検索(&F)",                   IDM_FIND_DLG_OPEN
-        MENUITEM "検索設定リセット(&H)",                IDM_FIND_HIGHLIGHT_OFF
+        MENUITEM "文字列検索(&F)",					IDM_FIND_DLG_OPEN
+        MENUITEM "検索設定リセット(&H)",			IDM_FIND_HIGHLIGHT_OFF
     END
     POPUP "挿入(&I)"
     BEGIN
         POPUP "ユニコード空白(&S)"
         BEGIN
-            MENUITEM " &1dot (HAIR SPACE)  [ U8202 ]", IDM_IN_01SPACE
-            MENUITEM " &2dot (THIN SPACE)  [ U8201 ]", IDM_IN_02SPACE
-            MENUITEM " &3dot (SIX-PER-EM SPACE)  [ U8198 ]", IDM_IN_03SPACE
-            MENUITEM " &4dot (FOUR-PER-EM SPACE)  [ U8197 ]", IDM_IN_04SPACE
-            MENUITEM " &5dot (THREE-PER-EM SPACE)  [ U8196 ]", IDM_IN_05SPACE
-            MENUITEM " &8dot (EN SPACE)  [ U8194 ]", IDM_IN_08SPACE
-            MENUITEM "1&0dot (FIGURE SPACE)  [ U8199 ]", IDM_IN_10SPACE
-            MENUITEM "1&6dot (EM SPACE)  [ U8195 ]", IDM_IN_16SPACE
+            MENUITEM " &1dot (HAIR SPACE)  [ U8202 ]",			IDM_IN_01SPACE
+            MENUITEM " &2dot (THIN SPACE)  [ U8201 ]",			IDM_IN_02SPACE
+            MENUITEM " &3dot (SIX-PER-EM SPACE)  [ U8198 ]",	IDM_IN_03SPACE
+            MENUITEM " &4dot (FOUR-PER-EM SPACE)  [ U8197 ]",	IDM_IN_04SPACE
+            MENUITEM " &5dot (THREE-PER-EM SPACE)  [ U8196 ]",	IDM_IN_05SPACE
+            MENUITEM " &8dot (EN SPACE)  [ U8194 ]",			IDM_IN_08SPACE
+            MENUITEM "1&0dot (FIGURE SPACE)  [ U8199 ]",		IDM_IN_10SPACE
+            MENUITEM "1&6dot (EM SPACE)  [ U8195 ]",			IDM_IN_16SPACE
         END
         POPUP "色指定(&C)"
         BEGIN
-            MENUITEM "白(&W)",                       IDM_INSTAG_WHITE
-            MENUITEM "青(&U)",                       IDM_INSTAG_BLUE
-            MENUITEM "黒(&B)",                       IDM_INSTAG_BLACK
-            MENUITEM "赤(&R)",                       IDM_INSTAG_RED
-            MENUITEM "緑(&G)",                       IDM_INSTAG_GREEN
+            MENUITEM "白(&W)",	IDM_INSTAG_WHITE
+            MENUITEM "青(&U)",	IDM_INSTAG_BLUE
+            MENUITEM "黒(&B)",	IDM_INSTAG_BLACK
+            MENUITEM "赤(&R)",	IDM_INSTAG_RED
+            MENUITEM "緑(&G)",	IDM_INSTAG_GREEN
         END
         MENUITEM SEPARATOR
-        MENUITEM "枠挿入ボックス(&I)",                 IDM_FRMINSBOX_OPEN
-        MENUITEM "枠　Alpha",                     IDM_INSFRAME_ALPHA
+        MENUITEM "枠挿入ボックス(&I)",	IDM_FRMINSBOX_OPEN
+        MENUITEM "枠　Alpha",			IDM_INSFRAME_ALPHA
         POPUP "枠...(&F)"
         BEGIN
-            MENUITEM "枠編集(&Z)",                     IDM_INSFRAME_EDIT
+            MENUITEM "枠編集(&Z)",		IDM_INSFRAME_EDIT
             MENUITEM SEPARATOR
-            MENUITEM "枠　Bravo",                     IDM_INSFRAME_BRAVO
-            MENUITEM "枠　Charlie",                   IDM_INSFRAME_CHARLIE
-            MENUITEM "枠　Delta",                     IDM_INSFRAME_DELTA
-            MENUITEM "枠　Echo",                      IDM_INSFRAME_ECHO
-            MENUITEM "枠　Foxtrot",                   IDM_INSFRAME_FOXTROT
-            MENUITEM "枠　Golf",                      IDM_INSFRAME_GOLF
-            MENUITEM "枠　Hotel",                     IDM_INSFRAME_HOTEL
-            MENUITEM "枠　India",                     IDM_INSFRAME_INDIA
-            MENUITEM "枠　Juliette",                  IDM_INSFRAME_JULIETTE
-            MENUITEM "枠　Kilo",                      IDM_INSFRAME_KILO
-            MENUITEM "枠　Lima",                      IDM_INSFRAME_LIMA
-            MENUITEM "枠　Mike",                      IDM_INSFRAME_MIKE
-            MENUITEM "枠　November",                  IDM_INSFRAME_NOVEMBER
-            MENUITEM "枠　Oscar",                     IDM_INSFRAME_OSCAR
-            MENUITEM "枠　Poppa",                     IDM_INSFRAME_PAPA
-            MENUITEM "枠　Quebec",                    IDM_INSFRAME_QUEBEC
-            MENUITEM "枠　Romeo",                     IDM_INSFRAME_ROMEO
-            MENUITEM "枠　Sierra",                    IDM_INSFRAME_SIERRA
-            MENUITEM "枠　Tango",                     IDM_INSFRAME_TANGO
+            MENUITEM "枠　Bravo",		IDM_INSFRAME_BRAVO
+            MENUITEM "枠　Charlie",		IDM_INSFRAME_CHARLIE
+            MENUITEM "枠　Delta",		IDM_INSFRAME_DELTA
+            MENUITEM "枠　Echo",		IDM_INSFRAME_ECHO
+            MENUITEM "枠　Foxtrot",		IDM_INSFRAME_FOXTROT
+            MENUITEM "枠　Golf",		IDM_INSFRAME_GOLF
+            MENUITEM "枠　Hotel",		IDM_INSFRAME_HOTEL
+            MENUITEM "枠　India",		IDM_INSFRAME_INDIA
+            MENUITEM "枠　Juliette",	IDM_INSFRAME_JULIETTE
+            MENUITEM "枠　Kilo",		IDM_INSFRAME_KILO
+            MENUITEM "枠　Lima",		IDM_INSFRAME_LIMA
+            MENUITEM "枠　Mike",		IDM_INSFRAME_MIKE
+            MENUITEM "枠　November",	IDM_INSFRAME_NOVEMBER
+            MENUITEM "枠　Oscar",		IDM_INSFRAME_OSCAR
+            MENUITEM "枠　Poppa",		IDM_INSFRAME_PAPA
+            MENUITEM "枠　Quebec",		IDM_INSFRAME_QUEBEC
+            MENUITEM "枠　Romeo",		IDM_INSFRAME_ROMEO
+            MENUITEM "枠　Sierra",		IDM_INSFRAME_SIERRA
+            MENUITEM "枠　Tango",		IDM_INSFRAME_TANGO
         END
         MENUITEM SEPARATOR
-        MENUITEM "文字ＡＡ変換ボックス(&M)",              IDM_MOZI_SCR_OPEN
-        MENUITEM "縦書き変換ボックス(&V)",               IDM_VERT_SCRIPT_OPEN
+        MENUITEM "文字ＡＡ変換ボックス(&M)",	IDM_MOZI_SCR_OPEN
+        MENUITEM "縦書き変換ボックス(&V)",		IDM_VERT_SCRIPT_OPEN
         MENUITEM SEPARATOR
         POPUP "ユーザ定義(&U)"
         BEGIN
-            MENUITEM "(无)",                         IDM_USERINS_NA
+            MENUITEM "(无)",	IDM_USERINS_NA
         END
         MENUITEM SEPARATOR
-        MENUITEM "各頁に通し番号を入れる(&N)",             IDM_PAGENUM_DLG_OPEN
+        MENUITEM "各頁に通し番号を入れる(&N)",	IDM_PAGENUM_DLG_OPEN
     END
     POPUP "整形(&P)"
     BEGIN
-        MENUITEM "右揃え線(&R)",                    IDM_RIGHT_GUIDE_SET
-        MENUITEM "行頭に全角空白追加(&I)",               IDM_INS_TOPSPACE
+        MENUITEM "右揃え線(&R)",						IDM_RIGHT_GUIDE_SET
+        MENUITEM "行頭に全角空白追加(&I)",				IDM_INS_TOPSPACE
         MENUITEM SEPARATOR
-        MENUITEM "行頭空白削除(&U)",                  IDM_DEL_TOPSPACE
-        MENUITEM "行末空白削除(&G)",                  IDM_DEL_LASTSPACE
-        MENUITEM "行末文字削除(&E)",                  IDM_DEL_LASTLETTER
-        MENUITEM "選択範囲を空白にする(&F)",              IDM_FILL_SPACE
-        MENUITEM "頁全体を空白で埋める(&B)",              IDM_FILL_ZENSP
+        MENUITEM "行頭空白削除(&U)",					IDM_DEL_TOPSPACE
+        MENUITEM "行末空白削除(&G)",					IDM_DEL_LASTSPACE
+        MENUITEM "行末文字削除(&E)",					IDM_DEL_LASTLETTER
+        MENUITEM "選択範囲を空白にする(&F)",			IDM_FILL_SPACE
+        MENUITEM "頁全体を空白で埋める(&B)",			IDM_FILL_ZENSP
         MENUITEM SEPARATOR
-        MENUITEM "行頭半角空白をユニコードに変換(&L)",         IDM_HEADHALF_EXCHANGE
+        MENUITEM "行頭半角空白をユニコードに変換(&L)",	IDM_HEADHALF_EXCHANGE
         MENUITEM SEPARATOR
-        MENUITEM "左右反転(&M)",                    IDM_MIRROR_INVERSE
-        MENUITEM "上下反転(&N)",                    IDM_UPSET_INVERSE
+        MENUITEM "左右反転(&M)",						IDM_MIRROR_INVERSE
+        MENUITEM "上下反転(&N)",						IDM_UPSET_INVERSE
         MENUITEM SEPARATOR
-        MENUITEM "右に寄せる(&H)",                   IDM_RIGHT_SLIDE
-        MENUITEM "１ドット増やす(&D)",                 IDM_INCREMENT_DOT
-        MENUITEM "１ドット減らす(&O)",                 IDM_DECREMENT_DOT
+        MENUITEM "右に寄せる(&H)",						IDM_RIGHT_SLIDE
+        MENUITEM "１ドット増やす(&D)",					IDM_INCREMENT_DOT
+        MENUITEM "１ドット減らす(&O)",					IDM_DECREMENT_DOT
         MENUITEM SEPARATOR
-        MENUITEM "全体を１ドット右へ(&J)",               IDM_INCR_DOT_LINES
-        MENUITEM "全体を１ドット左へ(&K)",               IDM_DECR_DOT_LINES
-        MENUITEM "指定位置から左に狭める(&Q)",             IDM_DOT_SPLIT_LEFT
-        MENUITEM "指定位置から右へ広げる(&P)",             IDM_DOT_SPLIT_RIGHT
+        MENUITEM "全体を１ドット右へ(&J)",				IDM_INCR_DOT_LINES
+        MENUITEM "全体を１ドット左へ(&K)",				IDM_DECR_DOT_LINES
+        MENUITEM "指定位置から左に狭める(&Q)",			IDM_DOT_SPLIT_LEFT
+        MENUITEM "指定位置から右へ広げる(&P)",			IDM_DOT_SPLIT_RIGHT
         MENUITEM SEPARATOR
         POPUP "ドットずれ調整(&A)"
         BEGIN
-            MENUITEM "調整基準ロック(&R)",                 IDM_DOTDIFF_LOCK
-            MENUITEM "カーソル位置で調整(&D)",               IDM_DOTDIFF_ADJT
+            MENUITEM "調整基準ロック(&R)",		IDM_DOTDIFF_LOCK
+            MENUITEM "カーソル位置で調整(&D)",	IDM_DOTDIFF_ADJT
         END
     END
     POPUP "表示(&N)"
     BEGIN
-        MENUITEM "空白を表示(&W)",                   IDM_SPACE_VIEW_TOGGLE
-        MENUITEM "グリッド線を表示(&H)",                IDM_GRID_VIEW_TOGGLE
-        MENUITEM "右ガイド線を表示(&M)",                IDM_RIGHT_RULER_TOGGLE
-        MENUITEM "下ガイド線を表示(&S)",                IDM_UNDER_RULER_TOGGLE
+        MENUITEM "空白を表示(&W)",				IDM_SPACE_VIEW_TOGGLE
+        MENUITEM "グリッド線を表示(&H)",		IDM_GRID_VIEW_TOGGLE
+        MENUITEM "右ガイド線を表示(&M)",		IDM_RIGHT_RULER_TOGGLE
+        MENUITEM "下ガイド線を表示(&S)",		IDM_UNDER_RULER_TOGGLE
         MENUITEM SEPARATOR
-        MENUITEM "複数行テンプレート表示(&A)",             IDM_MAATMPLE_VIEW
-        MENUITEM "複数行サムネイル(&B)",                IDM_MAA_THUMBNAIL_OPEN
-        MENUITEM "頁一覧(&L)",                     IDM_PAGELIST_VIEW
-        MENUITEM "壱行テンプレート(&T)",                IDM_LINE_TEMPLATE
-        MENUITEM "塗り潰しブラシ(&F)",                 IDM_BRUSH_PALETTE
-        MENUITEM "ユニコード表(&U)",                  IDM_UNI_PALETTE
-        MENUITEM "トレスモード(&R)",                  IDM_TRACE_MODE_ON
-        MENUITEM "ドラフトボード(&D)",                 IDM_DRAUGHT_OPEN
+        MENUITEM "複数行テンプレート表示(&A)",	IDM_MAATMPLE_VIEW
+        MENUITEM "複数行サムネイル(&B)",		IDM_MAA_THUMBNAIL_OPEN
+        MENUITEM "頁一覧(&L)",					IDM_PAGELIST_VIEW
+        MENUITEM "壱行テンプレート(&T)",		IDM_LINE_TEMPLATE
+        MENUITEM "塗り潰しブラシ(&F)",			IDM_BRUSH_PALETTE
+        MENUITEM "ユニコード表(&U)",			IDM_UNI_PALETTE
+        MENUITEM "トレスモード(&R)",			IDM_TRACE_MODE_ON
+        MENUITEM "ドラフトボード(&D)",			IDM_DRAUGHT_OPEN
         MENUITEM SEPARATOR
-        MENUITEM "プレビュー(&P)",                   IDM_ON_PREVIEW
+        MENUITEM "プレビュー(&P)",				IDM_ON_PREVIEW
     END
 END
 
@@ -214,23 +215,23 @@ IDC_PGLVPOPUPMENU MENU
 BEGIN
     POPUP "頁一覧操作"
     BEGIN
-        MENUITEM "内容ポップアップ表示(&T)",              IDM_PAGEL_AATIP_TOGGLE
-        MENUITEM "選択したら編集窓にフォーカス",              IDM_PAGEL_RETURN_FOCUS
+        MENUITEM "内容ポップアップ表示(&T)",		IDM_PAGEL_AATIP_TOGGLE
+        MENUITEM "選択したら編集窓にフォーカス",	IDM_PAGEL_RETURN_FOCUS
         MENUITEM SEPARATOR
-        MENUITEM "末尾に新規作成(&N)",                 IDM_PAGEL_ADD
-        MENUITEM "選択頁の次に新規作成(&I)",              IDM_PAGEL_INSERT
-        MENUITEM "選択頁を複製(&C)",                  IDM_PAGEL_DUPLICATE
+        MENUITEM "末尾に新規作成(&N)",				IDM_PAGEL_ADD
+        MENUITEM "選択頁の次に新規作成(&I)",		IDM_PAGEL_INSERT
+        MENUITEM "選択頁を複製(&C)",				IDM_PAGEL_DUPLICATE
         MENUITEM SEPARATOR
-        MENUITEM "選択頁を削除(&D)",                  IDM_PAGEL_DELETE
-        MENUITEM "次の頁と統合(&U)",                  IDM_PAGEL_COMBINE
-        MENUITEM "頁を上へ移動(&W)",                  IDM_PAGEL_UPFLOW
-        MENUITEM "頁を下へ移動(&S)",                  IDM_PAGEL_DOWNSINK
+        MENUITEM "選択頁を削除(&D)",				IDM_PAGEL_DELETE
+        MENUITEM "次の頁と統合(&U)",				IDM_PAGEL_COMBINE
+        MENUITEM "頁を上へ移動(&W)",				IDM_PAGEL_UPFLOW
+        MENUITEM "頁を下へ移動(&S)",				IDM_PAGEL_DOWNSINK
         MENUITEM SEPARATOR
-        MENUITEM "頁名称の変更(&R)",                  IDM_PAGEL_RENAME
+        MENUITEM "頁名称の変更(&R)",				IDM_PAGEL_RENAME
         MENUITEM SEPARATOR
-        MENUITEM "最新の情報に更新(&Y)",                IDM_PAGEL_DETAIL, GRAYED
+        MENUITEM "最新の情報に更新(&Y)",			IDM_PAGEL_DETAIL, GRAYED
         MENUITEM SEPARATOR
-        MENUITEM "常に手前に表示(&Z)",                 IDM_TOPMOST_TOGGLE
+        MENUITEM "常に手前に表示(&Z)",				IDM_TOPMOST_TOGGLE
     END
 END
 
@@ -238,25 +239,25 @@ IDM_AALIST_POPUP MENU
 BEGIN
     POPUP "複数行テンプレ表示でのアレ"
     BEGIN
-        MENUITEM "ドラフトボードに追加(&G)",              IDM_DRAUGHT_ADDING
+        MENUITEM "ドラフトボードに追加(&G)",		IDM_DRAUGHT_ADDING
         MENUITEM SEPARATOR
-        MENUITEM "編集ビューに通常挿入(&I)",              IDM_MAA_INSERT_EDIT
-        MENUITEM "編集ビューに矩形挿入(&R)",              IDM_MAA_INTERRUPT_EDIT
+        MENUITEM "編集ビューに通常挿入(&I)",		IDM_MAA_INSERT_EDIT
+        MENUITEM "編集ビューに矩形挿入(&R)",		IDM_MAA_INTERRUPT_EDIT
         MENUITEM SEPARATOR
-        MENUITEM "コピー(UNI&CODE)",               IDM_MAA_CLIP_UNICODE
-        MENUITEM "コピー(Shift&JIS)",              IDM_MAA_CLIP_SHIFTJIS
+        MENUITEM "コピー(UNI&CODE)",				IDM_MAA_CLIP_UNICODE
+        MENUITEM "コピー(Shift&JIS)",				IDM_MAA_CLIP_SHIFTJIS
         MENUITEM SEPARATOR
-        MENUITEM "レイヤで開く(&L)",                  IDM_MAA_SET_LAYERBOX
+        MENUITEM "レイヤで開く(&L)",				IDM_MAA_SET_LAYERBOX
         MENUITEM SEPARATOR
-        MENUITEM "サムネイル一覧表示(&H)",               IDM_MAA_THUMBNAIL_OPEN
+        MENUITEM "サムネイル一覧表示(&H)",			IDM_MAA_THUMBNAIL_OPEN
         MENUITEM SEPARATOR
-        MENUITEM "ＡＡポップアップ表示(&T)",              IDM_MAA_AATIP_TOGGLE
-        MENUITEM "ＡＡ区切りスタイル切換",                 IDM_MAA_SEP_STYLE_TOGGLE
-        MENUITEM "選択したら編集窓にフォーカス",              IDM_MAA_RETURN_FOCUS
-        MENUITEM "背景色変更(&K)",                   IDM_MAAITEM_BKCOLOUR
+        MENUITEM "ＡＡポップアップ表示(&T)",		IDM_MAA_AATIP_TOGGLE
+        MENUITEM "ＡＡ区切りスタイル切換",			IDM_MAA_SEP_STYLE_TOGGLE
+        MENUITEM "選択したら編集窓にフォーカス",	IDM_MAA_RETURN_FOCUS
+        MENUITEM "背景色変更(&K)",					IDM_MAAITEM_BKCOLOUR
         MENUITEM SEPARATOR
-        MENUITEM "ここにアイテム追加(&A)",               IDM_MAA_ITEM_INSERT
-        MENUITEM "アイテムを削除(&D)",                 IDM_MAA_FAV_DELETE
+        MENUITEM "ここにアイテム追加(&A)",			IDM_MAA_ITEM_INSERT
+        MENUITEM "アイテムを削除(&D)",				IDM_MAA_FAV_DELETE
     END
 END
 
@@ -264,18 +265,18 @@ IDM_AATREE_POPUP MENU
 BEGIN
     POPUP "複数行テンプレツリーのアレ"
     BEGIN
-        MENUITEM "プロファイル作成／開く(&N)",             IDM_MAA_PROFILE_MAKE
-        MENUITEM "AA一覧ツリーを再構築(&T)",             IDM_TREE_RECONSTRUCT
-        MENUITEM "プロファイル使用履歴(&H)",              IDM_OPEN_HISTORY
+        MENUITEM "プロファイル作成／開く(&N)",	IDM_MAA_PROFILE_MAKE
+        MENUITEM "AA一覧ツリーを再構築(&T)",	IDM_TREE_RECONSTRUCT
+        MENUITEM "プロファイル使用履歴(&H)",	IDM_OPEN_HISTORY
         MENUITEM SEPARATOR
-        MENUITEM "ファイル名で検索(&F)",                IDM_FINDMAA_DLG_OPEN
+        MENUITEM "ファイル名で検索(&F)",		IDM_FINDMAA_DLG_OPEN
         MENUITEM SEPARATOR
-        MENUITEM "（名称未設定）",                     IDM_DUMMY, GRAYED
-        MENUITEM "主タブで開く(&M)",                  IDM_AATREE_MAINOPEN
-        MENUITEM "副タブを追加(&S)",                  IDM_AATREE_SUBADD
-        MENUITEM "編集ビューに開く(&E)",                IDM_AATREE_GOEDIT
+        MENUITEM "（名称未設定）",				IDM_DUMMY, GRAYED
+        MENUITEM "主タブで開く(&M)",			IDM_AATREE_MAINOPEN
+        MENUITEM "副タブを追加(&S)",			IDM_AATREE_SUBADD
+        MENUITEM "編集ビューに開く(&E)",		IDM_AATREE_GOEDIT
         MENUITEM SEPARATOR
-        MENUITEM "このアイテムを削除(&D)",               IDM_MAA_ITEM_DELETE, GRAYED
+        MENUITEM "このアイテムを削除(&D)",		IDM_MAA_ITEM_DELETE, GRAYED
     END
 END
 
@@ -283,14 +284,14 @@ IDM_AATABS_POPUP MENU
 BEGIN
     POPUP "複数行テンプレタブのアレ"
     BEGIN
-        MENUITEM "このタブを閉じる(&Q)",                IDM_AATABS_DELETE
-        MENUITEM "全ての副タブを閉じる(&A)",              IDM_AATABS_ALLDELETE
+        MENUITEM "このタブを閉じる(&Q)",		IDM_AATABS_DELETE
+        MENUITEM "全ての副タブを閉じる(&A)",	IDM_AATABS_ALLDELETE
         MENUITEM SEPARATOR
-        MENUITEM "編集ビューに開く(&E)",                IDM_AATREE_GOEDIT
+        MENUITEM "編集ビューに開く(&E)",		IDM_AATREE_GOEDIT
         MENUITEM SEPARATOR
-        MENUITEM "表示名称の変更(&N)",                 IDM_AATABS_RENAME
+        MENUITEM "表示名称の変更(&N)",			IDM_AATABS_RENAME
         MENUITEM SEPARATOR
-        MENUITEM "副タブを壱行表示",                    IDM_AATABS_SINGLETAB
+        MENUITEM "副タブを壱行表示",			IDM_AATABS_SINGLETAB
     END
 END
 
@@ -298,10 +299,10 @@ IDM_LAYERBOX_POPUP MENU
 BEGIN
     POPUP "レイヤボックスのアレ"
     BEGIN
-        MENUITEM "コピー(&C)",                     IDM_LYB_COPY
+        MENUITEM "コピー(&C)",						IDM_LYB_COPY
         MENUITEM SEPARATOR
-        MENUITEM "透過領域設定をリセット(&R)",             IDM_LYB_TRANCE_RELEASE
-        MENUITEM "全ての空白を透過領域に設定(&T)",           IDM_LYB_TRANCE_ALL
+        MENUITEM "透過領域設定をリセット(&R)",		IDM_LYB_TRANCE_RELEASE
+        MENUITEM "全ての空白を透過領域に設定(&T)",	IDM_LYB_TRANCE_ALL
     END
 END
 
@@ -309,10 +310,10 @@ IDM_MULTIFILE_POPUP MENU
 BEGIN
     POPUP "複数ファイルタブのアレ"
     BEGIN
-        MENUITEM "保存(&S)",                      IDM_OVERWRITESAVE
-        MENUITEM "名前を付けて保存(&M)",                IDM_RENAMESAVE
+        MENUITEM "保存(&S)",				IDM_OVERWRITESAVE
+        MENUITEM "名前を付けて保存(&M)",	IDM_RENAMESAVE
         MENUITEM SEPARATOR
-        MENUITEM "タブを閉じる(&Q)",                  IDM_FILE_CLOSE
+        MENUITEM "タブを閉じる(&Q)",		IDM_FILE_CLOSE
     END
 END
 
@@ -320,8 +321,8 @@ IDM_TEMPLATE_POPUP MENU
 BEGIN
     POPUP "テンプレウインドウのアレ"
     BEGIN
-        MENUITEM "常に手前に表示(&Z)",                 IDM_TOPMOST_TOGGLE
-        MENUITEM "テンプレート再読込(&R)",               IDM_TMPLT_RELOAD
+        MENUITEM "常に手前に表示(&Z)",		IDM_TOPMOST_TOGGLE
+        MENUITEM "テンプレート再読込(&R)",	IDM_TMPLT_RELOAD
     END
 END
 
@@ -329,24 +330,24 @@ IDM_DRAUGHT_POPUP MENU
 BEGIN
     POPUP "ドラフトボードのアレ"
     BEGIN
-        MENUITEM "編集ビューに通常挿入(&I)",              IDM_DRAUGHT_INSERTEDIT
-        MENUITEM "編集ビューに矩形挿入(&R)",              IDM_DRAUGHT_INTERRUPTEDIT
-        MENUITEM "レイヤで開く(&L)",                  IDM_DRAUGHT_LAYERBOX
-        MENUITEM "コピー(UNI&CODE)",               IDM_DRAUGHT_UNICLIP
-        MENUITEM "コピー(Shift&JIS)",              IDM_DRAUGHT_SJISCLIP
+        MENUITEM "編集ビューに通常挿入(&I)",	IDM_DRAUGHT_INSERTEDIT
+        MENUITEM "編集ビューに矩形挿入(&R)",	IDM_DRAUGHT_INTERRUPTEDIT
+        MENUITEM "レイヤで開く(&L)",			IDM_DRAUGHT_LAYERBOX
+        MENUITEM "コピー(UNI&CODE)",			IDM_DRAUGHT_UNICLIP
+        MENUITEM "コピー(Shift&JIS)",			IDM_DRAUGHT_SJISCLIP
         MENUITEM SEPARATOR
-        MENUITEM "アイテムを削除(&D)",                 IDM_DRAUGHT_DELETE
-        MENUITEM "全内容を削除(&K)",                  IDM_DRAUGHT_ALLDELETE
+        MENUITEM "アイテムを削除(&D)",			IDM_DRAUGHT_DELETE
+        MENUITEM "全内容を削除(&K)",			IDM_DRAUGHT_ALLDELETE
         MENUITEM SEPARATOR
         POPUP "イメージサイズ"
         BEGIN
-            MENUITEM "控えめ  80px",                   IDM_DB_THUMB_ULTRALIGHT
-            MENUITEM "標準的 128px",                   IDM_DB_THUMB_REGULAR
-            MENUITEM "大きめ 160px",                   IDM_DB_THUMB_DEMIBOLD
-            MENUITEM "デカい 192px",                   IDM_DB_THUMB_ULTRABOLD
+            MENUITEM "控えめ  80px",			IDM_DB_THUMB_ULTRALIGHT
+            MENUITEM "標準的 128px",			IDM_DB_THUMB_REGULAR
+            MENUITEM "大きめ 160px",			IDM_DB_THUMB_DEMIBOLD
+            MENUITEM "デカい 192px",			IDM_DB_THUMB_ULTRABOLD
         END
-        MENUITEM "全内容をエクスポート(&E)",              IDM_DRAUGHT_EXPORT
-        MENUITEM "ドラフトボードを閉じる(&Q)",             IDM_DRAUGHT_CLOSE
+        MENUITEM "全内容をエクスポート(&E)",	IDM_DRAUGHT_EXPORT
+        MENUITEM "ドラフトボードを閉じる(&Q)",	IDM_DRAUGHT_CLOSE
     END
 END
 
@@ -429,8 +430,8 @@ CAPTION "バージョン情報 - Orinrin Editor"
 FONT 9, "MS UI Gothic"
 BEGIN
     ICON            IDI_ORINRINEDITOR,IDC_MYICON,6,6,20,20
-    LTEXT           "Orinrin Editor, Version 0.33 Aurora (2014.401.2200.920)",IDC_STATIC,36,6,168,8,SS_NOPREFIX
-    LTEXT           "Copyright (C) 2011 - 2014 Orinrin/SikigamiHNQ",IDC_STATIC,36,18,168,8
+    LTEXT           "Orinrin Editor, Version 0.341 Aurora (2015.126.2200.920)",IDC_STATIC,36,6,168,8,SS_NOPREFIX
+    LTEXT           "Copyright (C) 2011 - 2015 Orinrin/SikigamiHNQ",IDC_STATIC,36,18,168,8
     LTEXT           "Site ： お燐ちゃんは俺の嫁．ｃｏｍ",IDC_STATIC,36,30,168,8
     DEFPUSHBUTTON   "OK",IDOK,84,180,48,12,WS_GROUP
     EDITTEXT        IDE_ABOUT_DISP,6,42,204,132,ES_MULTILINE | ES_READONLY | NOT WS_BORDER,WS_EX_STATICEDGE
@@ -477,7 +478,7 @@ BEGIN
     LTEXT           "0x0070",IDS_UA_HOTEL,63,148,30,8
 END
 
-IDD_UNICODE_PALETTE_DLG_2 DIALOG 0, 0, 438, 218
+IDD_UNICODE_PALETTE_DLG_2 DIALOG  0, 0, 438, 218
 STYLE DS_SETFONT | DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_TOOLWINDOW
 CAPTION "ユニコード一覧表"
@@ -592,15 +593,15 @@ BEGIN
     EDITTEXT        IDE_PAGENAME,6,18,156,12,ES_AUTOHSCROLL
 END
 
-IDD_GENERAL_OPTION_DLG DIALOG 0, 0, 342, 322
+IDD_GENERAL_OPTION_DLG DIALOG 0, 0, 343, 358
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_TOOLWINDOW
 CAPTION "設定いろいろ"
 FONT 9, "MS UI Gothic"
 BEGIN
-    DEFPUSHBUTTON   "OK",IDOK,174,306,42,12
-    PUSHBUTTON      "キャンセル",IDCANCEL,234,306,42,12
-    PUSHBUTTON      "適用",IDB_APPLY,294,306,42,12
+    DEFPUSHBUTTON   "OK",IDOK,174,342,42,12
+    PUSHBUTTON      "キャンセル",IDCANCEL,234,342,42,12
+    PUSHBUTTON      "適用",IDB_APPLY,294,342,42,12
     GROUPBOX        "テンプレポップアップ",IDC_STATIC,6,6,96,30
     CONTROL         "通常",IDRB_POPUP_NOMAL,"Button",BS_AUTORADIOBUTTON | WS_GROUP,66,12,30,8
     CONTROL         "縮小",IDRB_POPUP_REDUCE,"Button",BS_AUTORADIOBUTTON,66,24,30,8
@@ -671,6 +672,9 @@ BEGIN
     LTEXT           "※行数",IDC_STATIC,312,162,22,12,SS_CENTERIMAGE
     GROUPBOX        "壱レス最大バイト数",IDC_STATIC,270,186,66,30
     EDITTEXT        IDE_PAGE_BYTE_MAX,288,198,30,12,ES_CENTER | ES_AUTOHSCROLL | ES_NUMBER
+    GROUPBOX        "MLT2HTMLの位置（外部ツール）",IDC_STATIC,6,306,330,30
+    EDITTEXT        IDE_EXTERNAL_M2H_PATH,12,318,264,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "実行ファイル",IDB_EXTERNAL_M2H_SEL,282,318,48,12
 END
 
 IDD_TRACEADJUST_DLG DIALOG  0, 0, 139, 281
@@ -927,8 +931,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 2014,401,2200,920
- PRODUCTVERSION 0,33,0,920
+ FILEVERSION 2015,126,2200,920
+ PRODUCTVERSION 0,34,1,920
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -949,12 +953,12 @@ BEGIN
         BEGIN
             VALUE "Comments", "Japanese Only, Perfectly No Warranty"
             VALUE "CompanyName", "I love 2ch, Yaruo and TohoProject"
-            VALUE "LegalCopyright", "Copyright (C) 2011 - 2014 Orinrin/SikigamiHNQ"
+            VALUE "LegalCopyright", "Copyright (C) 2011 - 2015 Orinrin/SikigamiHNQ"
             VALUE "LegalTrademarks", "License : GPLv3"
             VALUE "PrivateBuild", "Build by Visual C++ 2008 Express"
             VALUE "SpecialBuild", "Not Speciality"
-            VALUE "FileVersion", "2014.401.2200.920"
-            VALUE "ProductVersion", "0.33.0.920"
+            VALUE "FileVersion", "2015.126.2200.920"
+            VALUE "ProductVersion", "0.34.1.920"
             VALUE "FileDescription", "AsciiArt Story Editor by Orinrin!"
             VALUE "OriginalFilename", "OrinrinEditor.exe"
             VALUE "InternalName", "Orinrin Editor"

@@ -541,7 +541,7 @@ VOID Ltp_OnSize( HWND hWnd, UINT state, INT cx, INT cy )
 	MoveWindow( ghLvItemWnd, 0, cbxRect.bottom, cx, cy - cbxRect.bottom, TRUE );
 
 	GetClientRect( ghLvItemWnd, &rect );
-	width = rect.right / gLnClmCnt;
+	width  = rect.right / gLnClmCnt;	//	表示カラム数なので０になることはない
 
 	for( i = 0; gLnClmCnt > i; i++ )
 	{
@@ -713,15 +713,15 @@ HRESULT LineTmpleItemListOn( UINT listNum )
 	{
 		StringCchCopy( atItem, SUB_STRING, gvcTmples.at( listNum ).vcItems.at( i ).c_str( ) );
 
-		stLvi.iItem    = i / gLnClmCnt;
-		stLvi.iSubItem = i % gLnClmCnt;
+		stLvi.iItem     = i / gLnClmCnt;	//	表示カラム数なので０になることはない
+		stLvi.iSubItem  = i % gLnClmCnt;
 		if( 0 == stLvi.iSubItem )	ListView_InsertItem( ghLvItemWnd, &stLvi );
 		else						ListView_SetItem( ghLvItemWnd, &stLvi );
 	}
 
 	//	ブチこんだら幅調整
 	GetClientRect( ghLvItemWnd, &rect );
-	width = rect.right / gLnClmCnt;
+	width  = rect.right / gLnClmCnt;	//	表示カラム数なので０になることはない
 	for( i = 0; gLnClmCnt > i; i++ ){	ListView_SetColumnWidth( ghLvItemWnd, i, width );	}
 
 	return S_OK;

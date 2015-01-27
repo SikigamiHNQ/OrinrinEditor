@@ -281,7 +281,6 @@ UINT DocPageParamGet( PINT piMozi, PINT piByte )
 
 	LINE_ITR	itLine;
 
-#ifdef PAGE_DELAY_LOAD
 	//	もし頁展開前に呼ばれてたら
 	if( gitFileIt->vcCont.at( gixFocusPage ).ptRawData )
 	{
@@ -291,8 +290,6 @@ UINT DocPageParamGet( PINT piMozi, PINT piByte )
 	}
 	else
 	{
-#endif
-
 		iLines = DocNowFilePageLineCount( );
 
 		//	行単位で見ていく
@@ -309,10 +306,7 @@ UINT DocPageParamGet( PINT piMozi, PINT piByte )
 			dMozis += itLine->vcLine.size( );	//	文字数に改行は含まない
 			dBytes += itLine->iByteSz;
 		}
-
-#ifdef PAGE_DELAY_LOAD
 	}
-#endif
 
 	if( piMozi )	*piMozi = dMozis;
 	if( piByte )	*piByte = dBytes;
@@ -343,13 +337,11 @@ UINT DocPageByteCount( FILES_ITR itFile, INT dPage, PINT pMozi, PINT pByte )
 
 	if( 0 > dPage ){	dPage = gixFocusPage;	}
 
-#ifdef PAGE_DELAY_LOAD
 	//	もし頁展開前に呼ばれてたら
 	if( itFile->vcCont.at( dPage ).ptRawData )
 	{
 		MessageBox( NULL, TEXT("DocPageByteCount"), TEXT("DELAY_LOAD"), MB_OK );
 	}
-#endif
 
 	iBytes = 0;
 	iMozis = 0;
@@ -727,16 +719,11 @@ BOOLEAN NowPageInfoGet( UINT iTgtPage, LPPAGEINFOS pstInfo )
 		}
 	}
 
-#ifdef PAGE_DELAY_LOAD
 	//	この情報は常に返す
 	return (gitFileIt->vcCont.at( iTgtPage ).ptRawData ? TRUE : FALSE);
-#else
-	return FALSE;
-#endif
 }
 //-------------------------------------------------------------------------------------------------
 
-#ifdef PAGE_DELAY_LOAD
 /*!
 	指定ファイルの指定頁は読込ディレイしているか
 	@param[in]	itFile	指定ファイル
@@ -748,8 +735,6 @@ BOOLEAN PageIsDelayed( FILES_ITR itFile, UINT dPage )
 	return (itFile->vcCont.at( dPage ).ptRawData ? TRUE : FALSE);
 }
 //-------------------------------------------------------------------------------------------------
-
-#endif
 
 /*!
 	ONLINE構造体をクルヤーする

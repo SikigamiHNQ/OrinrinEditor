@@ -20,6 +20,17 @@ If not, see <http://www.gnu.org/licenses/>.
 
 //	注意・コマンドのリソースＩＤ番号は変更不可！
 
+
+//	TODO:	BIG_TEXT_SEPARATE	頁区切りのないTXTかどうかを確認する・もしそうなら適当なところで分ける
+//			ASTでないなら内容確認して、区切りがあるかどうか確認。１００行以上あり、かつ区切りがないなら、巨大テキストとみなす
+//			この場合は、巨大ファイルなので分割読込するか、やめるかにする。
+//			同じ所に、ｔｘｔをｍｌｔにしてファイルつくって、そこに出力し直して、これを開き直す？
+//			４０行以上かつ４行以上の空白改行があれば、そこで分割する
+
+
+
+
+
 //	TODO:	カーソル位置から左右を入れ替える。左右配置に使う。
 //改行のみの行で囲まれた範囲を対象。
 
@@ -266,7 +277,6 @@ If not, see <http://www.gnu.org/licenses/>.
 //	TODO:	ＯＫ？	空白の表示非表示をメモリする
 //	TODO:	ＯＫ？	合成するとき、上絵の周囲を白ヌキする機能
 //	TODO:	ＯＫ？	レイヤボックス白ヌキ、１６・２２とか、いくつかパヤーン作っておく
-//	TODO:	ＯＫ？	中CLICKで、開いてるファイル閉じる
 //	TODO:	ＯＫ？	MLT検索、文字列ないなら検索しないようにする
 //	TODO:	ＯＫ？	viewer側の表示色変更・背景とか
 //	TODO:	ＯＫ？	選択範囲をASTの頁名にする機能	IDM_PAGENAME_SELASSIGN
@@ -528,7 +538,15 @@ ASDファイル　　壱行が壱コンテンツ
 					未ロードの頁を統合したら、内容が消えるのを修正
 2014/04/01	0.33	今日のヒント機能を追加
 					本文の単語検索機能を実装。多分イケてる。
-					文字化けする機種依存文字を、ユニコード数値参照としてコピー出来るようにしてみた（場当たり的対応）
+					したらば仕様変更による文字化けする機種依存文字を、ユニコード数値参照としてコピー出来るようにしてみた（場当たり的対応）
+2015/01/23	0.34	枠編集で、幅０になるような指定がされるとアプリ毎ブッ飛ぶのを修正。ただし枠構造はおかしくなる。
+					ASTでもMLTでもなく、１００行以上あるファイル（多分ベタテキスト）について、分割して取り込む機能を追加
+					　（分割条件）４０行以降で４行以上の空きがあるか、１００行以降で１行以上の空きがあるか、２５６行以上続いている
+					MLT2HTMLを使ったHTMLエクスポート機能を追加
+					したらば仕様変更による文字化け文字の拡大に対応。多分いける気がする。
+2015/01/26	0341	分割読込したらぶっとぶ場合があるのを修正
+
+機種依存文字のバイトカウントを反映するのは、アプリ再起動が必要
 
 
 更新日時注意
@@ -631,27 +649,34 @@ static TCHAR		gatIniPath[MAX_PATH];	//!<	ＩＮＩファイルの位置
 EXTERNED INT		gbTmpltDock;	//!<	テンプレのドッキング
 
 static list<OPENHIST>	gltOpenHist;	//!<	ファイル開いた履歴・
-EXTERNED HMENU	ghHistyMenu;			//!<	履歴表示する部分・動的に内容作成せないかん
+EXTERNED HMENU		ghHistyMenu;		//!<	履歴表示する部分・動的に内容作成せないかん
+
+
+static BOOLEAN		gbDummy;		//
+
+#ifdef BIG_TEXT_SEPARATE
+static BOOLEAN		gbSeparateMod;	//!<	分割読込したタブに変更マーク必要
+#endif
 
 #ifdef FIND_STRINGS
-extern  HWND	ghFindDlg;		//	検索ダイヤログのハンドル
+extern  HWND		ghFindDlg;		//	検索ダイヤログのハンドル
 #endif
-extern  HWND	ghMoziWnd;		//	文字ＡＡ変換ダイヤログのハンドル
+extern  HWND		ghMoziWnd;		//	文字ＡＡ変換ダイヤログのハンドル
 
-extern  HWND	ghMaaFindDlg;	//	MAA検索ダイヤログハンドル
+extern  HWND		ghMaaFindDlg;	//	MAA検索ダイヤログハンドル
 
-extern  UINT	gdClickDrt;		//	ドラフトボードクルックスタイル
-extern  UINT	gdSubClickDrt;	//
+extern  UINT		 gdClickDrt;	//	ドラフトボードクルックスタイル
+extern  UINT		gdSubClickDrt;	//
 
-extern  HWND	ghViewWnd;		//	ビュー
+extern  HWND		ghViewWnd;		//	ビュー
 
-extern  UINT	gdGridXpos;		//	グリッド線のＸ間隔
-extern  UINT	gdGridYpos;		//	グリッド線のＹ間隔
-extern  UINT	gdRightRuler;	//	右線の位置ドット
-extern  UINT	gdUnderRuler;	//	下線の位置行数
+extern  UINT		 gdGridXpos;	//	グリッド線のＸ間隔
+extern  UINT		 gdGridYpos;	//	グリッド線のＹ間隔
+extern  UINT		gdRightRuler;	//	右線の位置ドット
+extern  UINT		gdUnderRuler;	//	下線の位置行数
 
 #ifdef SPMOZI_ENCODE
-extern  UINT	gbSpMoziEnc;	//!<	機種依存文字を数値参照コピーする
+extern  UINT		gbSpMoziEnc;	//!<	機種依存文字を数値参照コピーする
 #endif
 //-------------------------------------------------------------------------------------------------
 
@@ -836,6 +861,12 @@ INT APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 	gbUniPad = 0;
 
 	gbDockTmplView = TRUE;
+
+	gbDummy = 0;
+
+#ifdef BIG_TEXT_SEPARATE
+	gbSeparateMod = FALSE;	//	分割読込したタブに変更マーク必要
+#endif
 
 #ifdef WORK_LOG_OUT
 	iCode = InitParamValue( INIT_LOAD, VL_WORKLOG, 0 );
@@ -1588,17 +1619,22 @@ BOOLEAN Cls_OnCreate( HWND hWnd, LPCREATESTRUCT lpCreateStruct )
 */
 VOID Cls_OnCommand( HWND hWnd, INT id, HWND hWndCtl, UINT codeNotify )
 {
-	INT		iRslt;
-
+#ifdef NDEBUG
+	 INT	iRslt;
+#endif
 	//	キーボードショートカットは、そのときACTIVEなウインドウに行く
 
 	switch( id )
 	{
 		case  IDM_ABOUT:	DialogBox( ghInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About );	return;
 
-		case  IDM_EXIT:	//	WM_CLOSEとの整合性に注意セヨ
+		case IDM_EXIT:	//	WM_CLOSEとの整合性に注意セヨ
+#ifdef NDEBUG
 			iRslt = DocFileCloseCheck( hWnd, TRUE );
 			if( iRslt ){	DestroyWindow( hWnd );	}
+#else
+			DestroyWindow( hWnd );
+#endif
 			return;
 	}
 
@@ -2086,7 +2122,7 @@ void Cls_OnCopyData( HWND hWnd, HWND hWndFrom, PCOPYDATASTRUCT pstCopyData )
 
 	TRACE( TEXT("COPYDATA[%s]"), atBuff );
 
-	DocDoOpenFile( hWnd, atBuff );	//	それを開く
+	DocDoOpenFile( hWnd, atBuff );	//	別に起動したやつから飛んできたファイルを開く
 
 	return;
 }
@@ -2532,6 +2568,7 @@ HRESULT InitParamString( UINT dMode, UINT dStyle, LPTSTR ptStr )
 		case VS_FONT_NAME:		StringCchCopy( atKeyName, SUB_STRING, TEXT("FontName") );		break;
 		case VS_UNI_USE_LOG:	StringCchCopy( atKeyName, SUB_STRING, TEXT("UniUseLog") );		break;
 		case VS_RGUIDE_MOZI:	StringCchCopy( atKeyName, SUB_STRING, TEXT("RightGuideMozi") );	break;
+		case VS_EXT_M2H_PATH:	StringCchCopy( atKeyName, SUB_STRING, TEXT("ExtM2HPath") );		break;
 		default:	return E_INVALIDARG;
 	}
 
@@ -2983,6 +3020,45 @@ HRESULT OptionDialogueOpen( VOID )
 //-------------------------------------------------------------------------------------------------
 
 /*!
+	外部ツールMLT2HTMLのパス設定
+	@param[in]	hDlg	ダイヤログハンドル
+*/
+VOID OptionExtMlt2HtmlPath( HWND hDlg )
+{
+	OPENFILENAME	stOpenFile;
+//	HWND	hEditWnd;
+	 BOOLEAN	bOpened;
+	TCHAR	atFilePath[MAX_PATH], atFileName[MAX_STRING];
+
+
+	ZeroMemory( &stOpenFile, sizeof(OPENFILENAME) );
+
+	StringCchCopy( atFilePath, MAX_PATH, TEXT("MLT2HTML.exe") );
+	ZeroMemory( atFileName,  sizeof(atFileName) );
+
+	stOpenFile.lStructSize     = sizeof(OPENFILENAME);
+	stOpenFile.hwndOwner       = hDlg;
+	stOpenFile.lpstrFilter     = TEXT("実行ファイル\0*.exe\0\0");
+	stOpenFile.lpstrFile       = atFilePath;
+	stOpenFile.nMaxFile        = MAX_PATH;
+	stOpenFile.lpstrFileTitle  = atFileName;
+	stOpenFile.nMaxFileTitle   = MAX_STRING;
+	stOpenFile.lpstrTitle      = TEXT("実行ファイルを指定しておくれ");
+	stOpenFile.Flags           = OFN_EXPLORER | OFN_HIDEREADONLY;
+	stOpenFile.lpstrDefExt     = TEXT("exe");
+
+	//ここで FileOpenDialogue を出す
+	bOpened = GetOpenFileName( &stOpenFile );
+
+	if( !(bOpened) ){	 return;	}	//	キャンセルしてたら何もしない
+
+	SetDlgItemText( hDlg, IDE_EXTERNAL_M2H_PATH, atFilePath );
+
+	return;
+}
+//-------------------------------------------------------------------------------------------------
+
+/*!
 	おぷしょんダイヤログのプロシージャ
 	@param[in]	hDlg		ダイヤログハンドル
 	@param[in]	message		ウインドウメッセージの識別番号
@@ -2998,7 +3074,7 @@ INT_PTR CALLBACK OptionDlgProc( HWND hDlg, UINT message, WPARAM wParam, LPARAM l
 	UINT	id;
 	INT		dValue, iBuff;
 	TCHAR	atBuff[SUB_STRING];
-//	TCHAR	atPath[MAX_PATH];
+	TCHAR	atPath[MAX_PATH];
 
 	static LPTSTR	ptFontName;
 	CHOOSEFONT	stChooseFont;
@@ -3154,6 +3230,11 @@ INT_PTR CALLBACK OptionDlgProc( HWND hDlg, UINT message, WPARAM wParam, LPARAM l
 			}
 			CheckRadioButton( hDlg, IDRB_DRTSUB_INS_EDIT, IDRB_DRTSUB_CLIP_SJIS, id );
 
+			//	MLT2HTMLのパス
+			ZeroMemory( atPath, sizeof(atPath) );
+			InitParamString( INIT_LOAD, VS_EXT_M2H_PATH, atPath );
+			SetDlgItemText( hDlg, IDE_EXTERNAL_M2H_PATH, atPath );
+
 			return (INT_PTR)TRUE;
 
 		case WM_COMMAND:
@@ -3171,6 +3252,10 @@ INT_PTR CALLBACK OptionDlgProc( HWND hDlg, UINT message, WPARAM wParam, LPARAM l
 					{
 						StringCchCopy( ptFontName, LF_FACESIZE, stLogFont.lfFaceName );
 					}
+					break;
+
+				case IDB_EXTERNAL_M2H_SEL:	//	外部ツールのパス設定のアレ
+					OptionExtMlt2HtmlPath( hDlg );
 					break;
 
 				case IDB_APPLY://適用
@@ -3319,7 +3404,9 @@ INT_PTR CALLBACK OptionDlgProc( HWND hDlg, UINT message, WPARAM wParam, LPARAM l
 					else{	gdSubClickDrt = MAA_INSERT;	}	//	IDRB_DRTSUB_INS_EDIT
 					InitParamValue( INIT_SAVE, VL_DRT_MCLICK, gdSubClickDrt );
 
-
+					//	MLT2HTMLのパス
+					GetDlgItemText( hDlg, IDE_EXTERNAL_M2H_PATH, atPath, MAX_PATH );
+					InitParamString( INIT_SAVE, VS_EXT_M2H_PATH, atPath );
 
 					//	ＯＫなら閉じちゃう
 					if( IDOK == id ){	EndDialog( hDlg, IDOK );	}
@@ -3444,9 +3531,7 @@ VOID Ftb_OnMButtonUp( HWND hWnd, INT x, INT y, UINT flags )
 
 	TRACE( TEXT("FTAB start TAB [%d] [%d x %d]"), curSel, x, y );
 
-#ifdef MIDDLE_CLICK_CLOSE
 	MultiFileTabClose( curSel );
-#endif
 
 	return;
 }
@@ -3474,6 +3559,15 @@ HRESULT MultiFileTabFirst( LPTSTR ptName )
 	TabCtrl_DeleteItem( ghFileTabWnd, 0 );
 
 	TabCtrl_SetCurSel( ghFileTabWnd, 0 );
+
+#ifdef BIG_TEXT_SEPARATE
+	if( gbSeparateMod )	//	分割読込したので変更マークを付ける
+	{
+		DocModifyContent( 1 );
+		gbSeparateMod = FALSE;
+	}
+	//	タブができあがってから処理する必要がある
+#endif
 
 	return S_OK;
 }
@@ -3505,6 +3599,15 @@ HRESULT MultiFileTabAppend( LPARAM dNumber, LPTSTR ptName )
 	TabCtrl_SetCurSel( ghFileTabWnd, iCount );
 
 //	ここでファイルオーポンを記録すると、関係無いのまで無差別に記録してまう
+
+#ifdef BIG_TEXT_SEPARATE
+	if( gbSeparateMod )	//	分割読込したので変更マークを付ける
+	{
+		DocModifyContent( 1 );
+		gbSeparateMod = FALSE;
+	}
+	//	タブができあがってから処理する必要がある
+#endif
 
 	return S_OK;
 }
@@ -3717,9 +3820,46 @@ HRESULT ViewingFontGet( LPLOGFONT pstLogFont )
 }
 //-------------------------------------------------------------------------------------------------
 
+#ifdef BIG_TEXT_SEPARATE
+/*!
+	巨大ファイルを開くときの処理について問合せダイヤログ
+	@param[in]	dStyle	メッセージタイプ・１巨大ファイル問合せ　２改行無しエラー
+	@return	０なにもしない　１分割モード　２読込中止
+*/
+UINT DocHugeFileTreatment( UINT dStyle )
+{
+	 INT	iRslt = IDNO;
+	UINT	dMode;
+	BOOL	bVisible;
 
+	bVisible = IsWindowVisible( ghMainWnd );
 
+	if( 1 == dStyle )
+	{
+		iRslt = MessageBox( bVisible ? ghMainWnd : NULL, TEXT("大きなファイルを開こうとしてるよ。適当に分割して読み込むかい？\r\n\r\n　　はい：分割読込（すぐ保存してね）\t\n　　いいえ：そのまま読込（時間かかるかも）\r\n　　キャンセル：読込中止"), TEXT("一枚板のテキストっぽいよ"), MB_YESNOCANCEL | MB_ICONQUESTION );
+		//	有効になってないウインドウハンドルを親につかうとぶっとぶ
 
+		switch( iRslt )
+		{
+			case IDYES:	dMode = 1;	gbSeparateMod = TRUE;	break;	//	分割
+			case IDNO:	dMode = 0;	break;	//	なにもしない
+			default:	dMode = 2;	break;	//	読込中止
+		}
+	}
+	else if( 2 == dStyle )
+	{
+		MessageBox( bVisible ? ghMainWnd : NULL, TEXT("ファイルの中身がなんかおかしいよ。読込を中止するよ。"), TEXT("改行がないかも"), MB_OK | MB_ICONERROR );
+		dMode = 2;
+	}
+	else
+	{
+		dMode = 2;
+	}
+
+	return dMode;
+}
+//-------------------------------------------------------------------------------------------------
+#endif
 
 #ifdef USE_NOTIFYICON
 

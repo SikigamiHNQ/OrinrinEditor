@@ -101,7 +101,7 @@ HRESULT DocFileOpen( HWND hWnd )
 
 	if( !(bOpened) ){	return  E_ABORT;	}	//	キャンセルしてたら何もしない
 
-	DocDoOpenFile( hWnd, atFilePath );	//	開いて中身展開
+	DocDoOpenFile( hWnd, atFilePath );	//	ファイルを指定して読み込む時
 
 	return S_OK;
 }
@@ -128,7 +128,7 @@ HRESULT DocDoOpenFile( HWND hWnd, LPTSTR ptFile )
 		}
 	}
 
-	dNumber = DocFileInflate( ptFile );	//	開いて中身展開
+	dNumber = DocFileInflate( ptFile  );	//	ファイル名を受けて、開いて中身展開
 	if( !(dNumber) )
 	{
 		MessageBox( hWnd, TEXT("ファイルを開けなかったよ"), TEXT("お燐からのお知らせ"), MB_OK | MB_ICONERROR );
@@ -816,6 +816,64 @@ HRESULT DocImageSave( HWND hWnd, UINT bStyle, HFONT hFont )
 	SelectFont( hMemDC, hOldFont );
 
 	DeleteDC( hMemDC );
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+
+/*!
+	MLT2HTMLを使って、今開いているファイルをHTMLエクスポート
+	@param[in]	hWnd	親にするウインドウハンドル
+	@return		HRESULT	終了状態コード
+*/
+HRESULT DocHtmlExport( HWND hWnd )
+{
+	TCHAR	atFilePath[MAX_PATH], atCommandLine[BIG_STRING + 10];
+	TCHAR	atExePath[MAX_PATH];
+
+	 PROCESS_INFORMATION	stProInfo;
+	 STARTUPINFO	stStartInfo;
+
+
+
+	ZeroMemory( atFilePath,  sizeof(atFilePath) );
+
+	StringCchCopy( atFilePath, MAX_PATH, (*gitFileIt).atFileName );
+
+	//	今開いているファイルが未保存なら、チューシ
+	if( gitFileIt->dModify || ( NULL == atFilePath[0] ) )
+	{
+		MessageBox( hWnd, TEXT("先にファイルを保存してからにしてね。"), TEXT("ファイルが保存されてないよ"), MB_OK | MB_ICONERROR );
+		return E_ABORT;
+	}
+	PathQuoteSpaces( atFilePath );
+
+	ZeroMemory( atExePath, sizeof(atExePath) );
+	InitParamString( INIT_LOAD, VS_EXT_M2H_PATH, atExePath );
+	if( NULL == atExePath[0] )
+	{
+		MessageBox( hWnd, TEXT("MLT2HTML.exe を設定しておいてね。"), TEXT("外部ツールが無いよ"), MB_OK | MB_ICONERROR );
+		return E_ABORT;
+	}
+	PathQuoteSpaces( atExePath );
+
+	ZeroMemory( atCommandLine,  sizeof(atCommandLine) );
+
+	StringCchPrintf( atCommandLine, BIG_STRING + 10, TEXT("%s %s"), atExePath, atFilePath );
+	//	パスに含まれるスペースがあるとおかしくなったらコマルのでクオートしておく
+
+	ZeroMemory( &stProInfo, sizeof(PROCESS_INFORMATION) );
+
+	ZeroMemory( &stStartInfo, sizeof(STARTUPINFO) );
+	stStartInfo.cb = sizeof(STARTUPINFO);
+
+	CreateProcess( NULL, atCommandLine, NULL, NULL, FALSE, NORMAL_PRIORITY_CLASS, NULL, NULL, &stStartInfo, &stProInfo );
+
+	CloseHandle( stProInfo.hThread );
+
+	WaitForSingleObject( stProInfo.hProcess, INFINITE );	//	無限ウエイト・あぶないかも？
+
+	CloseHandle( stProInfo.hProcess );
 
 	return S_OK;
 }
