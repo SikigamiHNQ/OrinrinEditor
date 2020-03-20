@@ -48,7 +48,7 @@ If not, see <http://www.gnu.org/licenses/>.
 
 //!	EOFÉ}Å[ÉN
 #define EOF_SIZE	5
-CONST  TCHAR	gatEOF[] = TEXT("[EOF]");
+static CONST  TCHAR	gatEOF[] = TEXT("[EOF]");
 #define EOF_WIDTH	39
 
 

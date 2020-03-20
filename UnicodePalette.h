@@ -31,7 +31,7 @@ typedef struct tagUNICODENAME
 
 //	余り使わない所のジャンプは外してもいいか
 #define UNIGROUP_MAX	153
-CONST UNICODENAME	gstUniGroupName[] = {
+static CONST UNICODENAME	gstUniGroupName[] = {
 
 	{ 0x0000, TEXT("基本ラテン文字 （ASCII互換） / Basic Latin [0x0000 ( 0 )]") },
 	{ 0x0080, TEXT("ラテン1補助 / Latin-1 Supplement [0x0080 ( 128 )]") },
@@ -193,7 +193,7 @@ CONST UNICODENAME	gstUniGroupName[] = {
 
 
 #define UNINAME_MAX	15954
-CONST UNICODENAME	gstUniMoziName[] = {
+static CONST UNICODENAME	gstUniMoziName[] = {
 
 	{ 0x0000, TEXT("<control>NULL") },
 	{ 0x0001, TEXT("<control>START OF HEADING") },
