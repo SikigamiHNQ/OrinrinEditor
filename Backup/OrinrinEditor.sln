@@ -1,0 +1,32 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual C++ Express 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OrinrinEditor", "OrinrinEditor.vcproj", "{30415D19-CFC4-446B-A442-08C5ED7E789A}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OrinrinViewer", "OrinrinViewer.vcproj", "{58061F7A-E85E-438D-863B-C6732E32BA9C}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OrinrinCollector", "OrinrinCollector.vcproj", "{B1B65241-BB57-413F-BC5F-59537FB826BE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{30415D19-CFC4-446B-A442-08C5ED7E789A}.Debug|Win32.ActiveCfg = Debug|Win32
+		{30415D19-CFC4-446B-A442-08C5ED7E789A}.Debug|Win32.Build.0 = Debug|Win32
+		{30415D19-CFC4-446B-A442-08C5ED7E789A}.Release|Win32.ActiveCfg = Release|Win32
+		{30415D19-CFC4-446B-A442-08C5ED7E789A}.Release|Win32.Build.0 = Release|Win32
+		{58061F7A-E85E-438D-863B-C6732E32BA9C}.Debug|Win32.ActiveCfg = Debug|Win32
+		{58061F7A-E85E-438D-863B-C6732E32BA9C}.Debug|Win32.Build.0 = Debug|Win32
+		{58061F7A-E85E-438D-863B-C6732E32BA9C}.Release|Win32.ActiveCfg = Release|Win32
+		{58061F7A-E85E-438D-863B-C6732E32BA9C}.Release|Win32.Build.0 = Release|Win32
+		{B1B65241-BB57-413F-BC5F-59537FB826BE}.Debug|Win32.ActiveCfg = Debug|Win32
+		{B1B65241-BB57-413F-BC5F-59537FB826BE}.Debug|Win32.Build.0 = Debug|Win32
+		{B1B65241-BB57-413F-BC5F-59537FB826BE}.Release|Win32.ActiveCfg = Release|Win32
+		{B1B65241-BB57-413F-BC5F-59537FB826BE}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
