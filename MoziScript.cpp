@@ -1,6 +1,6 @@
-/*! @file
-	@brief ����AA�X�N���v�g�̖ʓ|�݂܂�
-	���̃t�@�C���� MoziScript.cpp �ł��B
+﻿/*! @file
+	@brief 文字AAスクリプトの面倒みます
+	このファイルは MoziScript.cpp です。
 	@author	SikigamiHNQ
 	@date	2011/10/26
 */
@@ -23,18 +23,18 @@ If not, see <http://www.gnu.org/licenses/>.
 
 /*
 
-���䑋�͍őO�ʌŒ�
-�A�C�R���̐���������₷��
-�E�N���ɂ����
-�A�C�R���f�U�C��������H
+制御窓は最前面固定
+アイコンの説明分かりやすく
+右クリにいれる
+アイコンデザインかえる？
 
 
-�`�r�s�A�`�r�c�ɑΉ��o����悤��
-���炩���߁A�����ɑΉ�����AA��ǂݍ���ł����E���O�Ƀt�@�C���𕡐��o�^�o����
-���e��SQL�I���������ŁE�Ή������ƁA�`�`�C���[�W��ێ����Ă���
-�t�@�C���g�ݍ��킹�ς��čč\���ł���Ƃ�
-�����Z�b�g�ێ��ł���悤�ɁH
-�t�@�C���͂h�m�h�ɂ܂Ƃ߂�B
+ＡＳＴ、ＡＳＤに対応出来るように
+あらかじめ、文字に対応するAAを読み込んでおく・事前にファイルを複数登録出来る
+内容はSQLオンメモリで・対応文字と、ＡＡイメージを保持しておく
+ファイル組み合わせ変えて再構成できるとか
+文字セット保持できるように？
+ファイルはＩＮＩにまとめる。
 [Mozi]
 count=2
 file0=....
@@ -43,19 +43,19 @@ file1=....
 use1=0
 
 
-���䑋����
-���͂��ꂽ�����́A�땶�����Ɋo���Ă����B����ʒu���e�������ɕێ�
-���͓��e���m�肵����A���C���{�b�N�X�̏������[�`���ŏ�������
-�\���g�E�{�[�_�[�n�m�n�e�e
+制御窓だす
+入力された文字は、壱文字毎に覚えておく。左上位置を各文字毎に保持
+入力内容が確定したら、レイヤボックスの書込ルーチンで処理する
+表示枠・ボーダーＯＮＯＦＦ
 
-���Ԓ����ł���悤�ɁB�A�����s�͈�s�ÂJ����
+字間調整できるように。連続改行は壱行づつ開ける
 
-�ʏ탂�[�h�E���͂d�c�h�s�A�\���X�V�Ɗm��o�@�����E���͂��čX�V�A�ʒu���߂Ċm��
-�\���g�́A�ҏW�G���A�Ƀt���[�e�B���O�X�^�e�B�b�N������ňꖇ��
-�X�^�e�B�b�N�̓T�u�N���X�Ń}�E�X�_�E���Ƃ��R���e�L�X�g�Ԃ�ǂ�
-�h���b�O�ňړ��E�R���e�L�X�g�ɂ͊m��E�X�V�ł�����
-�����ƕ����̊Ԃ𓧉߂��邩���Ȃ����I��
-���߂Ȃ�땶�����A���Ȃ��Ȃ�ꖇ�ɒ����ăJ�L�R����΂���
+通常モード・入力ＥＤＩＴ、表示更新と確定バァラン・入力して更新、位置決めて確定
+表示枠は、編集エリアにフローティングスタティックあたりで一枚板
+スタティックはサブクラスでマウスダウンとかコンテキストぶんどる
+ドラッグで移動・コンテキストには確定・更新でいいか
+文字と文字の間を透過するかしないか選択
+透過なら壱文字ずつ、しないなら一枚板に直してカキコすればいい
 
 
 IDD_MOZI_SCRIPT_DLG
@@ -86,30 +86,30 @@ static  TBBUTTON	gstMztbInfo[] = {
 
 typedef struct tagMOZIITEM
 {
-	TCHAR	cch;	//!<	����
-	LPTSTR	ptAA;	//!<	�����`�`
+	TCHAR	cch;	//!<	文字
+	LPTSTR	ptAA;	//!<	文字ＡＡ
 
-	INT		iLeft;	//!<	���h�b�g
-	INT		iTop;	//!<	��h�b�g
-	INT		iWidth;	//!<	�ő�h�b�g��
-	INT		iLine;	//!<	�g�p�s��
+	INT		iLeft;	//!<	左ドット
+	INT		iTop;	//!<	上ドット
+	INT		iWidth;	//!<	最大ドット幅
+	INT		iLine;	//!<	使用行数
 
 } MOZIITEM, *LPMOZIITEM;
 //-------------------------------------------------------------------------------------------------
 
 
-extern FILES_ITR	gitFileIt;		//!<	�����Ă�t�@�C���̖{��
-//#define gstFile	(*gitFileIt)		//!<	�C�e���[�^���\���̂ƌ��Ȃ�
+extern FILES_ITR	gitFileIt;		//!<	今見てるファイルの本体
+//#define gstFile	(*gitFileIt)		//!<	イテレータを構造体と見なす
 
-extern INT			gixFocusPage;	//	���ڒ��̃y�[�W�E�O�C���f�b�N�X
+extern INT			gixFocusPage;	//	注目中のページ・０インデックス
 
-extern HFONT		ghAaFont;		//	AA�p�t�H���g
+extern HFONT		ghAaFont;		//	AA用フォント
 
-extern  BYTE		gbAlpha;		//	�����x
+extern  BYTE		gbAlpha;		//	透明度
 
-extern  HWND		ghViewWnd;		//	�ҏW�r���[�E�C���h�E�̃n���h��
-extern INT			gdHideXdot;		//	���̉B�ꕔ��
-extern INT			gdViewTopLine;	//	�\�����̍ŏ㕔�s�ԍ�
+extern  HWND		ghViewWnd;		//	編集ビューウインドウのハンドル
+extern INT			gdHideXdot;		//	左の隠れ部分
+extern INT			gdViewTopLine;	//	表示中の最上部行番号
 
 
 
@@ -121,33 +121,33 @@ static  HWND		ghMoziToolBar;	//!<
 static HIMAGELIST	ghMoziImgLst;	//!<	
 
 static  ATOM		gMoziViewAtom;
-static  HWND		ghMoziViewWnd;	//!<	�\���X�^�e�B�b�N
+static  HWND		ghMoziViewWnd;	//!<	表示スタティック
 
-static  HWND		ghTextWnd;		//!<	��������͘g
-static  HWND		ghIsolaLvWnd;	//!<	�A�h�o���Y�h�����I�����X�g�r���[
-static  HWND		ghSettiLvWnd;	//!<	�ݒ胊�X�g�r���[
+static  HWND		ghTextWnd;		//!<	文字列入力枠
+static  HWND		ghIsolaLvWnd;	//!<	アドバンズド文字選択リストビュー
+static  HWND		ghSettiLvWnd;	//!<	設定リストビュー
 
-static POINT		gstViewOrigin;	//!<	�r���[�̍���E�C���h�E�ʒu�E
-static POINT		gstOffset;		//!<	�r���[���ォ��́A�{�b�N�X�̑��Έʒu
-static POINT		gstFrmSz;		//!<	�E�C���h�E�G�b�W����`��̈�܂ł̃I�t�Z�b�g
+static POINT		gstViewOrigin;	//!<	ビューの左上ウインドウ位置・
+static POINT		gstOffset;		//!<	ビュー左上からの、ボックスの相対位置
+static POINT		gstFrmSz;		//!<	ウインドウエッジから描画領域までのオフセット
 
-static INT			gdToolBarHei;	//!<	�c�[���o�[����
+static INT			gdToolBarHei;	//!<	ツールバー太さ
 
-static INT			gdMoziInterval;	//!<	�����Ԋu�E���F�L����@���F�k�܂�
+static INT			gdMoziInterval;	//!<	文字間隔・正：広がる　負：縮まる
 
-static INT			gdNowMode;		//!<	�O�ʏ�@�P�A�h�o���Y�h�@0x10�ݒ�
+static INT			gdNowMode;		//!<	０通常　１アドバンズド　0x10設定
 
-static INT			gdAvrWidth;		//!<	���ϐ�L��
-static INT			gdMaxLine;		//!<	�ő��L�s
+static INT			gdAvrWidth;		//!<	平均占有幅
+static INT			gdMaxLine;		//!<	最大占有行
 
-static LPTSTR		gptMzBuff;		//!<	�e�L�X�g�g���當���m�ۘg�E��
-static DWORD		gcchMzBuf;		//!<	�m�ۘg�̕������E�o�C�g����Ȃ���
+static LPTSTR		gptMzBuff;		//!<	テキスト枠から文字確保枠・可変
+static DWORD		gcchMzBuf;		//!<	確保枠の文字数・バイトじゃないぞ
 
-static BOOLEAN		gbQuickClose;	//!<	�\��t�����炷������
+static BOOLEAN		gbQuickClose;	//!<	貼り付けたらすぐ閉じる
 
 static WNDPROC		gpfOrigMoziEditProc;	//!<	
 
-static sqlite3		*gpMoziTable;	//!<	�����ꗗ�̃I���������f�^�x
+static sqlite3		*gpMoziTable;	//!<	文字一覧のオンメモリデタベ
 
 static vector<MOZIITEM>	gvcMoziItem;
 
@@ -197,10 +197,10 @@ HRESULT	MoziSqlItemDeleteAll( VOID );						//!<
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	�����X�N���v�g��INI�t�@�C�����m�ہE�E�C���h�E�N���X�o�^�E�A�v���N���シ���Ă΂��
-	@param[in]	ptCurrent	��f�B���N�g��
-	@param[in]	hInstance	�C���X�^���X�n���h��
-	@return		HRESULT	�I����ԃR�[�h
+	文字スクリプトのINIファイル名確保・ウインドウクラス登録・アプリ起動後すぐ呼ばれる
+	@param[in]	ptCurrent	基準ディレクトリ
+	@param[in]	hInstance	インスタンスハンドル
+	@return		HRESULT	終了状態コード
 */
 INT MoziInitialise( LPTSTR ptCurrent, HINSTANCE hInstance )
 {
@@ -233,7 +233,7 @@ INT MoziInitialise( LPTSTR ptCurrent, HINSTANCE hInstance )
 	StringCchCopy( gatMoziIni, MAX_PATH, ptCurrent );
 	PathAppend( gatMoziIni, MZCX_INI_FILE );
 
-//�����X�N���v�g���䑋
+//文字スクリプト制御窓
 	ZeroMemory( &wcex, sizeof(WNDCLASSEX) );
 	wcex.cbSize			= sizeof(WNDCLASSEX);
 	wcex.style			= CS_HREDRAW | CS_VREDRAW;
@@ -255,34 +255,34 @@ INT MoziInitialise( LPTSTR ptCurrent, HINSTANCE hInstance )
 	ZeroMemory( &gstViewOrigin, sizeof(POINT) );
 	gdToolBarHei = 0;
 
-	//	�A�C�R���@�m��E�X�V�E�ݒ�E�A�h�o���Y�h
+	//	アイコン　確定・更新・設定・アドバンズド
 	ghMoziImgLst = ImageList_Create( 16, 16, ILC_COLOR24 | ILC_MASK, 4, 1 );
 
 	hImg = LoadBitmap( hInstance, MAKEINTRESOURCE( IDBMP_MOZI_WRITE ) );
 	hMsq = LoadBitmap( hInstance, MAKEINTRESOURCE( IDBMQ_PAGENAMECHANGE ) );
-	ImageList_Add( ghMoziImgLst, hImg, hMsq );	//	�m��
+	ImageList_Add( ghMoziImgLst, hImg, hMsq );	//	確定
 	DeleteBitmap( hImg );	DeleteBitmap( hMsq );
 
 	hImg = LoadBitmap( hInstance, MAKEINTRESOURCE( IDBMP_REFRESH ) );
 	hMsq = LoadBitmap( hInstance, MAKEINTRESOURCE( IDBMQ_REFRESH ) );
-	ImageList_Add( ghMoziImgLst, hImg, hMsq );	//	�X�V
+	ImageList_Add( ghMoziImgLst, hImg, hMsq );	//	更新
 	DeleteBitmap( hImg );	DeleteBitmap( hMsq );
 
 	hImg = LoadBitmap( hInstance, MAKEINTRESOURCE( IDBMP_SETTING ) );
 	hMsq = LoadBitmap( hInstance, MAKEINTRESOURCE( IDBMQ_SETTING ) );
-	ImageList_Add( ghMoziImgLst, hImg, hMsq );	//	�ݒ�
+	ImageList_Add( ghMoziImgLst, hImg, hMsq );	//	設定
 	DeleteBitmap( hImg );	DeleteBitmap( hMsq );
 
 	//hImg = LoadBitmap( hInstance, MAKEINTRESOURCE( IDBMP_MOZI_ADVANCE ) );
 	//hMsq = LoadBitmap( hInstance, MAKEINTRESOURCE( IDBMQ_MOZI_ADVANCE ) );
-	//ImageList_Add( ghMoziImgLst, hImg, hMsq );	//	�A�h�o���Y�h
+	//ImageList_Add( ghMoziImgLst, hImg, hMsq );	//	アドバンズド
 	//DeleteBitmap( hImg );	DeleteBitmap( hMsq );
 
-//	�I��������SQL���A�K����������Ă���
+//	オンメモリSQLを、ガワだけ作っておく
 	MoziSqlTableOpenClose( M_CREATE );
 
 
-//�����\����
+//文字表示窓
 	ZeroMemory( &wcex, sizeof(WNDCLASSEX) );
 	wcex.cbSize			= sizeof(WNDCLASSEX);
 	wcex.style			= CS_HREDRAW | CS_VREDRAW;
@@ -299,7 +299,7 @@ INT MoziInitialise( LPTSTR ptCurrent, HINSTANCE hInstance )
 
 	gMoziViewAtom = RegisterClassEx( &wcex );
 
-	//	�K���ɍ���Ă���
+	//	適当に作っておく
 	gptMzBuff = (LPTSTR)malloc( MAX_PATH * sizeof(TCHAR) );
 	ZeroMemory( gptMzBuff, MAX_PATH * sizeof(TCHAR) );
 	gcchMzBuf = MAX_PATH;
@@ -310,9 +310,9 @@ INT MoziInitialise( LPTSTR ptCurrent, HINSTANCE hInstance )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	�����X�N���v�g�E�C���h�E���
-	@param[in]	hInst	�C���X�^���X�n���h��
-	@param[in]	hPrWnd	���C���̃E�C���h�E�n���h��
+	文字スクリプトウインドウ作る
+	@param[in]	hInst	インスタンスハンドル
+	@param[in]	hPrWnd	メインのウインドウハンドル
 */
 HWND MoziScripterCreate( HINSTANCE hInst, HWND hPrWnd )
 {
@@ -342,9 +342,9 @@ HWND MoziScripterCreate( HINSTANCE hInst, HWND hPrWnd )
 
 	gdMoziInterval = 0;
 
-	//	�{�̃E�C���h�E
+	//	本体ウインドウ
 	ghMoziWnd = CreateWindowEx( WS_EX_TOOLWINDOW | WS_EX_TOPMOST, MOZISCRIPT_CLASS,
-		TEXT("����AA�ϊ�"), WS_POPUP | WS_CAPTION | WS_SYSMENU,
+		TEXT("文字AA转换"), WS_POPUP | WS_CAPTION | WS_SYSMENU,
 		rect.right, rect.top, MZ_WIDTH, MZ_HEIGHT, NULL, NULL, hInst, NULL );
 
 //	DragAcceptFiles( ghMoziWnd, FALSE );
@@ -353,16 +353,16 @@ HWND MoziScripterCreate( HINSTANCE hInst, HWND hPrWnd )
 
 	gbQuickClose = TRUE;
 
-	//	�c�[���o�[
+	//	ツールバー
 	ghMoziToolBar = CreateWindowEx( WS_EX_CLIENTEDGE, TOOLBARCLASSNAME, TEXT("mozitoolbar"), WS_CHILD | WS_VISIBLE | TBSTYLE_FLAT | TBSTYLE_LIST | TBSTYLE_TOOLTIPS, 0, 0, 0, 0, ghMoziWnd, (HMENU)IDTB_MZSCR_TOOLBAR, hInst, NULL );
 
-	if( 0 == gdToolBarHei )	//	���l���擾�Ȃ�
+	if( 0 == gdToolBarHei )	//	数値未取得なら
 	{
 		GetWindowRect( ghMoziToolBar, &rect );
 		gdToolBarHei = rect.bottom - rect.top;
 	}
 
-	//	�����c�[���`�b�v�X�^�C����ǉ�
+	//	自動ツールチップスタイルを追加
 	SendMessage( ghMoziToolBar, TB_SETEXTENDEDSTYLE, 0, TBSTYLE_EX_MIXEDBUTTONS );
 
 	SendMessage( ghMoziToolBar, TB_SETIMAGELIST, 0, (LPARAM)ghMoziImgLst );
@@ -370,65 +370,65 @@ HWND MoziScripterCreate( HINSTANCE hInst, HWND hPrWnd )
 
 	SendMessage( ghMoziToolBar, TB_BUTTONSTRUCTSIZE, (WPARAM)sizeof(TBBUTTON), 0 );
 
-	//	�c�[���`�b�v�������ݒ�E�{�^���e�L�X�g���c�[���`�b�v�ɂȂ�
-	StringCchCopy( atBuffer, MAX_STRING, TEXT("�����`�`�}��") );					gstMztbInfo[0].iString = SendMessage( ghMoziToolBar, TB_ADDSTRING, 0, (LPARAM)atBuffer );
-	StringCchCopy( atBuffer, MAX_STRING, TEXT("������X�V / �g�p�t�@�C���X�V") );	gstMztbInfo[1].iString = SendMessage( ghMoziToolBar, TB_ADDSTRING, 0, (LPARAM)atBuffer );
-	StringCchCopy( atBuffer, MAX_STRING, TEXT("�g�p�t�@�C���ݒ�") );				gstMztbInfo[2].iString = SendMessage( ghMoziToolBar, TB_ADDSTRING, 0, (LPARAM)atBuffer );
-//	StringCchCopy( atBuffer, MAX_STRING, TEXT("�A�h�o���Y�h") );					gstMztbInfo[4].iString = SendMessage( ghMoziToolBar, TB_ADDSTRING, 0, (LPARAM)atBuffer );
+	//	ツールチップ文字列を設定・ボタンテキストがツールチップになる
+	StringCchCopy( atBuffer, MAX_STRING, TEXT("文字ＡＡ插入") );					gstMztbInfo[0].iString = SendMessage( ghMoziToolBar, TB_ADDSTRING, 0, (LPARAM)atBuffer );
+	StringCchCopy( atBuffer, MAX_STRING, TEXT("文字列更新 / 使用文件更新") );	gstMztbInfo[1].iString = SendMessage( ghMoziToolBar, TB_ADDSTRING, 0, (LPARAM)atBuffer );
+	StringCchCopy( atBuffer, MAX_STRING, TEXT("使用文件設定") );				gstMztbInfo[2].iString = SendMessage( ghMoziToolBar, TB_ADDSTRING, 0, (LPARAM)atBuffer );
+//	StringCchCopy( atBuffer, MAX_STRING, TEXT("アドバンズド") );					gstMztbInfo[4].iString = SendMessage( ghMoziToolBar, TB_ADDSTRING, 0, (LPARAM)atBuffer );
 
-	SendMessage( ghMoziToolBar , TB_ADDBUTTONS, (WPARAM)TB_ITEMS, (LPARAM)&gstMztbInfo );	//	�c�[���o�[�Ƀ{�^����}��
+	SendMessage( ghMoziToolBar , TB_ADDBUTTONS, (WPARAM)TB_ITEMS, (LPARAM)&gstMztbInfo );	//	ツールバーにボタンを挿入
 
-	SendMessage( ghMoziToolBar , TB_AUTOSIZE, 0, 0 );	//	�{�^���̃T�C�Y�ɍ��킹�ăc�[���o�[�����T�C�Y
+	SendMessage( ghMoziToolBar , TB_AUTOSIZE, 0, 0 );	//	ボタンのサイズに合わせてツールバーをリサイズ
 
-	//	�\��t���������`�F�b�N�{�b�N�X��t����
-	CreateWindowEx( 0, WC_BUTTON, TEXT("�}�����������"), WS_CHILD | WS_VISIBLE | BS_AUTOCHECKBOX, 128, 2, 170, 23, ghMoziToolBar, (HMENU)IDCB_MZSCR_QUICKCLOSE, hInst, NULL );
+	//	貼り付けたら閉じるチェックボックスを付ける
+	CreateWindowEx( 0, WC_BUTTON, TEXT("插入后关闭"), WS_CHILD | WS_VISIBLE | BS_AUTOCHECKBOX, 128, 2, 170, 23, ghMoziToolBar, (HMENU)IDCB_MZSCR_QUICKCLOSE, hInst, NULL );
 	CheckDlgButton( ghMoziToolBar, IDCB_MZSCR_QUICKCLOSE, gbQuickClose ? BST_CHECKED : BST_UNCHECKED );
 
-	InvalidateRect( ghMoziToolBar , NULL, TRUE );		//	�N���C�A���g�S�̂��ĕ`�悷�閽��
+	InvalidateRect( ghMoziToolBar , NULL, TRUE );		//	クライアント全体を再描画する命令
 
 	GetClientRect( ghMoziWnd, &rect );
 
 
-	//	������STATIC
-	CreateWindowEx( 0, WC_STATIC, TEXT("������"), WS_CHILD | WS_VISIBLE | SS_CENTERIMAGE, 0, gdToolBarHei, 52, MZ_PARAMHEI, ghMoziWnd, (HMENU)IDS_MZSCR_INTERVAL, hInst, NULL );
+	//	文字間STATIC
+	CreateWindowEx( 0, WC_STATIC, TEXT("文字间"), WS_CHILD | WS_VISIBLE | SS_CENTERIMAGE, 0, gdToolBarHei, 52, MZ_PARAMHEI, ghMoziWnd, (HMENU)IDS_MZSCR_INTERVAL, hInst, NULL );
 
-	//	������EDIT
+	//	文字間EDIT
 	CreateWindowEx( 0, WC_EDIT, TEXT("0"), WS_CHILD | WS_VISIBLE | WS_BORDER | ES_READONLY, 54, gdToolBarHei, 50, MZ_PARAMHEI, ghMoziWnd, (HMENU)IDE_MZSCR_INTERVAL, hInst, NULL );
 
-	//	������SPIN
+	//	文字間SPIN
 	CreateWindowEx( 0, UPDOWN_CLASS, TEXT("intervalspin"), WS_CHILD | WS_VISIBLE | UDS_AUTOBUDDY, 104, gdToolBarHei, 10, MZ_PARAMHEI, ghMoziWnd, (HMENU)IDUD_MZSCR_INTERVAL, hInst, NULL );
 
-	//	�����ԓ���CBX
-	CreateWindowEx( 0, WC_BUTTON, TEXT("�����Ԃ͓���"), WS_CHILD | WS_VISIBLE | BS_AUTOCHECKBOX, 130, gdToolBarHei, 120, MZ_PARAMHEI, ghMoziWnd, (HMENU)IDCB_MZSCR_TRANSPARENT, hInst, NULL );
+	//	文字間透過CBX
+	CreateWindowEx( 0, WC_BUTTON, TEXT("文字间通过"), WS_CHILD | WS_VISIBLE | BS_AUTOCHECKBOX, 130, gdToolBarHei, 120, MZ_PARAMHEI, ghMoziWnd, (HMENU)IDCB_MZSCR_TRANSPARENT, hInst, NULL );
 
 
 	height = gdToolBarHei + MZ_PARAMHEI;
 
-	//��������͘g
+	//文字列入力枠
 	ghTextWnd = CreateWindowEx( 0, WC_EDIT, TEXT(""), WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | WS_HSCROLL | ES_MULTILINE,
 		0, height, rect.right, rect.bottom - height, ghMoziWnd, (HMENU)IDE_MZSCR_TEXT, hInst, NULL );
 	SetWindowFont( ghTextWnd, ghAaFont, TRUE );
 
-	//	�T�u�N���X
+	//	サブクラス
 	gpfOrigMoziEditProc = SubclassWindow( ghTextWnd, gpfMoziEditProc );
 
-	//�ݒ�g
+	//設定枠
 	ghSettiLvWnd = CreateWindowEx( 0, WC_LISTVIEW, TEXT("mozisetting"),
 		WS_CHILD | WS_BORDER | WS_VSCROLL | LVS_REPORT | LVS_SINGLESEL | LVS_NOSORTHEADER,
 		0, gdToolBarHei, rect.right, rect.bottom - gdToolBarHei, ghMoziWnd, (HMENU)IDLV_MZSCR_SETTING, hInst, NULL );
 	ListView_SetExtendedListViewStyle( ghSettiLvWnd, LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES | LVS_EX_CHECKBOXES );
 
-	//	�T�u�N���X��	
+	//	サブクラス化	
 //	gpfOrgSettiLvProc = SubclassWindow( ghSettiLvWnd, gpfSettiLvProc );
 
 	ZeroMemory( &stLvColm, sizeof(LVCOLUMN) );
 	stLvColm.mask = LVCF_FMT | LVCF_WIDTH | LVCF_TEXT | LVCF_SUBITEM;
 	stLvColm.fmt = LVCFMT_LEFT;
-	stLvColm.pszText = TEXT("�t�@�C����");	stLvColm.cx = 200;	stLvColm.iSubItem = 0x00;	ListView_InsertColumn( ghSettiLvWnd, 0, &stLvColm );
-	stLvColm.pszText = TEXT("�t���p�X");	stLvColm.cx = 500;	stLvColm.iSubItem = 0x01;	ListView_InsertColumn( ghSettiLvWnd, 1, &stLvColm );
+	stLvColm.pszText = TEXT("文件名");	stLvColm.cx = 200;	stLvColm.iSubItem = 0x00;	ListView_InsertColumn( ghSettiLvWnd, 0, &stLvColm );
+	stLvColm.pszText = TEXT("完整路径");	stLvColm.cx = 500;	stLvColm.iSubItem = 0x01;	ListView_InsertColumn( ghSettiLvWnd, 1, &stLvColm );
 
 
-	//	�I��������SQL�A���g�������Ȃ�f�[�^�ǂݍ���ō\��
+	//	オンメモリSQL、中身が無効ならデータ読み込んで構成
 	dCount = MoziSqlItemCount( NULL, NULL );
 	MoziFileRebuild( ghMoziWnd, dCount ? FALSE : TRUE );
 
@@ -436,23 +436,23 @@ HWND MoziScripterCreate( HINSTANCE hInst, HWND hPrWnd )
 	UpdateWindow( ghMoziWnd );
 
 
-//�\���E�ʒu���ߔ������t���[�e�B���O�E�C���h�[
+//表示・位置決め半透明フローティングウインドー
 	ghMoziViewWnd = CreateWindowEx( WS_EX_TOOLWINDOW | WS_EX_LAYERED, MOZIVIEW_CLASS,
-		TEXT("�z�u"), WS_POPUP | WS_THICKFRAME | WS_CAPTION | WS_VISIBLE, 0, 0, 160, 120, NULL, NULL, hInst, NULL);
+		TEXT("配置"), WS_POPUP | WS_THICKFRAME | WS_CAPTION | WS_VISIBLE, 0, 0, 160, 120, NULL, NULL, hInst, NULL);
 	SetLayeredWindowAttributes( ghMoziViewWnd, 0, gbAlpha, LWA_ALPHA );
-	//	�����x�̓��C���{�b�N�X�̐ݒ���g��
+	//	透明度はレイヤボックスの設定を使う
 
 	ZeroMemory( &gstFrmSz, sizeof(POINT) );
 	ClientToScreen( ghMoziViewWnd, &gstFrmSz );
 
-	//	�E�C���h�E�ʒu���m�肳����
+	//	ウインドウ位置を確定させる
 	GetWindowRect( ghViewWnd, &vwRect );
-	gstViewOrigin.x = vwRect.left;	//	�r���[�E�C���h�E�̈ʒu�L�^
+	gstViewOrigin.x = vwRect.left;	//	ビューウインドウの位置記録
 	gstViewOrigin.y = vwRect.top;
 	x = (vwRect.left + LINENUM_WID) - gstFrmSz.x;
 	y = (vwRect.top  + RULER_AREA)  - gstFrmSz.y;
 	TRACE( TEXT("MOZI %d x %d"), x, y );
-	//	���̎��_��0dot,0line�̈ʒu�ɃN���C�����g���オ�A�b�[�I
+	//	この時点で0dot,0lineの位置にクライヤント左上がアッー！
 
 #ifdef _DEBUG
 	SetWindowPos( ghMoziViewWnd, HWND_TOP, x, y, 0, 0, SWP_NOSIZE | SWP_SHOWWINDOW );
@@ -467,7 +467,7 @@ HWND MoziScripterCreate( HINSTANCE hInst, HWND hPrWnd )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	�e�L�X�g�{�b�N�X�̓��e���X�N���v�g����
+	テキストボックスの内容をスクリプトする
 */
 HRESULT MoziEditAssemble( HWND hWnd )
 {
@@ -483,11 +483,11 @@ HRESULT MoziEditAssemble( HWND hWnd )
 
 	hWorkWnd = GetDlgItem( hWnd, IDE_MZSCR_TEXT );
 
-	//	�������m�F���ăo�b�t�@�쐬
+	//	文字数確認してバッファ作成
 	ileng = Edit_GetTextLength( hWorkWnd );
 	cchSz = ileng + 2;
 
-	if( gcchMzBuf <  cchSz )	//	�e�ʑ���Ȃ��Ȃ�g������
+	if( gcchMzBuf <  cchSz )	//	容量足りないなら拡張する
 	{
 		ptScript = (LPTSTR)realloc( gptMzBuff, cchSz * sizeof(TCHAR) );
 		gptMzBuff = ptScript;
@@ -498,7 +498,7 @@ HRESULT MoziEditAssemble( HWND hWnd )
 	Edit_GetText( hWorkWnd, gptMzBuff, cchSz );
 
 
-	//	��̃f�[�^�j��
+	//	先のデータ破壊
 	if( !( gvcMoziItem.empty( ) ) )
 	{
 		for( itMzitm = gvcMoziItem.begin( ); gvcMoziItem.end( ) != itMzitm; itMzitm++ ){	FREE( itMzitm->ptAA );	}
@@ -510,11 +510,11 @@ HRESULT MoziEditAssemble( HWND hWnd )
 	iMxLine = 1;
 	iMaxDot   = 0;
 	iLastLine = 0;
-	for( i = 0; ileng > i; i++ )	//	�땶�����o�����Ĉʒu�m�F
+	for( i = 0; ileng > i; i++ )	//	壱文字ずつバラして位置確認
 	{
 		ZeroMemory( &stMzitm, sizeof(MOZIITEM) );
 
-		if( TEXT('\r') ==  gptMzBuff[i] )	//	���s
+		if( TEXT('\r') ==  gptMzBuff[i] )	//	改行
 		{
 			iLastLine += iMxLine;
 
@@ -526,10 +526,10 @@ HRESULT MoziEditAssemble( HWND hWnd )
 		else
 		{
 			stMzitm.ptAA  = MoziSqlItemSelect( gptMzBuff[i], &(stMzitm.iLine), &(stMzitm.iWidth) );
-			if( !(stMzitm.ptAA) )	//	�����Ή��������Ȃ�������A���ϕ��Ńp�f�B���O
+			if( !(stMzitm.ptAA) )	//	もし対応文字がなかったら、平均幅でパディング
 			{
 				wid = ViewLetterWidthGet( gptMzBuff[i] );
-				//	�������m�F���āA�K���ɑS�p���p�ƌ��Ȃ��B
+				//	文字幅確認して、適当に全角半角と見なす。
 				if( 10 <= wid ){	stMzitm.iWidth = gdAvrWidth;	}
 				else{	stMzitm.iWidth = gdAvrWidth / 2;	}
 				stMzitm.iLine = gdMaxLine;
@@ -545,12 +545,12 @@ HRESULT MoziEditAssemble( HWND hWnd )
 
 		if( iMaxDot < iNdot )	iMaxDot = iNdot;
 	}
-	iLastLine += iMxLine;	//	�ŏI�s
-	iLastLine++;	//	�]�T�t��
+	iLastLine += iMxLine;	//	最終行
+	iLastLine++;	//	余裕付き
 
 	//gdNowMode
 
-	//	���̉�ʂ̍s���ƃh�b�g���m�F
+	//	今の画面の行数とドット数確認
 	iYline = ViewAreaSizeGet( &iViewXdot );
 	iViewYdot = iYline * LINE_HEIGHT;
 
@@ -561,14 +561,14 @@ HRESULT MoziEditAssemble( HWND hWnd )
 	cx -= rect.right;
 	cy -= rect.bottom;
 
-	//	�����E�C���h�E�T�C�Y�ɂȂ�͂�
+	//	多分ウインドウサイズになるはず
 	cx += iMaxDot;
 	cy += (iLastLine * LINE_HEIGHT);
 
-	//	�₽��f�J���Ȃ玩�d
+	//	やたらデカいなら自重
 	if( iViewXdot < cx ){	cx =  iViewXdot;	}
 	if( iViewYdot < cy ){	cy =  iViewYdot;	}
-	//	�������Ă����d�E�ŏ��T�C�Y�͓K��
+	//	小さくても自重・最小サイズは適当
 	if( 66 > cx ){	cx = 66;	}
 	if( 66 > cy ){	cy = 66;	}
 
@@ -586,12 +586,12 @@ HRESULT MoziEditAssemble( HWND hWnd )
 
 
 /*!
-	�G�f�B�b�g�{�b�N�X�T�u�N���X
-	@param[in]	hWnd	�E�C���h�E�̃n���h��
-	@param[in]	msg		�E�C���h�E���b�Z�[�W�̎��ʔԍ�
-	@param[in]	wParam	�ǉ��̏��P
-	@param[in]	lParam	�ǉ��̏��Q
-	@return	�����������ʂƂ�
+	エディットボックスサブクラス
+	@param[in]	hWnd	ウインドウのハンドル
+	@param[in]	msg		ウインドウメッセージの識別番号
+	@param[in]	wParam	追加の情報１
+	@param[in]	lParam	追加の情報２
+	@return	処理した結果とか
 */
 LRESULT CALLBACK gpfMoziEditProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
 {
@@ -605,12 +605,12 @@ LRESULT CALLBACK gpfMoziEditProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPa
 		default:	break;
 
 		case WM_COMMAND:
-			id         = LOWORD(wParam);	//	���������R�}���h�̎��ʎq
-			hWndCtl    = (HWND)lParam;		//	�R�}���h�𔭐��������q�E�C���h�E�̃n���h��
-			codeNotify = HIWORD(wParam);	//	�ǉ��̒ʒm���b�Z�[�W
+			id         = LOWORD(wParam);	//	発生したコマンドの識別子
+			hWndCtl    = (HWND)lParam;		//	コマンドを発生させた子ウインドウのハンドル
+			codeNotify = HIWORD(wParam);	//	追加の通知メッセージ
 			TRACE( TEXT("[%X]MoziEdit COMMAND %d"), hWnd, id );
 			
-			switch( id )	//	�L�[�{�[�h�V���[�g�J�b�g���u�b�Ƃ΂�
+			switch( id )	//	キーボードショートカットをブッとばす
 			{
 				case IDM_PASTE:	SendMessage( hWnd, WM_PASTE, 0, 0 );	return 0;
 				case IDM_COPY:	SendMessage( hWnd, WM_COPY,  0, 0 );	return 0;
@@ -632,20 +632,20 @@ LRESULT CALLBACK gpfMoziEditProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPa
 
 
 /*!
-	�X�N���v�g�r���[�̃E�C���h�E�v���V�[�W��
-	@param[in]	hWnd	�E�C���h�E�n���h��
-	@param[in]	message	�E�C���h�E���b�Z�[�W�̎��ʔԍ�
-	@param[in]	wParam	�ǉ��̏��P
-	@param[in]	lParam	�ǉ��̏��Q
-	@retval 0	���b�Z�[�W�����ς�
-	@retval no0	�����ł͏����������ɉ�
+	スクリプトビューのウインドウプロシージャ
+	@param[in]	hWnd	ウインドウハンドル
+	@param[in]	message	ウインドウメッセージの識別番号
+	@param[in]	wParam	追加の情報１
+	@param[in]	lParam	追加の情報２
+	@retval 0	メッセージ処理済み
+	@retval no0	ここでは処理せず次に回す
 */
 LRESULT CALLBACK MoziViewProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam )
 {
 	switch( message )
 	{
 		HANDLE_MSG( hWnd, WM_KEYDOWN,			Mzv_OnKey );
-		HANDLE_MSG( hWnd, WM_PAINT,				Mzv_OnPaint );		//	��ʂ̍X�V�Ƃ�
+		HANDLE_MSG( hWnd, WM_PAINT,				Mzv_OnPaint );		//	画面の更新とか
 		HANDLE_MSG( hWnd, WM_WINDOWPOSCHANGING,	Mzv_OnWindowPosChanging );
 		HANDLE_MSG( hWnd, WM_WINDOWPOSCHANGED,	Mzv_OnWindowPosChanged );
 
@@ -659,9 +659,9 @@ LRESULT CALLBACK MoziViewProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lP
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	��������Ă���Ƃ��ɔ����E�}�E�X�ŃE�C���h�E�h���b�O���Ƃ�
-	@param[in]	hWnd	�E�C���h�E�n���h��
-	@param[in]	pstPos	���̏u�Ԃ̃X�N���[�����W
+	動かされているときに発生・マウスでウインドウドラッグ中とか
+	@param[in]	hWnd	ウインドウハンドル
+	@param[in]	pstPos	その瞬間のスクリーン座標
 */
 VOID Mzv_OnMoving( HWND hWnd, LPRECT pstPos )
 {
@@ -670,27 +670,27 @@ VOID Mzv_OnMoving( HWND hWnd, LPRECT pstPos )
 	BOOLEAN	bMinus = FALSE;
 	TCHAR	atBuffer[SUB_STRING];
 
-	//	�t���[�����̍���X�N���[�����W
+	//	フレーム窓の左上スクリーン座標
 	xLy = pstPos->left + gstFrmSz.x;
 	yLy = pstPos->top  + gstFrmSz.y;
 
-	//	�r���[�̍���e�L�X�g�G���A�ʒu
+	//	ビューの左上テキストエリア位置
 	xEt = (gstViewOrigin.x + LINENUM_WID);
 	yEt = (gstViewOrigin.y + RULER_AREA);
 //	TRACE( TEXT("%d x %d"), xEt, yEt );
 
-	//	�I�t�Z�b�g��
-	xSb = xLy - xEt;	//	�w�͂��̂܂܃h�b�g��
-	ySb = yLy - yEt;	//	�x���h�b�g�Ȃ̂ōs���ɂ��Ȃ��Ƃ����Ȃ�
+	//	オフセット量
+	xSb = xLy - xEt;	//	Ｘはそのままドット数
+	ySb = yLy - yEt;	//	Ｙもドットなので行数にしないといけない
 
-	if( 0 > ySb ){	ySb *= -1;	bMinus = TRUE;	}	//	�}�C�i�X�␳
-	//	�s���I�ȃ��m�����߂���Ă΂�
+	if( 0 > ySb ){	ySb *= -1;	bMinus = TRUE;	}	//	マイナス補正
+	//	行数的なモノを求めるってばよ
 	dLine = ySb / LINE_HEIGHT;
 	dRema = ySb % LINE_HEIGHT;
 	if( (LINE_HEIGHT/2) < dRema ){	dLine++;	}
 	if( bMinus ){	dLine *= -1;	}else{	dLine++;	}
 
-	//	20110704	�����ł́A�܂��ʒu�̓X�N���[���̃Y�����l������ĂȂ�
+	//	20110704	ここでは、まだ位置はスクロールのズレが考慮されてない
 	xSb += gdHideXdot;
 	dLine += gdViewTopLine;
 
@@ -702,10 +702,10 @@ VOID Mzv_OnMoving( HWND hWnd, LPRECT pstPos )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	�E�B���h�E�̃T�C�Y�ύX����������O�ɑ����Ă���
-	@param[in]	hWnd	�E�C���h�E�n���h��
-	@param[in]	pstWpos	�V�����ʒu�Ƒ傫���������Ă�
-	@return		����Message������������O
+	ウィンドウのサイズ変更が完了する前に送られてくる
+	@param[in]	hWnd	ウインドウハンドル
+	@param[in]	pstWpos	新しい位置と大きさが入ってる
+	@return		このMessageを処理したら０
 */
 BOOL Mzv_OnWindowPosChanging( HWND hWnd, LPWINDOWPOS pstWpos )
 {
@@ -713,14 +713,14 @@ BOOL Mzv_OnWindowPosChanging( HWND hWnd, LPWINDOWPOS pstWpos )
 	BOOLEAN	bMinus = FALSE;
 	RECT	vwRect;
 
-	//	�ړ����Ȃ������Ƃ��͉������Ȃ��ł���
+	//	移動がなかったときは何もしないでおｋ
 	if( SWP_NOMOVE & pstWpos->flags )	return TRUE;
 
-	clPosY = pstWpos->y + gstFrmSz.y;	//	�\���ʒu��TOP
+	clPosY = pstWpos->y + gstFrmSz.y;	//	表示位置のTOP
 
-	//	�\����������s�P�ʂɍ��킹��
+	//	表示高さを壱行単位に合わせる
 	GetWindowRect( ghViewWnd, &vwRect );
-	gstViewOrigin.x = vwRect.left;//�ʒu�L�^�E���������ς����̂���Ȃ�
+	gstViewOrigin.x = vwRect.left;//位置記録・そうそう変わるものじゃない
 	gstViewOrigin.y = vwRect.top;
 	vwTopY = (vwRect.top  + RULER_AREA);
 
@@ -742,9 +742,9 @@ BOOL Mzv_OnWindowPosChanging( HWND hWnd, LPWINDOWPOS pstWpos )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	�E�B���h�E�̃T�C�Y�ύX�����������瑗���Ă���
-	@param[in]	hWnd	�E�C���h�E�n���h��
-	@param[in]	pstWpos	�V�����ʒu�Ƒ傫���������Ă�
+	ウィンドウのサイズ変更が完了したら送られてくる
+	@param[in]	hWnd	ウインドウハンドル
+	@param[in]	pstWpos	新しい位置と大きさが入ってる
 */
 VOID Mzv_OnWindowPosChanged( HWND hWnd, const LPWINDOWPOS pstWpos )
 {
@@ -752,11 +752,11 @@ VOID Mzv_OnWindowPosChanged( HWND hWnd, const LPWINDOWPOS pstWpos )
 
 	InvalidateRect( hWnd, NULL, TRUE );
 
-	//	�ړ����Ȃ������Ƃ��͉������Ȃ��ł���
+	//	移動がなかったときは何もしないでおｋ
 	if( SWP_NOMOVE & pstWpos->flags )	return;
 
 	GetWindowRect( ghViewWnd, &vwRect );
-	gstViewOrigin.x = vwRect.left;	//	�ʒu�L�^
+	gstViewOrigin.x = vwRect.left;	//	位置記録
 	gstViewOrigin.y = vwRect.top;
 
 	gstOffset.x = pstWpos->x - vwRect.left;
@@ -767,13 +767,13 @@ VOID Mzv_OnWindowPosChanged( HWND hWnd, const LPWINDOWPOS pstWpos )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	�L�[�_�E���������E�L�[�{�[�h�ňړ��p
-	@param[in]	hWnd	�E�C���h�E�n���h���E�r���[�̂Ƃ͌���Ȃ��̂Œ��ӃZ��
-	@param[in]	vk		�����ꂽ�L�[�����z�L�[�R�[�h�ŗ���
-	@param[in]	fDown	��O�_�E���@�O�A�b�v
-	@param[in]	cRepeat	�A���I�T���񐔁E���ĂȂ��H
-	@param[in]	flags	�L�[�t���O���낢��
-	@return		����
+	キーダウンが発生・キーボードで移動用
+	@param[in]	hWnd	ウインドウハンドル・ビューのとは限らないので注意セヨ
+	@param[in]	vk		押されたキーが仮想キーコードで来る
+	@param[in]	fDown	非０ダウン　０アップ
+	@param[in]	cRepeat	連続オサレ回数・取れてない？
+	@param[in]	flags	キーフラグいろいろ
+	@return		無し
 */
 VOID Mzv_OnKey( HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UINT flags )
 {
@@ -785,10 +785,10 @@ VOID Mzv_OnKey( HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UINT flags )
 	{
 		switch( vk )
 		{
-			case VK_RIGHT:	TRACE( TEXT("�E") );	rect.left++;	break;
-			case VK_LEFT:	TRACE( TEXT("��") );	rect.left--;	break;
-			case VK_DOWN:	TRACE( TEXT("��") );	rect.top += LINE_HEIGHT;	break;
-			case  VK_UP:	TRACE( TEXT("��") );	rect.top -= LINE_HEIGHT;	break;
+			case VK_RIGHT:	TRACE( TEXT("右") );	rect.left++;	break;
+			case VK_LEFT:	TRACE( TEXT("左") );	rect.left--;	break;
+			case VK_DOWN:	TRACE( TEXT("下") );	rect.top += LINE_HEIGHT;	break;
+			case  VK_UP:	TRACE( TEXT("上") );	rect.top -= LINE_HEIGHT;	break;
 			default:	return;
 		}
 	}
@@ -805,8 +805,8 @@ VOID Mzv_OnKey( HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UINT flags )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	PAINT�B�����̈悪�o�����Ƃ��ɔ����B�w�i�̈����ɒ��ӁB�w�i��h��Ԃ��Ă���A�I�u�W�F�N�g��`��
-	@param[in]	hWnd	�E�C���h�E�n���h��
+	PAINT。無効領域が出来たときに発生。背景の扱いに注意。背景を塗りつぶしてから、オブジェクトを描画
+	@param[in]	hWnd	ウインドウハンドル
 */
 VOID Mzv_OnPaint( HWND hWnd )
 {
@@ -817,7 +817,7 @@ VOID Mzv_OnPaint( HWND hWnd )
 
 	MoziViewDraw( hdc );
 
-	//���A���^�C���X�V����ƃt�H�[�J�X�����������Ȃ�H
+	//リアルタイム更新するとフォーカスがおかしくなる？
 
 	EndPaint( hWnd, &ps );
 
@@ -826,8 +826,8 @@ VOID Mzv_OnPaint( HWND hWnd )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	�\���g�̕`�揈��
-	@param[in]	hDC	�`�悷��f�o�C�X�R���e�L�X�g
+	表示枠の描画処理
+	@param[in]	hDC	描画するデバイスコンテキスト
 */
 VOID MoziViewDraw( HDC hDC )
 {
@@ -839,18 +839,18 @@ VOID MoziViewDraw( HDC hDC )
 
 	MZTM_ITR	itMzitm;
 
-	hFtOld = SelectFont( hDC, ghAaFont );	//	�t�H���g����������
+	hFtOld = SelectFont( hDC, ghAaFont );	//	フォントをくっつける
 	SetBkMode( hDC, TRANSPARENT );
 
 	iItems = gvcMoziItem.size( );
 
 	cmr = 0;
-	//	�e��������
+	//	各文字毎に
 	for( itMzitm = gvcMoziItem.begin( ); gvcMoziItem.end( ) != itMzitm; itMzitm++ )
 	{
-		if( !(itMzitm->ptAA) )	continue;	//	�f�[�^�������Ȃ��΂��΂����͂�
+		if( !(itMzitm->ptAA) )	continue;	//	データが無いなら飛ばせばいいはず
 
-		StringCchLength( itMzitm->ptAA, STRSAFE_MAX_CCH, &cchSize );	//	�S�̒����m�F����
+		StringCchLength( itMzitm->ptAA, STRSAFE_MAX_CCH, &cchSize );	//	全体長さ確認して
 
 		x      = itMzitm->iLeft;
 
@@ -862,16 +862,16 @@ VOID MoziViewDraw( HDC hDC )
 		ptHead = itMzitm->ptAA;
 		dLeng  = 0;
 		dPos   = 0;
-		for( iLn = 0; itMzitm->iLine >  iLn; iLn++ )	//	�����̍s����
+		for( iLn = 0; itMzitm->iLine >  iLn; iLn++ )	//	文字の行毎に
 		{
-			while( cchSize >= dLeng )	//	���s�܂ŁE��������NULL�܂�
+			while( cchSize >= dLeng )	//	改行まで・もしくはNULLまで
 			{
 				if( TEXT('\r') == itMzitm->ptAA[dLeng] )
 				{
 					ExtTextOut( hDC, x, y, 0, NULL, ptHead, dPos, NULL );
 
-					y      += LINE_HEIGHT;	//	���̍s�ʒu��
-					dLeng  += 2;	//	'\n'�����Ď��̍s�̐擪
+					y      += LINE_HEIGHT;	//	次の行位置へ
+					dLeng  += 2;	//	'\n'こえて次の行の先頭
 					dPos    = 0;
 					ptHead  = &(itMzitm->ptAA[dLeng]);
 					break;
@@ -895,10 +895,10 @@ VOID MoziViewDraw( HDC hDC )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	�r���[���ړ�����
-	@param[in]	hWnd	�{�̃E�C���h�E�n���h���E���܂�Ӗ��͂Ȃ�
-	@param[in]	state	����ԁE�ŏ����Ȃ�Ⴄ�R�g����
-	@return		HRESULT	�I����ԃR�[�h
+	ビューが移動した
+	@param[in]	hWnd	本体ウインドウハンドル・あまり意味はない
+	@param[in]	state	窓状態・最小化なら違うコトする
+	@return		HRESULT	終了状態コード
 */
 HRESULT MoziMoveFromView( HWND hWnd, UINT state )
 {
@@ -907,12 +907,12 @@ HRESULT MoziMoveFromView( HWND hWnd, UINT state )
 
 	if( !(ghMoziViewWnd) )	return S_FALSE;
 
-	//	�ŏ������͔�\���ɂ���Ƃ�	SIZE_MINIMIZED
+	//	最小化時は非表示にするとか	SIZE_MINIMIZED
 
 	if( SIZE_MINIMIZED != state )
 	{
 		GetWindowRect( ghViewWnd, &vwRect );
-		gstViewOrigin.x = vwRect.left;//�ʒu�L�^
+		gstViewOrigin.x = vwRect.left;//位置記録
 		gstViewOrigin.y = vwRect.top;
 	}
 
@@ -936,22 +936,22 @@ HRESULT MoziMoveFromView( HWND hWnd, UINT state )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	�E�C���h�E�v���V�[�W��
-	@param[in]	hWnd	�E�C���h�E�n���h��
-	@param[in]	message	�E�C���h�E���b�Z�[�W�̎��ʔԍ�
-	@param[in]	wParam	�ǉ��̏��P
-	@param[in]	lParam	�ǉ��̏��Q
-	@retval 0	���b�Z�[�W�����ς�
-	@retval no0	�����ł͏����������ɉ�
+	ウインドウプロシージャ
+	@param[in]	hWnd	ウインドウハンドル
+	@param[in]	message	ウインドウメッセージの識別番号
+	@param[in]	wParam	追加の情報１
+	@param[in]	lParam	追加の情報２
+	@retval 0	メッセージ処理済み
+	@retval no0	ここでは処理せず次に回す
 */
 LRESULT CALLBACK MoziProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam )
 {
 	switch( message )
 	{
-		HANDLE_MSG( hWnd, WM_PAINT,       Mzs_OnPaint );		//	��ʂ̍X�V�Ƃ�
-		HANDLE_MSG( hWnd, WM_NOTIFY,      Mzs_OnNotify );		//	�R�����R���g���[���̌ʃC�x���g
+		HANDLE_MSG( hWnd, WM_PAINT,       Mzs_OnPaint );		//	画面の更新とか
+		HANDLE_MSG( hWnd, WM_NOTIFY,      Mzs_OnNotify );		//	コモンコントロールの個別イベント
 		HANDLE_MSG( hWnd, WM_COMMAND,     Mzs_OnCommand );	
-		HANDLE_MSG( hWnd, WM_DESTROY,     Mzs_OnDestroy );		//	�I�����̏���
+		HANDLE_MSG( hWnd, WM_DESTROY,     Mzs_OnDestroy );		//	終了時の処理
 		HANDLE_MSG( hWnd, WM_DROPFILES,   Mzs_OnDropFiles );	//	D&D
 		HANDLE_MSG( hWnd, WM_CONTEXTMENU, Mzs_OnContextMenu );
 
@@ -963,12 +963,12 @@ LRESULT CALLBACK MoziProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	COMMAND���b�Z�[�W�̎󂯎��B�{�^�������ꂽ�Ƃ��Ŕ���
-	@param[in]	hWnd		�E�C���h�E�n���h��
-	@param[in]	id			���b�Z�[�W�𔭐��������q�E�C���h�E�̎��ʎq	LOWORD(wParam)
-	@param[in]	hWndCtl		���b�Z�[�W�𔭐��������q�E�C���h�E�̃n���h��	lParam
-	@param[in]	codeNotify	�ʒm���b�Z�[�W	HIWORD(wParam)
-	@return		�Ȃ�
+	COMMANDメッセージの受け取り。ボタン押されたとかで発生
+	@param[in]	hWnd		ウインドウハンドル
+	@param[in]	id			メッセージを発生させた子ウインドウの識別子	LOWORD(wParam)
+	@param[in]	hWndCtl		メッセージを発生させた子ウインドウのハンドル	lParam
+	@param[in]	codeNotify	通知メッセージ	HIWORD(wParam)
+	@return		なし
 */
 VOID Mzs_OnCommand( HWND hWnd, INT id, HWND hWndCtl, UINT codeNotify )
 {
@@ -980,22 +980,22 @@ VOID Mzs_OnCommand( HWND hWnd, INT id, HWND hWndCtl, UINT codeNotify )
 			if( !(0x10 & gdNowMode) )
 			{
 				MoziScriptInsert( hWnd );
-				if( gbQuickClose  ){	DestroyWindow( hWnd );	}	//	��������H
+				if( gbQuickClose  ){	DestroyWindow( hWnd );	}	//	直ぐ閉じる？
 			}
 			break;
 
 		case IDM_MOZI_REFRESH:
-			if( 0x10 & gdNowMode  ){	MoziFileRefresh( hWnd );	 return;	}	//	�ݒ�
+			if( 0x10 & gdNowMode  ){	MoziFileRefresh( hWnd );	 return;	}	//	設定
 			else{	MoziEditAssemble( hWnd );	}
 			break;
 
-		case IDE_MZSCR_TEXT:	//	�������͘g�E�������^�C���Ńr���[������
+		case IDE_MZSCR_TEXT:	//	文字入力枠・リヤルタイムでビューを書換
 			if( EN_UPDATE == codeNotify ){	MoziEditAssemble( hWnd );	}
 			break;
 
 		case IDM_MOZI_SETTING:
 			lRslt = SendMessage( ghMoziToolBar, TB_ISBUTTONCHECKED, IDM_MOZI_SETTING, 0 );
-			if( lRslt  )	//	�ݒ胂�[�h
+			if( lRslt  )	//	設定モード
 			{
 				gdNowMode |=  0x10;
 				DragAcceptFiles( ghMoziWnd, TRUE );
@@ -1044,8 +1044,8 @@ VOID Mzs_OnCommand( HWND hWnd, INT id, HWND hWndCtl, UINT codeNotify )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	PAINT�B�����̈悪�o�����Ƃ��ɔ����B�w�i�̈����ɒ��ӁB�w�i��h��Ԃ��Ă���A�I�u�W�F�N�g��`��
-	@param[in]	hWnd	�e�E�C���h�E�̃n���h��
+	PAINT。無効領域が出来たときに発生。背景の扱いに注意。背景を塗りつぶしてから、オブジェクトを描画
+	@param[in]	hWnd	親ウインドウのハンドル
 */
 VOID Mzs_OnPaint( HWND hWnd )
 {
@@ -1062,9 +1062,9 @@ VOID Mzs_OnPaint( HWND hWnd )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	�E�C���h�E�����Ƃ��ɔ����B�f�o�C�X�R���e�L�X�g�Ƃ��m�ۂ�����ʍ\���̃������Ƃ����I���B
-	@param[in]	hWnd	�e�E�C���h�E�̃n���h��
-	@return		����
+	ウインドウを閉じるときに発生。デバイスコンテキストとか確保した画面構造のメモリとかも終了。
+	@param[in]	hWnd	親ウインドウのハンドル
+	@return		無し
 */
 VOID Mzs_OnDestroy( HWND hWnd )
 {
@@ -1074,7 +1074,7 @@ VOID Mzs_OnDestroy( HWND hWnd )
 
 	if( ghMoziViewWnd ){	DestroyWindow( ghMoziViewWnd  );	}
 
-	//	��̃f�[�^�j��
+	//	先のデータ破壊
 	if( !( gvcMoziItem.empty( ) ) )
 	{
 		for( itMzitm = gvcMoziItem.begin( ); gvcMoziItem.end( ) != itMzitm; itMzitm++ ){	FREE( itMzitm->ptAA );	}
@@ -1088,12 +1088,12 @@ VOID Mzs_OnDestroy( HWND hWnd )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	�R���e�L�X�g���j���[�Ăт����A�N�V����(�v�͉E�N���b�N�j
-	@param[in]	hWnd		�E�C���h�E�n���h��
-	@param[in]	hWndContext	�R���e�L�X�g�����������E�C���h�E�̃n���h��
-	@param[in]	xPos		�X�N���[���w���W
-	@param[in]	yPos		�X�N���[���x����
-	@return		����
+	コンテキストメニュー呼びだしアクション(要は右クルック）
+	@param[in]	hWnd		ウインドウハンドル
+	@param[in]	hWndContext	コンテキストが発生したウインドウのハンドル
+	@param[in]	xPos		スクリーンＸ座標
+	@param[in]	yPos		スクリーンＹ座業
+	@return		無し
 */
 VOID Mzs_OnContextMenu( HWND hWnd, HWND hWndContext, UINT xPos, UINT yPos )
 {
@@ -1101,14 +1101,14 @@ VOID Mzs_OnContextMenu( HWND hWnd, HWND hWndContext, UINT xPos, UINT yPos )
 	POINT	stPoint;
 
 
-	stPoint.x = (SHORT)xPos;	//	��ʍ��W�̓}�C�i�X�����肤��
+	stPoint.x = (SHORT)xPos;	//	画面座標はマイナスもありうる
 	stPoint.y = (SHORT)yPos;
 
 	if( ghSettiLvWnd == hWndContext )
 	{
 		hMenu = CreatePopupMenu(  );
 
-		AppendMenu( hMenu, MF_STRING, IDM_MOZI_LISTDEL, TEXT("���X�g����폜") );
+		AppendMenu( hMenu, MF_STRING, IDM_MOZI_LISTDEL, TEXT("从列表删除") );
 
 		TrackPopupMenu( hMenu, 0, stPoint.x, stPoint.y, 0, hWnd, NULL );
 		DestroyMenu( hMenu );
@@ -1122,11 +1122,11 @@ VOID Mzs_OnContextMenu( HWND hWnd, HWND hWndContext, UINT xPos, UINT yPos )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	�m�[�e�B�t�@�C���b�Z�[�W�̏���
-	@param[in]	hWnd		�e�E�C���h�E�̃n���h��
-	@param[in]	idFrom		NOTIFY�𔭐��������R���g���[���̂h�c
-	@param[in]	pstNmhdr	NOTIFY�̏ڍ�
-	@return		�����������e�Ƃ�
+	ノーティファイメッセージの処理
+	@param[in]	hWnd		親ウインドウのハンドル
+	@param[in]	idFrom		NOTIFYを発生させたコントロールのＩＤ
+	@param[in]	pstNmhdr	NOTIFYの詳細
+	@return		処理した内容とか
 */
 LRESULT Mzs_OnNotify( HWND hWnd, INT idFrom, LPNMHDR pstNmhdr )
 {
@@ -1138,23 +1138,23 @@ LRESULT Mzs_OnNotify( HWND hWnd, INT idFrom, LPNMHDR pstNmhdr )
 
 		if( UDN_DELTAPOS == pstNmUpDown->hdr.code )
 		{
-			//	iDelta�@��Ł|�P�A���łP
+			//	iDelta　上で－１、下で１
 			TRACE( TEXT("UPDOWN %d"), pstNmUpDown->iDelta );
 			gdMoziInterval += (pstNmUpDown->iDelta);
 			SetDlgItemInt( hWnd, IDE_MZSCR_INTERVAL, gdMoziInterval, TRUE );
 
-			InvalidateRect( ghMoziViewWnd, NULL, TRUE );	//	�������^�C���H
+			InvalidateRect( ghMoziViewWnd, NULL, TRUE );	//	リヤルタイム？
 		}
 	}
 
-	return 0;	//	�����Ȃ��Ȃ�O��߂�
+	return 0;	//	何もないなら０を戻す
 }
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	�h���b�O���h���b�v�̎󂯓���
-	@param[in]	hWnd	�e�E�C���h�E�̃n���h��
-	@param[in]	hDrop	�h���b�s���I�u�W�F�N�c�n���h�D
+	ドラッグンドロップの受け入れ
+	@param[in]	hWnd	親ウインドウのハンドル
+	@param[in]	hDrop	ドロッピンオブジェクツハンドゥ
 */
 VOID Mzs_OnDropFiles( HWND hWnd, HDROP hDrop )
 {
@@ -1168,18 +1168,18 @@ VOID Mzs_OnDropFiles( HWND hWnd, HDROP hDrop )
 
 	TRACE( TEXT("MOZI DROP[%s]"), atFileName );
 
-	//	�g���q���m�F
+	//	拡張子を確認
 	if( FileExtensionCheck( atFileName, TEXT(".ast") ) )
 	{
-		MoziFileListAdd( atFileName );	//	�o�^�����ɐi��
+		MoziFileListAdd( atFileName );	//	登録処理に進む
 	}
-	//ptExten = PathFindExtension( atFileName );	//	�g���q�������Ȃ�NULL�A�Ƃ��������[�ɂȂ�
+	//ptExten = PathFindExtension( atFileName );	//	拡張子が無いならNULL、というか末端になる
 	//if( 0 == *ptExten ){	 return;	}
-	////	�g���q�w�肪�Ȃ��Ȃ�Ȃɂ��ł��Ȃ�
+	////	拡張子指定がないならなにもできない
 	//StringCchCopy( atExBuf, 10, ptExten );
-	//CharLower( atExBuf );	//	��r�̂��߂ɏ������ɂ����Ⴄ
+	//CharLower( atExBuf );	//	比較のために小文字にしちゃう
 	//if( StrCmp( atExBuf, TEXT(".ast") ) ){	 return;	}
-	////	AST�łȂ��Ȃ�i�j�����Ȃ�
+	////	ASTでないならナニもしない
 
 
 	return;
@@ -1187,7 +1187,7 @@ VOID Mzs_OnDropFiles( HWND hWnd, HDROP hDrop )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	�ݒ胊�X�g�r���[�Ƀt�@�C�����𑝂₷
+	設定リストビューにファイル名を増やす
 */
 HRESULT MoziFileListAdd( LPTSTR ptFilePath )
 {
@@ -1197,7 +1197,7 @@ HRESULT MoziFileListAdd( LPTSTR ptFilePath )
 	LVITEM	stLvi;
 
 	StringCchCopy( atFileName, MAX_PATH, ptFilePath );
-	PathStripPath( atFileName );	//	�t�@�C�����̂Ƃ���؂�o��
+	PathStripPath( atFileName );	//	ファイル名のところ切り出し
 
 
 	iItem = ListView_GetItemCount( ghSettiLvWnd );
@@ -1227,7 +1227,7 @@ HRESULT MoziFileListDelete( HWND hWnd )
 
 	iItem = ListView_GetNextItem( ghSettiLvWnd, -1, LVNI_ALL | LVNI_SELECTED );
 
-	//	�I������Ă郂�m���Ȃ��Ɩ��Ӗ�
+	//	選択されてるモノがないと無意味
 	if( 0 >  iItem ){	return  E_ABORT;	}
 
 	ListView_DeleteItem( ghSettiLvWnd, iItem );
@@ -1237,8 +1237,8 @@ HRESULT MoziFileListDelete( HWND hWnd )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	���X�g�r���[�̓��e��ۑ����Ďg�p�������č\������
-	@param[in]	hWnd	�E�C���h�E�n���h��
+	リストビューの内容を保存して使用文字を再構成する
+	@param[in]	hWnd	ウインドウハンドル
 */
 HRESULT MoziFileRefresh( HWND hWnd )
 {
@@ -1250,14 +1250,14 @@ HRESULT MoziFileRefresh( HWND hWnd )
 
 	iItem = ListView_GetItemCount( ghSettiLvWnd );
 
-	//	��U�Z�N�V��������ɂ���
+	//	一旦セクションを空にする
 	ZeroMemory( atBuff, sizeof(atBuff) );
 	WritePrivateProfileSection( TEXT("MoziScript"), atBuff, gatMoziIni );
 
 	StringCchPrintf( atBuff, MIN_STRING, TEXT("%d"), iItem );
 	WritePrivateProfileString( TEXT("MoziScript"), TEXT("Count"), atBuff, gatMoziIni );
 
-	MoziSqlItemDeleteAll(  );	//	�����ŃI��������SQL����ɂ���
+	MoziSqlItemDeleteAll(  );	//	ここでオンメモリSQLを空にして
 
 	ZeroMemory( &stLvi, sizeof(stLvi) );
 	stLvi.mask       = LVIF_TEXT;
@@ -1277,20 +1277,20 @@ HRESULT MoziFileRefresh( HWND hWnd )
 		StringCchPrintf( atBuff, MIN_STRING, TEXT("%u"), bCheck );
 		WritePrivateProfileString( TEXT("MoziScript"), atKeyName, atBuff, gatMoziIni );
 
-		//�`�F�b�N�L���Ȃ�A���g���L�^���Ă���
+		//チェック有効なら、中身を記録していく
 		if( bCheck ){	MoziFileStore( atFilePath );	}
 	}
 
-	if( bCheck ){	MoziSpaceCreate(  );	}	//	���ϕ��ƍő��L�s��
+	if( bCheck ){	MoziSpaceCreate(  );	}	//	平均幅と最大占有行数
 
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	�g�p�����t�@�C�������[�h���Ďg�p���e���č\������
-	@param[in]	hWnd	�E�C���h�E�n���h��
-	@param[in]	bMode	��OSQL�\�z�@�O���[�h�̂�
+	使用文字ファイルをロードして使用内容を再構成する
+	@param[in]	hWnd	ウインドウハンドル
+	@param[in]	bMode	非０SQL構築　０ロードのみ
 */
 HRESULT MoziFileRebuild( HWND hWnd, UINT bMode )
 {
@@ -1302,7 +1302,7 @@ HRESULT MoziFileRebuild( HWND hWnd, UINT bMode )
 
 	dCount = GetPrivateProfileInt( TEXT("MoziScript"), TEXT("Count"), 0, gatMoziIni );
 
-	if( bMode ){	MoziSqlItemDeleteAll(  );	}	//	�����ŃI��������SQL����ɂ���
+	if( bMode ){	MoziSqlItemDeleteAll(  );	}	//	ここでオンメモリSQLを空にして
 	ListView_DeleteAllItems( ghSettiLvWnd );
 
 	ZeroMemory( &stLvi, sizeof(stLvi) );
@@ -1320,7 +1320,7 @@ HRESULT MoziFileRebuild( HWND hWnd, UINT bMode )
 
 
 		StringCchCopy( atFileName, MAX_PATH, atFilePath );
-		PathStripPath( atFileName );	//	�t�@�C�����̂Ƃ���؂�o��
+		PathStripPath( atFileName );	//	ファイル名のところ切り出し
 
 		stLvi.iItem    = d;
 
@@ -1334,24 +1334,24 @@ HRESULT MoziFileRebuild( HWND hWnd, UINT bMode )
 
 		ListView_SetCheckState( ghSettiLvWnd, d, bCheck );
 
-		//�`�F�b�N�L���Ȃ�A���g���L�^���Ă���
+		//チェック有効なら、中身を記録していく
 		if( bCheck && bMode ){	MoziFileStore( atFilePath );	}
 	}
 
-	if( bCheck && bMode ){	MoziSpaceCreate(  );	}	//	���ϕ��ƍő��L�s��
+	if( bCheck && bMode ){	MoziSpaceCreate(  );	}	//	平均幅と最大占有行数
 
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	�������̕��ςƂ�B��Ή��������������ꍇ�̃p�f�B���O�Ɏg��
+	文字幅の平均とる。非対応文字があった場合のパディングに使う
 */
 HRESULT MoziSpaceCreate( VOID )
 {
 	INT	iLine, iAvDot;
 
-	//	��L�ő�s���ƕ��ϕ����m��
+	//	占有最大行数と平均幅を確保
 	MoziSqlItemCount( &iLine, &iAvDot );
 
 	gdAvrWidth = iAvDot;
@@ -1362,15 +1362,15 @@ HRESULT MoziSpaceCreate( VOID )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	���e����������
-	@param[in]	hWnd	�E�C���h�E�n���h���E���܂�Ӗ��͂Ȃ�
-	@return		HRESULT	�I����ԃR�[�h
+	内容を書き込む
+	@param[in]	hWnd	ウインドウハンドル・あまり意味はない
+	@return		HRESULT	終了状態コード
 */
 HRESULT MoziScriptInsert( HWND hWnd )
 {
-	UINT	bTranst;	//	���߂��邩�H
-	INT		ixNowPage;	//	���̕ł��o���Ă���
-	INT		ixTmpPage;	//	��Ɨp�ɂ���
+	UINT	bTranst;	//	透過するか？
+	INT		ixNowPage;	//	今の頁を覚えておく
+	INT		ixTmpPage;	//	作業用につくる
 	INT		iXhideBuf = 0, iYhideBuf = 0;
 
 	LPVOID		pBuffer;
@@ -1382,43 +1382,43 @@ HRESULT MoziScriptInsert( HWND hWnd )
 	MZTM_ITR	itMzitm;
 
 	bTranst = IsDlgButtonChecked( hWnd, IDCB_MZSCR_TRANSPARENT );
-	//���߂Ȃ�A�땶�����J�L�R����΂����B�����Ȃ�A���[�N�y�[�W���\���ō���āA�I����������
+	//透過なら、壱文字ずつカキコすればいい。統合なら、ワークページを非表示で作って、終わったら消す
 
-	ixNowPage = gixFocusPage;	//	�Ŕԍ��o�b�N�A�b�v
+	ixNowPage = gixFocusPage;	//	頁番号バックアップ
 	ixTmpPage = gixFocusPage;
 
 #ifdef DO_TRY_CATCH
 	try{
 #endif
 
-	if( !(bTranst) )	//	�ꎞ�łɍ쐬
+	if( !(bTranst) )	//	一時頁に作成
 	{
-		ixTmpPage = DocPageCreate( -1 );	//	��Ɨp�ꎞ�ō쐬
-		gixFocusPage = ixTmpPage;			//	���ڕŕύX
+		ixTmpPage = DocPageCreate( -1 );	//	作業用一時頁作成
+		gixFocusPage = ixTmpPage;			//	注目頁変更
 
-		iXhideBuf = gdHideXdot;		//	�X�N���[���ʒu�o�b�N�A�b�v
+		iXhideBuf = gdHideXdot;		//	スクロール位置バックアップ
 		iYhideBuf = gdViewTopLine;
 		gdHideXdot = 0;
 		gdViewTopLine = 0;
 	}
-	//	���߂Ȃ�{�łɒ��ŁA�񓧉߂Ȃ�_�~�[�łɏ����Ă���{�łɓ]������
+	//	透過なら本頁に直で、非透過ならダミー頁に書いてから本頁に転送する
 
-	//	�}�������ɂ́A���C���{�b�N�X���\�������Ŏg��
+	//	挿入処理には、レイヤボックスを非表示処理で使う
 	hLyrWnd = LayerBoxVisibalise( GetModuleHandle(NULL), TEXT(" "), 0x10 );
-	//	�_�~�[������n���āA�Ƃ肠�����g���쐬
+	//	ダミー文字列渡して、とりあえず枠を作成
 
 	GetWindowRect( ghMoziViewWnd, &rect );
 
 	cmr = 0;
-	//	�e��������
+	//	各文字毎に
 	for( itMzitm = gvcMoziItem.begin( ); gvcMoziItem.end( ) != itMzitm; itMzitm++ )
 	{
-		if( !(itMzitm->ptAA) )	continue;	//	�f�[�^�������Ȃ��΂��΂����͂�
+		if( !(itMzitm->ptAA) )	continue;	//	データが無いなら飛ばせばいいはず
 
-		//	���e��]��
+		//	内容を転送
 		LayerStringReplace( hLyrWnd, itMzitm->ptAA );
 
-		//	���C���̈ʒu��ύX
+		//	レイヤの位置を変更
 		x = (rect.left + gstFrmSz.x) + itMzitm->iLeft;
 
 		if( 0 >= itMzitm->iLeft ){	cmr = 0;	}
@@ -1429,24 +1429,24 @@ HRESULT MoziScriptInsert( HWND hWnd )
 
 		LayerBoxPositionChange( hLyrWnd, x, y );
 
-		//	�㏑������
+		//	上書きする
 		LayerContentsImportable( hLyrWnd, IDM_LYB_OVERRIDE, &iX, &iY, D_INVISI );
 	}
 
-	if( bTranst )	//	�L�����b�g�̈ʒu��K���ɂ��킹��
+	if( bTranst )	//	キャレットの位置を適当にあわせる
 	{
-		//	���߂Ȃ�{�łɁA�񓧉߂Ȃ�ꎞ�łɃ��C�����Ă�
+		//	透過なら本頁に、非透過なら一時頁にレイヤしてる
 	}
-	else	//	�ꎞ�ł���Ԃ�ǂ��ĉ��߂ď���
+	else	//	一時頁からぶんどって改めて書込
 	{
 		iByteSize = DocPageTextGetAlloc( gitFileIt, ixTmpPage, D_UNI, &pBuffer, TRUE );
 
-	//	gixFocusPage = ixNowPage;	//	���ɖ߂�
-		DocPageDelete( ixTmpPage, ixNowPage );	//	�ꎞ�ō폜���Ĉړ�
-//		DocPageChange( ixNowPage  );	//	�폜������ňړ�
+	//	gixFocusPage = ixNowPage;	//	元に戻す
+		DocPageDelete( ixTmpPage, ixNowPage );	//	一時頁削除して移動
+//		DocPageChange( ixNowPage  );	//	削除したら頁移動
 
-		//	���C���̈ʒu��ύX
-		GetWindowRect( ghViewWnd, &rect );	//	�ҏW�r���[����ʒu�ł���
+		//	レイヤの位置を変更
+		GetWindowRect( ghViewWnd, &rect );	//	編集ビューが基準位置である
 		x = rect.left;// + gstFrmSz.x;
 		y = rect.top;//  + gstFrmSz.y;
 		ViewPositionTransform( &x, &y, 1 );
@@ -1455,17 +1455,17 @@ HRESULT MoziScriptInsert( HWND hWnd )
 		gdHideXdot = iXhideBuf;
 		gdViewTopLine = iYhideBuf;
 
-		//	���e��]��
+		//	内容を転送
 		LayerStringReplace( hLyrWnd, (LPTSTR)pBuffer );
 
-		//	�㏑������
+		//	上書きする
 		LayerContentsImportable( hLyrWnd, IDM_LYB_OVERRIDE, &iX, &iY, D_INVISI );
 
 		FREE(pBuffer);
 	}
 
-	//�L�����b�g�ʒu�C��
-	//	�܂��ꏊ���m�F
+	//キャレット位置修正
+	//	まず場所を確認
 	GetWindowRect( ghViewWnd, &rect );
 	x = rect.left + LINENUM_WID;
 	y = rect.top  + RULER_AREA;
@@ -1473,15 +1473,15 @@ HRESULT MoziScriptInsert( HWND hWnd )
 	GetWindowRect( ghMoziViewWnd, &rect );
 	iX = (rect.left + gstFrmSz.x) - x;
 	iY = (rect.top  + gstFrmSz.y) - y;
-	//	�����ɂ͂ݏo���Ă���A�����̓}�C�i�X�ɂȂ��Ă���
+	//	左や上にはみ出してたら、ここはマイナスになっている
 
 	iY /= LINE_HEIGHT;
 
-	//	���̎��_�ł́A�X�N���[���ɂ��Y�����l������ĂȂ�
+	//	この時点では、スクロールによるズレが考慮されてない
 	iX += gdHideXdot;
-	iY += gdViewTopLine;	//	��������ő��v
+	iY += gdViewTopLine;	//	多分これで大丈夫
 
-	if( gdHideXdot >    iX )	iX = gdHideXdot + 11;	//	�O�̂���
+	if( gdHideXdot >    iX )	iX = gdHideXdot + 11;	//	念のため
 	if( gdViewTopLine > iY )	iY = gdViewTopLine;
 
 	ViewPosResetCaret( iX, iY );	
@@ -1492,7 +1492,7 @@ HRESULT MoziScriptInsert( HWND hWnd )
 	catch( ... ){	return  ETC_MSG( ("etc error"), E_FAIL );	}
 #endif
 
-	//	�I����������
+	//	終わったら閉じる
 	DestroyWindow( hLyrWnd );
 
 	return S_OK;
@@ -1500,11 +1500,11 @@ HRESULT MoziScriptInsert( HWND hWnd )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	�Ŗ��̓��e���Ԃ�����
-	@param[in]	ptLter	���ڂ̖��O�E��������NULL
-	@param[in]	ptCont	���ڂ̓��e
-	@param[in]	cchSize	���e�̕�����
-	@return		UINT	���ɈӖ��Ȃ�
+	頁毎の内容をぶち込む
+	@param[in]	ptLter	項目の名前・無い時はNULL
+	@param[in]	ptCont	項目の内容
+	@param[in]	cchSize	内容の文字数
+	@return		UINT	特に意味なし
 */
 UINT CALLBACK MoziItemTablise( LPTSTR ptLter, LPCTSTR ptCont, INT cchSize )
 {
@@ -1517,13 +1517,13 @@ UINT CALLBACK MoziItemTablise( LPTSTR ptLter, LPCTSTR ptCont, INT cchSize )
 
 	StringCchLength( ptLter, STRSAFE_MAX_CCH, &cchSz );
 	if( 1 != cchSz )	return 0;
-	//	�K�C�h���P���łȂ��ƈӖ�������
+	//	ガイドが１字でないと意味が無い
 
 	ptItem = (LPTSTR)malloc( (cchSize+1) * sizeof(TCHAR) );
 	ZeroMemory( ptItem, (cchSize+1) * sizeof(TCHAR) );
 	StringCchCopyN( ptItem, (cchSize+1), ptCont, cchSize );
 
-	//	�s���A�ő�h�b�g���̉�͂����邩
+	//	行数、最大ドット幅の解析もするか
 	cl = 0;
 	maxd = 0;
 	ptCaret = ptItem;
@@ -1532,31 +1532,31 @@ UINT CALLBACK MoziItemTablise( LPTSTR ptLter, LPCTSTR ptCont, INT cchSize )
 	{
 		if( 0x000D == *ptCaret )
 		{
-			*ptCaret = 0x0000;	//	��������I�_�ɂ���
-			MoziItemRemovePeriod( ptNext  );	//	�擪�ƏI���̃s�����h�����j�R�[�h�X�y�c�i�Y�ɒu������
+			*ptCaret = 0x0000;	//	いったん終点にする
+			MoziItemRemovePeriod( ptNext  );	//	先頭と終末のピリヲドをユニコードスペツナズに置き換え
 			dot = ViewStringWidthGet( ptNext );
 			*ptCaret = 0x000D;
 
-			if( maxd <= dot )	maxd =  dot;	//	�h�b�g�J�E���g
-			cl++;	//	�s�J�E���g
+			if( maxd <= dot )	maxd =  dot;	//	ドットカウント
+			cl++;	//	行カウント
 
-			ptCaret++;	//	0x000A�Ɉړ�
-			ptCaret++;	//	���̍s�̐擪�Ɉړ�
-			ptNext  = ptCaret;	//	�擪���m��
+			ptCaret++;	//	0x000Aに移動
+			ptCaret++;	//	次の行の先頭に移動
+			ptNext  = ptCaret;	//	先頭を確保
 		}
 		else
 		{
-			ptCaret++;	//	���̕����ֈړ�
+			ptCaret++;	//	次の文字へ移動
 		}
 	}
-	//	�ŏI�s�ɂ���
-	MoziItemRemovePeriod( ptNext  );	//	�擪�ƏI���̃s�����h�����j�R�[�h�X�y�c�i�Y�ɒu������
+	//	最終行について
+	MoziItemRemovePeriod( ptNext  );	//	先頭と終末のピリヲドをユニコードスペツナズに置き換え
 	dot = ViewStringWidthGet( ptNext );
 	if( maxd <= dot )	maxd = dot;
-	cl++;	//	�s�J�E���g
+	cl++;	//	行カウント
 
 
-	MoziSqlItemInsert( ptLter, ptItem, cl, maxd );	//	�f�[�^�x�[�X�ɃK���K���o�^
+	MoziSqlItemInsert( ptLter, ptItem, cl, maxd );	//	データベースにガンガン登録
 
 	FREE(ptItem);
 
@@ -1565,8 +1565,8 @@ UINT CALLBACK MoziItemTablise( LPTSTR ptLter, LPCTSTR ptCont, INT cchSize )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	��s�̃f�[�^���󂯎���āA�擪�ƏI���̃s�����h���R�h�b�g�̃��j�R�[�h�󔒂ɒu��������
-	@param[in]	ptText	�^�[�Q�b�g�s�ENULL�ŏI����Ă��邱��
+	壱行のデータを受け取って、先頭と終末のピリヲドを３ドットのユニコード空白に置き換える
+	@param[in]	ptText	ターゲット行・NULLで終わっていること
 */
 VOID MoziItemRemovePeriod( LPTSTR ptText )
 {
@@ -1574,21 +1574,21 @@ VOID MoziItemRemovePeriod( LPTSTR ptText )
 	UINT		d;
 
 	StringCchLength( ptText, STRSAFE_MAX_CCH, &cchSize );
-	if( 0 == cchSize )	return;	//	������Ȃ��Ȃ�i�j�����Ȃ�
+	if( 0 == cchSize )	return;	//	文字列ないならナニもしない
 
-	//	�擪�s�����h����
+	//	先頭ピリヲド検索
 	for( d = 0; cchSize > d; d++ )
 	{
 		if( TEXT('.') != ptText[d] )	break;
-		//	�s�����h���ᖳ���Ȃ�����I���
+		//	ピリヲドじゃ無くなったら終わり
 		ptText[d] = (TCHAR)0x2006;
 	}
 
-	//	�I���s�����h����
+	//	終末ピリヲド検索
 	for( d = (cchSize-1); 0 < d; d-- )
 	{
 		if( TEXT('.') != ptText[d] )	break;
-		//	�s�����h���ᖳ���Ȃ�����I���
+		//	ピリヲドじゃ無くなったら終わり
 		ptText[d] = (TCHAR)0x2006;
 	}
 
@@ -1597,8 +1597,8 @@ VOID MoziItemRemovePeriod( LPTSTR ptText )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	�����t�@�C����ǂݍ���łr�p�k�ɒ��߂Ă���
-	@param[in]	ptFilePath	�ǂ݂��ރt�@�C����
+	文字ファイルを読み込んでＳＱＬに貯めていく
+	@param[in]	ptFilePath	読みこむファイル名
 */
 HRESULT MoziFileStore( LPTSTR ptFilePath )
 {
@@ -1608,7 +1608,7 @@ HRESULT MoziFileStore( LPTSTR ptFilePath )
 	LPSTR		pcStr;
 	LPTSTR		ptText;
 
-	//	���b�c�I�[�|��
+	//	レッツオーポン
 	hFile = CreateFile( ptFilePath, GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL );
 	if( INVALID_HANDLE_VALUE == hFile ){	return E_INVALIDARG;	}
 
@@ -1618,13 +1618,13 @@ HRESULT MoziFileStore( LPTSTR ptFilePath )
 
 	SetFilePointer( hFile, 0, NULL, FILE_BEGIN );
 	ReadFile( hFile, pcStr, dByteSz, &readed, NULL );
-	CloseHandle( hFile );	//	���e�S����荞�񂾂���J��
+	CloseHandle( hFile );	//	内容全部取り込んだから開放
 
-	//	�g���q���m�F
+	//	拡張子を確認
 	if( FileExtensionCheck( ptFilePath, TEXT(".ast") ) )
 	{
-		ptText = SjisDecodeAlloc( pcStr );	//	SJIS�̓��e�����j�R�[�h�ɂ���
-		FREE(pcStr);	//	��������͏I���E���̓��j�R�[�h
+		ptText = SjisDecodeAlloc( pcStr );	//	SJISの内容をユニコードにする
+		FREE(pcStr);	//	元文字列は終わり・次はユニコード
 
 		StringCchLength( ptText, STRSAFE_MAX_CCH, &cchSize );
 
@@ -1636,7 +1636,7 @@ HRESULT MoziFileStore( LPTSTR ptFilePath )
 	}
 	else
 	{
-		FREE(pcStr);	//	��������͏I���
+		FREE(pcStr);	//	元文字列は終わり
 		return E_NOTIMPL;
 	}
 
@@ -1647,11 +1647,11 @@ HRESULT MoziFileStore( LPTSTR ptFilePath )
 
 
 /*!
-	�����L���b�V���p�I���������c�a
+	文字キャッシュ用オンメモリＤＢ
 */
 HRESULT MoziSqlTableOpenClose( UINT bMode )
 {
-	//	�c���[���
+	//	ツリー情報
 	CONST CHAR	cacMoziTable[] = { ("CREATE TABLE MoziScr ( id INTEGER PRIMARY KEY, letter TEXT, aacont TEXT, line INTEGER, dot INTEGER )") };
 	INT		rslt;
 	sqlite3_stmt	*statement;
@@ -1661,10 +1661,10 @@ HRESULT MoziSqlTableOpenClose( UINT bMode )
 		rslt = sqlite3_open( (":memory:"), &gpMoziTable );
 		if( SQLITE_OK != rslt ){	SQL_DEBUG( gpMoziTable );	return E_FAIL;	}
 
-		//�c���[�e�[�u���𐶐�
+		//ツリーテーブルを生成
 		rslt = sqlite3_prepare( gpMoziTable, cacMoziTable, -1, &statement, NULL );
 		if( SQLITE_OK != rslt ){	SQL_DEBUG( gpMoziTable );	return E_ACCESSDENIED;	}
-		rslt = sqlite3_step( statement );	//	���s
+		rslt = sqlite3_step( statement );	//	実行
 		if( SQLITE_DONE != rslt ){	SQL_DEBUG( gpMoziTable );	return E_ACCESSDENIED;	}
 		rslt = sqlite3_finalize(statement);
 
@@ -1681,19 +1681,19 @@ HRESULT MoziSqlTableOpenClose( UINT bMode )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	SQLite��Transaction���������߂���
-	@param[in]	mode	��O�J�n�@�O�I��
-	@return		HRESULT	�I����ԃR�[�h
+	SQLiteのTransactionをしたりやめたり
+	@param[in]	mode	非０開始　０終了
+	@return		HRESULT	終了状態コード
 */
 HRESULT MoziSqlTransOnOff( BYTE mode )
 {
 	if( mode )
 	{
-		sqlite3_exec( gpMoziTable, "BEGIN TRANSACTION",  NULL, NULL, NULL );	//	�g�����U�N�V�����J�n
+		sqlite3_exec( gpMoziTable, "BEGIN TRANSACTION",  NULL, NULL, NULL );	//	トランザクション開始
 	}
 	else
 	{
-		sqlite3_exec( gpMoziTable, "COMMIT TRANSACTION", NULL, NULL, NULL );	//	�g�����U�N�V�����I��
+		sqlite3_exec( gpMoziTable, "COMMIT TRANSACTION", NULL, NULL, NULL );	//	トランザクション終了
 	}
 
 	return S_OK;
@@ -1702,12 +1702,12 @@ HRESULT MoziSqlTransOnOff( BYTE mode )
 
 
 /*!
-	�f�B���N�g�����t�@�C���̃f�[�^�ꎞ�o�b�t�@�Ƀh�s���b
-	@param[in]	ptLter	�����R�[�h
-	@param[in]	ptCont	�����̂`�`�f�[�^
-	@param[in]	iLine	�s��
-	@param[in]	iDot	�ő�h�b�g��
-	@return	UINT	���ܓo�^����ID�ԍ�
+	ディレクトリかファイルのデータ一時バッファにドピュッ
+	@param[in]	ptLter	文字コード
+	@param[in]	ptCont	文字のＡＡデータ
+	@param[in]	iLine	行数
+	@param[in]	iDot	最大ドット数
+	@return	UINT	いま登録したID番号
 */
 UINT MoziSqlItemInsert( LPTSTR ptLter, LPTSTR ptCont, INT iLine, INT iDot )
 {
@@ -1735,7 +1735,7 @@ UINT MoziSqlItemInsert( LPTSTR ptLter, LPTSTR ptCont, INT iLine, INT iDot )
 
 	sqlite3_finalize( statement );
 
-	//	���ǉ�������̃A�����擾
+	//	今追加したやつのアレを取得
 	rslt = sqlite3_prepare( gpMoziTable, acAddNumCheck, -1, &statement, NULL );
 	if( SQLITE_OK != rslt ){	SQL_DEBUG( gpMoziTable );	return 0;	}
 
@@ -1751,11 +1751,11 @@ UINT MoziSqlItemInsert( LPTSTR ptLter, LPTSTR ptCont, INT iLine, INT iDot )
 
 
 /*!
-	�������w�肵�Ă`�`�Q�b�g
-	@param[in]	ch		����
-	@param[in]	piLine	�s�������o�b�t�@
-	@param[in]	piDot	�ő�h�b�g�������o�b�t�@
-	@return	LPTSTR	�`�`�{����Allocate���Ė߂��E�J���͎󂯂��K���ł�邱�ƁE����������NULL
+	文字を指定してＡＡゲット
+	@param[in]	ch		文字
+	@param[in]	piLine	行数いれるバッファ
+	@param[in]	piDot	最大ドット数いれるバッファ
+	@return	LPTSTR	ＡＡ本文をAllocateして戻す・開放は受けたガワでやること・無かったらNULL
 */
 LPTSTR MoziSqlItemSelect( TCHAR ch, LPINT piLine, LPINT piDot )
 {
@@ -1785,7 +1785,7 @@ LPTSTR MoziSqlItemSelect( TCHAR ch, LPINT piLine, LPINT piDot )
 	{
 		index = sqlite3_column_int( statement , 0 );	//	id
 		StringCchCopy( atMozi, 3, (LPCTSTR)sqlite3_column_text16( statement, 1 ) );	//	letter
-		rslt = sqlite3_column_bytes16( statement, 2 );	//	�T�C�Y�m�F
+		rslt = sqlite3_column_bytes16( statement, 2 );	//	サイズ確認
 		rslt += 2;
 		ptAac = (LPTSTR)malloc( rslt );
 		ZeroMemory( ptAac, rslt );
@@ -1804,10 +1804,10 @@ LPTSTR MoziSqlItemSelect( TCHAR ch, LPINT piLine, LPINT piDot )
 
 
 /*!
-	�o�^����Ă�����m�ہE�h�b�g�����ϒl�A�s���ő�l���m��
-	@param[in]	piLine	�s�������o�b�t�@
-	@param[in]	piAvDot	���σh�b�g�������o�b�t�@
-	@return		�o�^����Ă����
+	登録されている個数確保・ドット幅平均値、行数最大値も確保
+	@param[in]	piLine	行数いれるバッファ
+	@param[in]	piAvDot	平均ドット幅いれるバッファ
+	@return		登録されている個数
 */
 UINT MoziSqlItemCount( LPINT piLine, LPINT piAvDot )
 {
@@ -1832,7 +1832,7 @@ UINT MoziSqlItemCount( LPINT piLine, LPINT piAvDot )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	�S�f�[�^�j��
+	全データ破壊
 */
 HRESULT MoziSqlItemDeleteAll( VOID )
 {

@@ -109,7 +109,7 @@ UINT DocBadSpaceCheck( INT rdLine )
 	//	状態確認
 	if( DocRangeIsError( gitFileIt, gixFocusPage, rdLine ) )
 	{
-		TRACE( TEXT("範囲外エラー発生 PAGE[%d], LINE[%d]"), gixFocusPage, rdLine );
+		TRACE( TEXT("发生了范围溢出错误 PAGE[%d], LINE[%d]"), gixFocusPage, rdLine );
 		return 0;
 	}
 

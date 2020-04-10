@@ -345,8 +345,8 @@ LPARAM DocMultiFileClose( HWND hWnd, LPARAM uqNumber )
 	//	もし変更が残ってるなら注意を促す
 	if( gitFileIt->dModify )
 	{
-		StringCchPrintf( atBuffer, MAX_PATH, TEXT("ちょっとまって！\r\n[%s] は変更したままだよ。\r\nここで保存して閉じるかい？"), PathFindFileName( gitFileIt->atFileName ) );
-		iRslt = MessageBox( hWnd, atBuffer, TEXT("お燐からの確認"), MB_YESNOCANCEL | MB_ICONQUESTION );
+		StringCchPrintf( atBuffer, MAX_PATH, TEXT("等一下！\r\n[%s] 还没有保存哦。\r\n要保存之后再关闭吗？"), PathFindFileName( gitFileIt->atFileName ) );
+		iRslt = MessageBox( hWnd, atBuffer, TEXT("阿燐燐向您确认"), MB_YESNOCANCEL | MB_ICONQUESTION );
 		if( IDCANCEL == iRslt ){	return 0;	}
 
 		if( IDYES == iRslt ){	DocFileSave( hWnd, D_SJIS );	}
@@ -542,8 +542,8 @@ INT DocFileCloseCheck( HWND hWnd, UINT dMode )
 	{
 		if( itFiles->dModify )
 		{
-			StringCchPrintf( atMessage, BIG_STRING, TEXT("ちょっとまった！\r\n%s は保存してないよ。ここで保存するかい？"), itFiles->atFileName[0] ? PathFindFileName( itFiles->atFileName ) : itFiles->atDummyName );
-			rslt = MessageBox( hWnd, atMessage, TEXT("お燐からの確認"), MB_YESNOCANCEL | MB_ICONQUESTION );
+			StringCchPrintf( atMessage, BIG_STRING, TEXT("等一下！\r\n%s 还没有保存哦。要保存吗？"), itFiles->atFileName[0] ? PathFindFileName( itFiles->atFileName ) : itFiles->atDummyName );
+			rslt = MessageBox( hWnd, atMessage, TEXT("阿燐燐向您确认"), MB_YESNOCANCEL | MB_ICONQUESTION );
 			if( IDCANCEL ==  rslt ){	return 0;	}	//	キャンセルなら終わること自体とりやめ
 			if( IDYES == rslt ){	DocFileSave( hWnd, D_SJIS );	}	//	保存するならセーブを呼ぶ
 			//	NOなら何もせず次を確認
@@ -553,7 +553,7 @@ INT DocFileCloseCheck( HWND hWnd, UINT dMode )
 
 	if( !(bMod) )	//	未保存がなかったなら確認メッセージ
 	{
-		rslt = MessageBox( hWnd, TEXT("もう終わるかい？"), TEXT("お燐からの確認"), MB_YESNO | MB_ICONQUESTION );
+		rslt = MessageBox( hWnd, TEXT("已经要休息了吗？"), TEXT("阿燐燐向您确认"), MB_YESNO | MB_ICONQUESTION );
 		if( IDYES == rslt ){	ret = 1;	}
 		else{					ret = 0;	}
 	}

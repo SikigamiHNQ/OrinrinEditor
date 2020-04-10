@@ -587,7 +587,7 @@ INT DocInputLetter( INT nowDot, INT rdLine, TCHAR ch )
 
 	if( 0 == ch )
 	{
-		TRACE( TEXT("NULL文字が入った") );
+		TRACE( TEXT("混入了NULL文字") );
 		return 0;
 	}
 
@@ -595,7 +595,7 @@ INT DocInputLetter( INT nowDot, INT rdLine, TCHAR ch )
 
 	if( iLines <= rdLine )
 	{
-		TRACE( TEXT("OutOfRange 指定[%d] 行数[%d]"), rdLine, iLines );
+		TRACE( TEXT("超出范围 指定[%d] 行数[%d]"), rdLine, iLines );
 		return 0;
 	}
 
@@ -994,7 +994,7 @@ INT DocInputFromClipboard( PINT pNowDot, PINT pdLine, PINT pdMozi, UINT bSqMode 
 	ptString = DocClipboardDataGet( &dStyle );
 	if( !(ptString) )
 	{
-		NotifyBalloonExist( TEXT("テキストじゃないみたい。\t\n貼り付けられないよ。"), TEXT("お燐からのお知らせ"), NIIF_INFO );
+		NotifyBalloonExist( TEXT("要粘贴的内容似乎不是文本呢。\t\n粘贴不了哦。"), TEXT("阿燐燐向您确认"), NIIF_INFO );
 		return 0;
 	}
 
@@ -1430,7 +1430,7 @@ HRESULT DocPageNumInsert( HINSTANCE hInst, HWND hWnd )
 	iRslt = DialogBoxParam( hInst, MAKEINTRESOURCE(IDD_PAGENUMBER_DLG), hWnd, PageNumDlgProc, (LPARAM)(&stInfo) );
 	if( IDOK == iRslt )	//	挿入する
 	{
-#pragma message("ディレイロードしたら、頁番号挿入がおかしくなるはず")
+#pragma message("延迟读取的话，页码插入应该会出现问题。")
 		ixNumber = stInfo.dStartNum;	//	開始番号について
 
 		InitParamString( INIT_SAVE, VS_PAGE_FORMAT, stInfo.atStyle );

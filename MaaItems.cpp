@@ -1329,7 +1329,7 @@ HRESULT AacFindTextEntry( HWND hWnd, UINT bMode )
 	}
 	else
 	{
-		SetDlgItemText( hWnd, IDS_MAA_TXTFIND_MSGBOX, TEXT("å©Ç¬Ç©ÇÁÇ»Ç¢ÇÊ") );
+		SetDlgItemText( hWnd, IDS_MAA_TXTFIND_MSGBOX, TEXT("ùQïsìûöG") );
 		//MessageBox( hWnd, TEXT("å©Ç¬Ç©ÇÁÇ»Ç©Ç¡ÇΩÇÊ"), TEXT("Ç®ó”Ç©ÇÁÇÃÇ®ímÇÁÇπ"), MB_OK );
 	}
 

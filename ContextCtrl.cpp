@@ -37,151 +37,151 @@ typedef struct tagCONTEXTITEM
 
 CONST static CONTEXTITEM	gstContextItem[] =
 {
-/* 0*/	{  TEXT("新規作成"),	/*ファイル*/		IDM_NEWFILE				},
-/* 1*/	{  TEXT("ファイル開く"),					IDM_OPEN				},
-		{  TEXT("上書き保存"),						IDM_OVERWRITESAVE		},
-		{  TEXT("名前を付けて保存"),				IDM_RENAMESAVE			},
-		{  TEXT("現在頁を画像にして保存"),			IDM_IMAGE_SAVE			},
-/* 5*/	{  TEXT("一般設定"),						IDM_GENERAL_OPTION		},
-		{  TEXT("（セパレータ）"),					0						},
-		{  TEXT("元に戻す"),	/*編集*/			IDM_UNDO				},
-		{  TEXT("やり直し"),						IDM_REDO				},
-		{  TEXT("切り取り"),						IDM_CUT					},
-/*10*/	{  TEXT("Unicodeコピー"),					IDM_COPY				},
-		{  TEXT("SJISコピー"),						IDM_SJISCOPY			},
-		{  TEXT("全体をSJISコピー"),				IDM_SJISCOPY_ALL		},
-		{  TEXT("貼付"),							IDM_PASTE				},
-		{  TEXT("削除"),							IDM_DELETE				},
-/*15*/	{  TEXT("全選択"),							IDM_ALLSEL				},
-		{  TEXT("矩形選択"),						IDM_SQSELECT			},
-		{  TEXT("矩形貼付"),						IDM_SQUARE_PASTE		},
-		{  TEXT("レイヤボックス"),					IDM_LAYERBOX			},
-		{  TEXT("部分抽出モード"),					IDM_EXTRACTION_MODE		},
-/*20*/	{  TEXT("次の行以降を新頁に分割"),			IDM_PAGEL_DIVIDE		},
-		{  TEXT("選択文字列を頁名にする"),			IDM_PAGENAME_SELASSIGN	},
-		{  TEXT("（セパレータ）"),					0						},
-		{  TEXT("ユニコード空白"),	/*挿入*/		IDM_MN_UNISPACE			},//サブメニューダミー
-		{  TEXT(" 1 dot SPACE"),					IDM_IN_01SPACE			},
-/*25*/	{  TEXT(" 2 dot SPACE"),					IDM_IN_02SPACE			},
-		{  TEXT(" 3 dot SPACE"),					IDM_IN_03SPACE			},
-		{  TEXT(" 4 dot SPACE"),					IDM_IN_04SPACE			},
-		{  TEXT(" 5 dot SPACE"),					IDM_IN_05SPACE			},
-		{  TEXT(" 8 dot SPACE"),					IDM_IN_08SPACE			},
-/*30*/	{  TEXT("10 dot SPACE"),					IDM_IN_10SPACE			},
-		{  TEXT("16 dot SPACE"),					IDM_IN_16SPACE			},
-		{  TEXT("色指定"),							IDM_MN_COLOUR_SEL		},//サブメニューダミー
+/* 0*/	{  TEXT("新建文件"),	/*ファイル*/				IDM_NEWFILE				},
+/* 1*/	{  TEXT("打开文件"),							IDM_OPEN				},
+		{  TEXT("保存"),								IDM_OVERWRITESAVE		},
+		{  TEXT("另存为"),							IDM_RENAMESAVE			},
+		{  TEXT("保存为图片"),						IDM_IMAGE_SAVE			},
+/* 5*/	{  TEXT("一般设定"),							IDM_GENERAL_OPTION		},
+		{  TEXT("（セパレータ）"),						0						},
+		{  TEXT("撤销动作"),	/*編集*/					IDM_UNDO				},
+		{  TEXT("还原动作"),							IDM_REDO				},
+		{  TEXT("剪切"),								IDM_CUT					},
+/*10*/	{  TEXT("复制为Unicode"),						IDM_COPY				},
+		{  TEXT("复制为SJIS"),						IDM_SJISCOPY			},
+		{  TEXT("全部复制为SJIS"),					IDM_SJISCOPY_ALL		},
+		{  TEXT("粘贴"),								IDM_PASTE				},
+		{  TEXT("删除"),								IDM_DELETE				},
+/*15*/	{  TEXT("全选"),								IDM_ALLSEL				},
+		{  TEXT("矩阵选择"),							IDM_SQSELECT			},
+		{  TEXT("矩阵粘贴"),							IDM_SQUARE_PASTE		},
+		{  TEXT("AA嵌入工具"),						IDM_LAYERBOX			},
+		{  TEXT("部分提取模式"),						IDM_EXTRACTION_MODE		},
+/*20*/	{  TEXT("下一行开始另起一页"),					IDM_PAGEL_DIVIDE		},
+		{  TEXT("将选择文字列设为页名"),				IDM_PAGENAME_SELASSIGN	},
+		{  TEXT("（セパレータ）"),						0						},
+		{  TEXT("UNICODE空格"),	/*挿入*/				IDM_MN_UNISPACE			},//サブメニューダミー
+		{  TEXT("1像素空格"),							IDM_IN_01SPACE			},
+/*25*/	{  TEXT("2像素空格"),							IDM_IN_02SPACE			},
+		{  TEXT("3像素空格"),							IDM_IN_03SPACE			},
+		{  TEXT("4像素空格"),							IDM_IN_04SPACE			},
+		{  TEXT("5像素空格"),							IDM_IN_05SPACE			},
+		{  TEXT("8像素空格"),							IDM_IN_08SPACE			},
+/*30*/	{  TEXT("10像素空格"),						IDM_IN_10SPACE			},
+		{  TEXT("16像素空格"),						IDM_IN_16SPACE			},
+		{  TEXT("指定颜色"),							IDM_MN_COLOUR_SEL		},//サブメニューダミー
 		{  TEXT("白"),								IDM_INSTAG_WHITE		},
-		{  TEXT("青"),								IDM_INSTAG_BLUE			},
-/*35*/	{  TEXT("黒"),								IDM_INSTAG_BLACK		},
-		{  TEXT("赤"),								IDM_INSTAG_RED			},
-		{  TEXT("緑"),								IDM_INSTAG_GREEN		},
-		{  TEXT("枠選択"),							IDM_MN_INSFRAME_SEL		},//サブメニューダミー
-		{  TEXT("枠（１）"),						IDM_INSFRAME_ALPHA		},
-/*40*/	{  TEXT("枠（２）"),						IDM_INSFRAME_BRAVO		},
-		{  TEXT("枠（３）"),						IDM_INSFRAME_CHARLIE	},
-		{  TEXT("枠（４）"),						IDM_INSFRAME_DELTA		},
-		{  TEXT("枠（５）"),						IDM_INSFRAME_ECHO		},
-		{  TEXT("枠（６）"),						IDM_INSFRAME_FOXTROT	},
-/*45*/	{  TEXT("枠（７）"),						IDM_INSFRAME_GOLF		},
-		{  TEXT("枠（８）"),						IDM_INSFRAME_HOTEL		},
-		{  TEXT("枠（９）"),						IDM_INSFRAME_INDIA		},
-		{  TEXT("枠（１０）"),						IDM_INSFRAME_JULIETTE	},
-		{  TEXT("枠（１１）"),						IDM_INSFRAME_KILO		},
-/*50*/	{  TEXT("枠（１２）"),						IDM_INSFRAME_LIMA		},
-		{  TEXT("枠（１３）"),						IDM_INSFRAME_MIKE		},
-		{  TEXT("枠（１４）"),						IDM_INSFRAME_NOVEMBER	},
-		{  TEXT("枠（１５）"),						IDM_INSFRAME_OSCAR		},
-		{  TEXT("枠（１６）"),						IDM_INSFRAME_PAPA		},
-/*55*/	{  TEXT("枠（１７）"),						IDM_INSFRAME_QUEBEC		},
-		{  TEXT("枠（１８）"),						IDM_INSFRAME_ROMEO		},
-		{  TEXT("枠（１９）"),						IDM_INSFRAME_SIERRA		},
-		{  TEXT("枠（２０）"),						IDM_INSFRAME_TANGO		},
-		{  TEXT("枠編集"),							IDM_INSFRAME_EDIT		},
-/*60*/	{  TEXT("枠挿入ボックス"),					IDM_FRMINSBOX_OPEN		},
-		{  TEXT("文字ＡＡ変換ボックス"),			IDM_MOZI_SCR_OPEN		},
-		{  TEXT("縦書き変換ボックス"),				IDM_VERT_SCRIPT_OPEN	},
-		{  TEXT("ユーザ定義アイテム"),				IDM_MN_USER_REFS		},//サブメニューダミー
-		{  TEXT("ユーザアイテム（１）"),			IDM_USER_ITEM_ALPHA		},
-/*65*/	{  TEXT("ユーザアイテム（２）"),			IDM_USER_ITEM_BRAVO		},
-		{  TEXT("ユーザアイテム（３）"),			IDM_USER_ITEM_CHARLIE	},
-		{  TEXT("ユーザアイテム（４）"),			IDM_USER_ITEM_DELTA		},
-		{  TEXT("ユーザアイテム（５）"),			IDM_USER_ITEM_ECHO		},
-		{  TEXT("ユーザアイテム（６）"),			IDM_USER_ITEM_FOXTROT	},
-/*70*/	{  TEXT("ユーザアイテム（７）"),			IDM_USER_ITEM_GOLF		},
-		{  TEXT("ユーザアイテム（８）"),			IDM_USER_ITEM_HOTEL		},
-		{  TEXT("ユーザアイテム（９）"),			IDM_USER_ITEM_INDIA		},
-		{  TEXT("ユーザアイテム（１０）"),			IDM_USER_ITEM_JULIETTE	},
-		{  TEXT("ユーザアイテム（１１）"),			IDM_USER_ITEM_KILO		},
-/*75*/	{  TEXT("ユーザアイテム（１２）"),			IDM_USER_ITEM_LIMA		},
-		{  TEXT("ユーザアイテム（１３）"),			IDM_USER_ITEM_MIKE		},
-		{  TEXT("ユーザアイテム（１４）"),			IDM_USER_ITEM_NOVEMBER	},
-		{  TEXT("ユーザアイテム（１５）"),			IDM_USER_ITEM_OSCAR		},
-		{  TEXT("ユーザアイテム（１６）"),			IDM_USER_ITEM_PAPA		},
-/*80*/	{  TEXT("各頁に通し番号を入れる"),			IDM_PAGENUM_DLG_OPEN	},
-		{  TEXT("（セパレータ）"),					0						},
-		{  TEXT("右揃え線"),	/*整形*/			IDM_RIGHT_GUIDE_SET		},
-		{  TEXT("行頭に全角空白追加"),				IDM_INS_TOPSPACE		},
-		{  TEXT("行頭空白削除"),					IDM_DEL_TOPSPACE		},
-/*85*/	{  TEXT("行末空白削除"),					IDM_DEL_LASTSPACE		},
-		{  TEXT("行末文字削除"),					IDM_DEL_LASTLETTER		},
-		{  TEXT("選択範囲を空白にする"),			IDM_FILL_SPACE			},
-		{  TEXT("頁全体を空白で埋める"),			IDM_FILL_ZENSP			},
-		{  TEXT("行頭半角空白をユニコードに変換"),	IDM_HEADHALF_EXCHANGE	},
-/*90*/	{  TEXT("左右反転"),						IDM_MIRROR_INVERSE		},
-		{  TEXT("上下反転"),						IDM_UPSET_INVERSE		},
-		{  TEXT("右に寄せる"),						IDM_RIGHT_SLIDE			},
-		{  TEXT("１ドット増やす"),					IDM_INCREMENT_DOT		},
-		{  TEXT("１ドット減らす"),					IDM_DECREMENT_DOT		},
-/*95*/	{  TEXT("全体を１ドット右へ"),				IDM_INCR_DOT_LINES		},
-		{  TEXT("全体を１ドット左へ"),				IDM_DECR_DOT_LINES		},
-		{  TEXT("指定位置から右へ広げる"),			IDM_DOT_SPLIT_RIGHT		},
-		{  TEXT("指定位置から左に狭める"),			IDM_DOT_SPLIT_LEFT		},
-		{  TEXT("調整基準ロック"),					IDM_DOTDIFF_LOCK		},
-/*100*/	{  TEXT("カーソル位置で調整"),				IDM_DOTDIFF_ADJT		},
-		{  TEXT("（セパレータ）"),					0						},
-		{  TEXT("空白を表示"),	/*表示*/			IDM_SPACE_VIEW_TOGGLE	},
-		{  TEXT("グリッド線を表示"),				IDM_GRID_VIEW_TOGGLE	},
-		{  TEXT("右ガイド線を表示"),				IDM_RIGHT_RULER_TOGGLE	},
-/*105*/	{  TEXT("行ガイド線を表示"),				IDM_UNDER_RULER_TOGGLE	},
-		{  TEXT("複数行テンプレート表示"),			IDM_MAATMPLE_VIEW		},
-		{  TEXT("頁一覧表示"),						IDM_PAGELIST_VIEW		},
-		{  TEXT("壱行テンプレート表示"),			IDM_LINE_TEMPLATE		},
-		{  TEXT("塗り潰しブラシ表示"),				IDM_BRUSH_PALETTE		},
-/*110*/	{  TEXT("ユニコード表を開く"),				IDM_UNI_PALETTE			},
-		{  TEXT("トレスモード"),					IDM_TRACE_MODE_ON		},
-		{  TEXT("プレビュー"),						IDM_ON_PREVIEW			},
-		{  TEXT("ドラフトボードを開く"),			IDM_DRAUGHT_OPEN		},
-		{  TEXT("サムネイルを表示"),				IDM_MAA_THUMBNAIL_OPEN	},
-/*115*/	{  TEXT("（セパレータ）"),					0						},
-		{  TEXT("選択範囲をドラフトボードへ"),		IDM_COPY_TO_DRAUGHT		},
-		{  TEXT("（セパレータ）"),	0	/*以下、内容固定？の特殊コマンド*/	},
-		{  TEXT("選択頁を複製"),					IDM_PAGEL_DUPLICATE		},
-		{  TEXT("選択頁を削除"),					IDM_PAGEL_DELETE		},
-/*120*/	{  TEXT("次の頁と統合"),					IDM_PAGEL_COMBINE		},
-		{  TEXT("選択頁の次に新規作成"),			IDM_PAGEL_INSERT		},
-		{  TEXT("末尾に頁を新規作成"),				IDM_PAGEL_ADD			},
-		{  TEXT("頁を下へ移動"),					IDM_PAGEL_DOWNSINK		},
-		{  TEXT("頁を上へ移動"),					IDM_PAGEL_UPFLOW		},
-/*125*/	{  TEXT("頁名称の変更"),					IDM_PAGEL_RENAME		},
-		{  TEXT("トレス画像表示/非表示"),			IDM_TRC_VIEWTOGGLE		},
-		{  TEXT("テンプレグループ切替↑"),			IDM_TMPLT_GROUP_PREV	},
-		{  TEXT("テンプレグループ切替↓"),			IDM_TMPLT_GROUP_NEXT	},
-		{  TEXT("窓フォーカス切替↑"),				IDM_WINDOW_CHANGE		},
-/*130*/	{  TEXT("窓フォーカス切替↓"),				IDM_WINDOW_CHG_RVRS		},
-		{  TEXT("ファイルを閉じる"),				IDM_FILE_CLOSE			},
-		{  TEXT("ファイル切替↑"),					IDM_FILE_PREV			},
-		{  TEXT("ファイル切替↓"),					IDM_FILE_NEXT			},
-		{  TEXT("前の頁へ移動"),					IDM_PAGE_PREV			},
-/*135*/	{  TEXT("次の頁へ移動"),					IDM_PAGE_NEXT			},
-		{  TEXT("テンプレグリッド増加"),			IDM_TMPL_GRID_INCREASE	},
-		{  TEXT("テンプレグリッド減少"),			IDM_TMPL_GRID_DECREASE	},
-		{  TEXT("表示画面再描画"),					IDM_NOW_PAGE_REFRESH	},
-		{  TEXT("（未実装）文字列検索"),			IDM_FIND_DLG_OPEN		},
-/*140*/	{  TEXT("（未実装）検索設定リセット"),		IDM_FIND_HIGHLIGHT_OFF	},
-		{  TEXT("（未実装）次の検索位置"),			IDM_FIND_JUMP_NEXT		},
-		{  TEXT("（未実装）前の検索位置"),			IDM_FIND_JUMP_PREV		},
-		{  TEXT("（未実装）新しい文字列を検索"),	IDM_FIND_TARGET_SET		},
-		{  TEXT("（セパレータ）"),					0						}
+		{  TEXT("蓝"),								IDM_INSTAG_BLUE			},
+/*35*/	{  TEXT("黑"),								IDM_INSTAG_BLACK		},
+		{  TEXT("红"),								IDM_INSTAG_RED			},
+		{  TEXT("绿"),								IDM_INSTAG_GREEN		},
+		{  TEXT("选择边框"),							IDM_MN_INSFRAME_SEL		},//サブメニューダミー
+		{  TEXT("边框（１）"),						IDM_INSFRAME_ALPHA		},
+/*40*/	{  TEXT("边框（２）"),						IDM_INSFRAME_BRAVO		},
+		{  TEXT("边框（３）"),						IDM_INSFRAME_CHARLIE	},
+		{  TEXT("边框（４）"),						IDM_INSFRAME_DELTA		},
+		{  TEXT("边框（５）"),						IDM_INSFRAME_ECHO		},
+		{  TEXT("边框（６）"),						IDM_INSFRAME_FOXTROT	},
+/*45*/	{  TEXT("边框（７）"),						IDM_INSFRAME_GOLF		},
+		{  TEXT("边框（８）"),						IDM_INSFRAME_HOTEL		},
+		{  TEXT("边框（９）"),						IDM_INSFRAME_INDIA		},
+		{  TEXT("边框（１０）"),						IDM_INSFRAME_JULIETTE	},
+		{  TEXT("边框（１１）"),						IDM_INSFRAME_KILO		},
+/*50*/	{  TEXT("边框（１２）"),						IDM_INSFRAME_LIMA		},
+		{  TEXT("边框（１３）"),						IDM_INSFRAME_MIKE		},
+		{  TEXT("边框（１４）"),						IDM_INSFRAME_NOVEMBER	},
+		{  TEXT("边框（１５）"),						IDM_INSFRAME_OSCAR		},
+		{  TEXT("边框（１６）"),						IDM_INSFRAME_PAPA		},
+/*55*/	{  TEXT("边框（１７）"),						IDM_INSFRAME_QUEBEC		},
+		{  TEXT("边框（１８）"),						IDM_INSFRAME_ROMEO		},
+		{  TEXT("边框（１９）"),						IDM_INSFRAME_SIERRA		},
+		{  TEXT("边框（２０）"),						IDM_INSFRAME_TANGO		},
+		{  TEXT("编辑边框"),							IDM_INSFRAME_EDIT		},
+/*60*/	{  TEXT("边框插入工具"),						IDM_FRMINSBOX_OPEN		},
+		{  TEXT("文字AA化工具"),						IDM_MOZI_SCR_OPEN		},
+		{  TEXT("纵排版工具"),						IDM_VERT_SCRIPT_OPEN	},
+		{  TEXT("用户自定义原件"),						IDM_MN_USER_REFS		},//サブメニューダミー
+		{  TEXT("用户自定义原件（１）"),				IDM_USER_ITEM_ALPHA		},
+/*65*/	{  TEXT("用户自定义原件（２）"),				IDM_USER_ITEM_BRAVO		},
+		{  TEXT("用户自定义原件（３）"),				IDM_USER_ITEM_CHARLIE	},
+		{  TEXT("用户自定义原件（４）"),				IDM_USER_ITEM_DELTA		},
+		{  TEXT("用户自定义原件（５）"),				IDM_USER_ITEM_ECHO		},
+		{  TEXT("用户自定义原件（６）"),				IDM_USER_ITEM_FOXTROT	},
+/*70*/	{  TEXT("用户自定义原件（７）"),				IDM_USER_ITEM_GOLF		},
+		{  TEXT("用户自定义原件（８）"),				IDM_USER_ITEM_HOTEL		},
+		{  TEXT("用户自定义原件（９）"),				IDM_USER_ITEM_INDIA		},
+		{  TEXT("用户自定义原件（１０）"),				IDM_USER_ITEM_JULIETTE	},
+		{  TEXT("用户自定义原件（１１）"),				IDM_USER_ITEM_KILO		},
+/*75*/	{  TEXT("用户自定义原件（１２）"),				IDM_USER_ITEM_LIMA		},
+		{  TEXT("用户自定义原件（１３）"),				IDM_USER_ITEM_MIKE		},
+		{  TEXT("用户自定义原件（１４）"),				IDM_USER_ITEM_NOVEMBER	},
+		{  TEXT("用户自定义原件（１５）"),				IDM_USER_ITEM_OSCAR		},
+		{  TEXT("用户自定义原件（１６）"),				IDM_USER_ITEM_PAPA		},
+/*80*/	{  TEXT("在各页插入页码"),						IDM_PAGENUM_DLG_OPEN	},
+		{  TEXT("（セパレータ）"),						0						},
+		{  TEXT("右对齐线"),	/*整形*/					IDM_RIGHT_GUIDE_SET		},
+		{  TEXT("在行头追加全角空格"),					IDM_INS_TOPSPACE		},
+		{  TEXT("删除行头空格"),						IDM_DEL_TOPSPACE		},
+/*85*/	{  TEXT("删除行尾空格"),						IDM_DEL_LASTSPACE		},
+		{  TEXT("删除行尾文字"),						IDM_DEL_LASTLETTER		},
+		{  TEXT("将选择范围替换为空格"),				IDM_FILL_SPACE			},
+		{  TEXT("将全页用空格替换"),					IDM_FILL_ZENSP			},
+		{  TEXT("将行头空格替换为Unicode"),			IDM_HEADHALF_EXCHANGE	},
+/*90*/	{  TEXT("左右翻转"),							IDM_MIRROR_INVERSE		},
+		{  TEXT("上下翻转"),							IDM_UPSET_INVERSE		},
+		{  TEXT("向右对齐"),							IDM_RIGHT_SLIDE			},
+		{  TEXT("增加1像素"),							IDM_INCREMENT_DOT		},
+		{  TEXT("减少1像素"),							IDM_DECREMENT_DOT		},
+/*95*/	{  TEXT("全体右移1像素"),						IDM_INCR_DOT_LINES		},
+		{  TEXT("全体左移1像素"),						IDM_DECR_DOT_LINES		},
+		{  TEXT("从指定位置向左挤压"),					IDM_DOT_SPLIT_RIGHT		},
+		{  TEXT("从指定位置向右舒展"),					IDM_DOT_SPLIT_LEFT		},
+		{  TEXT("锁定调整基准"),						IDM_DOTDIFF_LOCK		},
+/*100*/	{  TEXT("调整为光标所在位置"),					IDM_DOTDIFF_ADJT		},
+		{  TEXT("（セパレータ）"),						0						},
+		{  TEXT("显示空格"),	/*表示*/					IDM_SPACE_VIEW_TOGGLE	},
+		{  TEXT("显示辅助线"),						IDM_GRID_VIEW_TOGGLE	},
+		{  TEXT("显示右边界线"),						IDM_RIGHT_RULER_TOGGLE	},
+/*105*/	{  TEXT("显示下边界线"),						IDM_UNDER_RULER_TOGGLE	},
+		{  TEXT("显示复数行模板"),						IDM_MAATMPLE_VIEW		},
+		{  TEXT("页一览"),							IDM_PAGELIST_VIEW		},
+		{  TEXT("显示单行模板"),						IDM_LINE_TEMPLATE		},
+		{  TEXT("笔刷"),								IDM_BRUSH_PALETTE		},
+/*110*/	{  TEXT("Unicode表"),						IDM_UNI_PALETTE			},
+		{  TEXT("背景图控制器"),						IDM_TRACE_MODE_ON		},
+		{  TEXT("预览"),								IDM_ON_PREVIEW			},
+		{  TEXT("缓存作画版"),						IDM_DRAUGHT_OPEN		},
+		{  TEXT("サムネイルを表示"),					IDM_MAA_THUMBNAIL_OPEN	},
+/*115*/	{  TEXT("（セパレータ）"),						0						},
+		{  TEXT("复制到缓存作画版"),					IDM_COPY_TO_DRAUGHT		},
+		{  TEXT("（セパレータ）"),			0	/*以下、内容固定？の特殊コマンド*/	},
+		{  TEXT("复制选择页"),						IDM_PAGEL_DUPLICATE		},
+		{  TEXT("删除选择页"),						IDM_PAGEL_DELETE		},
+/*120*/	{  TEXT("和下一页合并"),						IDM_PAGEL_COMBINE		},
+		{  TEXT("在选择页之后新建页"),					IDM_PAGEL_INSERT		},
+		{  TEXT("在末页之后新建页"),					IDM_PAGEL_ADD			},
+		{  TEXT("将页往下移动"),						IDM_PAGEL_DOWNSINK		},
+		{  TEXT("将页往上移动"),						IDM_PAGEL_UPFLOW		},
+/*125*/	{  TEXT("修改页名称"),						IDM_PAGEL_RENAME		},
+		{  TEXT("显示/隐藏 背景图"),					IDM_TRC_VIEWTOGGLE		},
+		{  TEXT("切换模板组↑"),						IDM_TMPLT_GROUP_PREV	},
+		{  TEXT("切换模板组↓"),						IDM_TMPLT_GROUP_NEXT	},
+		{  TEXT("切换当前窗口↑"),						IDM_WINDOW_CHANGE		},
+/*130*/	{  TEXT("切换当前窗口↓"),						IDM_WINDOW_CHG_RVRS		},
+		{  TEXT("关闭文件"),							IDM_FILE_CLOSE			},
+		{  TEXT("切换文件↑"),							IDM_FILE_PREV			},
+		{  TEXT("切换文件↓"),							IDM_FILE_NEXT			},
+		{  TEXT("移动至前一页"),						IDM_PAGE_PREV			},
+/*135*/	{  TEXT("移动至后一页"),						IDM_PAGE_NEXT			},
+		{  TEXT("テンプレグリッド増加"),				IDM_TMPL_GRID_INCREASE	},
+		{  TEXT("テンプレグリッド減少"),				IDM_TMPL_GRID_DECREASE	},
+		{  TEXT("刷新当前画面"),						IDM_NOW_PAGE_REFRESH	},
+		{  TEXT("（未実装）文字列検索"),				IDM_FIND_DLG_OPEN		},
+/*140*/	{  TEXT("（未実装）検索設定リセット"),			IDM_FIND_HIGHLIGHT_OFF	},
+		{  TEXT("（未実装）次の検索位置"),				IDM_FIND_JUMP_NEXT		},
+		{  TEXT("（未実装）前の検索位置"),				IDM_FIND_JUMP_PREV		},
+		{  TEXT("（未実装）新しい文字列を検索"),			IDM_FIND_TARGET_SET		},
+		{  TEXT("（セパレータ）"),						0						}
 };
 
 #define ALL_ITEMS	 117	//	右クリ用　０インデックス
@@ -406,13 +406,13 @@ VOID CntxEditBuild( VOID )
 			{	//	枠名称										//	IDM_INSFRAME_ZULU
 				num = itMnItm->dCommandoID - IDM_INSFRAME_ALPHA;
 				FrameNameLoad( num, atBuffer, SUB_STRING );
-				StringCchPrintf( atItem, MAX_STRING, TEXT("枠：%s"), atBuffer );
+				StringCchPrintf( atItem, MAX_STRING, TEXT("边框：%s"), atBuffer );
 			}
 			else if( IDM_USER_ITEM_ALPHA <= itMnItm->dCommandoID && itMnItm->dCommandoID <= IDM_USER_ITEM_PAPA )
 			{	//	ユーザアイテム名称
 				num = itMnItm->dCommandoID - IDM_USER_ITEM_ALPHA;
 				UserDefItemNameget( num, atBuffer, SUB_STRING );
-				StringCchPrintf( atItem, MAX_STRING, TEXT("ユーザ：%s"), atBuffer );
+				StringCchPrintf( atItem, MAX_STRING, TEXT("用户：%s"), atBuffer );
 			}
 			else
 			{
@@ -580,7 +580,7 @@ VOID CntxDlgLvInit( HWND hDlg )
 	stLvColm.fmt      = LVCFMT_LEFT;
 	stLvColm.iSubItem = 0;
 
-	stLvColm.pszText  = TEXT("メニューアイテム");
+	stLvColm.pszText  = TEXT("菜单按钮");
 	stLvColm.cx       = rect.right - 23;
 	ListView_InsertColumn( hLvWnd, 0, &stLvColm );
 
@@ -625,7 +625,7 @@ VOID CntxDlgAllListUp( HWND hDlg )
 		IDM_MN_INSFRAME_SEL == gstContextItem[d].dCommandoID || 
 		IDM_MN_USER_REFS    == gstContextItem[d].dCommandoID )
 		{
-			StringCchCat( atItem, SUB_STRING, TEXT("（サブメニュー展開）") );
+			StringCchCat( atItem, SUB_STRING, TEXT("（打开副菜单）") );
 		}
 
 		stLvi.iItem = d;
@@ -947,7 +947,7 @@ INT_PTR CALLBACK AccelKeyDlgProc( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 
 
 				case IDB_FUNCKEY_INIT:	//	設定を初期化する
-					if( IDOK == MessageBox( hDlg, TEXT("キー設定を初期状態に戻すよ"), TEXT("設定リセットだよ"), MB_OKCANCEL | MB_ICONQUESTION ) )
+					if( IDOK == MessageBox( hDlg, TEXT("要将快捷键设置初始化了哦"), TEXT("已经把设定初始化了哦"), MB_OKCANCEL | MB_ICONQUESTION ) )
 					{
 						AccelKeySettingReset( hDlg, &cltAccel );
 						AccelKeyListInit( hDlg, &cltAccel );
@@ -1121,7 +1121,7 @@ HRESULT AccelKeyBindString( LPACCEL pstAccel, LPTSTR ptBuffer, UINT_PTR cchSize 
 			case VK_CAPITAL:	StringCchCopy( atKey, MIN_STRING, TEXT("CAPITAL") );	break;
 			case VK_KANA:		StringCchCopy( atKey, MIN_STRING, TEXT("KANA") );	break;
 			case VK_ESCAPE:		StringCchCopy( atKey, MIN_STRING, TEXT("Esc") );	break;
-			case VK_CONVERT:	StringCchCopy( atKey, MIN_STRING, TEXT("変換") );	break;
+			case VK_CONVERT:	StringCchCopy( atKey, MIN_STRING, TEXT("变换") );	break;
 			case VK_NONCONVERT:	StringCchCopy( atKey, MIN_STRING, TEXT("无変換") );	break;
 			case VK_SPACE:		StringCchCopy( atKey, MIN_STRING, TEXT("Space") );	break;
 			case VK_PRIOR:		StringCchCopy( atKey, MIN_STRING, TEXT("PageUp") );	break;
@@ -1152,22 +1152,22 @@ HRESULT AccelKeyBindString( LPACCEL pstAccel, LPTSTR ptBuffer, UINT_PTR cchSize 
 			case VK_NUMLOCK:	StringCchCopy( atKey, MIN_STRING, TEXT("NumLock") );	break;
 			case VK_SCROLL:		StringCchCopy( atKey, MIN_STRING, TEXT("ScrollLock") );	break;
 			case VK_OEM_NEC_EQUAL:	StringCchCopy( atKey, MIN_STRING, TEXT("NUM =") );	break;
-			case VK_BROWSER_BACK:		StringCchCopy( atKey, MIN_STRING, TEXT("戻る") );	break;
-			case VK_BROWSER_FORWARD:	StringCchCopy( atKey, MIN_STRING, TEXT("進む") );	break;
+			case VK_BROWSER_BACK:		StringCchCopy( atKey, MIN_STRING, TEXT("返回") );	break;
+			case VK_BROWSER_FORWARD:	StringCchCopy( atKey, MIN_STRING, TEXT("前进") );	break;
 			case VK_BROWSER_REFRESH:	StringCchCopy( atKey, MIN_STRING, TEXT("更新") );	break;
 			case VK_BROWSER_STOP:		StringCchCopy( atKey, MIN_STRING, TEXT("停止") );	break;
-			case VK_BROWSER_SEARCH:		StringCchCopy( atKey, MIN_STRING, TEXT("検索") );	break;
-			case VK_BROWSER_FAVORITES:	StringCchCopy( atKey, MIN_STRING, TEXT("気入") );	break;
-			case VK_BROWSER_HOME:		StringCchCopy( atKey, MIN_STRING, TEXT("ホム") );	break;
-			case VK_VOLUME_MUTE:		StringCchCopy( atKey, MIN_STRING, TEXT("消音") );	break;
-			case VK_VOLUME_DOWN:		StringCchCopy( atKey, MIN_STRING, TEXT("音下") );	break;
-			case VK_VOLUME_UP:			StringCchCopy( atKey, MIN_STRING, TEXT("音上") );	break;
-			case VK_MEDIA_NEXT_TRACK:	StringCchCopy( atKey, MIN_STRING, TEXT("次項") );	break;
-			case VK_MEDIA_PREV_TRACK:	StringCchCopy( atKey, MIN_STRING, TEXT("前項") );	break;
+			case VK_BROWSER_SEARCH:		StringCchCopy( atKey, MIN_STRING, TEXT("检索") );	break;
+			case VK_BROWSER_FAVORITES:	StringCchCopy( atKey, MIN_STRING, TEXT("收藏") );	break;
+			case VK_BROWSER_HOME:		StringCchCopy( atKey, MIN_STRING, TEXT("主页") );	break;
+			case VK_VOLUME_MUTE:		StringCchCopy( atKey, MIN_STRING, TEXT("静音") );	break;
+			case VK_VOLUME_DOWN:		StringCchCopy( atKey, MIN_STRING, TEXT("降音") );	break;
+			case VK_VOLUME_UP:			StringCchCopy( atKey, MIN_STRING, TEXT("升音") );	break;
+			case VK_MEDIA_NEXT_TRACK:	StringCchCopy( atKey, MIN_STRING, TEXT("后一项") );	break;
+			case VK_MEDIA_PREV_TRACK:	StringCchCopy( atKey, MIN_STRING, TEXT("前一项") );	break;
 			case VK_MEDIA_STOP:			StringCchCopy( atKey, MIN_STRING, TEXT("停止") );	break;
-			case VK_MEDIA_PLAY_PAUSE:	StringCchCopy( atKey, MIN_STRING, TEXT("再生") );	break;
-			case VK_LAUNCH_MAIL:		StringCchCopy( atKey, MIN_STRING, TEXT("メル") );	break;
-			case VK_LAUNCH_MEDIA_SELECT:StringCchCopy( atKey, MIN_STRING, TEXT("選択") );	break;
+			case VK_MEDIA_PLAY_PAUSE:	StringCchCopy( atKey, MIN_STRING, TEXT("重播") );	break;
+			case VK_LAUNCH_MAIL:		StringCchCopy( atKey, MIN_STRING, TEXT("邮件") );	break;
+			case VK_LAUNCH_MEDIA_SELECT:StringCchCopy( atKey, MIN_STRING, TEXT("选择") );	break;
 			case VK_LAUNCH_APP1:		StringCchCopy( atKey, MIN_STRING, TEXT("APP1") );	break;
 			case VK_LAUNCH_APP2:		StringCchCopy( atKey, MIN_STRING, TEXT("APP2") );	break;
 			case VK_OEM_1:		StringCchCopy( atKey, MIN_STRING, TEXT(":") );	break;
@@ -1183,10 +1183,10 @@ HRESULT AccelKeyBindString( LPACCEL pstAccel, LPTSTR ptBuffer, UINT_PTR cchSize 
 			case VK_OEM_7:		StringCchCopy( atKey, MIN_STRING, TEXT("^") );	break;
 			case VK_OEM_8:		StringCchCopy( atKey, MIN_STRING, TEXT("_") );	break;
 			case VK_OEM_102:	StringCchCopy( atKey, MIN_STRING, TEXT("ろ") );	break;	//	ろ
-			case VK_OEM_ATTN:	StringCchCopy( atKey, MIN_STRING, TEXT("CapsLock") );	break;
-			case VK_OEM_COPY:	StringCchCopy( atKey, MIN_STRING, TEXT("カ夕ひら") );	break;
-			case VK_OEM_AUTO:	StringCchCopy( atKey, MIN_STRING, TEXT("半/全 漢1") );	break;
-			case VK_OEM_ENLW:	StringCchCopy( atKey, MIN_STRING, TEXT("半/全 漢2") );	break;
+			case VK_OEM_ATTN:	StringCchCopy( atKey, MIN_STRING, TEXT("大小写切换") );	break;
+			case VK_OEM_COPY:	StringCchCopy( atKey, MIN_STRING, TEXT("片假平假转换") );	break;
+			case VK_OEM_AUTO:	StringCchCopy( atKey, MIN_STRING, TEXT("半全角汉字1") );	break;
+			case VK_OEM_ENLW:	StringCchCopy( atKey, MIN_STRING, TEXT("半全角汉字2") );	break;
 
 			//	足りない分はＳＤＫから追加する
 			default:	StringCchPrintf( atKey, MIN_STRING, TEXT("0x%02X"), pstAccel->key );	break;
@@ -1268,12 +1268,12 @@ VOID AccelKeyListInit( HWND hDlg, list<ACCEL> *pltAccel )
 	stLvColm.fmt      = LVCFMT_LEFT;
 
 	stLvColm.iSubItem = 0;
-	stLvColm.pszText  = TEXT("機能");
+	stLvColm.pszText  = TEXT("功能");
 	stLvColm.cx       = width;
 	ListView_InsertColumn( hLvWnd, 0, &stLvColm );
 
 	stLvColm.iSubItem = 1;
-	stLvColm.pszText  = TEXT("キーバインド");
+	stLvColm.pszText  = TEXT("组合键");
 	stLvColm.cx       = width;
 	ListView_InsertColumn( hLvWnd, 1, &stLvColm );
 
@@ -1474,7 +1474,7 @@ HRESULT AccelKeyListOutput( HWND hDlg )
 	//ここで FileSaveDialogue を出す
 	stSaveFile.lStructSize     = sizeof(OPENFILENAME);
 	stSaveFile.hwndOwner       = hDlg;
-	stSaveFile.lpstrFilter     = TEXT("テキストファイル ( *.txt )\0*.txt\0全てのファイル ( *.* )\0*.*\0\0");
+	stSaveFile.lpstrFilter     = TEXT("文本文件 ( *.txt )\0*.txt\0所有文件类型 ( *.* )\0*.*\0\0");
 	stSaveFile.nFilterIndex    = 1;	//	デフォのフィルタ選択肢
 	stSaveFile.lpstrFile       = atFilePath;
 	stSaveFile.nMaxFile        = MAX_PATH;
@@ -1482,7 +1482,7 @@ HRESULT AccelKeyListOutput( HWND hDlg )
 	stSaveFile.nMaxFileTitle   = MAX_STRING;
 	stSaveFile.lpstrDefExt     = TEXT("txt");
 //	stSaveFile.lpstrInitialDir = 
-	stSaveFile.lpstrTitle      = TEXT("保存するファイル名を指定してね");
+	stSaveFile.lpstrTitle      = TEXT("请指定要保存的文件名呢");
 	stSaveFile.Flags           = OFN_EXPLORER | OFN_OVERWRITEPROMPT | OFN_HIDEREADONLY;
 
 	bOpened = GetSaveFileName( &stSaveFile );
@@ -1492,7 +1492,7 @@ HRESULT AccelKeyListOutput( HWND hDlg )
 	hFile = CreateFile( atFilePath, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL );
 	if( INVALID_HANDLE_VALUE == hFile )
 	{
-		MessageBox( hDlg, TEXT("ファイルを開けなかったよ・・・"), NULL, MB_OK | MB_ICONERROR );
+		MessageBox( hDlg, TEXT("打开文件失败了哦……"), NULL, MB_OK | MB_ICONERROR );
 		return E_HANDLE;
 	}
 	SetFilePointer( hFile, 0, NULL, FILE_BEGIN );
@@ -1505,7 +1505,7 @@ HRESULT AccelKeyListOutput( HWND hDlg )
 	{
 		AccelKeyBindString( &(pstAccel[i]), atKeyBind, SUB_STRING );
 
-		StringCchCopy( atCmdName, MIN_STRING, TEXT("（名称不明）") );
+		StringCchCopy( atCmdName, MIN_STRING, TEXT("（未知名称）") );
 		for( j = 0; FULL_ITEMS > j; j++ )
 		{
 			if( gstContextItem[j].dCommandoID == pstAccel[i].cmd )
@@ -1528,7 +1528,7 @@ HRESULT AccelKeyListOutput( HWND hDlg )
 	SetEndOfFile( hFile );
 	CloseHandle( hFile );
 
-	MessageBox( hDlg, TEXT("ファイル出力したよ。"), TEXT("（・∀・）ｂ"), MB_OK | MB_ICONINFORMATION );
+	MessageBox( hDlg, TEXT("已经保存了文件了哦。"), TEXT("（・∀・）ｂ"), MB_OK | MB_ICONINFORMATION );
 
 	return S_OK;
 }
@@ -1558,7 +1558,7 @@ HRESULT AccelKeyBindExistCheck( HWND hDlg, LPACCEL pstAccel, list<ACCEL> *pltAcc
 		{
 			//	同じのがあった
 			dCommand = itAccel->cmd;
-			StringCchCopy( atFuncName, MIN_STRING, TEXT("（名称不明）") );
+			StringCchCopy( atFuncName, MIN_STRING, TEXT("（未知名称）") );
 
 			for( i = 0; FULL_ITEMS > i; i++ )
 			{
@@ -1569,8 +1569,8 @@ HRESULT AccelKeyBindExistCheck( HWND hDlg, LPACCEL pstAccel, list<ACCEL> *pltAcc
 				}
 			}
 
-			StringCchPrintf( atMsg, MAX_STRING, TEXT("このキーバインドは「%s」で使ってるよ。"), atFuncName );
-			MessageBox( hDlg, atMsg, TEXT("かぶっちゃったよ"), MB_OK | MB_ICONWARNING );
+			StringCchPrintf( atMsg, MAX_STRING, TEXT("这个组合键已经被「%s」占用了哦。"), atFuncName );
+			MessageBox( hDlg, atMsg, TEXT("设置重复了哦"), MB_OK | MB_ICONWARNING );
 
 			return E_ACCESSDENIED;
 		}

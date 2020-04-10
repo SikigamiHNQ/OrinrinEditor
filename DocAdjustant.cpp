@@ -636,7 +636,7 @@ HRESULT	DocRightGuideline( LPVOID pVoid )
 {
 	INT	iTop, iBottom, i;
 
-	TRACE( TEXT("右揃え線") );
+	TRACE( TEXT("右对齐线") );
 
 	iTop    = (*gitFileIt).vcCont.at( gixFocusPage ).dSelLineTop;
 	iBottom = (*gitFileIt).vcCont.at( gixFocusPage ).dSelLineBottom;
@@ -754,14 +754,14 @@ INT DocDiffAdjBaseSet( INT yLine )
 	INT	dDot = 0;
 	TCHAR	atMessage[MAX_STRING];
 
-	TRACE( TEXT("自動調整基準点ロックオン") );
+	TRACE( TEXT("锁定自动条正基准点") );
 
 	dDot = DocLineParamGet( yLine, NULL, NULL );
 
 	gdDiffLock = dDot;
 
-	StringCchPrintf( atMessage, MAX_STRING, TEXT("調整基準位置を %d ドットに設定したですぅ"), dDot );
-	NotifyBalloonExist( atMessage, TEXT("ロックオン"), NIIF_INFO );
+	StringCchPrintf( atMessage, MAX_STRING, TEXT("将基准位置调整为 %d 像素的说"), dDot );
+	NotifyBalloonExist( atMessage, TEXT("锁定"), NIIF_INFO );
 
 	return dDot;
 }
@@ -793,7 +793,7 @@ INT DocDiffAdjExec( PINT pxDot, INT yLine )
 	dTgtDot = DocLineStateCheckWithDot( *pxDot, yLine, &dBgnDot, &dEndDot, &dBgnCnt, &dRngCnt, &bIsSpace );
 	if( !(bIsSpace) )
 	{
-		NotifyBalloonExist( TEXT("連続するスペースの部分にカーソルを当てるですぅ"), TEXT("調整不可能"), NIIF_ERROR );
+		NotifyBalloonExist( TEXT("将光标移动到连续空格的部分的说"), TEXT("无法调整"), NIIF_ERROR );
 		return 0;
 	}
 	//今現在の空白幅を確認
@@ -809,7 +809,7 @@ INT DocDiffAdjExec( PINT pxDot, INT yLine )
 
 	if( 41 > dTgtDot )	//	ユニコード使うなら確認しなくても大丈夫？
 	{
-		NotifyBalloonExist( TEXT("もう少し幅がないと調整できないですぅ"), TEXT("狭すぎ"), NIIF_ERROR );
+		NotifyBalloonExist( TEXT("宽度太窄的话就没有办法调整的说"), TEXT("太窄了"), NIIF_ERROR );
 		return 0;
 	}
 
@@ -818,7 +818,7 @@ INT DocDiffAdjExec( PINT pxDot, INT yLine )
 
 	if( !(ptPlus) )
 	{
-		NotifyBalloonExist( TEXT("調整出来なかったですぅ"), TEXT("自動調整失敗"), NIIF_ERROR );
+		NotifyBalloonExist( TEXT("调整失败了的说"), TEXT("自动调整失败"), NIIF_ERROR );
 		return 0;
 	}
 
@@ -958,7 +958,7 @@ HRESULT DocTopLetterInsert( TCHAR ch, PINT pXdot, INT dLine )
 	INT			iTop, iBottom, i, xDot = 0;
 	BOOLEAN		bFirst = TRUE, bSeled = FALSE;
 
-	TRACE( TEXT("行頭空白を追加") );
+	TRACE( TEXT("在行头追加全角空格") );
 	
 	//	範囲確認
 	iLines  = DocNowFilePageLineCount( );
@@ -1026,7 +1026,7 @@ HRESULT DocTopSpaceErase( PINT pXdot, INT dLine )
 	if( 0 > iTop )		iTop = 0;
 	if( 0 > iBottom )	iBottom = iLines - 1;
 
-	TRACE( TEXT("行頭空白を削除") );
+	TRACE( TEXT("删除行头空格") );
 	//	選択範囲は、操作した行全体を選択状態にする
 
 	itLine = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.begin();
@@ -1098,7 +1098,7 @@ HRESULT DocLastLetterErase( PINT pXdot, INT dLine )
 	if( 0 > iTop )		iTop = 0;
 	if( 0 > iBottom )	iBottom = iLines - 1;
 
-	TRACE( TEXT("行末文字削除") );
+	TRACE( TEXT("删除行尾文字") );
 	//	選択してる場合は、操作行を全選択状態にする
 	itLine = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.begin();
 	std::advance( itLine, iTop );	//	位置合わせ
@@ -1169,7 +1169,7 @@ HRESULT DocLastSpaceErase( PINT pXdot, INT dLine )
 
 	LINE_ITR	itLine;
 
-	TRACE( TEXT("行末空白削除") );
+	TRACE( TEXT("删除行尾空格") );
 
 	//	範囲確認
 	iLines = DocNowFilePageLineCount( );
@@ -1334,7 +1334,7 @@ HRESULT DocRightSlide( PINT pXdot, INT dLine )
 
 	LINE_ITR	itLine;
 
-	TRACE( TEXT("右寄せ") );
+	TRACE( TEXT("向右对齐") );
 
 	//	右寄せ限界確認
 	dSliDot = InitParamValue( INIT_LOAD, VL_RIGHT_SLIDE, 790 );
@@ -1355,7 +1355,7 @@ HRESULT DocRightSlide( PINT pXdot, INT dLine )
 	dPaDot = dSliDot - dRitDot;
 	if( 0 > dPaDot )
 	{
-		NotifyBalloonExist( TEXT("はみ出してるみたい"), TEXT("失敗"), NIIF_ERROR );
+		NotifyBalloonExist( TEXT("似乎溢出边界了"), TEXT("失败"), NIIF_ERROR );
 		return E_FAIL;
 	}
 
@@ -1457,7 +1457,7 @@ HRESULT DocPositionShift( UINT vk, PINT pXdot, INT dLine )
 	pstUndoBuff = &((*gitFileIt).vcCont.at( gixFocusPage ).stUndoLog);
 
 
-	TRACE( TEXT("全体ずらし") );
+	TRACE( TEXT("全体打散") );
 
 	if( VK_RIGHT == vk )		bRight = TRUE;
 	else if( VK_LEFT == vk )	bRight = FALSE;
@@ -1594,7 +1594,7 @@ HRESULT DocHeadHalfSpaceExchange( HWND hWnd )
 	if( 0 > iTop )		iTop = 0;
 	if( 0 > iBottom )	iBottom = iLines - 1;
 
-	TRACE( TEXT("行頭半角をユニコードに") );
+	TRACE( TEXT("将行头半角转换为全角") );
 
 	ViewSelPageAll( -1 );	//	選択範囲無くなる
 
@@ -1671,7 +1671,7 @@ HRESULT DocCentreWidthShift( UINT vk, PINT pXdot, INT dLine )
 	pstUndoBuff = &((*gitFileIt).vcCont.at( gixFocusPage ).stUndoLog);
 
 	iBaseDot = *pXdot;	//	基準点、なるべく動かないようにせないかん
-	TRACE( TEXT("中間ずらし %dDOT"), iBaseDot );
+	TRACE( TEXT("中间打散 %dDOT"), iBaseDot );
 
 	iFnlDot = iBaseDot;
 

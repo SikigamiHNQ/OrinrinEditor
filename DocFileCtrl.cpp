@@ -83,14 +83,14 @@ HRESULT DocFileOpen( HWND hWnd )
 
 	stOpenFile.lStructSize     = sizeof(OPENFILENAME);
 	stOpenFile.hwndOwner       = hWnd;
-	stOpenFile.lpstrFilter     = TEXT("アスキーアートファイル ( mlt, ast, txt )\0*.mlt;*.ast;*.txt\0全ての形式(*.*)\0*.*\0\0");
+	stOpenFile.lpstrFilter     = TEXT("AA文件 ( mlt, ast, txt )\0*.mlt;*.ast;*.txt\0所有格式(*.*)\0*.*\0\0");
 	stOpenFile.nFilterIndex    = 1;
 	stOpenFile.lpstrFile       = atFilePath;
 	stOpenFile.nMaxFile        = MAX_PATH;
 	stOpenFile.lpstrFileTitle  = atFileName;
 	stOpenFile.nMaxFileTitle   = MAX_STRING;
 //	stOpenFile.lpstrInitialDir = 
-	stOpenFile.lpstrTitle      = TEXT("開くファイルを指定しておくれ");
+	stOpenFile.lpstrTitle      = TEXT("请您指定一下要打开的文件吧");
 	stOpenFile.Flags           = OFN_EXPLORER | OFN_HIDEREADONLY;
 	stOpenFile.lpstrDefExt     = TEXT("mlt");
 
@@ -131,7 +131,7 @@ HRESULT DocDoOpenFile( HWND hWnd, LPTSTR ptFile )
 	dNumber = DocFileInflate( ptFile  );	//	ファイル名を受けて、開いて中身展開
 	if( !(dNumber) )
 	{
-		MessageBox( hWnd, TEXT("ファイルを開けなかったよ"), TEXT("お燐からのお知らせ"), MB_OK | MB_ICONERROR );
+		MessageBox( hWnd, TEXT("文件打开失败了哦。"), TEXT("阿燐燐向您确认"), MB_OK | MB_ICONERROR );
 		return E_HANDLE;
 	}
 	else
@@ -256,7 +256,7 @@ HRESULT DocFileBackup( HWND hWnd )
 		hFile = CreateFile( atFilePath, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL );
 		if( INVALID_HANDLE_VALUE == hFile )
 		{
-			NotifyBalloonExist( TEXT("バックアップが出来なかったよ・・・"), TEXT("異常発生"), NIIF_ERROR );
+			NotifyBalloonExist( TEXT("备份失败了哦……"), TEXT("发生异常"), NIIF_ERROR );
 			//	gbAutoBUmsg	バックアップ出来なかったメッセージは常に表示がいいか
 			return E_HANDLE;
 		}
@@ -307,7 +307,7 @@ HRESULT DocFileBackup( HWND hWnd )
 		FREE( pbSplit );
 	}
 
-	if( gbAutoBUmsg ){	NotifyBalloonExist( TEXT("作業中のファイルをバックアップ保存したよ。"), TEXT("お燐からのお知らせ"), NIIF_INFO );	}
+	if( gbAutoBUmsg ){	NotifyBalloonExist( TEXT("已经将编辑状态的文件备份了哦。"), TEXT("阿燐燐向您确认"), NIIF_INFO );	}
 
 	return S_OK;
 }
@@ -391,14 +391,14 @@ HRESULT DocFileSave( HWND hWnd, UINT bStyle )
 		//ここで FileSaveDialogue を出す
 		stSaveFile.lStructSize     = sizeof(OPENFILENAME);
 		stSaveFile.hwndOwner       = hWnd;
-		stSaveFile.lpstrFilter     = TEXT("[ShiftJIS]アスキーアートファイル ( mlt, ast, txt )\0*.mlt;*.ast;*.txt\0[UTF8]アスキーアートファイル ( mlt, ast, txt )\0*.mlt;*.ast;*.txt\0\0");
+		stSaveFile.lpstrFilter     = TEXT("[ShiftJIS]AA文件 ( mlt, ast, txt )\0*.mlt;*.ast;*.txt\0[UTF8]AA文件 ( mlt, ast, txt )\0*.mlt;*.ast;*.txt\0\0");
 		stSaveFile.nFilterIndex    = 1;	//	デフォのフィルタ選択肢
 		stSaveFile.lpstrFile       = atFilePath;
 		stSaveFile.nMaxFile        = MAX_PATH;
 		stSaveFile.lpstrFileTitle  = atFileName;
 		stSaveFile.nMaxFileTitle   = MAX_STRING;
 //		stSaveFile.lpstrInitialDir = 
-		stSaveFile.lpstrTitle      = TEXT("保存するファイル名を指定してね");
+		stSaveFile.lpstrTitle      = TEXT("请您指定要保存的文件名呢");
 		stSaveFile.Flags           = OFN_EXPLORER | OFN_OVERWRITEPROMPT | OFN_HIDEREADONLY;
 		//デフォルト拡張子の指定・あとで面倒見てるからここではしない方が良い
 		//	stSaveFile.lpstrDefExt = TEXT("ast");
@@ -419,7 +419,7 @@ HRESULT DocFileSave( HWND hWnd, UINT bStyle )
 		{	//	名無しのままエクスポートしようとしてたら無効
 			if( NULL == (*gitFileIt).atFileName[0] )
 			{
-				MessageBox( hWnd, TEXT("先に通常の保存をしてからエクスポートしてね。"), TEXT("お燐からのお知らせ"), MB_OK | MB_ICONINFORMATION );
+				MessageBox( hWnd, TEXT("请先使用SJIS编码保存一遍之后再进行其他格式的转换呢。"), TEXT("阿燐燐向您确认"), MB_OK | MB_ICONINFORMATION );
 				return E_FAIL;
 			}
 		}
@@ -452,7 +452,7 @@ HRESULT DocFileSave( HWND hWnd, UINT bStyle )
 		{
 			if( isAST && (bStyle & D_RENAME) )	//	既存ASTかつリネームなら
 			{
-				mbRslt = MessageBox( hWnd, TEXT("MLTで保存すると頁名称がなくなっちゃうよ。\r\nそれでも良いかい？"), TEXT("お燐からの確認"), MB_OKCANCEL | MB_ICONQUESTION );
+				mbRslt = MessageBox( hWnd, TEXT("使用MLT格式保存的话页名称就会丢失哦。\r\n真的关系吗？"), TEXT("阿燐燐向您确认"), MB_OKCANCEL | MB_ICONQUESTION );
 				if( IDOK != mbRslt )	return E_ABORT;
 
 				isMLT = TRUE;	isAST = FALSE;	idExten = 1;
@@ -489,7 +489,7 @@ HRESULT DocFileSave( HWND hWnd, UINT bStyle )
 	hFile = CreateFile( atFilePath, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL );
 	if( INVALID_HANDLE_VALUE == hFile )
 	{
-		MessageBox( hWnd, TEXT("ファイルを開けなかったよ"), TEXT("お燐からのお知らせ"), MB_OK | MB_ICONERROR );
+		MessageBox( hWnd, TEXT("打开文件失败了哦"), TEXT("阿燐燐向您确认"), MB_OK | MB_ICONERROR );
 		return E_HANDLE;
 	}
 
@@ -572,8 +572,8 @@ HRESULT DocFileSave( HWND hWnd, UINT bStyle )
 		//InitLastOpen( INIT_SAVE, atFilePath );	//	ラストオーポンを書換
 		MultiFileTabRename( (*gitFileIt).dUnique, atFilePath );	//	タブ名称変更
 		AppTitleChange( atFilePath );
-		StringCchPrintf( atBuffer, MAX_STRING, TEXT("拡張子を %s にして保存したよ。"), aatExte[idExten] );
-		NotifyBalloonExist( atBuffer, TEXT("お燐からのお知らせ"), NIIF_INFO );
+		StringCchPrintf( atBuffer, MAX_STRING, TEXT("已经保存为 %s 格式的文件了哦。"), aatExte[idExten] );
+		NotifyBalloonExist( atBuffer, TEXT("阿燐燐向您确认"), NIIF_INFO );
 
 		OpenHistoryLogging( hWnd , atFilePath );	//	ファイル名変更したので記録取り直し
 	}
@@ -591,11 +591,11 @@ HRESULT DocFileSave( HWND hWnd, UINT bStyle )
 
 		if( bUnic || bUtf8 )
 		{
-			NotifyBalloonExist( TEXT("ファイルのエクスポートしたよ。"), TEXT("お燐からのお知らせ"), NIIF_INFO );
+			NotifyBalloonExist( TEXT("文件的导出已经成功了哦。"), TEXT("阿燐燐向您确认"), NIIF_INFO );
 		}
 		else
 		{
-			if( gbSaveMsgOn ){	NotifyBalloonExist( TEXT("ファイルを保存したよ。"), TEXT("お燐からのお知らせ"), NIIF_INFO );	}
+			if( gbSaveMsgOn ){	NotifyBalloonExist( TEXT("文件已经保存了哦。"), TEXT("阿燐燐向您确认"), NIIF_INFO );	}
 		}
 	}
 
@@ -721,14 +721,14 @@ HRESULT DocImageSave( HWND hWnd, UINT bStyle, HFONT hFont )
 	ZeroMemory( &stSaveFile, sizeof(OPENFILENAME) );
 	stSaveFile.lStructSize     = sizeof(OPENFILENAME);
 	stSaveFile.hwndOwner       = hWnd;
-	stSaveFile.lpstrFilter     = TEXT("BMP ファイル ( *.bmp )\0*.bmp\0PNG ファイル ( *.png )\0*.png\0\0");
+	stSaveFile.lpstrFilter     = TEXT("BMP 文件 ( *.bmp )\0*.bmp\0PNG 文件 ( *.png )\0*.png\0\0");
 	stSaveFile.nFilterIndex    = 1;	//	デフォのフィルタ選択肢
 	stSaveFile.lpstrFile       = atOutName;
 	stSaveFile.nMaxFile        = MAX_PATH;
 	stSaveFile.lpstrFileTitle  = atFileName;
 	stSaveFile.nMaxFileTitle   = MAX_STRING;
 //		stSaveFile.lpstrInitialDir = 
-	stSaveFile.lpstrTitle      = TEXT("保存するファイル名と形式を指定しておくれ");
+	stSaveFile.lpstrTitle      = TEXT("请您指定要保存的文件名和格式哦");
 	stSaveFile.Flags           = OFN_EXPLORER | OFN_OVERWRITEPROMPT | OFN_HIDEREADONLY;
 
 	bOpened = GetSaveFileName( &stSaveFile );
@@ -753,7 +753,7 @@ HRESULT DocImageSave( HWND hWnd, UINT bStyle, HFONT hFont )
 
 	SetRect( &rect, 4, 4, iDotX - 4, iDotY- 4 );
 
-	TRACE( TEXT("サイズ %d x %d"), iDotX, iDotY );
+	TRACE( TEXT("大小 %d x %d"), iDotX, iDotY );
 
 	iByteSize = DocPageTextGetAlloc( gitFileIt, gixFocusPage, D_UNI, &pBuffer, TRUE );
 	ptText = (LPTSTR)pBuffer;
@@ -807,7 +807,7 @@ HRESULT DocImageSave( HWND hWnd, UINT bStyle, HFONT hFont )
 	else
 	{
 		//	しっぱい
-		TRACE( TEXT("失敗 %s"), atOutName );
+		TRACE( TEXT("失败 %s"), atOutName );
 	}
 
 	SelectBitmap( hMemDC, hOldBmp );
@@ -843,7 +843,7 @@ HRESULT DocHtmlExport( HWND hWnd )
 	//	今開いているファイルが未保存なら、チューシ
 	if( gitFileIt->dModify || ( NULL == atFilePath[0] ) )
 	{
-		MessageBox( hWnd, TEXT("先にファイルを保存してからにしてね。"), TEXT("ファイルが保存されてないよ"), MB_OK | MB_ICONERROR );
+		MessageBox( hWnd, TEXT("请先保存文件再进行其他步骤哦。"), TEXT("文件还没有保存哦"), MB_OK | MB_ICONERROR );
 		return E_ABORT;
 	}
 	PathQuoteSpaces( atFilePath );
@@ -852,7 +852,7 @@ HRESULT DocHtmlExport( HWND hWnd )
 	InitParamString( INIT_LOAD, VS_EXT_M2H_PATH, atExePath );
 	if( NULL == atExePath[0] )
 	{
-		MessageBox( hWnd, TEXT("MLT2HTML.exe を設定しておいてね。"), TEXT("外部ツールが無いよ"), MB_OK | MB_ICONERROR );
+		MessageBox( hWnd, TEXT("请先设定MLT2HTML.exe哦。"), TEXT("缺少外部工具哦"), MB_OK | MB_ICONERROR );
 		return E_ABORT;
 	}
 	PathQuoteSpaces( atExePath );

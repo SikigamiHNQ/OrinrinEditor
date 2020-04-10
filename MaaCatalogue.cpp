@@ -1,6 +1,6 @@
-/*! @file
-	@brief MLT�t�@�C����ǂ�ŁA���g���������ɓW�J���܂�
-	���̃t�@�C���� MaaCatalogue.cpp �ł��B
+﻿/*! @file
+	@brief MLTファイルを読んで、中身をメモリに展開します
+	このファイルは MaaCatalogue.cpp です。
 	@author	SikigamiHNQ
 	@date	2011/06/22
 */
@@ -24,41 +24,41 @@ If not, see <http://www.gnu.org/licenses/>.
 
 /*
 
-AA��1�s��������2�s�ŁA�����e���ȉ��̕�����ȊO����n�܂�ꍇ�A
-����AA�������o���Ƃ��ĔF�����Amenu���ڂɒǉ����܂��B
+AAが1行もしくは2行で、かつ内容が以下の文字列以外から始まる場合、
+そのAAを小見出しとして認識し、menu項目に追加します。
 
 Last Mod
-�ŏI�X
-�@�@�i�S�p��2�j
-�@ �i�S�p�󔒁{���p�󔒁j
+最終更
+　　（全角空白2つ）
+　 （全角空白＋半角空白）
 :
 _
-�i
+（
 (
 .
 /
 
-�������A�u��؂�.mlt�v�E�u�����o���E�͂ݗp.mlt�v�ɂ��ẮA�ȉ��̕����񂩂�n�܂�ꍇ�̂݁A
-����AA�������o���Ƃ��ĔF���Amenu���ڂɒǉ����܂��B
+ただし、「区切り.mlt」・「吹き出し・囲み用.mlt」については、以下の文字列から始まる場合のみ、
+そのAAを小見出しとして認識、menu項目に追加します。
 
-�y
+【
 
-�y�@�����Q�O�����ȏ�͔F�����Ȃ��Ƃ��̃��W�b�N�K�v��
+【　無き２０文字以上は認識しないとかのロジック必要か
 */
 
 
 #define MLT_SEPARATER	("[SPLIT]")
 #define AST_SEPARATER	("[AA]")
 
-//	�\���̒�`�EOrinrinEditor.h�ֈړ�
+//	構造体定義・OrinrinEditor.hへ移動
 
 //-------------------------------------------------------------------------------------------------
 
-static  vector<AAMATRIX>	gvcArts;	//!<	�J����AA�̕ێ�
+static  vector<AAMATRIX>	gvcArts;	//!<	開いたAAの保持
 
-static TCHAR	gatOpenFile[MAX_PATH];	//!<	�J�����t�@�C����
+static TCHAR	gatOpenFile[MAX_PATH];	//!<	開いたファイル名
 
-static TCHAR	gatBkUpDir[MAX_PATH];	//!<	MLT�������������̃o�b�N�A�b�v�쐬
+static TCHAR	gatBkUpDir[MAX_PATH];	//!<	MLT書き換えた時のバックアップ作成
 //-------------------------------------------------------------------------------------------------
 
 
@@ -76,14 +76,14 @@ HRESULT	AacItemOutput( HWND );
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	�o�b�N�A�b�v�f�B���N�g���[���m�ہE�N�����Ɉ��Ă΂�邾��
-	@param[in]	ptCurrent	��f�B���N�g��
+	バックアップディレクトリーを確保・起動時に壱回呼ばれるだけ
+	@param[in]	ptCurrent	基準ディレクトリ
 */
 VOID AacBackupDirectoryInit( LPTSTR ptCurrent )
 {
 	StringCchCopy( gatBkUpDir, MAX_PATH, ptCurrent );
 	PathAppend( gatBkUpDir, BACKUP_DIR );
-	CreateDirectory( gatBkUpDir, NULL );	//	�߂Ƀf�B���N�g�����������生�������s���邾���Ȃ̂Ŗ�薳��
+	CreateDirectory( gatBkUpDir, NULL );	//	已にディレクトリがあったら函数が失敗するだけなので問題無い
 
 	return;
 }
@@ -92,10 +92,10 @@ VOID AacBackupDirectoryInit( LPTSTR ptCurrent )
 
 
 /*!
-	MLT�t�@�C�������󂯎���āA�W�J������i�߂�
-	@param[in]	hWnd		�e�E�C���h�E�n���h��
-	@param[in]	ptFileName	�t�@�C����
-	@return		DWORD		�m�ۂ�����
+	MLTファイル名を受け取って、展開処理を進める
+	@param[in]	hWnd		親ウインドウハンドル
+	@param[in]	ptFileName	ファイル名
+	@return		DWORD		確保した個数
 */
 DWORD AacAssembleFile( HWND hWnd, LPTSTR ptFileName )
 {
@@ -109,100 +109,100 @@ DWORD AacAssembleFile( HWND hWnd, LPTSTR ptFileName )
 
 	SetFilePointer( hFile, 0, NULL, FILE_BEGIN );
 
-	rdFileSize = GetFileSize( hFile, NULL );	//	�S�f�����ɑΉ����H
+	rdFileSize = GetFileSize( hFile, NULL );	//	４Ｇ超えに対応を？
 
-	StringCchCopy( gatOpenFile , MAX_PATH, ptFileName );	//	�t�@�C�����L�^
+	StringCchCopy( gatOpenFile , MAX_PATH, ptFileName );	//	ファイル名記録
 
-	//	AST�ł��邩�H
+	//	ASTであるか？
 	isAST = PathMatchSpec( ptFileName , TEXT("*.ast") );
 
-	//	�S�̃o�b�t�@�����
+	//	全体バッファ作って
 	pcFullBuff = (LPSTR)malloc( rdFileSize + 1 );
 	if( !(pcFullBuff) ){	return 0;	}
 
 	ZeroMemory( pcFullBuff, rdFileSize + 1 );
-	//	���g�Ǎ�
+	//	中身読込
 	ReadFile( hFile, pcFullBuff, rdFileSize, &readed, NULL );
 
-	CloseHandle( hFile );	//	���e�m�ۂ���������Ă���
+	CloseHandle( hFile );	//	内容確保したから閉じておｋ
 
-	AacMatrixClear(   );	//	�����̓��e�S�j��
+	AacMatrixClear(   );	//	既存の内容全破壊
 
-//	AST�͂����œW�J����΂���
-	//	�W�J��������
+//	ASTはここで展開すればいい
+	//	展開処理する
 	if( isAST ){	rdCount = AacInflateAst( pcFullBuff, readed );	}
 	else{			rdCount = AacInflateMlt( pcFullBuff, readed );	}
 
-#pragma message ("�������ǉ�������͖��[��0x0D���������Ă�E��΂��ēǂݍ��ޏ�����")
+#pragma message ("旧末尾追加したやつは末端に0x0Dがくっついてる・飛ばして読み込む処理を")
 
-	free( pcFullBuff );	//	�J���Y��Ȃ��悤�ɒ��ӃZ��
+	free( pcFullBuff );	//	開放忘れないように注意セヨ
 
 	return rdCount;
 }
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	AST�̑S�̃o�b�t�@���󂯎���āA�������ĕێ�
-	@param[in]	pcTotal	�S�̃o�b�t�@
-	@param[in]	cbTotal	�o�C�g��
-	@return		DWORD	�m�ۂ�����
+	ASTの全体バッファを受け取って、分解して保持
+	@param[in]	pcTotal	全体バッファ
+	@param[in]	cbTotal	バイト数
+	@return		DWORD	確保した個数
 */
 DWORD AacInflateAst( LPSTR pcTotal, DWORD cbTotal )
 {
-	LPSTR	pcCaret;	//	�Ǎ��J�n�E���݈ʒu
-	LPSTR	pcStart;	//	�Z�p���[�^�̒��O
+	LPSTR	pcCaret;	//	読込開始・現在位置
+	LPSTR	pcStart;	//	セパレータの直前
 	LPSTR	pcEnd;
 	//LPSTR	pcCheck;
-	UINT	iNumber;	//	�ʂ��ԍ��J�E���g
+	UINT	iNumber;	//	通し番号カウント
 
 	UINT	cbItem;
 	BOOLEAN	bLast;
 //	CHAR	acName[MAX_STRING];
 
-	AAMATRIX	stAAbuf;//	���AA�̕ێ��E�x�N�^�[�ɓ����
+	AAMATRIX	stAAbuf;//	一つのAAの保持・ベクターに入れる
 
 
 	bLast = FALSE;
-	iNumber = 0;	//	�ʂ��ԍ��O�C���f�b�N�X
+	iNumber = 0;	//	通し番号０インデックス
 
-	pcCaret = StrStrA( pcTotal, AST_SEPARATER );	//	�ŏ��̃Z�p���[�^�܂Ői�߂�
-	if( !pcCaret )	return 0;	//	���̎��_�Ŗ��������炨������
+	pcCaret = StrStrA( pcTotal, AST_SEPARATER );	//	最初のセパレータまで進める
+	if( !pcCaret )	return 0;	//	この時点で無かったらおかしい
 
-	do	//	ptCaret��[AA]�ɂȂ��Ă�͂�
+	do	//	ptCaretは[AA]になってるはず
 	{
 		ZeroMemory( &stAAbuf, sizeof(AAMATRIX) );
 
 		stAAbuf.ixNum = iNumber;
 
-		pcStart = NextLineA(  pcCaret );	//	���̍s���炪�{��
+		pcStart = NextLineA(  pcCaret );	//	次の行からが本番
 
 		pcCaret += 5;	//	[AA][
-		cbItem  = pcStart - pcCaret;	//	���O�����̕�����
+		cbItem  = pcStart - pcCaret;	//	名前部分の文字数
 		cbItem -= 3;	//	]rn
 
 	
-		if( 0 < cbItem )	//	���O�m��
+		if( 0 < cbItem )	//	名前確保
 		{
 			StringCchCopyNA( stAAbuf.acAstName, MAX_STRING, pcCaret, cbItem );
-			AaTitleAddString( iNumber , stAAbuf.acAstName );	//	���o���ǉ�
+			AaTitleAddString( iNumber , stAAbuf.acAstName );	//	見出し追加
 		}
 
-		pcCaret = pcStart;	//	�{�̕���
+		pcCaret = pcStart;	//	本体部分
 
-		pcEnd = StrStrA( pcCaret, AST_SEPARATER );	//	�Z�p���[�^��T��
-		//	���̎��_��pcEnd�͎���[AA]�������Ă�E��������NULL(�Ō�̃R�})
-		if( !pcEnd )	//	������Ȃ������灁���ꂪ�Ō�Ȃ灁NULL
+		pcEnd = StrStrA( pcCaret, AST_SEPARATER );	//	セパレータを探す
+		//	この時点でpcEndは次の[AA]をさしてる・もしくはNULL(最後のコマ)
+		if( !pcEnd )	//	見つからなかったら＝これが最後なら＝NULL
 		{
-			pcEnd = pcTotal + cbTotal;	//	CHAR�T�C�Y�Ōv�Z�����H
+			pcEnd = pcTotal + cbTotal;	//	CHARサイズで計算おｋ？
 			bLast = TRUE;
 		}
-		stAAbuf.cbItem = pcEnd - pcCaret;	//	CHAR�P�ʂł��邩
+		stAAbuf.cbItem = pcEnd - pcCaret;	//	CHAR単位であるか
 
-		//����	���[��0x0D�P�Ƃ��O��
+		//＠＠	末端の0x0D単独を外す
 		//pcCheck = pcEnd;	pcCheck--;
 		//if( 0x0D == *pcCheck )	stAAbuf.cbItem--;
 
-		//	�ŏI�łłȂ��ꍇ�͖��[�̉��s������
+		//	最終頁でない場合は末端の改行分引く
 		//if( !(bLast) && 0 < cbItem ){	cbItem -= CH_CRLF_CCH;	}
 
 		stAAbuf.pcItem = (LPSTR)malloc( stAAbuf.cbItem + 2 );
@@ -218,37 +218,37 @@ DWORD AacInflateAst( LPSTR pcTotal, DWORD cbTotal )
 			CopyMemory( stAAbuf.pcItem, pcCaret, stAAbuf.cbItem );
 		}
 
-		gvcArts.push_back( stAAbuf );	//	�x�N�^�[�ɒǉ�
-		//	������ stAAbuf.pcItem ���t���[���Ă͂����Ȃ��Evector�Ŏg���Ă���
+		gvcArts.push_back( stAAbuf );	//	ベクターに追加
+		//	ここで stAAbuf.pcItem をフリーしてはいけない・vectorで使っている
 
 		iNumber++;
 
 		pcCaret = pcEnd;
 
-	}while( *pcCaret );	//	�f�[�^�L����胋�[�v�ŒT��
+	}while( *pcCaret );	//	データ有る限りループで探す
 
 	return iNumber;
 }
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	MLT�̑S�̃o�b�t�@���󂯎���āA�������ĕێ�
-	@param[in]	pcTotal	�S�̃o�b�t�@
-	@param[in]	cbTotal	�o�C�g��
-	@return		DWORD	�m�ۂ�����
+	MLTの全体バッファを受け取って、分解して保持
+	@param[in]	pcTotal	全体バッファ
+	@param[in]	cbTotal	バイト数
+	@return		DWORD	確保した個数
 */
 DWORD AacInflateMlt( LPSTR pcTotal, DWORD cbTotal )
 {
-	LPSTR	pcCaret;	//	�Ǎ��J�n�E���݈ʒu
-	LPSTR	pcEnd;		//	���AA�̖��[�ʒu�E�Z�p���[�^�̒��O
+	LPSTR	pcCaret;	//	読込開始・現在位置
+	LPSTR	pcEnd;		//	一つのAAの末端位置・セパレータの直前
 	//LPSTR	pcCheck;
-	DWORD	iNumber;	//	�ʂ��ԍ��J�E���g
-	AAMATRIX	stAAbuf;//	���AA�̕ێ��E�x�N�^�[�ɓ����
+	DWORD	iNumber;	//	通し番号カウント
+	AAMATRIX	stAAbuf;//	一つのAAの保持・ベクターに入れる
 
-	pcCaret = pcTotal;	//	�܂��͍ŏ�����
+	pcCaret = pcTotal;	//	まずは最初から
 
-	iNumber = 0;	//	�ʂ��ԍ��O�C���f�b�N�X
-	//	�n�_�ɂ̓Z�p���[�^�������̂Ƃ݂Ȃ��B�A������Z�p���[�^�́A���s�݂̂Ƃ��Ĉ���
+	iNumber = 0;	//	通し番号０インデックス
+	//	始点にはセパレータ無いものとみなす。連続するセパレータは、改行のみとして扱う
 
 	do
 	{
@@ -256,14 +256,14 @@ DWORD AacInflateMlt( LPSTR pcTotal, DWORD cbTotal )
 
 		stAAbuf.ixNum = iNumber;
 
-		pcEnd = StrStrA( pcCaret, MLT_SEPARATER );	//	�Z�p���[�^��T��
-		if( !pcEnd )	//	������Ȃ������灁���ꂪ�Ō�Ȃ灁NULL
+		pcEnd = StrStrA( pcCaret, MLT_SEPARATER );	//	セパレータを探す
+		if( !pcEnd )	//	見つからなかったら＝これが最後なら＝NULL
 		{
 			pcEnd = pcTotal + cbTotal;
 		}
-		stAAbuf.cbItem = pcEnd - pcCaret;	//	�o�C�g���Ȃ̂ł���ł����͂�
+		stAAbuf.cbItem = pcEnd - pcCaret;	//	バイト数なのでこれでいいはず
 
-		//����	���[��0x0D�P�Ƃ��O��
+		//＠＠	末端の0x0D単独を外す
 		//if( 0 != stAAbuf.cbItem )
 		//{
 		//	pcCheck = pcEnd;	pcCheck--;
@@ -283,16 +283,16 @@ DWORD AacInflateMlt( LPSTR pcTotal, DWORD cbTotal )
 			CopyMemory( stAAbuf.pcItem, pcCaret, stAAbuf.cbItem );
 		}
 
-		AacTitleCheck( &stAAbuf );	//	���e�m�F���Ăł������Ȃ猩�o���ɂ���
+		AacTitleCheck( &stAAbuf );	//	内容確認してできそうなら見出しにする
 
-		gvcArts.push_back( stAAbuf );	//	�x�N�^�[�ɒǉ�
-		//	������ stAAbuf.pcItem ���t���[���Ă͂����Ȃ��Evector�Ŏg���Ă���
+		gvcArts.push_back( stAAbuf );	//	ベクターに追加
+		//	ここで stAAbuf.pcItem をフリーしてはいけない・vectorで使っている
 
 		iNumber++;
 
 		pcCaret = NextLineA( pcEnd );
 
-	}while( *pcCaret );	//	�f�[�^�L����胋�[�v�ŒT��
+	}while( *pcCaret );	//	データ有る限りループで探す
 
 
 	return iNumber;
@@ -300,9 +300,9 @@ DWORD AacInflateMlt( LPSTR pcTotal, DWORD cbTotal )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	���o���ɂȂ蓾��Tango��T��
-	@param[in]	pstItem	�`�F�b�N����^�[�Q�b�g���e
-	@return		UINT	��O���o���������@�O�Ȃ�����
+	見出しになり得るTangoを探す
+	@param[in]	pstItem	チェックするターゲット内容
+	@return		UINT	非０見出しあった　０なかった
 */
 UINT AacTitleCheck( LPAAMATRIX pstItem )
 {
@@ -310,83 +310,83 @@ UINT AacTitleCheck( LPAAMATRIX pstItem )
 	LPSTR	pcLine;
 	UINT	cbSize, d;
 
-	if( 4 > pstItem->cbItem )	return 0;	//	�����������牽������
+	if( 4 > pstItem->cbItem )	return 0;	//	小さすぎたら何も無い
 
-	//	�Ƃ肠�����擪��s�ڂɂ���
+	//	とりあえず先頭壱行目について
 	pcCaret = pstItem->pcItem;
 
-	//	�擪�ɂ���
-	if( !( strncmp( pcCaret, "�y", 2 ) ) )	//	�u�����P�b�g�ł��邩
+	//	先頭について
+	if( !( strncmp( pcCaret, "【", 2 ) ) )	//	ブランケットであるか
 	{
-		pcOpen = pcCaret + 2;	//	���e�J�n�ʒu
+		pcOpen = pcCaret + 2;	//	内容開始位置
 
 		cbSize  = pstItem->cbItem;
-		cbSize -= 2;	//	��s�̏ꍇ�����z���Čv�Z
+		cbSize -= 2;	//	壱行の場合を見越して計算
 
 		pcEnd = NextLineA( pcCaret );
-		//	���g��NULL�Ȃ�A���s������s�ł���
+		//	中身がNULLなら、改行無し壱行である
 		if( *pcEnd )
 		{
 			pcCaret = pcOpen;
 			cbSize = pcEnd - pcCaret;
 		}
-		//	�����ŁAcbSize�͈�s�̒����ɂȂ�
+		//	ここで、cbSizeは壱行の長さになる
 		pcLine = (LPSTR)malloc( cbSize+1 );
 		ZeroMemory( pcLine, cbSize+1 );
 		CopyMemory( pcLine, pcOpen, cbSize );
 		pcCaret = pcLine;
 		for( d = 0; cbSize > d; d++ )
 		{
-			if( !(strncmp( pcCaret, "�z", 2 ) ) )
+			if( !(strncmp( pcCaret, "】", 2 ) ) )
 			{
 				*pcCaret = NULL;
 				break;
 			}
 			pcCaret++;
 		}
-		//�����܂łŁApcLine�Ɂy�z�̕����񂪎c���Ă���͂�
+		//ここまでで、pcLineに【】の文字列が残っているはず
 		AaTitleAddString( pstItem->ixNum, pcLine );
 
 		FREE(pcLine);
 	}
 	else
 	{
-		//	�擪������̕����ł���Ȃ猩�o���ł͂Ȃ�
+		//	先頭が特定の文字であるなら見出しではない
 		if( ':' ==  pcCaret[0] )	return 0;
 		if( '_' ==  pcCaret[0] )	return 0;
 		if( '(' ==  pcCaret[0] )	return 0;
 		if( '.' ==  pcCaret[0] )	return 0;
 		if( '/' ==  pcCaret[0] )	return 0;
-		//	�擪������������̕�����ł���Ȃ猩�o���ł͂Ȃ�
-		if( !( strncmp( pcCaret, "�i", 2 ) ) )	return 0;
-		if( !( strncmp( pcCaret, "�@ ", 3 ) ) )	return 0;	//	�S�p�󔒁{���p��
-		if( !( strncmp( pcCaret, "�@�@", 4 ) ) )	return 0;	//	�S�p��2��
-		if( !( strncmp( pcCaret, "�ŏI�X", 4 ) ) )	return 0;
+		//	先頭数文字が特定の文字列であるなら見出しではない
+		if( !( strncmp( pcCaret, "（", 2 ) ) )	return 0;
+		if( !( strncmp( pcCaret, "　 ", 3 ) ) )	return 0;	//	全角空白＋半角空白
+		if( !( strncmp( pcCaret, "　　", 4 ) ) )	return 0;	//	全角空白2つ
+		if( !( strncmp( pcCaret, "最終更", 4 ) ) )	return 0;
 		if( !( strncmp( pcCaret, "Last Mod", 8 ) ) )	return 0;
 
-		//	���o���ƌ��Ȃ��ē��e���Q�b�g����B
-		cbSize = pstItem->cbItem;	//	��s�̏ꍇ
+		//	見出しと見なして内容をゲットする。
+		cbSize = pstItem->cbItem;	//	壱行の場合
 
 		pcEnd = NextLineA( pcCaret );
-		//NULL�Ȃ�A���s������s�ł���
+		//NULLなら、改行無し壱行である
 		if( *pcEnd )
 		{
-			cbSize = pcEnd - pcCaret;	//	���s������
+			cbSize = pcEnd - pcCaret;	//	改行分注意
 
 			pcOpen = pcEnd;
-			pcEnd  = NextLineA( pcOpen );	//	���s�m�F
-			//	�����ŁA�R�s�ڈȍ~������Ό��o���Ƃ͌��Ȃ��Ȃ�
+			pcEnd  = NextLineA( pcOpen );	//	次行確認
+			//	ここで、３行目以降があれば見出しとは見なさない
 			if( *pcEnd )	return 0;
 		}
 
-		//	�����ŁAcbSize�͈�s�̒����ɂȂ�
+		//	ここで、cbSizeは壱行の長さになる
 
-		//	�����A�s�����ɒ���������A���o���Ƃ͌��Ȃ��Ȃ�
+		//	もし、行が妙に長かったら、見出しとは見なさない
 		if( 42 <= cbSize )	return 0;
 
 		pcLine = (LPSTR)malloc( cbSize );
 		ZeroMemory( pcLine, cbSize );
-		CopyMemory( pcLine, pcCaret, cbSize-2 );	//	���s���J�b�g
+		CopyMemory( pcLine, pcCaret, cbSize-2 );	//	改行分カット
 
 		AaTitleAddString( pstItem->ixNum, pcLine );
 
@@ -398,7 +398,7 @@ UINT AacTitleCheck( LPAAMATRIX pstItem )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	�m�ۂ��Ă�A�C�e������Ԃ�
+	確保してるアイテム数を返す
 */
 INT_PTR AacItemCount( UINT reserve )
 {
@@ -407,12 +407,12 @@ INT_PTR AacItemCount( UINT reserve )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	�ʂ��ԍ����󂯂āAHBITMAP�ƃT�C�Y��Ԃ�
-	@param[in]	hWnd	�E�C���h�E�n���h��
-	@param[in]	iNumber	�ʂ��ԍ��O�C���f�b�N�X
-	@param[out]	pstSize	�傫��
-	@param[out]	pstArea	�h�b�g�����C��
-	@return	HBITMAP	AA�̓��e�̃r�b�g�}�b�v��Ԃ��B�߂ɂ���Ȃ炻�̂܂܁A�A�C�e���Ȃ��Ȃ�NULL
+	通し番号を受けて、HBITMAPとサイズを返す
+	@param[in]	hWnd	ウインドウハンドル
+	@param[in]	iNumber	通し番号０インデックス
+	@param[out]	pstSize	大きさ
+	@param[out]	pstArea	ドットｘライン
+	@return	HBITMAP	AAの内容のビットマップを返す。已にあるならそのまま、アイテムないならNULL
 */
 HBITMAP AacArtImageGet( HWND hWnd, INT iNumber, LPSIZE pstSize, LPSIZE pstArea )
 {
@@ -426,13 +426,13 @@ HBITMAP AacArtImageGet( HWND hWnd, INT iNumber, LPSIZE pstSize, LPSIZE pstArea )
 	pstArea->cy = 0;
 
 	iItems = gvcArts.size( );
-	if( iItems <= iNumber ){	return NULL;	}	//	�͂ݏo���̏ꍇ
+	if( iItems <= iNumber ){	return NULL;	}	//	はみ出しの場合
 
 	itArts = gvcArts.begin();
 	for( i = 0; iNumber >  i; i++ ){	itArts++;	}
 
 
-	//	�m�ۍς̏ꍇ	hThumbDC
+	//	確保済の場合	hThumbDC
 	if( itArts->hThumbBmp )
 	{
 		pstSize->cx = itArts->stSize.cx;
@@ -445,7 +445,7 @@ HBITMAP AacArtImageGet( HWND hWnd, INT iNumber, LPSIZE pstSize, LPSIZE pstArea )
 	}
 
 
-	//	���m�ۂ̏ꍇ
+	//	未確保の場合
 	DraughtAaImageing( hWnd, &(*itArts) );
 
 	pstSize->cx = itArts->stSize.cx;
@@ -459,9 +459,9 @@ HBITMAP AacArtImageGet( HWND hWnd, INT iNumber, LPSIZE pstSize, LPSIZE pstArea )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	�ʂ��ԍ����󂯂āA���e��Ԃ�
-	@param[in]	iNumber	�ʂ��ԍ��O�C���f�b�N�X
-	@return	LPSTR	AA�̓��e���A�������m�ۂ��ēn���B�󂯎�������ŊJ������
+	通し番号を受けて、内容を返す
+	@param[in]	iNumber	通し番号０インデックス
+	@return	LPSTR	AAの内容を、メモリ確保して渡す。受け取った方で開放する
 */
 LPSTR AacAsciiArtGet( DWORD iNumber )
 {
@@ -481,11 +481,11 @@ LPSTR AacAsciiArtGet( DWORD iNumber )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	�ʂ��ԍ����󂯂āA���e�̍ő�h�b�g���ƍs���ƃo�C�g����߂�
-	@param[in]	iNumber	�ʂ��ԍ��O�C���f�b�N�X
-	@param[out]	piLine	�s���Ԃ�
-	@param[out]	pBytes	�o�C�g���Ԃ��iEditor�̂݁j
-	@return		�ő�h�b�g��
+	通し番号を受けて、内容の最大ドット数と行数とバイト数を戻す
+	@param[in]	iNumber	通し番号０インデックス
+	@param[out]	piLine	行数返す
+	@param[out]	pBytes	バイト数返す（Editorのみ）
+	@return		最大ドット数
 */
 INT AacArtSizeGet( DWORD iNumber, PINT piLine, PINT pBytes )
 {
@@ -533,14 +533,14 @@ INT AacArtSizeGet( DWORD iNumber, PINT piLine, PINT pBytes )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	MLT�̕ێ����e��S�j��
-	@return	HRESULT	�I����ԃR�[�h
+	MLTの保持内容を全破棄
+	@return	HRESULT	終了状態コード
 */
 HRESULT AacMatrixClear( VOID )
 {
 	MAAM_ITR	itArts;
 
-	//	��ɗ̈���J��
+	//	先に領域を開放
 	for( itArts = gvcArts.begin(); itArts != gvcArts.end(); itArts++ )
 	{
 		FREE( itArts->pcItem );
@@ -553,17 +553,17 @@ HRESULT AacMatrixClear( VOID )
 		}
 	}
 
-	gvcArts.clear();	//	�����đS�j��
+	gvcArts.clear();	//	そして全破棄
 
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	�g�p�̋敪�f�B���N�g�������󂯎���āA�r�p�k���璆�g���m�ۂ���
-	@param[in]	hWnd		�e�E�C���h�E�n���h���ENULL�Ȃ�j��
-	@param[in]	ptBlockName	�敪�f�B���N�g����
-	@return		DWORD		�m�ۂ�����
+	使用の区分ディレクトリ名を受け取って、ＳＱＬから中身を確保する
+	@param[in]	hWnd		親ウインドウハンドル・NULLなら破壊
+	@param[in]	ptBlockName	区分ディレクトリ名
+	@return		DWORD		確保した個数
 */
 DWORD AacAssembleSql( HWND hWnd, LPCTSTR ptBlockName )
 {
@@ -571,11 +571,11 @@ DWORD AacAssembleSql( HWND hWnd, LPCTSTR ptBlockName )
 
 	ixItems = SqlFavCount( ptBlockName, NULL );
 
-	AacMatrixClear(   );	//	�����̓��e�S�j��
+	AacMatrixClear(   );	//	既存の内容全破壊
 
 	if( 0 == ixItems )	return 0;
 
-	//	�R�[���o�b�N���Ē��g���x�N�^�[�Ɋm��
+	//	コールバックして中身をベクターに確保
 	SqlFavArtEnum( ptBlockName, AacFavInflate );
 
 	return ixItems;
@@ -583,19 +583,19 @@ DWORD AacAssembleSql( HWND hWnd, LPCTSTR ptBlockName )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	�R�[���o�b�N�ł��C�ɓ��胊�X�g�̒��g���Q�b�c
-	@param[in]	dLength	�o�C�g��
-	@param[in]	dummy	���g�p
-	@param[in]	fake	���g�p
-	@param[in]	pcConts	AA�{��
-	@return		UINT	�m�ۂ�����
+	コールバックでお気に入りリストの中身をゲッツ
+	@param[in]	dLength	バイト数
+	@param[in]	dummy	未使用
+	@param[in]	fake	未使用
+	@param[in]	pcConts	AA本体
+	@return		UINT	確保した個数
 */
 LRESULT CALLBACK AacFavInflate( UINT dLength, UINT dummy, UINT fake, LPCVOID pcConts )
 {
-	UINT_PTR	iNumber;	//	�ʂ��ԍ�
-	AAMATRIX	stAAbuf;	//	���AA�̕ێ��E�x�N�^�[�ɓ����
+	UINT_PTR	iNumber;	//	通し番号
+	AAMATRIX	stAAbuf;	//	一つのAAの保持・ベクターに入れる
 
-	iNumber = gvcArts.size( );	//	�����o�Ă���̂ŁA�O�C���f�b�N�X�ɂȂ�
+	iNumber = gvcArts.size( );	//	個数が出てくるので、０インデックスになる
 
 	TRACE( TEXT("NUM[%d] byte[%d]"), iNumber, dLength );
 
@@ -603,13 +603,13 @@ LRESULT CALLBACK AacFavInflate( UINT dLength, UINT dummy, UINT fake, LPCVOID pcC
 
 	stAAbuf.ixNum = iNumber;
 
-	stAAbuf.cbItem = dLength;	//	�o�C�g���Ȃ̂ł���ł����͂�
+	stAAbuf.cbItem = dLength;	//	バイト数なのでこれでいいはず
 	stAAbuf.pcItem = (LPSTR)malloc( stAAbuf.cbItem + 2 );
 	ZeroMemory( stAAbuf.pcItem, stAAbuf.cbItem + 2 );
 
 	CopyMemory( stAAbuf.pcItem, pcConts, stAAbuf.cbItem );
 
-	gvcArts.push_back( stAAbuf );	//	�x�N�^�[�ɒǉ�
+	gvcArts.push_back( stAAbuf );	//	ベクターに追加
 
 	return 0;
 }
@@ -624,22 +624,22 @@ LRESULT CALLBACK AacFavInflate( UINT dLength, UINT dummy, UINT fake, LPCVOID pcC
 
 typedef struct tagITEMADDINFO
 {
-	LPTSTR	ptContent;			//!<	�{�����e
-	TCHAR	atSep[MAX_STRING];	//!<	�Z�p���[�^���e
-	INT		bType;				//!<	��OMLT�@�OAST
+	LPTSTR	ptContent;			//!<	本文内容
+	TCHAR	atSep[MAX_STRING];	//!<	セパレータ内容
+	INT		bType;				//!<	非０MLT　０AST
 
 } ITEMADDINFO, *LPITEMADDINFO;
 //--------------------------------------
 
 
 /*!
-	�A�C�e���ǉ��̖ʓ|����_�C�����O�[
-	@param[in]	hDlg		�_�C�����O�n���h��
-	@param[in]	message		�E�C���h�E���b�Z�[�W�̎��ʔԍ�
-	@param[in]	wParam		�ǉ��̏��P
-	@param[in]	lParam		�ǉ��̏��Q
-	@retval 0	���b�Z�[�W�͏������Ă��Ȃ�
-	@retval no0	�Ȃ񂩏������ꂽ
+	アイテム追加の面倒見るダイヤログー
+	@param[in]	hDlg		ダイヤログハンドル
+	@param[in]	message		ウインドウメッセージの識別番号
+	@param[in]	wParam		追加の情報１
+	@param[in]	lParam		追加の情報２
+	@retval 0	メッセージは処理していない
+	@retval no0	なんか処理された
 */
 INT_PTR CALLBACK AaItemAddDlgProc( HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam )
 {
@@ -655,24 +655,24 @@ INT_PTR CALLBACK AaItemAddDlgProc( HWND hDlg, UINT message, WPARAM wParam, LPARA
 		case WM_INITDIALOG:
 			pstIaInfo = (LPITEMADDINFO)(lParam);
 			GetClientRect( hDlg, &rect );
-			CreateWindowEx( 0, WC_BUTTON, TEXT("���̕�"),         WS_CHILD | WS_VISIBLE, 0, 0, 75, 23, hDlg, (HMENU)IDB_MAID_NOWPAGE, GetModuleHandle(NULL), NULL );
-			CreateWindowEx( 0, WC_BUTTON, TEXT("�N���b�v�{�[�h"), WS_CHILD | WS_VISIBLE, 75, 0, 120, 23, hDlg, (HMENU)IDB_MAID_CLIPBOARD, GetModuleHandle(NULL), NULL ); 
+			CreateWindowEx( 0, WC_BUTTON, TEXT("今の頁"),         WS_CHILD | WS_VISIBLE, 0, 0, 75, 23, hDlg, (HMENU)IDB_MAID_NOWPAGE, GetModuleHandle(NULL), NULL );
+			CreateWindowEx( 0, WC_BUTTON, TEXT("クリップボード"), WS_CHILD | WS_VISIBLE, 75, 0, 120, 23, hDlg, (HMENU)IDB_MAID_CLIPBOARD, GetModuleHandle(NULL), NULL ); 
 			CreateWindowEx( 0, WC_EDIT,   TEXT(""),               WS_CHILD | WS_VISIBLE | WS_BORDER | ES_AUTOHSCROLL, 195, 0, rect.right-195-50, 23, hDlg, (HMENU)IDE_MAID_ITEMNAME, GetModuleHandle(NULL), NULL );
-			CreateWindowEx( 0, WC_BUTTON, TEXT("�ǉ�"),           WS_CHILD | WS_VISIBLE, rect.right-50, 0, 50, 23, hDlg, (HMENU)IDB_MAID_ADDGO, GetModuleHandle(NULL), NULL );
+			CreateWindowEx( 0, WC_BUTTON, TEXT("追加"),           WS_CHILD | WS_VISIBLE, rect.right-50, 0, 50, 23, hDlg, (HMENU)IDB_MAID_ADDGO, GetModuleHandle(NULL), NULL );
 			CreateWindowEx( 0, WC_EDIT,   TEXT(""),               WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | WS_HSCROLL | ES_MULTILINE | ES_READONLY, 0, 23, rect.right, rect.bottom-23, hDlg, (HMENU)IDE_MAID_CONTENTS, GetModuleHandle(NULL), NULL );
-			//	�Ȃ�ł킴�킴����������̂��v���o���Ȃ��B
+			//	なんでわざわざこうやったのか思い出せない。
 
 			if( pstIaInfo->bType )
 			{
-				SetDlgItemText( hDlg, IDE_MAID_ITEMNAME, TEXT("���̂�AST�łȂ��Ǝg�p�ł��Ȃ���") );
+				SetDlgItemText( hDlg, IDE_MAID_ITEMNAME, TEXT("名称はASTでないと使用できないよ") );
 				EnableWindow( GetDlgItem(hDlg,IDE_MAID_ITEMNAME), FALSE );
 				StringCchCopy( pstIaInfo->atSep, MAX_STRING, TEXT("[SPLIT]\r\n") );
 			}
 
-			//	�Ƃ肠�����N���b�v�{�[�h�̒��g���Ƃ�
+			//	とりあえずクリップボードの中身をとる
 			ptBuffer = DocClipboardDataGet( NULL );
 			if( !(ptBuffer) ){	DocPageGetAlloc( D_UNI , (LPVOID *)(&ptBuffer) );	}
-			//	�g���Ȃ��V�����m�Ȃ�A���̕ł̓��e�������Ă��ĕ\��
+			//	使えないシロモノなら、今の頁の内容を持ってきて表示
 			SetDlgItemText( hDlg, IDE_MAID_CONTENTS, ptBuffer );
 			return (INT_PTR)TRUE;
 
@@ -685,20 +685,20 @@ INT_PTR CALLBACK AaItemAddDlgProc( HWND hDlg, UINT message, WPARAM wParam, LPARA
 					EndDialog(hDlg, 0 );
 					return (INT_PTR)TRUE;
 
-				case IDB_MAID_ADDGO:	//	�ǉ����s
+				case IDB_MAID_ADDGO:	//	追加実行
 					if( ptBuffer )
 					{
 						StringCchLength( ptBuffer, STRSAFE_MAX_CCH, &cchSize );
 						cchSize += 4;
 						pstIaInfo->ptContent = (LPTSTR)malloc( cchSize * sizeof(TCHAR) );
 						StringCchCopy( pstIaInfo->ptContent, cchSize, ptBuffer );
-						//	�X�v���b�^�p�̉��s
+						//	スプリッタ用の改行
 						StringCchCat( pstIaInfo->ptContent, cchSize, CH_CRLFW );
 
-						if( !(pstIaInfo->bType) )	//	AST�Ȃ�^�C�g������
+						if( !(pstIaInfo->bType) )	//	ASTならタイトル頂く
 						{
 							GetDlgItemText( hDlg, IDE_MAID_ITEMNAME, atName, MAX_PATH );
-					//		StringCchPrintf( pstIaInfo->atSep, MAX_STRING, TEXT("[AA][%s]\r\n"), atName );	//	���̂܂܂ł̓^�O�����d�ɕۑ�����Ă܂�
+					//		StringCchPrintf( pstIaInfo->atSep, MAX_STRING, TEXT("[AA][%s]\r\n"), atName );	//	このままではタグが多重に保存されてまう
 							StringCchCopy( pstIaInfo->atSep, MAX_STRING, atName );
 						}
 					}
@@ -735,10 +735,10 @@ INT_PTR CALLBACK AaItemAddDlgProc( HWND hDlg, UINT message, WPARAM wParam, LPARA
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	�ʂ��ԍ����󂯂āA������폜
-	@param[in]	hWnd	�e�E�C���h�E�n���h��
-	@param[in]	iNumber	�ʂ��ԍ��O�C���f�b�N�X�E�}�C�i�X�Ȃ牽�����Ȃ�
-	@return	HRESULT	�I����ԃR�[�h
+	通し番号を受けて、それを削除
+	@param[in]	hWnd	親ウインドウハンドル
+	@param[in]	iNumber	通し番号０インデックス・マイナスなら何もしない
+	@return	HRESULT	終了状態コード
 */
 HRESULT AacItemDelete( HWND hWnd, LONG iNumber )
 {
@@ -748,17 +748,17 @@ HRESULT AacItemDelete( HWND hWnd, LONG iNumber )
 	if( 0 > iNumber )	return E_OUTOFMEMORY;
 
 	itMaaItem = gvcArts.begin();
-	std::advance( itMaaItem , iNumber );	//	�ڕW�܂Ői�߂�
+	std::advance( itMaaItem , iNumber );	//	目標まで進める
 
-	//�f���[�g�m�F������
+	//デリート確認がいる
 
-	gvcArts.erase( itMaaItem );	//	�f���[�g����
+	gvcArts.erase( itMaaItem );	//	デリート処理
 
-	AacItemBackUpCreate( NULL );	//	�o�b�N�A�b�v���Ă���
+	AacItemBackUpCreate( NULL );	//	バックアップしておく
 
-	AacItemOutput( hWnd );	//	�����Ńt�@�C�����o�͍X�V
+	AacItemOutput( hWnd );	//	ここでファイルを出力更新
 
-	//	�ǉ����������烊���[�h����
+	//	追加処理したらリロードする
 	curSel = TabMultipleNowSel(  );
 	AaItemsDoShow( hWnd, gatOpenFile, curSel );
 
@@ -767,51 +767,51 @@ HRESULT AacItemDelete( HWND hWnd, LONG iNumber )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	�ʂ��ԍ����󂯂āA�����̎�O�ɃA�C�e���ǉ�
-	@param[in]	hWnd	�e�E�C���h�E�n���h��
-	@param[in]	iNumber	�ʂ��ԍ��O�C���f�b�N�X�E�}�C�i�X�Ȃ疖���ɒǉ��Ƃ���
-	@return	HRESULT	�I����ԃR�[�h
+	通し番号を受けて、そこの手前にアイテム追加
+	@param[in]	hWnd	親ウインドウハンドル
+	@param[in]	iNumber	通し番号０インデックス・マイナスなら末尾に追加とする
+	@return	HRESULT	終了状態コード
 */
 HRESULT AacItemInsert( HWND hWnd, LONG iNumber )
 {
 	UINT_PTR	cbSize;
 	LPSTR		pcName;
 	INT			curSel;
-	AAMATRIX	stAAbuf;	//	���AA�̕ێ��E�x�N�^�[�ɓ����
+	AAMATRIX	stAAbuf;	//	一つのAAの保持・ベクターに入れる
 	ITEMADDINFO	stIaInfo;
 
 	ZeroMemory( &stAAbuf, sizeof(AAMATRIX) );
 	ZeroMemory( &stIaInfo, sizeof(ITEMADDINFO) );
 
-	//	�g���q�m�F
+	//	拡張子確認
 	if( FileExtensionCheck( gatOpenFile, TEXT(".ast") ) ){	stIaInfo.bType =  0;	}
 	else{	stIaInfo.bType =  1;	}
 
 	if( DialogBoxParam( GetModuleHandle(NULL), MAKEINTRESOURCE(IDD_MAA_IADD_DLG), hWnd, AaItemAddDlgProc, (LPARAM)(&stIaInfo) ) )
 	{
-		if( stIaInfo.ptContent )	//	���g���L���Ȃ珈������
+		if( stIaInfo.ptContent )	//	中身が有効なら処理する
 		{
-			//	���O�m��
-			pcName = SjisEncodeAlloc( stIaInfo.atSep  );	//	�ϊ�
+			//	名前確保
+			pcName = SjisEncodeAlloc( stIaInfo.atSep  );	//	変換
 			StringCchLengthA( pcName, STRSAFE_MAX_CCH, &cbSize );
 			StringCchCopyA( stAAbuf.acAstName, MAX_STRING, pcName );
 			FREE( pcName );
 			stAAbuf.cbItem = cbSize;
-			//	�{�̊m��
+			//	本体確保
 			stAAbuf.pcItem = SjisEncodeAlloc( stIaInfo.ptContent  );
 
 			if( 0 <= iNumber )	gvcArts.insert( gvcArts.begin() + iNumber, stAAbuf );
 			else				gvcArts.push_back( stAAbuf );
-		//	������ stAAbuf.pcItem ���t���[���Ă͂����Ȃ��Evector�Ŏg���Ă���
+		//	ここで stAAbuf.pcItem をフリーしてはいけない・vectorで使っている
 
 			FREE( stIaInfo.ptContent );
 
-			AacItemBackUpCreate( NULL );	//	�o�b�N�A�b�v���Ă���
+			AacItemBackUpCreate( NULL );	//	バックアップしておく
 
-			AacItemOutput( hWnd );	//	�����Ńt�@�C�����o�͍X�V
+			AacItemOutput( hWnd );	//	ここでファイルを出力更新
 
-			//�ǉ����������烊���[�h����E�R���{�b�N�X�N�����[�Ƃ�����
-		//	AaTitleClear(  );	//	AaItemsDoShow�̒��ł���Ă邩�炱���ɂ͕s�v
+			//追加処理したらリロードする・コンボックスクルヤーとか注意
+		//	AaTitleClear(  );	//	AaItemsDoShowの中でやってるからここには不要
 			curSel = TabMultipleNowSel(  );
 			AaItemsDoShow( hWnd, gatOpenFile, curSel );
 		}
@@ -822,29 +822,29 @@ HRESULT AacItemInsert( HWND hWnd, LONG iNumber )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	�ύX���ʂ�ۑ�����O�ɁA�o�b�N�A�b�v�Ƃ��Ă���
+	変更結果を保存する前に、バックアップとっておく
 */
 UINT AacItemBackUpCreate( LPVOID pVoid )
 {
 	TCHAR	atOutFile[MAX_PATH], atFileName[MAX_PATH];
 
-	//	�t�@�C�����m��
+	//	ファイル名確保
 	StringCchCopy( atFileName, MAX_PATH, PathFindFileName( gatOpenFile ) );
-	//	�K���Ɋg���q�t���Ă���
+	//	適当に拡張子付けておく
 	StringCchCat( atFileName, MAX_PATH, TEXT(".abk") );
-	//	�p�X�����
+	//	パスを作る
 	StringCchCopy( atOutFile, MAX_PATH, gatBkUpDir );
-	PathAppend( atOutFile, atFileName );	//	Backup�t�@�C����
+	PathAppend( atOutFile, atFileName );	//	Backupファイル名
 
-	//	�t�@�C�����R�s�[����
-	CopyFile( gatOpenFile, atOutFile, FALSE );	//	�����̃t�@�C���͏㏑������
+	//	ファイルをコピーする
+	CopyFile( gatOpenFile, atOutFile, FALSE );	//	既存のファイルは上書きする
 
 	return 1;
 }
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	�X�V�������e���A�E�g�v�b�g����
+	更新した内容をアウトプットする
 */
 HRESULT AacItemOutput( HWND hWnd )
 {
@@ -860,40 +860,40 @@ HRESULT AacItemOutput( HWND hWnd )
 	MAAM_ITR	itAamx;
 
 
-	//	�g���q�m�F
+	//	拡張子確認
 	if( FileExtensionCheck( gatOpenFile, TEXT(".ast") ) ){	isAST = TRUE;	}
 	else{	isAST = FALSE;	}
 
 	hFile = CreateFile( gatOpenFile, GENERIC_WRITE, 0, NULL, TRUNCATE_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL );
 	if( INVALID_HANDLE_VALUE == hFile )
 	{
-		MessageBox( hWnd, TEXT("�t�@�C�����J���Ȃ�������"), TEXT("���ӂ���̂��m�点"), MB_OK | MB_ICONERROR );
+		MessageBox( hWnd, TEXT("文件打开失败了哦"), TEXT("阿燐燐向您确认"), MB_OK | MB_ICONERROR );
 		return E_HANDLE;
 	}
 
 	SetFilePointer( hFile, 0, NULL, FILE_BEGIN );
 
 	iPage = gvcArts.size();
-	//	�S���o�͂��Ă���
+	//	全部出力していく
 	for( i = 0, itAamx = gvcArts.begin(); gvcArts.end() != itAamx; itAamx++, i++ )
 	{
-		//	��؂���o��	�]�v�ȉ��s���{���ɂ������̂��C��
+		//	区切りを出力	余計な改行が本文にくっつくのを修正
 		ZeroMemory( acSep, sizeof(acSep) );	cbSize = 0;
-		if( isAST )	//	AST�t�@�C���ł���
+		if( isAST )	//	ASTファイルである
 		{
 			StringCchPrintfA( acSep , MAX_STRING, ("[AA][%s]%s"), itAamx->acAstName, CH_CRLFA );
 		}
-		else	//	MLT�ł���BTXT��������Ȃ��B
+		else	//	MLTである。TXTかもしれない。
 		{
-			if( 1 <= i )	//	�t�@�C���擪�ɂ͕s�v
+			if( 1 <= i )	//	ファイル先頭には不要
 			{
 				StringCchPrintfA( acSep, MAX_STRING, ("%s%s"), MLT_SEPARATERA, CH_CRLFA );
 			}
 		}
-		StringCchLengthA( acSep , MAX_STRING, &cbSize );	//	�����m�F�AMLT�̏ꍇ����
+		StringCchLengthA( acSep , MAX_STRING, &cbSize );	//	長さ確認、MLTの場合注意
 		if( cbSize ){	WriteFile( hFile, acSep, cbSize, &wrote, NULL );	}
 
-		//	�{���o��
+		//	本文出力
 		StringCchLengthA( itAamx->pcItem, STRSAFE_MAX_CCH, &cbSize );
 		WriteFile( hFile, itAamx->pcItem, cbSize, &wrote, NULL );
 	}
