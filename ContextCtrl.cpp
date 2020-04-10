@@ -1,6 +1,6 @@
-/*! @file
-	@brief ƒƒCƒ“‚ÌƒRƒ“ƒeƒLƒXƒgƒƒjƒ…[‚ÌŠÇ—‚µ‚Ü‚·
-	‚±‚Ìƒtƒ@ƒCƒ‹‚Í ContextCtrl.cpp ‚Å‚·B
+ï»¿/*! @file
+	@brief ãƒ¡ã‚¤ãƒ³ã®ã‚³ãƒ³ãƒ†ã‚­ã‚¹ãƒˆãƒ¡ãƒ‹ãƒ¥ãƒ¼ã®ç®¡ç†ã—ã¾ã™
+	ã“ã®ãƒ•ã‚¡ã‚¤ãƒ«ã¯ ContextCtrl.cpp ã§ã™ã€‚
 	@author	SikigamiHNQ
 	@date	2011/11/07
 */
@@ -21,12 +21,12 @@ If not, see <http://www.gnu.org/licenses/>.
 #include "OrinrinEditor.h"
 //-------------------------------------------------------------------------------------------------
 
-//	ƒ†[ƒU’è‹`‚Æ‚©˜g‚Æ‚©‚ÍAƒTƒuƒƒjƒ…[—p‚Ìƒ_ƒ~[ƒAƒCƒeƒ€‚ğ—pˆÓ‚·‚é
+//	ãƒ¦ãƒ¼ã‚¶å®šç¾©ã¨ã‹æ ã¨ã‹ã¯ã€ã‚µãƒ–ãƒ¡ãƒ‹ãƒ¥ãƒ¼ç”¨ã®ãƒ€ãƒŸãƒ¼ã‚¢ã‚¤ãƒ†ãƒ ã‚’ç”¨æ„ã™ã‚‹
 
 typedef struct tagCONTEXTITEM
 {
-	TCHAR	atString[MIN_STRING];		//!<	•\¦‚·‚é•¶š—ñ
-	UINT	dCommandoID;				//!<	ƒRƒ}ƒ“ƒh‚h‚cE0‚ÅƒZƒpƒŒ[ƒ^
+	TCHAR	atString[MIN_STRING];		//!<	è¡¨ç¤ºã™ã‚‹æ–‡å­—åˆ—
+	UINT	dCommandoID;				//!<	ã‚³ãƒãƒ³ãƒ‰ï¼©ï¼¤ãƒ»0ã§ã‚»ãƒ‘ãƒ¬ãƒ¼ã‚¿
 
 } CONTEXTITEM, *LPCONTEXTITEM;
 //-------------------------------------------------------------------------------------------------
@@ -37,30 +37,30 @@ typedef struct tagCONTEXTITEM
 
 CONST static CONTEXTITEM	gstContextItem[] =
 {
-/* 0*/	{  TEXT("V‹Kì¬"),	/*ƒtƒ@ƒCƒ‹*/		IDM_NEWFILE				},
-/* 1*/	{  TEXT("ƒtƒ@ƒCƒ‹ŠJ‚­"),					IDM_OPEN				},
-		{  TEXT("ã‘‚«•Û‘¶"),						IDM_OVERWRITESAVE		},
-		{  TEXT("–¼‘O‚ğ•t‚¯‚Ä•Û‘¶"),				IDM_RENAMESAVE			},
-		{  TEXT("Œ»İ•Å‚ğ‰æ‘œ‚É‚µ‚Ä•Û‘¶"),			IDM_IMAGE_SAVE			},
-/* 5*/	{  TEXT("ˆê”Êİ’è"),						IDM_GENERAL_OPTION		},
-		{  TEXT("iƒZƒpƒŒ[ƒ^j"),					0						},
-		{  TEXT("Œ³‚É–ß‚·"),	/*•ÒW*/			IDM_UNDO				},
-		{  TEXT("‚â‚è’¼‚µ"),						IDM_REDO				},
-		{  TEXT("Ø‚èæ‚è"),						IDM_CUT					},
-/*10*/	{  TEXT("UnicodeƒRƒs["),					IDM_COPY				},
-		{  TEXT("SJISƒRƒs["),						IDM_SJISCOPY			},
-		{  TEXT("‘S‘Ì‚ğSJISƒRƒs["),				IDM_SJISCOPY_ALL		},
-		{  TEXT("“\•t"),							IDM_PASTE				},
-		{  TEXT("íœ"),							IDM_DELETE				},
-/*15*/	{  TEXT("‘S‘I‘ğ"),							IDM_ALLSEL				},
-		{  TEXT("‹éŒ`‘I‘ğ"),						IDM_SQSELECT			},
-		{  TEXT("‹éŒ`“\•t"),						IDM_SQUARE_PASTE		},
-		{  TEXT("ƒŒƒCƒ„ƒ{ƒbƒNƒX"),					IDM_LAYERBOX			},
-		{  TEXT("•”•ª’Šoƒ‚[ƒh"),					IDM_EXTRACTION_MODE		},
-/*20*/	{  TEXT("Ÿ‚ÌsˆÈ~‚ğV•Å‚É•ªŠ„"),			IDM_PAGEL_DIVIDE		},
-		{  TEXT("‘I‘ğ•¶š—ñ‚ğ•Å–¼‚É‚·‚é"),			IDM_PAGENAME_SELASSIGN	},
-		{  TEXT("iƒZƒpƒŒ[ƒ^j"),					0						},
-		{  TEXT("ƒ†ƒjƒR[ƒh‹ó”’"),	/*‘}“ü*/		IDM_MN_UNISPACE			},//ƒTƒuƒƒjƒ…[ƒ_ƒ~[
+/* 0*/	{  TEXT("æ–°è¦ä½œæˆ"),	/*ãƒ•ã‚¡ã‚¤ãƒ«*/		IDM_NEWFILE				},
+/* 1*/	{  TEXT("ãƒ•ã‚¡ã‚¤ãƒ«é–‹ã"),					IDM_OPEN				},
+		{  TEXT("ä¸Šæ›¸ãä¿å­˜"),						IDM_OVERWRITESAVE		},
+		{  TEXT("åå‰ã‚’ä»˜ã‘ã¦ä¿å­˜"),				IDM_RENAMESAVE			},
+		{  TEXT("ç¾åœ¨é ã‚’ç”»åƒã«ã—ã¦ä¿å­˜"),			IDM_IMAGE_SAVE			},
+/* 5*/	{  TEXT("ä¸€èˆ¬è¨­å®š"),						IDM_GENERAL_OPTION		},
+		{  TEXT("ï¼ˆã‚»ãƒ‘ãƒ¬ãƒ¼ã‚¿ï¼‰"),					0						},
+		{  TEXT("å…ƒã«æˆ»ã™"),	/*ç·¨é›†*/			IDM_UNDO				},
+		{  TEXT("ã‚„ã‚Šç›´ã—"),						IDM_REDO				},
+		{  TEXT("åˆ‡ã‚Šå–ã‚Š"),						IDM_CUT					},
+/*10*/	{  TEXT("Unicodeã‚³ãƒ”ãƒ¼"),					IDM_COPY				},
+		{  TEXT("SJISã‚³ãƒ”ãƒ¼"),						IDM_SJISCOPY			},
+		{  TEXT("å…¨ä½“ã‚’SJISã‚³ãƒ”ãƒ¼"),				IDM_SJISCOPY_ALL		},
+		{  TEXT("è²¼ä»˜"),							IDM_PASTE				},
+		{  TEXT("å‰Šé™¤"),							IDM_DELETE				},
+/*15*/	{  TEXT("å…¨é¸æŠ"),							IDM_ALLSEL				},
+		{  TEXT("çŸ©å½¢é¸æŠ"),						IDM_SQSELECT			},
+		{  TEXT("çŸ©å½¢è²¼ä»˜"),						IDM_SQUARE_PASTE		},
+		{  TEXT("ãƒ¬ã‚¤ãƒ¤ãƒœãƒƒã‚¯ã‚¹"),					IDM_LAYERBOX			},
+		{  TEXT("éƒ¨åˆ†æŠ½å‡ºãƒ¢ãƒ¼ãƒ‰"),					IDM_EXTRACTION_MODE		},
+/*20*/	{  TEXT("æ¬¡ã®è¡Œä»¥é™ã‚’æ–°é ã«åˆ†å‰²"),			IDM_PAGEL_DIVIDE		},
+		{  TEXT("é¸æŠæ–‡å­—åˆ—ã‚’é åã«ã™ã‚‹"),			IDM_PAGENAME_SELASSIGN	},
+		{  TEXT("ï¼ˆã‚»ãƒ‘ãƒ¬ãƒ¼ã‚¿ï¼‰"),					0						},
+		{  TEXT("ãƒ¦ãƒ‹ã‚³ãƒ¼ãƒ‰ç©ºç™½"),	/*æŒ¿å…¥*/		IDM_MN_UNISPACE			},//ã‚µãƒ–ãƒ¡ãƒ‹ãƒ¥ãƒ¼ãƒ€ãƒŸãƒ¼
 		{  TEXT(" 1 dot SPACE"),					IDM_IN_01SPACE			},
 /*25*/	{  TEXT(" 2 dot SPACE"),					IDM_IN_02SPACE			},
 		{  TEXT(" 3 dot SPACE"),					IDM_IN_03SPACE			},
@@ -69,170 +69,170 @@ CONST static CONTEXTITEM	gstContextItem[] =
 		{  TEXT(" 8 dot SPACE"),					IDM_IN_08SPACE			},
 /*30*/	{  TEXT("10 dot SPACE"),					IDM_IN_10SPACE			},
 		{  TEXT("16 dot SPACE"),					IDM_IN_16SPACE			},
-		{  TEXT("Fw’è"),							IDM_MN_COLOUR_SEL		},//ƒTƒuƒƒjƒ…[ƒ_ƒ~[
-		{  TEXT("”’"),								IDM_INSTAG_WHITE		},
-		{  TEXT("Â"),								IDM_INSTAG_BLUE			},
-/*35*/	{  TEXT("•"),								IDM_INSTAG_BLACK		},
-		{  TEXT("Ô"),								IDM_INSTAG_RED			},
-		{  TEXT("—Î"),								IDM_INSTAG_GREEN		},
-		{  TEXT("˜g‘I‘ğ"),							IDM_MN_INSFRAME_SEL		},//ƒTƒuƒƒjƒ…[ƒ_ƒ~[
-		{  TEXT("˜gi‚Pj"),						IDM_INSFRAME_ALPHA		},
-/*40*/	{  TEXT("˜gi‚Qj"),						IDM_INSFRAME_BRAVO		},
-		{  TEXT("˜gi‚Rj"),						IDM_INSFRAME_CHARLIE	},
-		{  TEXT("˜gi‚Sj"),						IDM_INSFRAME_DELTA		},
-		{  TEXT("˜gi‚Tj"),						IDM_INSFRAME_ECHO		},
-		{  TEXT("˜gi‚Uj"),						IDM_INSFRAME_FOXTROT	},
-/*45*/	{  TEXT("˜gi‚Vj"),						IDM_INSFRAME_GOLF		},
-		{  TEXT("˜gi‚Wj"),						IDM_INSFRAME_HOTEL		},
-		{  TEXT("˜gi‚Xj"),						IDM_INSFRAME_INDIA		},
-		{  TEXT("˜gi‚P‚Oj"),						IDM_INSFRAME_JULIETTE	},
-		{  TEXT("˜gi‚P‚Pj"),						IDM_INSFRAME_KILO		},
-/*50*/	{  TEXT("˜gi‚P‚Qj"),						IDM_INSFRAME_LIMA		},
-		{  TEXT("˜gi‚P‚Rj"),						IDM_INSFRAME_MIKE		},
-		{  TEXT("˜gi‚P‚Sj"),						IDM_INSFRAME_NOVEMBER	},
-		{  TEXT("˜gi‚P‚Tj"),						IDM_INSFRAME_OSCAR		},
-		{  TEXT("˜gi‚P‚Uj"),						IDM_INSFRAME_PAPA		},
-/*55*/	{  TEXT("˜gi‚P‚Vj"),						IDM_INSFRAME_QUEBEC		},
-		{  TEXT("˜gi‚P‚Wj"),						IDM_INSFRAME_ROMEO		},
-		{  TEXT("˜gi‚P‚Xj"),						IDM_INSFRAME_SIERRA		},
-		{  TEXT("˜gi‚Q‚Oj"),						IDM_INSFRAME_TANGO		},
-		{  TEXT("˜g•ÒW"),							IDM_INSFRAME_EDIT		},
-/*60*/	{  TEXT("˜g‘}“üƒ{ƒbƒNƒX"),					IDM_FRMINSBOX_OPEN		},
-		{  TEXT("•¶š‚`‚`•ÏŠ·ƒ{ƒbƒNƒX"),			IDM_MOZI_SCR_OPEN		},
-		{  TEXT("c‘‚«•ÏŠ·ƒ{ƒbƒNƒX"),				IDM_VERT_SCRIPT_OPEN	},
-		{  TEXT("ƒ†[ƒU’è‹`ƒAƒCƒeƒ€"),				IDM_MN_USER_REFS		},//ƒTƒuƒƒjƒ…[ƒ_ƒ~[
-		{  TEXT("ƒ†[ƒUƒAƒCƒeƒ€i‚Pj"),			IDM_USER_ITEM_ALPHA		},
-/*65*/	{  TEXT("ƒ†[ƒUƒAƒCƒeƒ€i‚Qj"),			IDM_USER_ITEM_BRAVO		},
-		{  TEXT("ƒ†[ƒUƒAƒCƒeƒ€i‚Rj"),			IDM_USER_ITEM_CHARLIE	},
-		{  TEXT("ƒ†[ƒUƒAƒCƒeƒ€i‚Sj"),			IDM_USER_ITEM_DELTA		},
-		{  TEXT("ƒ†[ƒUƒAƒCƒeƒ€i‚Tj"),			IDM_USER_ITEM_ECHO		},
-		{  TEXT("ƒ†[ƒUƒAƒCƒeƒ€i‚Uj"),			IDM_USER_ITEM_FOXTROT	},
-/*70*/	{  TEXT("ƒ†[ƒUƒAƒCƒeƒ€i‚Vj"),			IDM_USER_ITEM_GOLF		},
-		{  TEXT("ƒ†[ƒUƒAƒCƒeƒ€i‚Wj"),			IDM_USER_ITEM_HOTEL		},
-		{  TEXT("ƒ†[ƒUƒAƒCƒeƒ€i‚Xj"),			IDM_USER_ITEM_INDIA		},
-		{  TEXT("ƒ†[ƒUƒAƒCƒeƒ€i‚P‚Oj"),			IDM_USER_ITEM_JULIETTE	},
-		{  TEXT("ƒ†[ƒUƒAƒCƒeƒ€i‚P‚Pj"),			IDM_USER_ITEM_KILO		},
-/*75*/	{  TEXT("ƒ†[ƒUƒAƒCƒeƒ€i‚P‚Qj"),			IDM_USER_ITEM_LIMA		},
-		{  TEXT("ƒ†[ƒUƒAƒCƒeƒ€i‚P‚Rj"),			IDM_USER_ITEM_MIKE		},
-		{  TEXT("ƒ†[ƒUƒAƒCƒeƒ€i‚P‚Sj"),			IDM_USER_ITEM_NOVEMBER	},
-		{  TEXT("ƒ†[ƒUƒAƒCƒeƒ€i‚P‚Tj"),			IDM_USER_ITEM_OSCAR		},
-		{  TEXT("ƒ†[ƒUƒAƒCƒeƒ€i‚P‚Uj"),			IDM_USER_ITEM_PAPA		},
-/*80*/	{  TEXT("Še•Å‚É’Ê‚µ”Ô†‚ğ“ü‚ê‚é"),			IDM_PAGENUM_DLG_OPEN	},
-		{  TEXT("iƒZƒpƒŒ[ƒ^j"),					0						},
-		{  TEXT("‰E‘µ‚¦ü"),	/*®Œ`*/			IDM_RIGHT_GUIDE_SET		},
-		{  TEXT("s“ª‚É‘SŠp‹ó”’’Ç‰Á"),				IDM_INS_TOPSPACE		},
-		{  TEXT("s“ª‹ó”’íœ"),					IDM_DEL_TOPSPACE		},
-/*85*/	{  TEXT("s––‹ó”’íœ"),					IDM_DEL_LASTSPACE		},
-		{  TEXT("s––•¶šíœ"),					IDM_DEL_LASTLETTER		},
-		{  TEXT("‘I‘ğ”ÍˆÍ‚ğ‹ó”’‚É‚·‚é"),			IDM_FILL_SPACE			},
-		{  TEXT("•Å‘S‘Ì‚ğ‹ó”’‚Å–„‚ß‚é"),			IDM_FILL_ZENSP			},
-		{  TEXT("s“ª”¼Šp‹ó”’‚ğƒ†ƒjƒR[ƒh‚É•ÏŠ·"),	IDM_HEADHALF_EXCHANGE	},
-/*90*/	{  TEXT("¶‰E”½“]"),						IDM_MIRROR_INVERSE		},
-		{  TEXT("ã‰º”½“]"),						IDM_UPSET_INVERSE		},
-		{  TEXT("‰E‚ÉŠñ‚¹‚é"),						IDM_RIGHT_SLIDE			},
-		{  TEXT("‚Pƒhƒbƒg‘‚â‚·"),					IDM_INCREMENT_DOT		},
-		{  TEXT("‚PƒhƒbƒgŒ¸‚ç‚·"),					IDM_DECREMENT_DOT		},
-/*95*/	{  TEXT("‘S‘Ì‚ğ‚Pƒhƒbƒg‰E‚Ö"),				IDM_INCR_DOT_LINES		},
-		{  TEXT("‘S‘Ì‚ğ‚Pƒhƒbƒg¶‚Ö"),				IDM_DECR_DOT_LINES		},
-		{  TEXT("w’èˆÊ’u‚©‚ç‰E‚ÖL‚°‚é"),			IDM_DOT_SPLIT_RIGHT		},
-		{  TEXT("w’èˆÊ’u‚©‚ç¶‚É‹·‚ß‚é"),			IDM_DOT_SPLIT_LEFT		},
-		{  TEXT("’²®Šî€ƒƒbƒN"),					IDM_DOTDIFF_LOCK		},
-/*100*/	{  TEXT("ƒJ[ƒ\ƒ‹ˆÊ’u‚Å’²®"),				IDM_DOTDIFF_ADJT		},
-		{  TEXT("iƒZƒpƒŒ[ƒ^j"),					0						},
-		{  TEXT("‹ó”’‚ğ•\¦"),	/*•\¦*/			IDM_SPACE_VIEW_TOGGLE	},
-		{  TEXT("ƒOƒŠƒbƒhü‚ğ•\¦"),				IDM_GRID_VIEW_TOGGLE	},
-		{  TEXT("‰EƒKƒCƒhü‚ğ•\¦"),				IDM_RIGHT_RULER_TOGGLE	},
-/*105*/	{  TEXT("sƒKƒCƒhü‚ğ•\¦"),				IDM_UNDER_RULER_TOGGLE	},
-		{  TEXT("•¡”sƒeƒ“ƒvƒŒ[ƒg•\¦"),			IDM_MAATMPLE_VIEW		},
-		{  TEXT("•Åˆê——•\¦"),						IDM_PAGELIST_VIEW		},
-		{  TEXT("ˆësƒeƒ“ƒvƒŒ[ƒg•\¦"),			IDM_LINE_TEMPLATE		},
-		{  TEXT("“h‚è’×‚µƒuƒ‰ƒV•\¦"),				IDM_BRUSH_PALETTE		},
-/*110*/	{  TEXT("ƒ†ƒjƒR[ƒh•\‚ğŠJ‚­"),				IDM_UNI_PALETTE			},
-		{  TEXT("ƒgƒŒƒXƒ‚[ƒh"),					IDM_TRACE_MODE_ON		},
-		{  TEXT("ƒvƒŒƒrƒ…["),						IDM_ON_PREVIEW			},
-		{  TEXT("ƒhƒ‰ƒtƒgƒ{[ƒh‚ğŠJ‚­"),			IDM_DRAUGHT_OPEN		},
-		{  TEXT("ƒTƒ€ƒlƒCƒ‹‚ğ•\¦"),				IDM_MAA_THUMBNAIL_OPEN	},
-/*115*/	{  TEXT("iƒZƒpƒŒ[ƒ^j"),					0						},
-		{  TEXT("‘I‘ğ”ÍˆÍ‚ğƒhƒ‰ƒtƒgƒ{[ƒh‚Ö"),		IDM_COPY_TO_DRAUGHT		},
-		{  TEXT("iƒZƒpƒŒ[ƒ^j"),	0	/*ˆÈ‰ºA“à—eŒÅ’èH‚Ì“ÁêƒRƒ}ƒ“ƒh*/	},
-		{  TEXT("‘I‘ğ•Å‚ğ•¡»"),					IDM_PAGEL_DUPLICATE		},
-		{  TEXT("‘I‘ğ•Å‚ğíœ"),					IDM_PAGEL_DELETE		},
-/*120*/	{  TEXT("Ÿ‚Ì•Å‚Æ“‡"),					IDM_PAGEL_COMBINE		},
-		{  TEXT("‘I‘ğ•Å‚ÌŸ‚ÉV‹Kì¬"),			IDM_PAGEL_INSERT		},
-		{  TEXT("––”ö‚É•Å‚ğV‹Kì¬"),				IDM_PAGEL_ADD			},
-		{  TEXT("•Å‚ğ‰º‚ÖˆÚ“®"),					IDM_PAGEL_DOWNSINK		},
-		{  TEXT("•Å‚ğã‚ÖˆÚ“®"),					IDM_PAGEL_UPFLOW		},
-/*125*/	{  TEXT("•Å–¼Ì‚Ì•ÏX"),					IDM_PAGEL_RENAME		},
-		{  TEXT("ƒgƒŒƒX‰æ‘œ•\¦/”ñ•\¦"),			IDM_TRC_VIEWTOGGLE		},
-		{  TEXT("ƒeƒ“ƒvƒŒƒOƒ‹[ƒvØ‘Öª"),			IDM_TMPLT_GROUP_PREV	},
-		{  TEXT("ƒeƒ“ƒvƒŒƒOƒ‹[ƒvØ‘Ö«"),			IDM_TMPLT_GROUP_NEXT	},
-		{  TEXT("‘‹ƒtƒH[ƒJƒXØ‘Öª"),				IDM_WINDOW_CHANGE		},
-/*130*/	{  TEXT("‘‹ƒtƒH[ƒJƒXØ‘Ö«"),				IDM_WINDOW_CHG_RVRS		},
-		{  TEXT("ƒtƒ@ƒCƒ‹‚ğ•Â‚¶‚é"),				IDM_FILE_CLOSE			},
-		{  TEXT("ƒtƒ@ƒCƒ‹Ø‘Öª"),					IDM_FILE_PREV			},
-		{  TEXT("ƒtƒ@ƒCƒ‹Ø‘Ö«"),					IDM_FILE_NEXT			},
-		{  TEXT("‘O‚Ì•Å‚ÖˆÚ“®"),					IDM_PAGE_PREV			},
-/*135*/	{  TEXT("Ÿ‚Ì•Å‚ÖˆÚ“®"),					IDM_PAGE_NEXT			},
-		{  TEXT("ƒeƒ“ƒvƒŒƒOƒŠƒbƒh‘‰Á"),			IDM_TMPL_GRID_INCREASE	},
-		{  TEXT("ƒeƒ“ƒvƒŒƒOƒŠƒbƒhŒ¸­"),			IDM_TMPL_GRID_DECREASE	},
-		{  TEXT("•\¦‰æ–ÊÄ•`‰æ"),					IDM_NOW_PAGE_REFRESH	},
-		{  TEXT("i–¢À‘•j•¶š—ñŒŸõ"),			IDM_FIND_DLG_OPEN		},
-/*140*/	{  TEXT("i–¢À‘•jŒŸõİ’èƒŠƒZƒbƒg"),		IDM_FIND_HIGHLIGHT_OFF	},
-		{  TEXT("i–¢À‘•jŸ‚ÌŒŸõˆÊ’u"),			IDM_FIND_JUMP_NEXT		},
-		{  TEXT("i–¢À‘•j‘O‚ÌŒŸõˆÊ’u"),			IDM_FIND_JUMP_PREV		},
-		{  TEXT("i–¢À‘•jV‚µ‚¢•¶š—ñ‚ğŒŸõ"),	IDM_FIND_TARGET_SET		},
-		{  TEXT("iƒZƒpƒŒ[ƒ^j"),					0						}
+		{  TEXT("è‰²æŒ‡å®š"),							IDM_MN_COLOUR_SEL		},//ã‚µãƒ–ãƒ¡ãƒ‹ãƒ¥ãƒ¼ãƒ€ãƒŸãƒ¼
+		{  TEXT("ç™½"),								IDM_INSTAG_WHITE		},
+		{  TEXT("é’"),								IDM_INSTAG_BLUE			},
+/*35*/	{  TEXT("é»’"),								IDM_INSTAG_BLACK		},
+		{  TEXT("èµ¤"),								IDM_INSTAG_RED			},
+		{  TEXT("ç·‘"),								IDM_INSTAG_GREEN		},
+		{  TEXT("æ é¸æŠ"),							IDM_MN_INSFRAME_SEL		},//ã‚µãƒ–ãƒ¡ãƒ‹ãƒ¥ãƒ¼ãƒ€ãƒŸãƒ¼
+		{  TEXT("æ ï¼ˆï¼‘ï¼‰"),						IDM_INSFRAME_ALPHA		},
+/*40*/	{  TEXT("æ ï¼ˆï¼’ï¼‰"),						IDM_INSFRAME_BRAVO		},
+		{  TEXT("æ ï¼ˆï¼“ï¼‰"),						IDM_INSFRAME_CHARLIE	},
+		{  TEXT("æ ï¼ˆï¼”ï¼‰"),						IDM_INSFRAME_DELTA		},
+		{  TEXT("æ ï¼ˆï¼•ï¼‰"),						IDM_INSFRAME_ECHO		},
+		{  TEXT("æ ï¼ˆï¼–ï¼‰"),						IDM_INSFRAME_FOXTROT	},
+/*45*/	{  TEXT("æ ï¼ˆï¼—ï¼‰"),						IDM_INSFRAME_GOLF		},
+		{  TEXT("æ ï¼ˆï¼˜ï¼‰"),						IDM_INSFRAME_HOTEL		},
+		{  TEXT("æ ï¼ˆï¼™ï¼‰"),						IDM_INSFRAME_INDIA		},
+		{  TEXT("æ ï¼ˆï¼‘ï¼ï¼‰"),						IDM_INSFRAME_JULIETTE	},
+		{  TEXT("æ ï¼ˆï¼‘ï¼‘ï¼‰"),						IDM_INSFRAME_KILO		},
+/*50*/	{  TEXT("æ ï¼ˆï¼‘ï¼’ï¼‰"),						IDM_INSFRAME_LIMA		},
+		{  TEXT("æ ï¼ˆï¼‘ï¼“ï¼‰"),						IDM_INSFRAME_MIKE		},
+		{  TEXT("æ ï¼ˆï¼‘ï¼”ï¼‰"),						IDM_INSFRAME_NOVEMBER	},
+		{  TEXT("æ ï¼ˆï¼‘ï¼•ï¼‰"),						IDM_INSFRAME_OSCAR		},
+		{  TEXT("æ ï¼ˆï¼‘ï¼–ï¼‰"),						IDM_INSFRAME_PAPA		},
+/*55*/	{  TEXT("æ ï¼ˆï¼‘ï¼—ï¼‰"),						IDM_INSFRAME_QUEBEC		},
+		{  TEXT("æ ï¼ˆï¼‘ï¼˜ï¼‰"),						IDM_INSFRAME_ROMEO		},
+		{  TEXT("æ ï¼ˆï¼‘ï¼™ï¼‰"),						IDM_INSFRAME_SIERRA		},
+		{  TEXT("æ ï¼ˆï¼’ï¼ï¼‰"),						IDM_INSFRAME_TANGO		},
+		{  TEXT("æ ç·¨é›†"),							IDM_INSFRAME_EDIT		},
+/*60*/	{  TEXT("æ æŒ¿å…¥ãƒœãƒƒã‚¯ã‚¹"),					IDM_FRMINSBOX_OPEN		},
+		{  TEXT("æ–‡å­—ï¼¡ï¼¡å¤‰æ›ãƒœãƒƒã‚¯ã‚¹"),			IDM_MOZI_SCR_OPEN		},
+		{  TEXT("ç¸¦æ›¸ãå¤‰æ›ãƒœãƒƒã‚¯ã‚¹"),				IDM_VERT_SCRIPT_OPEN	},
+		{  TEXT("ãƒ¦ãƒ¼ã‚¶å®šç¾©ã‚¢ã‚¤ãƒ†ãƒ "),				IDM_MN_USER_REFS		},//ã‚µãƒ–ãƒ¡ãƒ‹ãƒ¥ãƒ¼ãƒ€ãƒŸãƒ¼
+		{  TEXT("ãƒ¦ãƒ¼ã‚¶ã‚¢ã‚¤ãƒ†ãƒ ï¼ˆï¼‘ï¼‰"),			IDM_USER_ITEM_ALPHA		},
+/*65*/	{  TEXT("ãƒ¦ãƒ¼ã‚¶ã‚¢ã‚¤ãƒ†ãƒ ï¼ˆï¼’ï¼‰"),			IDM_USER_ITEM_BRAVO		},
+		{  TEXT("ãƒ¦ãƒ¼ã‚¶ã‚¢ã‚¤ãƒ†ãƒ ï¼ˆï¼“ï¼‰"),			IDM_USER_ITEM_CHARLIE	},
+		{  TEXT("ãƒ¦ãƒ¼ã‚¶ã‚¢ã‚¤ãƒ†ãƒ ï¼ˆï¼”ï¼‰"),			IDM_USER_ITEM_DELTA		},
+		{  TEXT("ãƒ¦ãƒ¼ã‚¶ã‚¢ã‚¤ãƒ†ãƒ ï¼ˆï¼•ï¼‰"),			IDM_USER_ITEM_ECHO		},
+		{  TEXT("ãƒ¦ãƒ¼ã‚¶ã‚¢ã‚¤ãƒ†ãƒ ï¼ˆï¼–ï¼‰"),			IDM_USER_ITEM_FOXTROT	},
+/*70*/	{  TEXT("ãƒ¦ãƒ¼ã‚¶ã‚¢ã‚¤ãƒ†ãƒ ï¼ˆï¼—ï¼‰"),			IDM_USER_ITEM_GOLF		},
+		{  TEXT("ãƒ¦ãƒ¼ã‚¶ã‚¢ã‚¤ãƒ†ãƒ ï¼ˆï¼˜ï¼‰"),			IDM_USER_ITEM_HOTEL		},
+		{  TEXT("ãƒ¦ãƒ¼ã‚¶ã‚¢ã‚¤ãƒ†ãƒ ï¼ˆï¼™ï¼‰"),			IDM_USER_ITEM_INDIA		},
+		{  TEXT("ãƒ¦ãƒ¼ã‚¶ã‚¢ã‚¤ãƒ†ãƒ ï¼ˆï¼‘ï¼ï¼‰"),			IDM_USER_ITEM_JULIETTE	},
+		{  TEXT("ãƒ¦ãƒ¼ã‚¶ã‚¢ã‚¤ãƒ†ãƒ ï¼ˆï¼‘ï¼‘ï¼‰"),			IDM_USER_ITEM_KILO		},
+/*75*/	{  TEXT("ãƒ¦ãƒ¼ã‚¶ã‚¢ã‚¤ãƒ†ãƒ ï¼ˆï¼‘ï¼’ï¼‰"),			IDM_USER_ITEM_LIMA		},
+		{  TEXT("ãƒ¦ãƒ¼ã‚¶ã‚¢ã‚¤ãƒ†ãƒ ï¼ˆï¼‘ï¼“ï¼‰"),			IDM_USER_ITEM_MIKE		},
+		{  TEXT("ãƒ¦ãƒ¼ã‚¶ã‚¢ã‚¤ãƒ†ãƒ ï¼ˆï¼‘ï¼”ï¼‰"),			IDM_USER_ITEM_NOVEMBER	},
+		{  TEXT("ãƒ¦ãƒ¼ã‚¶ã‚¢ã‚¤ãƒ†ãƒ ï¼ˆï¼‘ï¼•ï¼‰"),			IDM_USER_ITEM_OSCAR		},
+		{  TEXT("ãƒ¦ãƒ¼ã‚¶ã‚¢ã‚¤ãƒ†ãƒ ï¼ˆï¼‘ï¼–ï¼‰"),			IDM_USER_ITEM_PAPA		},
+/*80*/	{  TEXT("å„é ã«é€šã—ç•ªå·ã‚’å…¥ã‚Œã‚‹"),			IDM_PAGENUM_DLG_OPEN	},
+		{  TEXT("ï¼ˆã‚»ãƒ‘ãƒ¬ãƒ¼ã‚¿ï¼‰"),					0						},
+		{  TEXT("å³æƒãˆç·š"),	/*æ•´å½¢*/			IDM_RIGHT_GUIDE_SET		},
+		{  TEXT("è¡Œé ­ã«å…¨è§’ç©ºç™½è¿½åŠ "),				IDM_INS_TOPSPACE		},
+		{  TEXT("è¡Œé ­ç©ºç™½å‰Šé™¤"),					IDM_DEL_TOPSPACE		},
+/*85*/	{  TEXT("è¡Œæœ«ç©ºç™½å‰Šé™¤"),					IDM_DEL_LASTSPACE		},
+		{  TEXT("è¡Œæœ«æ–‡å­—å‰Šé™¤"),					IDM_DEL_LASTLETTER		},
+		{  TEXT("é¸æŠç¯„å›²ã‚’ç©ºç™½ã«ã™ã‚‹"),			IDM_FILL_SPACE			},
+		{  TEXT("é å…¨ä½“ã‚’ç©ºç™½ã§åŸ‹ã‚ã‚‹"),			IDM_FILL_ZENSP			},
+		{  TEXT("è¡Œé ­åŠè§’ç©ºç™½ã‚’ãƒ¦ãƒ‹ã‚³ãƒ¼ãƒ‰ã«å¤‰æ›"),	IDM_HEADHALF_EXCHANGE	},
+/*90*/	{  TEXT("å·¦å³åè»¢"),						IDM_MIRROR_INVERSE		},
+		{  TEXT("ä¸Šä¸‹åè»¢"),						IDM_UPSET_INVERSE		},
+		{  TEXT("å³ã«å¯„ã›ã‚‹"),						IDM_RIGHT_SLIDE			},
+		{  TEXT("ï¼‘ãƒ‰ãƒƒãƒˆå¢—ã‚„ã™"),					IDM_INCREMENT_DOT		},
+		{  TEXT("ï¼‘ãƒ‰ãƒƒãƒˆæ¸›ã‚‰ã™"),					IDM_DECREMENT_DOT		},
+/*95*/	{  TEXT("å…¨ä½“ã‚’ï¼‘ãƒ‰ãƒƒãƒˆå³ã¸"),				IDM_INCR_DOT_LINES		},
+		{  TEXT("å…¨ä½“ã‚’ï¼‘ãƒ‰ãƒƒãƒˆå·¦ã¸"),				IDM_DECR_DOT_LINES		},
+		{  TEXT("æŒ‡å®šä½ç½®ã‹ã‚‰å³ã¸åºƒã’ã‚‹"),			IDM_DOT_SPLIT_RIGHT		},
+		{  TEXT("æŒ‡å®šä½ç½®ã‹ã‚‰å·¦ã«ç‹­ã‚ã‚‹"),			IDM_DOT_SPLIT_LEFT		},
+		{  TEXT("èª¿æ•´åŸºæº–ãƒ­ãƒƒã‚¯"),					IDM_DOTDIFF_LOCK		},
+/*100*/	{  TEXT("ã‚«ãƒ¼ã‚½ãƒ«ä½ç½®ã§èª¿æ•´"),				IDM_DOTDIFF_ADJT		},
+		{  TEXT("ï¼ˆã‚»ãƒ‘ãƒ¬ãƒ¼ã‚¿ï¼‰"),					0						},
+		{  TEXT("ç©ºç™½ã‚’è¡¨ç¤º"),	/*è¡¨ç¤º*/			IDM_SPACE_VIEW_TOGGLE	},
+		{  TEXT("ã‚°ãƒªãƒƒãƒ‰ç·šã‚’è¡¨ç¤º"),				IDM_GRID_VIEW_TOGGLE	},
+		{  TEXT("å³ã‚¬ã‚¤ãƒ‰ç·šã‚’è¡¨ç¤º"),				IDM_RIGHT_RULER_TOGGLE	},
+/*105*/	{  TEXT("è¡Œã‚¬ã‚¤ãƒ‰ç·šã‚’è¡¨ç¤º"),				IDM_UNDER_RULER_TOGGLE	},
+		{  TEXT("è¤‡æ•°è¡Œãƒ†ãƒ³ãƒ—ãƒ¬ãƒ¼ãƒˆè¡¨ç¤º"),			IDM_MAATMPLE_VIEW		},
+		{  TEXT("é ä¸€è¦§è¡¨ç¤º"),						IDM_PAGELIST_VIEW		},
+		{  TEXT("å£±è¡Œãƒ†ãƒ³ãƒ—ãƒ¬ãƒ¼ãƒˆè¡¨ç¤º"),			IDM_LINE_TEMPLATE		},
+		{  TEXT("å¡—ã‚Šæ½°ã—ãƒ–ãƒ©ã‚·è¡¨ç¤º"),				IDM_BRUSH_PALETTE		},
+/*110*/	{  TEXT("ãƒ¦ãƒ‹ã‚³ãƒ¼ãƒ‰è¡¨ã‚’é–‹ã"),				IDM_UNI_PALETTE			},
+		{  TEXT("ãƒˆãƒ¬ã‚¹ãƒ¢ãƒ¼ãƒ‰"),					IDM_TRACE_MODE_ON		},
+		{  TEXT("ãƒ—ãƒ¬ãƒ“ãƒ¥ãƒ¼"),						IDM_ON_PREVIEW			},
+		{  TEXT("ãƒ‰ãƒ©ãƒ•ãƒˆãƒœãƒ¼ãƒ‰ã‚’é–‹ã"),			IDM_DRAUGHT_OPEN		},
+		{  TEXT("ã‚µãƒ ãƒã‚¤ãƒ«ã‚’è¡¨ç¤º"),				IDM_MAA_THUMBNAIL_OPEN	},
+/*115*/	{  TEXT("ï¼ˆã‚»ãƒ‘ãƒ¬ãƒ¼ã‚¿ï¼‰"),					0						},
+		{  TEXT("é¸æŠç¯„å›²ã‚’ãƒ‰ãƒ©ãƒ•ãƒˆãƒœãƒ¼ãƒ‰ã¸"),		IDM_COPY_TO_DRAUGHT		},
+		{  TEXT("ï¼ˆã‚»ãƒ‘ãƒ¬ãƒ¼ã‚¿ï¼‰"),	0	/*ä»¥ä¸‹ã€å†…å®¹å›ºå®šï¼Ÿã®ç‰¹æ®Šã‚³ãƒãƒ³ãƒ‰*/	},
+		{  TEXT("é¸æŠé ã‚’è¤‡è£½"),					IDM_PAGEL_DUPLICATE		},
+		{  TEXT("é¸æŠé ã‚’å‰Šé™¤"),					IDM_PAGEL_DELETE		},
+/*120*/	{  TEXT("æ¬¡ã®é ã¨çµ±åˆ"),					IDM_PAGEL_COMBINE		},
+		{  TEXT("é¸æŠé ã®æ¬¡ã«æ–°è¦ä½œæˆ"),			IDM_PAGEL_INSERT		},
+		{  TEXT("æœ«å°¾ã«é ã‚’æ–°è¦ä½œæˆ"),				IDM_PAGEL_ADD			},
+		{  TEXT("é ã‚’ä¸‹ã¸ç§»å‹•"),					IDM_PAGEL_DOWNSINK		},
+		{  TEXT("é ã‚’ä¸Šã¸ç§»å‹•"),					IDM_PAGEL_UPFLOW		},
+/*125*/	{  TEXT("é åç§°ã®å¤‰æ›´"),					IDM_PAGEL_RENAME		},
+		{  TEXT("ãƒˆãƒ¬ã‚¹ç”»åƒè¡¨ç¤º/éè¡¨ç¤º"),			IDM_TRC_VIEWTOGGLE		},
+		{  TEXT("ãƒ†ãƒ³ãƒ—ãƒ¬ã‚°ãƒ«ãƒ¼ãƒ—åˆ‡æ›¿â†‘"),			IDM_TMPLT_GROUP_PREV	},
+		{  TEXT("ãƒ†ãƒ³ãƒ—ãƒ¬ã‚°ãƒ«ãƒ¼ãƒ—åˆ‡æ›¿â†“"),			IDM_TMPLT_GROUP_NEXT	},
+		{  TEXT("çª“ãƒ•ã‚©ãƒ¼ã‚«ã‚¹åˆ‡æ›¿â†‘"),				IDM_WINDOW_CHANGE		},
+/*130*/	{  TEXT("çª“ãƒ•ã‚©ãƒ¼ã‚«ã‚¹åˆ‡æ›¿â†“"),				IDM_WINDOW_CHG_RVRS		},
+		{  TEXT("ãƒ•ã‚¡ã‚¤ãƒ«ã‚’é–‰ã˜ã‚‹"),				IDM_FILE_CLOSE			},
+		{  TEXT("ãƒ•ã‚¡ã‚¤ãƒ«åˆ‡æ›¿â†‘"),					IDM_FILE_PREV			},
+		{  TEXT("ãƒ•ã‚¡ã‚¤ãƒ«åˆ‡æ›¿â†“"),					IDM_FILE_NEXT			},
+		{  TEXT("å‰ã®é ã¸ç§»å‹•"),					IDM_PAGE_PREV			},
+/*135*/	{  TEXT("æ¬¡ã®é ã¸ç§»å‹•"),					IDM_PAGE_NEXT			},
+		{  TEXT("ãƒ†ãƒ³ãƒ—ãƒ¬ã‚°ãƒªãƒƒãƒ‰å¢—åŠ "),			IDM_TMPL_GRID_INCREASE	},
+		{  TEXT("ãƒ†ãƒ³ãƒ—ãƒ¬ã‚°ãƒªãƒƒãƒ‰æ¸›å°‘"),			IDM_TMPL_GRID_DECREASE	},
+		{  TEXT("è¡¨ç¤ºç”»é¢å†æç”»"),					IDM_NOW_PAGE_REFRESH	},
+		{  TEXT("ï¼ˆæœªå®Ÿè£…ï¼‰æ–‡å­—åˆ—æ¤œç´¢"),			IDM_FIND_DLG_OPEN		},
+/*140*/	{  TEXT("ï¼ˆæœªå®Ÿè£…ï¼‰æ¤œç´¢è¨­å®šãƒªã‚»ãƒƒãƒˆ"),		IDM_FIND_HIGHLIGHT_OFF	},
+		{  TEXT("ï¼ˆæœªå®Ÿè£…ï¼‰æ¬¡ã®æ¤œç´¢ä½ç½®"),			IDM_FIND_JUMP_NEXT		},
+		{  TEXT("ï¼ˆæœªå®Ÿè£…ï¼‰å‰ã®æ¤œç´¢ä½ç½®"),			IDM_FIND_JUMP_PREV		},
+		{  TEXT("ï¼ˆæœªå®Ÿè£…ï¼‰æ–°ã—ã„æ–‡å­—åˆ—ã‚’æ¤œç´¢"),	IDM_FIND_TARGET_SET		},
+		{  TEXT("ï¼ˆã‚»ãƒ‘ãƒ¬ãƒ¼ã‚¿ï¼‰"),					0						}
 };
 
-#define ALL_ITEMS	 117	//	‰EƒNƒŠ—p@‚OƒCƒ“ƒfƒbƒNƒX
-#define FULL_ITEMS	 145	//	‘SƒAƒCƒeƒ€
+#define ALL_ITEMS	 117	//	å³ã‚¯ãƒªç”¨ã€€ï¼ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹
+#define FULL_ITEMS	 145	//	å…¨ã‚¢ã‚¤ãƒ†ãƒ 
 
-//	‰EƒNƒŠ—pƒTƒuƒAƒCƒeƒ€EˆÊ’u’²®–Y‚ê‚È‚¢‚æ‚¤‚É
+//	å³ã‚¯ãƒªç”¨ã‚µãƒ–ã‚¢ã‚¤ãƒ†ãƒ ãƒ»ä½ç½®èª¿æ•´å¿˜ã‚Œãªã„ã‚ˆã†ã«
 #define CTS_UNISPACE	24
 #define CTS_COLOURINS	33
 #define CTS_FRAMEINS	39
 #define CTS_USERITEM	64
 
-//	ƒTƒu“WŠJ‚·‚éƒAƒCƒeƒ€‚É’ˆÓƒZƒˆEƒRƒ“ƒeƒLƒXƒgƒƒjƒ…[‚ÆƒAƒNƒZƒ‹ƒL[
+//	ã‚µãƒ–å±•é–‹ã™ã‚‹ã‚¢ã‚¤ãƒ†ãƒ ã«æ³¨æ„ã‚»ãƒ¨ãƒ»ã‚³ãƒ³ãƒ†ã‚­ã‚¹ãƒˆãƒ¡ãƒ‹ãƒ¥ãƒ¼ã¨ã‚¢ã‚¯ã‚»ãƒ«ã‚­ãƒ¼
 
-//	ƒL[ƒoƒCƒ“ƒhEƒƒjƒ…[‚É“ü‚Á‚Ä‚È‚¢‹@”\‚É’ˆÓ
+//	ã‚­ãƒ¼ãƒã‚¤ãƒ³ãƒ‰ãƒ»ãƒ¡ãƒ‹ãƒ¥ãƒ¼ã«å…¥ã£ã¦ãªã„æ©Ÿèƒ½ã«æ³¨æ„
 
-//‰Šúİ’è
+//åˆæœŸè¨­å®š
 #define DEF_ITEMS	32
 const static UINT	gadDefItem[] =
 {
-	IDM_CUT,				//	Ø‚èæ‚è
-	IDM_COPY,				//	UnicodeƒRƒs[
-	IDM_PASTE,				//	“\•t
-	IDM_ALLSEL,				//	‘S‘I‘ğ
+	IDM_CUT,				//	åˆ‡ã‚Šå–ã‚Š
+	IDM_COPY,				//	Unicodeã‚³ãƒ”ãƒ¼
+	IDM_PASTE,				//	è²¼ä»˜
+	IDM_ALLSEL,				//	å…¨é¸æŠ
 	0,
-	IDM_COPY_TO_DRAUGHT,	//	‘I‘ğ”ÍˆÍ‚ğƒhƒ‰ƒtƒgƒ{[ƒh‚Ö
+	IDM_COPY_TO_DRAUGHT,	//	é¸æŠç¯„å›²ã‚’ãƒ‰ãƒ©ãƒ•ãƒˆãƒœãƒ¼ãƒ‰ã¸
 	0,
-	IDM_SJISCOPY,			//	SJISƒRƒs[
-	IDM_SJISCOPY_ALL,		//	‘S‘Ì‚ğSJISƒRƒs[
+	IDM_SJISCOPY,			//	SJISã‚³ãƒ”ãƒ¼
+	IDM_SJISCOPY_ALL,		//	å…¨ä½“ã‚’SJISã‚³ãƒ”ãƒ¼
 	0,
-	IDM_SQSELECT,			//	‹éŒ`‘I‘ğ
+	IDM_SQSELECT,			//	çŸ©å½¢é¸æŠ
 	0,
-	IDM_LAYERBOX,			//	ƒŒƒCƒ„ƒ{ƒbƒNƒX
-	IDM_FRMINSBOX_OPEN,		//	˜g‘}“üƒ{ƒbƒNƒX
-	IDM_MOZI_SCR_OPEN,		//	•¶š‚`‚`•ÏŠ·ƒ{ƒbƒNƒX
+	IDM_LAYERBOX,			//	ãƒ¬ã‚¤ãƒ¤ãƒœãƒƒã‚¯ã‚¹
+	IDM_FRMINSBOX_OPEN,		//	æ æŒ¿å…¥ãƒœãƒƒã‚¯ã‚¹
+	IDM_MOZI_SCR_OPEN,		//	æ–‡å­—ï¼¡ï¼¡å¤‰æ›ãƒœãƒƒã‚¯ã‚¹
 	0,
-	IDM_RIGHT_GUIDE_SET,	//	‰E‘µ‚¦ü
-	IDM_INS_TOPSPACE,		//	s“ª‚É‘SŠp‹ó”’’Ç‰Á
-	IDM_DEL_TOPSPACE,		//	s“ª‹ó”’íœ
-	IDM_DEL_LASTSPACE,		//	s––‹ó”’íœ
-	IDM_DEL_LASTLETTER,		//	s––•¶šíœ
-	IDM_FILL_SPACE,			//	‘I‘ğ”ÍˆÍ‚ğ‹ó”’‚É‚·‚é
-	IDM_RIGHT_SLIDE,		//	‰E‚ÉŠñ‚¹‚é
+	IDM_RIGHT_GUIDE_SET,	//	å³æƒãˆç·š
+	IDM_INS_TOPSPACE,		//	è¡Œé ­ã«å…¨è§’ç©ºç™½è¿½åŠ 
+	IDM_DEL_TOPSPACE,		//	è¡Œé ­ç©ºç™½å‰Šé™¤
+	IDM_DEL_LASTSPACE,		//	è¡Œæœ«ç©ºç™½å‰Šé™¤
+	IDM_DEL_LASTLETTER,		//	è¡Œæœ«æ–‡å­—å‰Šé™¤
+	IDM_FILL_SPACE,			//	é¸æŠç¯„å›²ã‚’ç©ºç™½ã«ã™ã‚‹
+	IDM_RIGHT_SLIDE,		//	å³ã«å¯„ã›ã‚‹
 	0,
-	IDM_INCR_DOT_LINES,		//	‘S‘Ì‚ğ‚Pƒhƒbƒg‰E‚Ö
-	IDM_DECR_DOT_LINES,		//	‘S‘Ì‚ğ‚Pƒhƒbƒg¶‚Ö
+	IDM_INCR_DOT_LINES,		//	å…¨ä½“ã‚’ï¼‘ãƒ‰ãƒƒãƒˆå³ã¸
+	IDM_DECR_DOT_LINES,		//	å…¨ä½“ã‚’ï¼‘ãƒ‰ãƒƒãƒˆå·¦ã¸
 	0,
-	IDM_SPACE_VIEW_TOGGLE,	//	‹ó”’‚ğ•\¦	
-	IDM_GRID_VIEW_TOGGLE,	//	ƒOƒŠƒbƒhü‚ğ•\¦
-	IDM_RIGHT_RULER_TOGGLE,	//	‰EƒKƒCƒhü‚ğ•\¦
+	IDM_SPACE_VIEW_TOGGLE,	//	ç©ºç™½ã‚’è¡¨ç¤º	
+	IDM_GRID_VIEW_TOGGLE,	//	ã‚°ãƒªãƒƒãƒ‰ç·šã‚’è¡¨ç¤º
+	IDM_RIGHT_RULER_TOGGLE,	//	å³ã‚¬ã‚¤ãƒ‰ç·šã‚’è¡¨ç¤º
 	0,
-	IDM_PAGEL_DIVIDE		//	Ÿ‚ÌsˆÈ~‚ğV•Å‚É•ªŠ„
+	IDM_PAGEL_DIVIDE		//	æ¬¡ã®è¡Œä»¥é™ã‚’æ–°é ã«åˆ†å‰²
 };
 //-------------------------------------------------------------------------------------------------
 
@@ -290,10 +290,10 @@ HRESULT	AccelKeyTableSave( list<ACCEL> * );
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	‹N“®‰Šú‰»EINIƒfƒBƒŒƒNƒgƒŠŠi”[‚Æ‚©‰Šú¶¬‚Æ‚©
-	@param[in]	ptCurrent	Šî€ƒfƒBƒŒƒNƒgƒŠ
-	@param[in]	hInstance	‚±‚ÌƒAƒvƒŠ‚ÌÀ‘¶
-	@return		HRESULT		I—¹ó‘ÔƒR[ƒh
+	èµ·å‹•æ™‚åˆæœŸåŒ–ãƒ»INIãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªæ ¼ç´ã¨ã‹åˆæœŸç”Ÿæˆã¨ã‹
+	@param[in]	ptCurrent	åŸºæº–ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒª
+	@param[in]	hInstance	ã“ã®ã‚¢ãƒ—ãƒªã®å®Ÿå­˜
+	@return		HRESULT		çµ‚äº†çŠ¶æ…‹ã‚³ãƒ¼ãƒ‰
 */
 HRESULT CntxEditInitialise( LPTSTR ptCurrent, HINSTANCE hInstance )
 {
@@ -324,9 +324,9 @@ HRESULT CntxEditInitialise( LPTSTR ptCurrent, HINSTANCE hInstance )
 
 	gvcCntxItem.clear();
 
-	//	‰Šúó‘Ô
+	//	åˆæœŸçŠ¶æ…‹
 	dCount = GetPrivateProfileInt( TEXT("Context"), TEXT("Count"), 0, gatCntxIni );
-	if( 1 <= dCount )	//	ƒf[ƒ^—L‚è
+	if( 1 <= dCount )	//	ãƒ‡ãƒ¼ã‚¿æœ‰ã‚Š
 	{
 		for( ims = 0; dCount > ims; ims++ )
 		{
@@ -343,7 +343,7 @@ HRESULT CntxEditInitialise( LPTSTR ptCurrent, HINSTANCE hInstance )
 			}
 		}
 	}
-	else	//	ƒf[ƒ^–³‚µ‚È‚çƒfƒtƒHƒƒjƒ…[‚ğ\’z
+	else	//	ãƒ‡ãƒ¼ã‚¿ç„¡ã—ãªã‚‰ãƒ‡ãƒ•ã‚©ãƒ¡ãƒ‹ãƒ¥ãƒ¼ã‚’æ§‹ç¯‰
 	{
 		for( ims = 0; DEF_ITEMS > ims; ims++ )
 		{
@@ -365,7 +365,7 @@ HRESULT CntxEditInitialise( LPTSTR ptCurrent, HINSTANCE hInstance )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	‚Å‚«‚ ‚ª‚Á‚Ä‚éƒRƒ“ƒeƒLƒXƒgƒƒjƒ…[‚ğŠO•”‚Åg‚¤
+	ã§ãã‚ãŒã£ã¦ã‚‹ã‚³ãƒ³ãƒ†ã‚­ã‚¹ãƒˆãƒ¡ãƒ‹ãƒ¥ãƒ¼ã‚’å¤–éƒ¨ã§ä½¿ã†
 */
 HMENU CntxMenuGet( VOID )
 {
@@ -374,7 +374,7 @@ HMENU CntxMenuGet( VOID )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	ƒRƒ“ƒeƒLƒXƒgƒƒjƒ…[‚ğ‘g‚İ—§‚Ä‚éB
+	ã‚³ãƒ³ãƒ†ã‚­ã‚¹ãƒˆãƒ¡ãƒ‹ãƒ¥ãƒ¼ã‚’çµ„ã¿ç«‹ã¦ã‚‹ã€‚
 */
 VOID CntxEditBuild( VOID )
 {
@@ -400,23 +400,23 @@ VOID CntxEditBuild( VOID )
 		else
 		{
 			ZeroMemory( atBuffer, sizeof(atBuffer) );
-			StringCchCopy( atItem, MAX_STRING, itMnItm->atString );	//	æ‚É‹L˜^
+			StringCchCopy( atItem, MAX_STRING, itMnItm->atString );	//	å…ˆã«è¨˜éŒ²
 
 			if( IDM_INSFRAME_ALPHA <= itMnItm->dCommandoID && itMnItm->dCommandoID <= IDM_INSFRAME_TANGO )
-			{	//	˜g–¼Ì										//	IDM_INSFRAME_ZULU
+			{	//	æ åç§°										//	IDM_INSFRAME_ZULU
 				num = itMnItm->dCommandoID - IDM_INSFRAME_ALPHA;
 				FrameNameLoad( num, atBuffer, SUB_STRING );
-				StringCchPrintf( atItem, MAX_STRING, TEXT("˜gF%s"), atBuffer );
+				StringCchPrintf( atItem, MAX_STRING, TEXT("æ ï¼š%s"), atBuffer );
 			}
 			else if( IDM_USER_ITEM_ALPHA <= itMnItm->dCommandoID && itMnItm->dCommandoID <= IDM_USER_ITEM_PAPA )
-			{	//	ƒ†[ƒUƒAƒCƒeƒ€–¼Ì
+			{	//	ãƒ¦ãƒ¼ã‚¶ã‚¢ã‚¤ãƒ†ãƒ åç§°
 				num = itMnItm->dCommandoID - IDM_USER_ITEM_ALPHA;
 				UserDefItemNameget( num, atBuffer, SUB_STRING );
-				StringCchPrintf( atItem, MAX_STRING, TEXT("ƒ†[ƒUF%s"), atBuffer );
+				StringCchPrintf( atItem, MAX_STRING, TEXT("ãƒ¦ãƒ¼ã‚¶ï¼š%s"), atBuffer );
 			}
 			else
 			{
-				//	‰½‚à–³‚¢
+				//	ä½•ã‚‚ç„¡ã„
 			}
 
 			if( 26 > e )
@@ -467,9 +467,9 @@ VOID CntxEditBuild( VOID )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	•ÒWƒ_ƒCƒ„ƒƒOŠJ‚­
-	@param[in]	hWnd	ƒEƒCƒ“ƒhƒEƒnƒ“ƒhƒ‹
-	@return		HRESULT	I—¹ó‘ÔƒR[ƒh
+	ç·¨é›†ãƒ€ã‚¤ãƒ¤ãƒ­ã‚°é–‹ã
+	@param[in]	hWnd	ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ãƒãƒ³ãƒ‰ãƒ«
+	@return		HRESULT	çµ‚äº†çŠ¶æ…‹ã‚³ãƒ¼ãƒ‰
 */
 HRESULT CntxEditDlgOpen( HWND hWnd )
 {
@@ -480,7 +480,7 @@ HRESULT CntxEditDlgOpen( HWND hWnd )
 	iRslt = DialogBoxParam( ghInst, MAKEINTRESOURCE(IDD_CONTEXT_ITEM_DLG), hWnd, CntxEditDlgProc, 0 );
 	if( IDOK == iRslt )
 	{
-		//	ˆê’UƒZƒNƒVƒ‡ƒ“‚ğ‹ó‚É‚·‚é
+		//	ä¸€æ—¦ã‚»ã‚¯ã‚·ãƒ§ãƒ³ã‚’ç©ºã«ã™ã‚‹
 		ZeroMemory( atBuff, sizeof(atBuff) );
 		WritePrivateProfileSection( TEXT("Context"), atBuff, gatCntxIni );
 
@@ -508,13 +508,13 @@ HRESULT CntxEditDlgOpen( HWND hWnd )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	•ÒWƒ_ƒCƒ„ƒƒOƒ{ƒbƒNƒX‚ÌƒƒZ[ƒWƒnƒ“ƒhƒ‰‚¾‚Á‚Ä‚Î‚æ
-	@param[in]	hDlg	ƒ_ƒCƒ„ƒƒOƒnƒ“ƒhƒ‹
-	@param[in]	message	ƒEƒCƒ“ƒhƒEƒƒbƒZ[ƒW‚Ì¯•Ê”Ô†
-	@param[in]	wParam	’Ç‰Á‚Ìî•ñ‚P
-	@param[in]	lParam	’Ç‰Á‚Ìî•ñ‚Q
-	@retval 0	ƒƒbƒZ[ƒW‚Íˆ—‚µ‚Ä‚¢‚È‚¢
-	@retval no0	‚È‚ñ‚©ˆ—‚³‚ê‚½
+	ç·¨é›†ãƒ€ã‚¤ãƒ¤ãƒ­ã‚°ãƒœãƒƒã‚¯ã‚¹ã®ãƒ¡ã‚»ãƒ¼ã‚¸ãƒãƒ³ãƒ‰ãƒ©ã ã£ã¦ã°ã‚ˆ
+	@param[in]	hDlg	ãƒ€ã‚¤ãƒ¤ãƒ­ã‚°ãƒãƒ³ãƒ‰ãƒ«
+	@param[in]	message	ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã®è­˜åˆ¥ç•ªå·
+	@param[in]	wParam	è¿½åŠ ã®æƒ…å ±ï¼‘
+	@param[in]	lParam	è¿½åŠ ã®æƒ…å ±ï¼’
+	@retval 0	ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã¯å‡¦ç†ã—ã¦ã„ãªã„
+	@retval no0	ãªã‚“ã‹å‡¦ç†ã•ã‚ŒãŸ
 */
 INT_PTR CALLBACK CntxEditDlgProc( HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam )
 {
@@ -536,9 +536,9 @@ INT_PTR CALLBACK CntxEditDlgProc( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 			return (INT_PTR)TRUE;
 
 		case WM_COMMAND:
-			id         = LOWORD(wParam);	//	ƒƒbƒZ[ƒW‚ğ”­¶‚³‚¹‚½qƒEƒCƒ“ƒhƒE‚Ì¯•Êq
-			hWndCtl    = (HWND)lParam;		//	ƒƒbƒZ[ƒW‚ğ”­¶‚³‚¹‚½qƒEƒCƒ“ƒhƒE‚Ìƒnƒ“ƒhƒ‹
-			codeNotify = HIWORD(wParam);	//	’Ê’mƒƒbƒZ[ƒW
+			id         = LOWORD(wParam);	//	ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’ç™ºç”Ÿã•ã›ãŸå­ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ã®è­˜åˆ¥å­
+			hWndCtl    = (HWND)lParam;		//	ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’ç™ºç”Ÿã•ã›ãŸå­ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ã®ãƒãƒ³ãƒ‰ãƒ«
+			codeNotify = HIWORD(wParam);	//	é€šçŸ¥ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸
 			switch( id )
 			{
 				case IDOK:		EndDialog( hDlg, IDOK );		return (INT_PTR)TRUE;
@@ -560,8 +560,8 @@ INT_PTR CALLBACK CntxEditDlgProc( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	ƒAƒCƒeƒ€‚ÌƒŠƒXƒgƒrƒ…[ì¬
-	@param[in]	hDlg	ƒ_ƒCƒ„ƒƒOƒnƒ“ƒhƒ‹
+	ã‚¢ã‚¤ãƒ†ãƒ ã®ãƒªã‚¹ãƒˆãƒ“ãƒ¥ãƒ¼ä½œæˆ
+	@param[in]	hDlg	ãƒ€ã‚¤ãƒ¤ãƒ­ã‚°ãƒãƒ³ãƒ‰ãƒ«
 */
 VOID CntxDlgLvInit( HWND hDlg )
 {
@@ -580,7 +580,7 @@ VOID CntxDlgLvInit( HWND hDlg )
 	stLvColm.fmt      = LVCFMT_LEFT;
 	stLvColm.iSubItem = 0;
 
-	stLvColm.pszText  = TEXT("ƒƒjƒ…[ƒAƒCƒeƒ€");
+	stLvColm.pszText  = TEXT("ãƒ¡ãƒ‹ãƒ¥ãƒ¼ã‚¢ã‚¤ãƒ†ãƒ ");
 	stLvColm.cx       = rect.right - 23;
 	ListView_InsertColumn( hLvWnd, 0, &stLvColm );
 
@@ -597,8 +597,8 @@ VOID CntxDlgLvInit( HWND hDlg )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	‘SƒAƒCƒeƒ€‚ğƒŠƒXƒgƒrƒ…[‚Éƒuƒb‚±‚Ş
-	@param[in]	hDlg	ƒ_ƒCƒ„ƒƒOƒnƒ“ƒhƒ‹
+	å…¨ã‚¢ã‚¤ãƒ†ãƒ ã‚’ãƒªã‚¹ãƒˆãƒ“ãƒ¥ãƒ¼ã«ãƒ–ãƒƒã“ã‚€
+	@param[in]	hDlg	ãƒ€ã‚¤ãƒ¤ãƒ­ã‚°ãƒãƒ³ãƒ‰ãƒ«
 */
 VOID CntxDlgAllListUp( HWND hDlg )
 {
@@ -625,7 +625,7 @@ VOID CntxDlgAllListUp( HWND hDlg )
 		IDM_MN_INSFRAME_SEL == gstContextItem[d].dCommandoID || 
 		IDM_MN_USER_REFS    == gstContextItem[d].dCommandoID )
 		{
-			StringCchCat( atItem, SUB_STRING, TEXT("iƒTƒuƒƒjƒ…[“WŠJj") );
+			StringCchCat( atItem, SUB_STRING, TEXT("ï¼ˆã‚µãƒ–ãƒ¡ãƒ‹ãƒ¥ãƒ¼å±•é–‹ï¼‰") );
 		}
 
 		stLvi.iItem = d;
@@ -635,8 +635,8 @@ VOID CntxDlgAllListUp( HWND hDlg )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	ƒƒjƒ…[\¬‚ğƒŠƒXƒgƒrƒ…[‚É•\¦
-	@param[in]	hDlg	ƒ_ƒCƒ„ƒƒOƒnƒ“ƒhƒ‹
+	ãƒ¡ãƒ‹ãƒ¥ãƒ¼æ§‹æˆã‚’ãƒªã‚¹ãƒˆãƒ“ãƒ¥ãƒ¼ã«è¡¨ç¤º
+	@param[in]	hDlg	ãƒ€ã‚¤ãƒ¤ãƒ­ã‚°ãƒãƒ³ãƒ‰ãƒ«
 */
 VOID CntxDlgBuildListUp( HWND hDlg )
 {
@@ -672,7 +672,7 @@ VOID CntxDlgBuildListUp( HWND hDlg )
 			IDM_MN_INSFRAME_SEL == itMnItm->dCommandoID || 
 			IDM_MN_USER_REFS    == itMnItm->dCommandoID )
 			{
-				StringCchCat( atItem, SUB_STRING, TEXT("@@[„") );
+				StringCchCat( atItem, SUB_STRING, TEXT("ã€€ã€€[ï¼") );
 			}
 
 		}
@@ -685,8 +685,8 @@ VOID CntxDlgBuildListUp( HWND hDlg )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	ƒAƒCƒeƒ€‚ğ’Ç‰Á
-	@param[in]	hDlg	ƒ_ƒCƒ„ƒƒOƒnƒ“ƒhƒ‹
+	ã‚¢ã‚¤ãƒ†ãƒ ã‚’è¿½åŠ 
+	@param[in]	hDlg	ãƒ€ã‚¤ãƒ¤ãƒ­ã‚°ãƒãƒ³ãƒ‰ãƒ«
 */
 VOID CntxDlgItemAdd( HWND hDlg )
 {
@@ -697,21 +697,21 @@ VOID CntxDlgItemAdd( HWND hDlg )
 	hListWnd  = GetDlgItem( hDlg, IDLV_MENU_ALLITEM );
 	hBuildWnd = GetDlgItem( hDlg, IDLV_MENU_BUILDX );
 
-	//	Œ³‚Ì‚Ù‚¤
+	//	å…ƒã®ã»ã†
 	iSel = ListView_GetNextItem( hListWnd, -1, LVNI_ALL | LVNI_SELECTED );
-	if( 0 > iSel )	 return;	//	‘I‘ğ‚µ‚Ä‚È‚©‚Á‚½‚çI‚í‚è
+	if( 0 > iSel )	 return;	//	é¸æŠã—ã¦ãªã‹ã£ãŸã‚‰çµ‚ã‚ã‚Š
 
 	iCount = ListView_GetItemCount( hBuildWnd );
 
 
-	//	‘I‘ğ‚µ‚½ƒ„ƒc‚ÌŸ‚É‚¢‚ê‚éE–¢‘I‘ğ‚©––”ö‚È‚ç––”ö‚Ö
+	//	é¸æŠã—ãŸãƒ¤ãƒ„ã®æ¬¡ã«ã„ã‚Œã‚‹ãƒ»æœªé¸æŠã‹æœ«å°¾ãªã‚‰æœ«å°¾ã¸
 	iIns = ListView_GetNextItem( hBuildWnd, -1, LVNI_ALL | LVNI_SELECTED );
 	if( (0 > iIns) || ((iIns+1) >= iCount) ){	gltCntxEdit.push_back( gstContextItem[iSel] );	}
 	else
 	{
 		itMnItm = gltCntxEdit.begin();
 		std::advance( itMnItm, iIns+1 );
-		//	ƒCƒeƒŒ[ƒ^‚Ì’¼‘O‚É“ü‚é
+		//	ã‚¤ãƒ†ãƒ¬ãƒ¼ã‚¿ã®ç›´å‰ã«å…¥ã‚‹
 		gltCntxEdit.insert( itMnItm, gstContextItem[iSel] );
 	}
 
@@ -724,8 +724,8 @@ VOID CntxDlgItemAdd( HWND hDlg )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	ƒAƒCƒeƒ€‚ğíœ
-	@param[in]	hDlg	ƒ_ƒCƒ„ƒƒOƒnƒ“ƒhƒ‹
+	ã‚¢ã‚¤ãƒ†ãƒ ã‚’å‰Šé™¤
+	@param[in]	hDlg	ãƒ€ã‚¤ãƒ¤ãƒ­ã‚°ãƒãƒ³ãƒ‰ãƒ«
 */
 VOID CntxDlgItemDel( HWND hDlg )
 {
@@ -737,7 +737,7 @@ VOID CntxDlgItemDel( HWND hDlg )
 	hBuildWnd = GetDlgItem( hDlg, IDLV_MENU_BUILDX );
 
 	iSel = ListView_GetNextItem( hBuildWnd, -1, LVNI_ALL | LVNI_SELECTED );
-	if( 0 > iSel )	return;	//	‘I‘ğ‚µ‚Ä‚È‚©‚Á‚½‚çI‚í‚è
+	if( 0 > iSel )	return;	//	é¸æŠã—ã¦ãªã‹ã£ãŸã‚‰çµ‚ã‚ã‚Š
 
 	itMnItm = gltCntxEdit.begin();
 	std::advance( itMnItm, iSel );
@@ -751,8 +751,8 @@ VOID CntxDlgItemDel( HWND hDlg )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	ƒAƒCƒeƒ€‚ğª‚Ö
-	@param[in]	hDlg	ƒ_ƒCƒ„ƒƒOƒnƒ“ƒhƒ‹
+	ã‚¢ã‚¤ãƒ†ãƒ ã‚’â†‘ã¸
+	@param[in]	hDlg	ãƒ€ã‚¤ãƒ¤ãƒ­ã‚°ãƒãƒ³ãƒ‰ãƒ«
 */
 VOID CntxDlgItemSpinUp( HWND hDlg )
 {
@@ -764,12 +764,12 @@ VOID CntxDlgItemSpinUp( HWND hDlg )
 	hBuildWnd = GetDlgItem( hDlg, IDLV_MENU_BUILDX );
 
 	iSel = ListView_GetNextItem( hBuildWnd, -1, LVNI_ALL | LVNI_SELECTED );
-	if( 0 >= iSel ){	 return;	}	//	‘I‘ğ‚µ‚Ä‚È‚¢‚©ˆê”Ôã‚È‚çI‚í‚è
+	if( 0 >= iSel ){	 return;	}	//	é¸æŠã—ã¦ãªã„ã‹ä¸€ç•ªä¸Šãªã‚‰çµ‚ã‚ã‚Š
 
 	itTgtItm = gltCntxEdit.begin();
 	std::advance( itTgtItm, iSel );
 	itSwpItm = itTgtItm;
-	itSwpItm--;	//	“ü‚ê‚éæ‚Íˆê‚Â‘O
+	itSwpItm--;	//	å…¥ã‚Œã‚‹å…ˆã¯ä¸€ã¤å‰
 
 	StringCchCopy( stItem.atString, MIN_STRING, itTgtItm->atString );
 	stItem.dCommandoID = itTgtItm->dCommandoID;
@@ -786,8 +786,8 @@ VOID CntxDlgItemSpinUp( HWND hDlg )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	ƒAƒCƒeƒ€‚ğ«‚Ö
-	@param[in]	hDlg	ƒ_ƒCƒ„ƒƒOƒnƒ“ƒhƒ‹
+	ã‚¢ã‚¤ãƒ†ãƒ ã‚’â†“ã¸
+	@param[in]	hDlg	ãƒ€ã‚¤ãƒ¤ãƒ­ã‚°ãƒãƒ³ãƒ‰ãƒ«
 */
 VOID CntxDlgItemSpinDown( HWND hDlg )
 {
@@ -799,16 +799,16 @@ VOID CntxDlgItemSpinDown( HWND hDlg )
 	hBuildWnd = GetDlgItem( hDlg, IDLV_MENU_BUILDX );
 
 	iSel = ListView_GetNextItem( hBuildWnd, -1, LVNI_ALL | LVNI_SELECTED );
-	if( 0 > iSel )	return;	//	‘I‘ğ‚µ‚Ä‚È‚©‚Á‚½‚çI‚í‚è
+	if( 0 > iSel )	return;	//	é¸æŠã—ã¦ãªã‹ã£ãŸã‚‰çµ‚ã‚ã‚Š
 
 	iCount = ListView_GetItemCount( hBuildWnd );
-	if( iSel >= (iCount-1) )	 return;	//	––’[‚È‚çI‚í‚è
+	if( iSel >= (iCount-1) )	 return;	//	æœ«ç«¯ãªã‚‰çµ‚ã‚ã‚Š
 
-	//	ˆ—‚ÌˆÊ’uŠÖŒW‚É’ˆÓ
+	//	å‡¦ç†ã®ä½ç½®é–¢ä¿‚ã«æ³¨æ„
 	itSwpItm = gltCntxEdit.begin();
 	std::advance( itSwpItm, iSel );
 	itTgtItm = itSwpItm;
-	itTgtItm++;	//	“ü‚ê‚éæ‚Íˆê‚ÂŸ
+	itTgtItm++;	//	å…¥ã‚Œã‚‹å…ˆã¯ä¸€ã¤æ¬¡
 
 	StringCchCopy( stItem.atString, MIN_STRING, itTgtItm->atString );
 	stItem.dCommandoID = itTgtItm->dCommandoID;
@@ -829,13 +829,13 @@ VOID CntxDlgItemSpinDown( HWND hDlg )
 #ifdef ACCELERATOR_EDIT
 //-------------------------------------------------------------------------------------------------
 
-//	ƒzƒbƒgƒL[ƒRƒ“ƒgƒ[ƒ‹‚ÍAƒtƒH[ƒJƒX‚ ‚Ä‚ÄƒL[“ü—Í‚·‚é‚Æ”F¯‚·‚é
-//	“o˜^Ï‚İ‚ÌƒOƒ[ƒoƒ‹ƒzƒbƒgƒL[‚ª‚ ‚é‚ÆA‚»‚Á‚¿‚ª—Dæ‚µ‚Ä“®‚­
+//	ãƒ›ãƒƒãƒˆã‚­ãƒ¼ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ«ã¯ã€ãƒ•ã‚©ãƒ¼ã‚«ã‚¹ã‚ã¦ã¦ã‚­ãƒ¼å…¥åŠ›ã™ã‚‹ã¨èªè­˜ã™ã‚‹
+//	ç™»éŒ²æ¸ˆã¿ã®ã‚°ãƒ­ãƒ¼ãƒãƒ«ãƒ›ãƒƒãƒˆã‚­ãƒ¼ãŒã‚ã‚‹ã¨ã€ãã£ã¡ãŒå„ªå…ˆã—ã¦å‹•ã
 
 /*!
-	ƒAƒNƒZƒ‰ƒŒ[ƒgƒL[•ÒWDIALOGUE‚ğŠJ‚­
-	@param[in]	hWnd		ƒEƒCƒ“ƒhƒEƒnƒ“ƒhƒ‹
-	@return		HRESULT		I—¹ó‘ÔƒR[ƒh
+	ã‚¢ã‚¯ã‚»ãƒ©ãƒ¬ãƒ¼ãƒˆã‚­ãƒ¼ç·¨é›†DIALOGUEã‚’é–‹ã
+	@param[in]	hWnd		ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ãƒãƒ³ãƒ‰ãƒ«
+	@return		HRESULT		çµ‚äº†çŠ¶æ…‹ã‚³ãƒ¼ãƒ‰
 */
 HRESULT AccelKeyDlgOpen( HWND hWnd )
 {
@@ -847,8 +847,8 @@ HRESULT AccelKeyDlgOpen( HWND hWnd )
 	iRslt = DialogBoxParam( ghInst, MAKEINTRESOURCE(IDD_ACCEL_KEY_DLG), hWnd, AccelKeyDlgProc, 0 );
 	if( IDOK == iRslt )
 	{
-		//	ƒAƒNƒZƒ‰ƒnƒ“ƒhƒ‹‘Š·‚ª•K—v
-		//	ƒAƒNƒZƒ‰ƒe[ƒuƒ‹Šm•Û‚µ‚Äƒƒ‚ƒŠ\‘¢‘Ì‚ÅŠm•Û
+		//	ã‚¢ã‚¯ã‚»ãƒ©ãƒãƒ³ãƒ‰ãƒ«æ›¸æ›ãŒå¿…è¦
+		//	ã‚¢ã‚¯ã‚»ãƒ©ãƒ†ãƒ¼ãƒ–ãƒ«ç¢ºä¿ã—ã¦ãƒ¡ãƒ¢ãƒªæ§‹é€ ä½“ã§ç¢ºä¿
 		pstAccel = AccelKeyTableLoadAlloc( &iEntry );
 		AccelKeyTableCreate( pstAccel, iEntry );
 
@@ -862,13 +862,13 @@ HRESULT AccelKeyDlgOpen( HWND hWnd )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	ƒAƒNƒZƒ‹ƒL[•ÒWƒ_ƒCƒ„ƒƒOƒ{ƒbƒNƒX‚ÌƒƒZ[ƒWƒnƒ“ƒhƒ‰‚¾‚Á‚Ä‚Î‚æ
-	@param[in]	hDlg	ƒ_ƒCƒ„ƒƒOƒnƒ“ƒhƒ‹
-	@param[in]	message	ƒEƒCƒ“ƒhƒEƒƒbƒZ[ƒW‚Ì¯•Ê”Ô†
-	@param[in]	wParam	’Ç‰Á‚Ìî•ñ‚P
-	@param[in]	lParam	’Ç‰Á‚Ìî•ñ‚Q
-	@retval 0	ƒƒbƒZ[ƒW‚Íˆ—‚µ‚Ä‚¢‚È‚¢
-	@retval no0	‚È‚ñ‚©ˆ—‚³‚ê‚½
+	ã‚¢ã‚¯ã‚»ãƒ«ã‚­ãƒ¼ç·¨é›†ãƒ€ã‚¤ãƒ¤ãƒ­ã‚°ãƒœãƒƒã‚¯ã‚¹ã®ãƒ¡ã‚»ãƒ¼ã‚¸ãƒãƒ³ãƒ‰ãƒ©ã ã£ã¦ã°ã‚ˆ
+	@param[in]	hDlg	ãƒ€ã‚¤ãƒ¤ãƒ­ã‚°ãƒãƒ³ãƒ‰ãƒ«
+	@param[in]	message	ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã®è­˜åˆ¥ç•ªå·
+	@param[in]	wParam	è¿½åŠ ã®æƒ…å ±ï¼‘
+	@param[in]	lParam	è¿½åŠ ã®æƒ…å ±ï¼’
+	@retval 0	ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã¯å‡¦ç†ã—ã¦ã„ãªã„
+	@retval no0	ãªã‚“ã‹å‡¦ç†ã•ã‚ŒãŸ
 */
 INT_PTR CALLBACK AccelKeyDlgProc( HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam )
 {
@@ -890,7 +890,7 @@ INT_PTR CALLBACK AccelKeyDlgProc( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 	HWND	hWndCtl;
 	UINT	codeNotify;
 
-//ƒzƒbƒgƒL[CONTROL‚ÍAƒXƒy[ƒX‚ªg‚¦‚È‚¢
+//ãƒ›ãƒƒãƒˆã‚­ãƒ¼CONTROLã¯ã€ã‚¹ãƒšãƒ¼ã‚¹ãŒä½¿ãˆãªã„
 
 	switch( message )
 	{
@@ -900,7 +900,7 @@ INT_PTR CALLBACK AccelKeyDlgProc( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 
 			cltAccel.clear();
 			pstAccel = AccelKeyTableGetAlloc( &iAccEntry );
-			//	‚±‚±‚ÅŠm•Û‚µ‚½ƒAƒNƒZƒ‰‚ÍƒŠƒXƒg‚É‚µ‚Ä•Û‚µ‚Ä‚¨‚­
+			//	ã“ã“ã§ç¢ºä¿ã—ãŸã‚¢ã‚¯ã‚»ãƒ©ã¯ãƒªã‚¹ãƒˆã«ã—ã¦ä¿æŒã—ã¦ãŠã
 			for( i = 0; iAccEntry > i; i++ ){	cltAccel.push_back( pstAccel[i] );	}
 			FREE( pstAccel );
 
@@ -910,27 +910,27 @@ INT_PTR CALLBACK AccelKeyDlgProc( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 			return (INT_PTR)TRUE;
 
 		case WM_COMMAND:
-			id         = LOWORD(wParam);	//	ƒƒbƒZ[ƒW‚ğ”­¶‚³‚¹‚½qƒEƒCƒ“ƒhƒE‚Ì¯•Êq
-			hWndCtl    = (HWND)lParam;		//	ƒƒbƒZ[ƒW‚ğ”­¶‚³‚¹‚½qƒEƒCƒ“ƒhƒE‚Ìƒnƒ“ƒhƒ‹
-			codeNotify = HIWORD(wParam);	//	’Ê’mƒƒbƒZ[ƒW
+			id         = LOWORD(wParam);	//	ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’ç™ºç”Ÿã•ã›ãŸå­ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ã®è­˜åˆ¥å­
+			hWndCtl    = (HWND)lParam;		//	ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’ç™ºç”Ÿã•ã›ãŸå­ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ã®ãƒãƒ³ãƒ‰ãƒ«
+			codeNotify = HIWORD(wParam);	//	é€šçŸ¥ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸
 			switch( id )
 			{
 				case IDOK:
-					AccelKeyTableSave( &cltAccel );	//	ƒZ[ƒu
+					AccelKeyTableSave( &cltAccel );	//	ã‚»ãƒ¼ãƒ–
 				case IDCANCEL:
 					cltAccel.clear();
 					EndDialog( hDlg, id );
 					return (INT_PTR)TRUE;
 
 
-				case IDB_FUNCKEY_CLEAR:	//	‰ğœ
+				case IDB_FUNCKEY_CLEAR:	//	è§£é™¤
 					SendMessage( hHokyWnd, HKM_SETHOTKEY, 0, 0 );
 					iItem = WndTagGet( hHokyWnd );
 					AccelKeyBindListMod( hDlg, iItem, NULL, &cltAccel );
 					return (INT_PTR)TRUE;
 
 
-				case IDB_FUNCKEY_SET:	//	ƒZƒbƒg
+				case IDB_FUNCKEY_SET:	//	ã‚»ãƒƒãƒˆ
 					lRslt = SendMessage( hHokyWnd, HKM_GETHOTKEY, 0, 0 );
 					stAcce.key   = LOBYTE( lRslt );
 					if( BST_CHECKED == IsDlgButtonChecked( hDlg, IDCB_FUNCKEY_SPACE ) )
@@ -939,15 +939,15 @@ INT_PTR CALLBACK AccelKeyDlgProc( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 					stAcce.cmd    = 0;
 					if( SUCCEEDED( AccelKeyBindExistCheck( hDlg, &stAcce, &cltAccel ) ) )
 					{
-						//	‚©‚Ô‚Á‚Ä‚È‚©‚Á‚½‚ç“o˜^‚·‚é
+						//	ã‹ã¶ã£ã¦ãªã‹ã£ãŸã‚‰ç™»éŒ²ã™ã‚‹
 						iItem = WndTagGet( hHokyWnd );
 						AccelKeyBindListMod( hDlg, iItem, &stAcce, &cltAccel );
 					}
 					return (INT_PTR)TRUE;
 
 
-				case IDB_FUNCKEY_INIT:	//	İ’è‚ğ‰Šú‰»‚·‚é
-					if( IDOK == MessageBox( hDlg, TEXT("ƒL[İ’è‚ğ‰Šúó‘Ô‚É–ß‚·‚æ"), TEXT("İ’èƒŠƒZƒbƒg‚¾‚æ"), MB_OKCANCEL | MB_ICONQUESTION ) )
+				case IDB_FUNCKEY_INIT:	//	è¨­å®šã‚’åˆæœŸåŒ–ã™ã‚‹
+					if( IDOK == MessageBox( hDlg, TEXT("ã‚­ãƒ¼è¨­å®šã‚’åˆæœŸçŠ¶æ…‹ã«æˆ»ã™ã‚ˆ"), TEXT("è¨­å®šãƒªã‚»ãƒƒãƒˆã ã‚ˆ"), MB_OKCANCEL | MB_ICONQUESTION ) )
 					{
 						AccelKeySettingReset( hDlg, &cltAccel );
 						AccelKeyListInit( hDlg, &cltAccel );
@@ -955,7 +955,7 @@ INT_PTR CALLBACK AccelKeyDlgProc( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 					return (INT_PTR)TRUE;
 
 
-				case IDB_FUNCKEY_FILEOUT:	//	İ’è‚ğƒtƒ@ƒCƒ‹‚Éo—Í
+				case IDB_FUNCKEY_FILEOUT:	//	è¨­å®šã‚’ãƒ•ã‚¡ã‚¤ãƒ«ã«å‡ºåŠ›
 					AccelKeyListOutput( hDlg );
 					return (INT_PTR)TRUE;
 
@@ -975,13 +975,13 @@ INT_PTR CALLBACK AccelKeyDlgProc( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	ƒAƒNƒZƒ‹ƒL[•ÒW‚Ìƒm[ƒeƒBƒtƒ@ƒCƒƒbƒZ[ƒWˆ—
-	@param[in]	hDlg		ƒ_ƒCƒ„ƒƒOƒnƒ“ƒhƒ‹
-	@param[in]	idFrom		”­¶‚µ‚½ƒRƒ‚ƒ“‚ÌID”Ô†
-	@param[in]	pstNmhdr	ƒCƒxƒ“ƒg“à—e
-	@param[in]	*pltAccel	ƒAƒNƒZƒ‰ƒL[ƒe[ƒuƒ‹
-	@retval 0	ƒƒbƒZ[ƒW‚Íˆ—‚µ‚Ä‚¢‚È‚¢
-	@retval no0	‚È‚ñ‚©ˆ—‚³‚ê‚½
+	ã‚¢ã‚¯ã‚»ãƒ«ã‚­ãƒ¼ç·¨é›†ã®ãƒãƒ¼ãƒ†ã‚£ãƒ•ã‚¡ã‚¤ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸å‡¦ç†
+	@param[in]	hDlg		ãƒ€ã‚¤ãƒ¤ãƒ­ã‚°ãƒãƒ³ãƒ‰ãƒ«
+	@param[in]	idFrom		ç™ºç”Ÿã—ãŸã‚³ãƒ¢ãƒ³ã®IDç•ªå·
+	@param[in]	pstNmhdr	ã‚¤ãƒ™ãƒ³ãƒˆå†…å®¹
+	@param[in]	*pltAccel	ã‚¢ã‚¯ã‚»ãƒ©ã‚­ãƒ¼ãƒ†ãƒ¼ãƒ–ãƒ«
+	@retval 0	ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã¯å‡¦ç†ã—ã¦ã„ãªã„
+	@retval no0	ãªã‚“ã‹å‡¦ç†ã•ã‚ŒãŸ
 */
 INT_PTR AccelKeyNotify( HWND hDlg, INT idFrom, LPNMHDR pstNmhdr, list<ACCEL> *pltAccel )
 {
@@ -992,20 +992,20 @@ INT_PTR AccelKeyNotify( HWND hDlg, INT idFrom, LPNMHDR pstNmhdr, list<ACCEL> *pl
 
 	list<ACCEL>::iterator	itAccel;
 
-	if( IDLV_FUNCKEY_LIST == idFrom )	//	ˆê——ƒŠƒXƒgƒrƒ…[‚Å
+	if( IDLV_FUNCKEY_LIST == idFrom )	//	ä¸€è¦§ãƒªã‚¹ãƒˆãƒ“ãƒ¥ãƒ¼ã§
 	{
-		if( NM_CLICK == pstNmhdr->code )	//	ƒNƒŠƒbƒP‚³‚ê‚½‚ç
+		if( NM_CLICK == pstNmhdr->code )	//	ã‚¯ãƒªãƒƒã‚±ã•ã‚ŒãŸã‚‰
 		{
 			pstLv = (LPNMLISTVIEW)pstNmhdr;
-			pstLv->iItem;	//	‚»‚ÌƒAƒCƒeƒ€‚ğŠm”F‚µ‚Ä
+			pstLv->iItem;	//	ãã®ã‚¢ã‚¤ãƒ†ãƒ ã‚’ç¢ºèªã—ã¦
 
 			ZeroMemory( &stLvi, sizeof(stLvi) );
-			stLvi.mask     = LVIF_PARAM;	//	ƒRƒ}ƒ“ƒhƒR[ƒh‚ğŠm•Û‚·‚é
+			stLvi.mask     = LVIF_PARAM;	//	ã‚³ãƒãƒ³ãƒ‰ã‚³ãƒ¼ãƒ‰ã‚’ç¢ºä¿ã™ã‚‹
 			stLvi.iItem    = pstLv->iItem;
 			ListView_GetItem( pstNmhdr->hwndFrom, &stLvi );
 
 			hHokyWnd = GetDlgItem( hDlg, IDHKC_FUNCKEY_INPUT );
-			WndTagSet( hHokyWnd , stLvi.iItem );	//	‘I‘ğ‚µ‚½s‚ğŠm•Û
+			WndTagSet( hHokyWnd , stLvi.iItem );	//	é¸æŠã—ãŸè¡Œã‚’ç¢ºä¿
 
 			for( itAccel = (*pltAccel).begin(); itAccel != (*pltAccel).end(); itAccel++ )
 			{
@@ -1016,7 +1016,7 @@ INT_PTR AccelKeyNotify( HWND hDlg, INT idFrom, LPNMHDR pstNmhdr, list<ACCEL> *pl
 					{	SendMessage( hHokyWnd , HKM_SETHOTKEY, MAKEWORD(itAccel->key, bMod), 0 );	}
 					else{	SendMessage( hHokyWnd, HKM_SETHOTKEY, MAKEWORD(itAccel->key, (bMod|HOTKEYF_EXT)), 0 );	}
 
-					break;			//		í‚ÉHOTKEYF_EXT‚¢‚ê‚é‚ÆASpace‚ª–{“–‚É‹ó”’‚É‚È‚é
+					break;			//		å¸¸ã«HOTKEYF_EXTã„ã‚Œã‚‹ã¨ã€SpaceãŒæœ¬å½“ã«ç©ºç™½ã«ãªã‚‹
 				}
 			}
 			if( itAccel == (*pltAccel).end() )	SendMessage( hHokyWnd, HKM_SETHOTKEY, 0, 0 );
@@ -1031,9 +1031,9 @@ INT_PTR AccelKeyNotify( HWND hDlg, INT idFrom, LPNMHDR pstNmhdr, list<ACCEL> *pl
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	ƒAƒNƒZƒ‰ƒe[ƒuƒ‹‚ğ‰Šúƒtƒ@ƒCƒ‹‚©‚çŠm•Û‚·‚éEƒƒ‚ƒŠŠm•Û‚·‚é‚Ì‚Å•Ô‚è’l‚Ìˆµ‚¢‚É’ˆÓ
-	@param[out]	piEntry	Šm•Û‚µ‚½ƒGƒ“ƒgƒŠ”‚ğ–ß‚·
-	@return		Šm•Û‚µ‚½ƒe[ƒuƒ‹\‘¢‘Ì‚Ìƒ|ƒCƒ“ƒ^[Efree‚É’ˆÓ
+	ã‚¢ã‚¯ã‚»ãƒ©ãƒ†ãƒ¼ãƒ–ãƒ«ã‚’åˆæœŸãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚‰ç¢ºä¿ã™ã‚‹ãƒ»ãƒ¡ãƒ¢ãƒªç¢ºä¿ã™ã‚‹ã®ã§è¿”ã‚Šå€¤ã®æ‰±ã„ã«æ³¨æ„
+	@param[out]	piEntry	ç¢ºä¿ã—ãŸã‚¨ãƒ³ãƒˆãƒªæ•°ã‚’æˆ»ã™
+	@return		ç¢ºä¿ã—ãŸãƒ†ãƒ¼ãƒ–ãƒ«æ§‹é€ ä½“ã®ãƒã‚¤ãƒ³ã‚¿ãƒ¼ãƒ»freeã«æ³¨æ„
 */
 LPACCEL AccelKeyTableLoadAlloc( LPINT piEntry )
 {
@@ -1042,9 +1042,9 @@ LPACCEL AccelKeyTableLoadAlloc( LPINT piEntry )
 	TCHAR	atKeyName[MIN_STRING];
 	LPACCEL	pstAccel = NULL;
 
-	//	‰Šúó‘Ô
+	//	åˆæœŸçŠ¶æ…‹
 	dCount = GetPrivateProfileInt( TEXT("Accelerator"), TEXT("Count"), 0, gatCntxIni );
-	if( 1 <= dCount )	//	ƒf[ƒ^—L‚è
+	if( 1 <= dCount )	//	ãƒ‡ãƒ¼ã‚¿æœ‰ã‚Š
 	{
 		pstAccel = (LPACCEL)malloc( dCount * sizeof(ACCEL) );
 
@@ -1052,7 +1052,7 @@ LPACCEL AccelKeyTableLoadAlloc( LPINT piEntry )
 		{
 			StringCchPrintf( atKeyName, MIN_STRING, TEXT("AcCMD%d"), i );
 			dValue = GetPrivateProfileInt( TEXT("Accelerator"), atKeyName, 0, gatCntxIni );
-			if( 0 == dValue )	continue;	//	İ’è‚ª‚O‚È‚ç‰½‚à‚µ‚È‚¢
+			if( 0 == dValue )	continue;	//	è¨­å®šãŒï¼ãªã‚‰ä½•ã‚‚ã—ãªã„
 			pstAccel[aim].cmd = dValue;
 
 			StringCchPrintf( atKeyName, MIN_STRING, TEXT("AcVirt%d"), i );
@@ -1074,11 +1074,11 @@ LPACCEL AccelKeyTableLoadAlloc( LPINT piEntry )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	ƒL[ƒoƒCƒ“ƒh‚ğQÆ‚µ‚ÄA•¶š—ñ‚ğì‚é
-	@param[in]	pstAccel	ƒAƒNƒZƒ‰ƒL[ƒe[ƒuƒ‹
-	@param[in]	ptBuffer	•¶š—ñ“ü‚ê‚éƒoƒbƒtƒ@‚Ìƒ|ƒCƒ“ƒ^[
-	@param[in]	cchSize		ƒoƒbƒtƒ@‚Ì•¶š”
-	@return		HRESULT		I—¹ó‘ÔƒR[ƒh
+	ã‚­ãƒ¼ãƒã‚¤ãƒ³ãƒ‰ã‚’å‚ç…§ã—ã¦ã€æ–‡å­—åˆ—ã‚’ä½œã‚‹
+	@param[in]	pstAccel	ã‚¢ã‚¯ã‚»ãƒ©ã‚­ãƒ¼ãƒ†ãƒ¼ãƒ–ãƒ«
+	@param[in]	ptBuffer	æ–‡å­—åˆ—å…¥ã‚Œã‚‹ãƒãƒƒãƒ•ã‚¡ã®ãƒã‚¤ãƒ³ã‚¿ãƒ¼
+	@param[in]	cchSize		ãƒãƒƒãƒ•ã‚¡ã®æ–‡å­—æ•°
+	@return		HRESULT		çµ‚äº†çŠ¶æ…‹ã‚³ãƒ¼ãƒ‰
 */
 HRESULT AccelKeyBindString( LPACCEL pstAccel, LPTSTR ptBuffer, UINT_PTR cchSize )
 {
@@ -1086,7 +1086,7 @@ HRESULT AccelKeyBindString( LPACCEL pstAccel, LPTSTR ptBuffer, UINT_PTR cchSize 
 
 	ZeroMemory( ptBuffer, cchSize * sizeof(TCHAR) );
 
-//	FVIRTKEY  FNOINVERT  ‚Íí‚ÉŠÜ‚ß‚é
+//	FVIRTKEY  FNOINVERT  ã¯å¸¸ã«å«ã‚ã‚‹
 
 	if( FCONTROL & pstAccel->fVirt )	StringCchCat( ptBuffer, cchSize, TEXT("Ctrl + ") );
 	if( FSHIFT   & pstAccel->fVirt )	StringCchCat( ptBuffer, cchSize, TEXT("Shift + ") );
@@ -1121,17 +1121,17 @@ HRESULT AccelKeyBindString( LPACCEL pstAccel, LPTSTR ptBuffer, UINT_PTR cchSize 
 			case VK_CAPITAL:	StringCchCopy( atKey, MIN_STRING, TEXT("CAPITAL") );	break;
 			case VK_KANA:		StringCchCopy( atKey, MIN_STRING, TEXT("KANA") );	break;
 			case VK_ESCAPE:		StringCchCopy( atKey, MIN_STRING, TEXT("Esc") );	break;
-			case VK_CONVERT:	StringCchCopy( atKey, MIN_STRING, TEXT("•ÏŠ·") );	break;
-			case VK_NONCONVERT:	StringCchCopy( atKey, MIN_STRING, TEXT("Ù•ÏŠ·") );	break;
+			case VK_CONVERT:	StringCchCopy( atKey, MIN_STRING, TEXT("å¤‰æ›") );	break;
+			case VK_NONCONVERT:	StringCchCopy( atKey, MIN_STRING, TEXT("æ— å¤‰æ›") );	break;
 			case VK_SPACE:		StringCchCopy( atKey, MIN_STRING, TEXT("Space") );	break;
 			case VK_PRIOR:		StringCchCopy( atKey, MIN_STRING, TEXT("PageUp") );	break;
 			case VK_NEXT:		StringCchCopy( atKey, MIN_STRING, TEXT("PageDown") );	break;
 			case VK_END:		StringCchCopy( atKey, MIN_STRING, TEXT("End") );	break;
 			case VK_HOME:		StringCchCopy( atKey, MIN_STRING, TEXT("Home") );	break;
-			case VK_LEFT:		StringCchCopy( atKey, MIN_STRING, TEXT("©") );	break;
-			case VK_UP:			StringCchCopy( atKey, MIN_STRING, TEXT("ª") );	break;
-			case VK_RIGHT:		StringCchCopy( atKey, MIN_STRING, TEXT("¨") );	break;
-			case VK_DOWN:		StringCchCopy( atKey, MIN_STRING, TEXT("«") );	break;
+			case VK_LEFT:		StringCchCopy( atKey, MIN_STRING, TEXT("â†") );	break;
+			case VK_UP:			StringCchCopy( atKey, MIN_STRING, TEXT("â†‘") );	break;
+			case VK_RIGHT:		StringCchCopy( atKey, MIN_STRING, TEXT("â†’") );	break;
+			case VK_DOWN:		StringCchCopy( atKey, MIN_STRING, TEXT("â†“") );	break;
 			case VK_SELECT:		StringCchCopy( atKey, MIN_STRING, TEXT("SELECT") );	break;
 			case VK_PRINT:		StringCchCopy( atKey, MIN_STRING, TEXT("PRINT") );	break;
 			case VK_EXECUTE:	StringCchCopy( atKey, MIN_STRING, TEXT("EXECUTE") );	break;
@@ -1139,8 +1139,8 @@ HRESULT AccelKeyBindString( LPACCEL pstAccel, LPTSTR ptBuffer, UINT_PTR cchSize 
 			case VK_INSERT:		StringCchCopy( atKey, MIN_STRING, TEXT("Insert") );	break;
 			case VK_DELETE:		StringCchCopy( atKey, MIN_STRING, TEXT("Delete") );	break;
 			case VK_HELP:		StringCchCopy( atKey, MIN_STRING, TEXT("Help") );	break;
-			case VK_LWIN:		StringCchCopy( atKey, MIN_STRING, TEXT("¶Win") );	break;
-			case VK_RWIN:		StringCchCopy( atKey, MIN_STRING, TEXT("‰EWin") );	break;
+			case VK_LWIN:		StringCchCopy( atKey, MIN_STRING, TEXT("å·¦Win") );	break;
+			case VK_RWIN:		StringCchCopy( atKey, MIN_STRING, TEXT("å³Win") );	break;
 			case VK_APPS:		StringCchCopy( atKey, MIN_STRING, TEXT("APPZ") );	break;
 			case VK_SLEEP:		StringCchCopy( atKey, MIN_STRING, TEXT("SLEEP") );	break;
 			case VK_MULTIPLY:	StringCchCopy( atKey, MIN_STRING, TEXT("NUM *") );	break;
@@ -1152,22 +1152,22 @@ HRESULT AccelKeyBindString( LPACCEL pstAccel, LPTSTR ptBuffer, UINT_PTR cchSize 
 			case VK_NUMLOCK:	StringCchCopy( atKey, MIN_STRING, TEXT("NumLock") );	break;
 			case VK_SCROLL:		StringCchCopy( atKey, MIN_STRING, TEXT("ScrollLock") );	break;
 			case VK_OEM_NEC_EQUAL:	StringCchCopy( atKey, MIN_STRING, TEXT("NUM =") );	break;
-			case VK_BROWSER_BACK:		StringCchCopy( atKey, MIN_STRING, TEXT("–ß‚é") );	break;
-			case VK_BROWSER_FORWARD:	StringCchCopy( atKey, MIN_STRING, TEXT("i‚Ş") );	break;
-			case VK_BROWSER_REFRESH:	StringCchCopy( atKey, MIN_STRING, TEXT("XV") );	break;
-			case VK_BROWSER_STOP:		StringCchCopy( atKey, MIN_STRING, TEXT("’â~") );	break;
-			case VK_BROWSER_SEARCH:		StringCchCopy( atKey, MIN_STRING, TEXT("ŒŸõ") );	break;
-			case VK_BROWSER_FAVORITES:	StringCchCopy( atKey, MIN_STRING, TEXT("‹C“ü") );	break;
-			case VK_BROWSER_HOME:		StringCchCopy( atKey, MIN_STRING, TEXT("ƒzƒ€") );	break;
-			case VK_VOLUME_MUTE:		StringCchCopy( atKey, MIN_STRING, TEXT("Á‰¹") );	break;
-			case VK_VOLUME_DOWN:		StringCchCopy( atKey, MIN_STRING, TEXT("‰¹‰º") );	break;
-			case VK_VOLUME_UP:			StringCchCopy( atKey, MIN_STRING, TEXT("‰¹ã") );	break;
-			case VK_MEDIA_NEXT_TRACK:	StringCchCopy( atKey, MIN_STRING, TEXT("Ÿ€") );	break;
-			case VK_MEDIA_PREV_TRACK:	StringCchCopy( atKey, MIN_STRING, TEXT("‘O€") );	break;
-			case VK_MEDIA_STOP:			StringCchCopy( atKey, MIN_STRING, TEXT("’â~") );	break;
-			case VK_MEDIA_PLAY_PAUSE:	StringCchCopy( atKey, MIN_STRING, TEXT("Ä¶") );	break;
-			case VK_LAUNCH_MAIL:		StringCchCopy( atKey, MIN_STRING, TEXT("ƒƒ‹") );	break;
-			case VK_LAUNCH_MEDIA_SELECT:StringCchCopy( atKey, MIN_STRING, TEXT("‘I‘ğ") );	break;
+			case VK_BROWSER_BACK:		StringCchCopy( atKey, MIN_STRING, TEXT("æˆ»ã‚‹") );	break;
+			case VK_BROWSER_FORWARD:	StringCchCopy( atKey, MIN_STRING, TEXT("é€²ã‚€") );	break;
+			case VK_BROWSER_REFRESH:	StringCchCopy( atKey, MIN_STRING, TEXT("æ›´æ–°") );	break;
+			case VK_BROWSER_STOP:		StringCchCopy( atKey, MIN_STRING, TEXT("åœæ­¢") );	break;
+			case VK_BROWSER_SEARCH:		StringCchCopy( atKey, MIN_STRING, TEXT("æ¤œç´¢") );	break;
+			case VK_BROWSER_FAVORITES:	StringCchCopy( atKey, MIN_STRING, TEXT("æ°—å…¥") );	break;
+			case VK_BROWSER_HOME:		StringCchCopy( atKey, MIN_STRING, TEXT("ãƒ›ãƒ ") );	break;
+			case VK_VOLUME_MUTE:		StringCchCopy( atKey, MIN_STRING, TEXT("æ¶ˆéŸ³") );	break;
+			case VK_VOLUME_DOWN:		StringCchCopy( atKey, MIN_STRING, TEXT("éŸ³ä¸‹") );	break;
+			case VK_VOLUME_UP:			StringCchCopy( atKey, MIN_STRING, TEXT("éŸ³ä¸Š") );	break;
+			case VK_MEDIA_NEXT_TRACK:	StringCchCopy( atKey, MIN_STRING, TEXT("æ¬¡é …") );	break;
+			case VK_MEDIA_PREV_TRACK:	StringCchCopy( atKey, MIN_STRING, TEXT("å‰é …") );	break;
+			case VK_MEDIA_STOP:			StringCchCopy( atKey, MIN_STRING, TEXT("åœæ­¢") );	break;
+			case VK_MEDIA_PLAY_PAUSE:	StringCchCopy( atKey, MIN_STRING, TEXT("å†ç”Ÿ") );	break;
+			case VK_LAUNCH_MAIL:		StringCchCopy( atKey, MIN_STRING, TEXT("ãƒ¡ãƒ«") );	break;
+			case VK_LAUNCH_MEDIA_SELECT:StringCchCopy( atKey, MIN_STRING, TEXT("é¸æŠ") );	break;
 			case VK_LAUNCH_APP1:		StringCchCopy( atKey, MIN_STRING, TEXT("APP1") );	break;
 			case VK_LAUNCH_APP2:		StringCchCopy( atKey, MIN_STRING, TEXT("APP2") );	break;
 			case VK_OEM_1:		StringCchCopy( atKey, MIN_STRING, TEXT(":") );	break;
@@ -1178,17 +1178,17 @@ HRESULT AccelKeyBindString( LPACCEL pstAccel, LPTSTR ptBuffer, UINT_PTR cchSize 
 			case VK_OEM_2:		StringCchCopy( atKey, MIN_STRING, TEXT("/") );	break;
 			case VK_OEM_3:		StringCchCopy( atKey, MIN_STRING, TEXT("@") );	break;
 			case VK_OEM_4:		StringCchCopy( atKey, MIN_STRING, TEXT("[") );	break;
-			case VK_OEM_5:		StringCchCopy( atKey, MIN_STRING, TEXT("\\") );	break;	//	
+			case VK_OEM_5:		StringCchCopy( atKey, MIN_STRING, TEXT("\\") );	break;	//	ï¿¥
 			case VK_OEM_6:		StringCchCopy( atKey, MIN_STRING, TEXT("]") );	break;
 			case VK_OEM_7:		StringCchCopy( atKey, MIN_STRING, TEXT("^") );	break;
 			case VK_OEM_8:		StringCchCopy( atKey, MIN_STRING, TEXT("_") );	break;
-			case VK_OEM_102:	StringCchCopy( atKey, MIN_STRING, TEXT("‚ë") );	break;	//	‚ë
+			case VK_OEM_102:	StringCchCopy( atKey, MIN_STRING, TEXT("ã‚") );	break;	//	ã‚
 			case VK_OEM_ATTN:	StringCchCopy( atKey, MIN_STRING, TEXT("CapsLock") );	break;
-			case VK_OEM_COPY:	StringCchCopy( atKey, MIN_STRING, TEXT("ƒJ—[‚Ğ‚ç") );	break;
-			case VK_OEM_AUTO:	StringCchCopy( atKey, MIN_STRING, TEXT("”¼/‘S Š¿1") );	break;
-			case VK_OEM_ENLW:	StringCchCopy( atKey, MIN_STRING, TEXT("”¼/‘S Š¿2") );	break;
+			case VK_OEM_COPY:	StringCchCopy( atKey, MIN_STRING, TEXT("ã‚«å¤•ã²ã‚‰") );	break;
+			case VK_OEM_AUTO:	StringCchCopy( atKey, MIN_STRING, TEXT("åŠ/å…¨ æ¼¢1") );	break;
+			case VK_OEM_ENLW:	StringCchCopy( atKey, MIN_STRING, TEXT("åŠ/å…¨ æ¼¢2") );	break;
 
-			//	‘«‚è‚È‚¢•ª‚Í‚r‚c‚j‚©‚ç’Ç‰Á‚·‚é
+			//	è¶³ã‚Šãªã„åˆ†ã¯ï¼³ï¼¤ï¼«ã‹ã‚‰è¿½åŠ ã™ã‚‹
 			default:	StringCchPrintf( atKey, MIN_STRING, TEXT("0x%02X"), pstAccel->key );	break;
 		}
 	}
@@ -1212,13 +1212,13 @@ HRESULT AccelKeyBindString( LPACCEL pstAccel, LPTSTR ptBuffer, UINT_PTR cchSize 
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	ƒRƒ}ƒ“ƒh”Ô†‚ğQÆ‚µ‚ÄAƒqƒbƒg‚µ‚½‚çƒAƒNƒZƒ‹•¶š—ñ‚ğì‚Á‚Ä‚­‚Á‚Â‚¯‚é
-	@param[in]	ptText		ˆ—Œ‹‰Ê‚ğ‚­‚Á‚Â‚¯‚é•¶š—ñƒ|ƒCƒ“ƒ^[
-	@param[in]	cchSize		ƒoƒbƒtƒ@‚Ì•¶š”
-	@param[in]	dCommand	ƒRƒ}ƒ“ƒh”Ô†
-	@param[in]	pstAccel	ƒAƒNƒZƒ‰ƒL[ƒe[ƒuƒ‹
-	@param[in]	iEntry		ƒe[ƒuƒ‹‚Ìƒf[ƒ^”
-	@return		HRESULT		I—¹ó‘ÔƒR[ƒh
+	ã‚³ãƒãƒ³ãƒ‰ç•ªå·ã‚’å‚ç…§ã—ã¦ã€ãƒ’ãƒƒãƒˆã—ãŸã‚‰ã‚¢ã‚¯ã‚»ãƒ«æ–‡å­—åˆ—ã‚’ä½œã£ã¦ãã£ã¤ã‘ã‚‹
+	@param[in]	ptText		å‡¦ç†çµæœã‚’ãã£ã¤ã‘ã‚‹æ–‡å­—åˆ—ãƒã‚¤ãƒ³ã‚¿ãƒ¼
+	@param[in]	cchSize		ãƒãƒƒãƒ•ã‚¡ã®æ–‡å­—æ•°
+	@param[in]	dCommand	ã‚³ãƒãƒ³ãƒ‰ç•ªå·
+	@param[in]	pstAccel	ã‚¢ã‚¯ã‚»ãƒ©ã‚­ãƒ¼ãƒ†ãƒ¼ãƒ–ãƒ«
+	@param[in]	iEntry		ãƒ†ãƒ¼ãƒ–ãƒ«ã®ãƒ‡ãƒ¼ã‚¿æ•°
+	@return		HRESULT		çµ‚äº†çŠ¶æ…‹ã‚³ãƒ¼ãƒ‰
 */
 HRESULT AccelKeyTextBuild( LPTSTR ptText, UINT_PTR cchSize, DWORD dCommand, CONST LPACCEL pstAccel, INT iEntry )
 {
@@ -1243,9 +1243,9 @@ HRESULT AccelKeyTextBuild( LPTSTR ptText, UINT_PTR cchSize, DWORD dCommand, CONS
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	ƒAƒNƒZƒ‹ƒL[•ÒW‚ÌƒŠƒXƒgƒrƒ…[‰Šú‰»
-	@param[in]	hDlg		ƒ_ƒCƒ„ƒƒOƒnƒ“ƒhƒ‹
-	@param[in]	*pltAccel	ƒAƒNƒZƒ‰ƒL[ƒe[ƒuƒ‹
+	ã‚¢ã‚¯ã‚»ãƒ«ã‚­ãƒ¼ç·¨é›†ã®ãƒªã‚¹ãƒˆãƒ“ãƒ¥ãƒ¼åˆæœŸåŒ–
+	@param[in]	hDlg		ãƒ€ã‚¤ãƒ¤ãƒ­ã‚°ãƒãƒ³ãƒ‰ãƒ«
+	@param[in]	*pltAccel	ã‚¢ã‚¯ã‚»ãƒ©ã‚­ãƒ¼ãƒ†ãƒ¼ãƒ–ãƒ«
 */
 VOID AccelKeyListInit( HWND hDlg, list<ACCEL> *pltAccel )
 {
@@ -1268,12 +1268,12 @@ VOID AccelKeyListInit( HWND hDlg, list<ACCEL> *pltAccel )
 	stLvColm.fmt      = LVCFMT_LEFT;
 
 	stLvColm.iSubItem = 0;
-	stLvColm.pszText  = TEXT("‹@”\");
+	stLvColm.pszText  = TEXT("æ©Ÿèƒ½");
 	stLvColm.cx       = width;
 	ListView_InsertColumn( hLvWnd, 0, &stLvColm );
 
 	stLvColm.iSubItem = 1;
-	stLvColm.pszText  = TEXT("ƒL[ƒoƒCƒ“ƒh");
+	stLvColm.pszText  = TEXT("ã‚­ãƒ¼ãƒã‚¤ãƒ³ãƒ‰");
 	stLvColm.cx       = width;
 	ListView_InsertColumn( hLvWnd, 1, &stLvColm );
 
@@ -1284,7 +1284,7 @@ VOID AccelKeyListInit( HWND hDlg, list<ACCEL> *pltAccel )
 	{
 		stItem.iItem = j;
 
-		//	ŠÖŒW–³‚¢‚â‚Â‚Í”ò‚Î‚·
+		//	é–¢ä¿‚ç„¡ã„ã‚„ã¤ã¯é£›ã°ã™
 		if( 0 == gstContextItem[i].dCommandoID || 
 		IDM_MN_UNISPACE     == gstContextItem[i].dCommandoID || 
 		IDM_MN_COLOUR_SEL   == gstContextItem[i].dCommandoID || 
@@ -1323,28 +1323,28 @@ VOID AccelKeyListInit( HWND hDlg, list<ACCEL> *pltAccel )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	ƒAƒNƒZƒ‹ƒL[‚ÆƒzƒbƒgƒL[‚ÌCüq‚ğ“ü‘Ö
-	@param[in]	bSrc	Œ³‚ÌCüqƒR[ƒh
-	@param[in]	bDrct	”ñ‚OƒAƒNƒZƒ‹¨ƒzƒbƒg@‚Oƒzƒbƒg¨ƒAƒNƒZƒ‹
-	@return	•ÏŠ·‚µ‚½ƒR[ƒh
+	ã‚¢ã‚¯ã‚»ãƒ«ã‚­ãƒ¼ã¨ãƒ›ãƒƒãƒˆã‚­ãƒ¼ã®ä¿®é£¾å­ã‚’å…¥æ›¿
+	@param[in]	bSrc	å…ƒã®ä¿®é£¾å­ã‚³ãƒ¼ãƒ‰
+	@param[in]	bDrct	éï¼ã‚¢ã‚¯ã‚»ãƒ«â†’ãƒ›ãƒƒãƒˆã€€ï¼ãƒ›ãƒƒãƒˆâ†’ã‚¢ã‚¯ã‚»ãƒ«
+	@return	å¤‰æ›ã—ãŸã‚³ãƒ¼ãƒ‰
 */
 BYTE AccelHotModExchange( BYTE bSrc, BOOLEAN bDrct )
 {
 	BYTE	bDest = 0;
 
-	if( bDrct )	//	ƒAƒNƒZƒ‹¨ƒzƒbƒg
+	if( bDrct )	//	ã‚¢ã‚¯ã‚»ãƒ«â†’ãƒ›ãƒƒãƒˆ
 	{
-		if( bSrc & FSHIFT )		bDest |= HOTKEYF_SHIFT;		//	ƒVƒtƒg
-		if( bSrc & FCONTROL )	bDest |= HOTKEYF_CONTROL;	//	ƒRƒ“ƒgƒ[ƒ‹
-		if( bSrc & FALT )		bDest |= HOTKEYF_ALT;		//	ƒAƒ‹ƒ^ƒl[ƒg
+		if( bSrc & FSHIFT )		bDest |= HOTKEYF_SHIFT;		//	ã‚·ãƒ•ãƒˆ
+		if( bSrc & FCONTROL )	bDest |= HOTKEYF_CONTROL;	//	ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ«
+		if( bSrc & FALT )		bDest |= HOTKEYF_ALT;		//	ã‚¢ãƒ«ã‚¿ãƒãƒ¼ãƒˆ
 	}
-	else	//	ƒzƒbƒg¨ƒAƒNƒZƒ‹
+	else	//	ãƒ›ãƒƒãƒˆâ†’ã‚¢ã‚¯ã‚»ãƒ«
 	{
-		if( bSrc & HOTKEYF_SHIFT )		bDest |= FSHIFT;	//	ƒVƒtƒg
-		if( bSrc & HOTKEYF_CONTROL )	bDest |= FCONTROL;	//	ƒRƒ“ƒgƒ[ƒ‹
-		if( bSrc & HOTKEYF_ALT )		bDest |= FALT;		//	ƒAƒ‹ƒ^ƒl[ƒg
+		if( bSrc & HOTKEYF_SHIFT )		bDest |= FSHIFT;	//	ã‚·ãƒ•ãƒˆ
+		if( bSrc & HOTKEYF_CONTROL )	bDest |= FCONTROL;	//	ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ«
+		if( bSrc & HOTKEYF_ALT )		bDest |= FALT;		//	ã‚¢ãƒ«ã‚¿ãƒãƒ¼ãƒˆ
 
-		bDest |= (FVIRTKEY|FNOINVERT);	//	í‚É‚ ‚é
+		bDest |= (FVIRTKEY|FNOINVERT);	//	å¸¸ã«ã‚ã‚‹
 	}
 
 	return bDest;
@@ -1352,9 +1352,9 @@ BYTE AccelHotModExchange( BYTE bSrc, BOOLEAN bDrct )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	ƒAƒNƒZƒ‹ƒe[ƒuƒ‹‚ğ•Û‘¶
-	@param[in]	*pltAccel	ƒAƒNƒZƒ‰ƒL[ƒe[ƒuƒ‹
-	@return		HRESULT		I—¹ó‘ÔƒR[ƒh
+	ã‚¢ã‚¯ã‚»ãƒ«ãƒ†ãƒ¼ãƒ–ãƒ«ã‚’ä¿å­˜
+	@param[in]	*pltAccel	ã‚¢ã‚¯ã‚»ãƒ©ã‚­ãƒ¼ãƒ†ãƒ¼ãƒ–ãƒ«
+	@return		HRESULT		çµ‚äº†çŠ¶æ…‹ã‚³ãƒ¼ãƒ‰
 */
 HRESULT AccelKeyTableSave( list<ACCEL> *pltAccel )
 {
@@ -1362,7 +1362,7 @@ HRESULT AccelKeyTableSave( list<ACCEL> *pltAccel )
 	TCHAR	atKeyName[MIN_STRING], atBuff[MIN_STRING];
 	list<ACCEL>::iterator	itAccel;
 
-	//	ˆê’UƒZƒNƒVƒ‡ƒ“‚ğ‹ó‚É‚·‚é
+	//	ä¸€æ—¦ã‚»ã‚¯ã‚·ãƒ§ãƒ³ã‚’ç©ºã«ã™ã‚‹
 	ZeroMemory( atBuff, sizeof(atBuff) );
 	WritePrivateProfileSection( TEXT("Accelerator"), atBuff, gatCntxIni );
 
@@ -1392,10 +1392,10 @@ HRESULT AccelKeyTableSave( list<ACCEL> *pltAccel )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	ƒAƒNƒZƒ‹İ’è‚ğ‰Šúó‘Ô‚ÉƒAƒb[
-	@param[in]	hDlg		ƒ_ƒCƒ„ƒƒOƒnƒ“ƒhƒ‹
-	@param[in]	*pltAccel	ƒAƒNƒZƒ‰ƒL[ƒe[ƒuƒ‹
-	@return		HRESULT		I—¹ó‘ÔƒR[ƒh
+	ã‚¢ã‚¯ã‚»ãƒ«è¨­å®šã‚’åˆæœŸçŠ¶æ…‹ã«ã‚¢ãƒƒãƒ¼
+	@param[in]	hDlg		ãƒ€ã‚¤ãƒ¤ãƒ­ã‚°ãƒãƒ³ãƒ‰ãƒ«
+	@param[in]	*pltAccel	ã‚¢ã‚¯ã‚»ãƒ©ã‚­ãƒ¼ãƒ†ãƒ¼ãƒ–ãƒ«
+	@return		HRESULT		çµ‚äº†çŠ¶æ…‹ã‚³ãƒ¼ãƒ‰
 */
 HRESULT AccelKeySettingReset( HWND hDlg, list<ACCEL> *pltAccel )
 {
@@ -1404,43 +1404,43 @@ HRESULT AccelKeySettingReset( HWND hDlg, list<ACCEL> *pltAccel )
 	LPACCEL	pstAccel = NULL;
 	INT		iItems, i;
 
-	//	Œ³X‚Ìƒe[ƒuƒ‹‚ğŠm•Û
+	//	å…ƒã€…ã®ãƒ†ãƒ¼ãƒ–ãƒ«ã‚’ç¢ºä¿
 	hAccel = LoadAccelerators( ghInst, MAKEINTRESOURCE(IDC_ORINRINEDITOR) );
 
-	//	‚Ü‚¸ŒÂ”Šm•Û
+	//	ã¾ãšå€‹æ•°ç¢ºä¿
 	iItems = CopyAcceleratorTable( hAccel, NULL, 0 );
 	if( 0 >= iItems )	return E_POINTER;
 
 	pstAccel = (LPACCEL)malloc( iItems * sizeof(ACCEL) );
 	if( !(pstAccel) )	return NULL;
 
-	//	–{‘ÌŠm•Û
+	//	æœ¬ä½“ç¢ºä¿
 	iItems = CopyAcceleratorTable( hAccel, pstAccel, iItems );
 
-	DestroyAcceleratorTable( hAccel );	//	‘S•”‰˜˜`‚Á‚½‚ç‚Ô‚Á‰ó‚µ‚Ä‚¨‚­
+	DestroyAcceleratorTable( hAccel );	//	å…¨éƒ¨æ±šå€­ã£ãŸã‚‰ã¶ã£å£Šã—ã¦ãŠã
 
-	(*pltAccel).clear();	//	ƒNƒ‹ƒ„[
+	(*pltAccel).clear();	//	ã‚¯ãƒ«ãƒ¤ãƒ¼
 
 	for( i = 0; iItems > i; i++ ){	(*pltAccel).push_back( pstAccel[i] );	}
 
 	FREE( pstAccel );
 
 	hLvWnd = GetDlgItem( hDlg, IDLV_FUNCKEY_LIST );
-	ListView_DeleteAllItems( hLvWnd );	//	ƒŠƒXƒgƒrƒ…[‚Í‰ó‚µ‚Ä‚¨‚­•û‚ª‘‚¢
+	ListView_DeleteAllItems( hLvWnd );	//	ãƒªã‚¹ãƒˆãƒ“ãƒ¥ãƒ¼ã¯å£Šã—ã¦ãŠãæ–¹ãŒæ—©ã„
 
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	İ’è‚ğƒtƒ@ƒCƒ‹‚ÉƒGƒNƒXƒ|[ƒg‚·‚é
-	@param[in]	hDlg	ƒ_ƒCƒ„ƒƒOƒnƒ“ƒhƒ‹
-	@return		HRESULT	I—¹ó‘ÔƒR[ƒh
+	è¨­å®šã‚’ãƒ•ã‚¡ã‚¤ãƒ«ã«ã‚¨ã‚¯ã‚¹ãƒãƒ¼ãƒˆã™ã‚‹
+	@param[in]	hDlg	ãƒ€ã‚¤ãƒ¤ãƒ­ã‚°ãƒãƒ³ãƒ‰ãƒ«
+	@return		HRESULT	çµ‚äº†çŠ¶æ…‹ã‚³ãƒ¼ãƒ‰
 */
 HRESULT AccelKeyListOutput( HWND hDlg )
 {
-//	CONST  WCHAR	rtHead = 0xFEFF;	//	ƒ†ƒjƒR[ƒhƒeƒLƒXƒgƒwƒbƒ_
-	//	ƒtƒ@ƒCƒ‹Œ`®‚ÍH@SJIS‚©UTF8‚Å‚¢‚¢
+//	CONST  WCHAR	rtHead = 0xFEFF;	//	ãƒ¦ãƒ‹ã‚³ãƒ¼ãƒ‰ãƒ†ã‚­ã‚¹ãƒˆãƒ˜ãƒƒãƒ€
+	//	ãƒ•ã‚¡ã‚¤ãƒ«å½¢å¼ã¯ï¼Ÿã€€SJISã‹UTF8ã§ã„ã„
 
 	HANDLE	hFile;
 	DWORD	wrote;
@@ -1471,41 +1471,41 @@ HRESULT AccelKeyListOutput( HWND hDlg )
 
 	StringCchCopy( atFilePath, MAX_PATH, TEXT("Accelerator.txt") );
 #if 1
-	//‚±‚±‚Å FileSaveDialogue ‚ğo‚·
+	//ã“ã“ã§ FileSaveDialogue ã‚’å‡ºã™
 	stSaveFile.lStructSize     = sizeof(OPENFILENAME);
 	stSaveFile.hwndOwner       = hDlg;
-	stSaveFile.lpstrFilter     = TEXT("ƒeƒLƒXƒgƒtƒ@ƒCƒ‹ ( *.txt )\0*.txt\0‘S‚Ä‚Ìƒtƒ@ƒCƒ‹ ( *.* )\0*.*\0\0");
-	stSaveFile.nFilterIndex    = 1;	//	ƒfƒtƒH‚ÌƒtƒBƒ‹ƒ^‘I‘ğˆ
+	stSaveFile.lpstrFilter     = TEXT("ãƒ†ã‚­ã‚¹ãƒˆãƒ•ã‚¡ã‚¤ãƒ« ( *.txt )\0*.txt\0å…¨ã¦ã®ãƒ•ã‚¡ã‚¤ãƒ« ( *.* )\0*.*\0\0");
+	stSaveFile.nFilterIndex    = 1;	//	ãƒ‡ãƒ•ã‚©ã®ãƒ•ã‚£ãƒ«ã‚¿é¸æŠè‚¢
 	stSaveFile.lpstrFile       = atFilePath;
 	stSaveFile.nMaxFile        = MAX_PATH;
 	stSaveFile.lpstrFileTitle  = atFileName;
 	stSaveFile.nMaxFileTitle   = MAX_STRING;
 	stSaveFile.lpstrDefExt     = TEXT("txt");
 //	stSaveFile.lpstrInitialDir = 
-	stSaveFile.lpstrTitle      = TEXT("•Û‘¶‚·‚éƒtƒ@ƒCƒ‹–¼‚ğw’è‚µ‚Ä‚Ë");
+	stSaveFile.lpstrTitle      = TEXT("ä¿å­˜ã™ã‚‹ãƒ•ã‚¡ã‚¤ãƒ«åã‚’æŒ‡å®šã—ã¦ã­");
 	stSaveFile.Flags           = OFN_EXPLORER | OFN_OVERWRITEPROMPT | OFN_HIDEREADONLY;
 
 	bOpened = GetSaveFileName( &stSaveFile );
 	if( !(bOpened) ){	return  E_ABORT;	}
-	//	ƒLƒƒƒ“ƒZƒ‹‚µ‚Ä‚½‚ç‰½‚à‚µ‚È‚¢
+	//	ã‚­ãƒ£ãƒ³ã‚»ãƒ«ã—ã¦ãŸã‚‰ä½•ã‚‚ã—ãªã„
 #endif
 	hFile = CreateFile( atFilePath, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL );
 	if( INVALID_HANDLE_VALUE == hFile )
 	{
-		MessageBox( hDlg, TEXT("ƒtƒ@ƒCƒ‹‚ğŠJ‚¯‚È‚©‚Á‚½‚æEEE"), NULL, MB_OK | MB_ICONERROR );
+		MessageBox( hDlg, TEXT("ãƒ•ã‚¡ã‚¤ãƒ«ã‚’é–‹ã‘ãªã‹ã£ãŸã‚ˆãƒ»ãƒ»ãƒ»"), NULL, MB_OK | MB_ICONERROR );
 		return E_HANDLE;
 	}
 	SetFilePointer( hFile, 0, NULL, FILE_BEGIN );
 
 	//WriteFile( hFile, &rtHead, 2, &wrote, NULL );
 
-	//	İ’è‚³‚ê‚Ä‚éƒe[ƒuƒ‹‚ğŠm•Û
+	//	è¨­å®šã•ã‚Œã¦ã‚‹ãƒ†ãƒ¼ãƒ–ãƒ«ã‚’ç¢ºä¿
 	pstAccel = AccelKeyTableGetAlloc( &iAccEntry );
 	for( i = 0; iAccEntry > i; i++ )
 	{
 		AccelKeyBindString( &(pstAccel[i]), atKeyBind, SUB_STRING );
 
-		StringCchCopy( atCmdName, MIN_STRING, TEXT("i–¼Ì•s–¾j") );
+		StringCchCopy( atCmdName, MIN_STRING, TEXT("ï¼ˆåç§°ä¸æ˜ï¼‰") );
 		for( j = 0; FULL_ITEMS > j; j++ )
 		{
 			if( gstContextItem[j].dCommandoID == pstAccel[i].cmd )
@@ -1520,7 +1520,7 @@ HRESULT AccelKeyListOutput( HWND hDlg )
 
 		cbSize = WideCharToMultiByte( CP_ACP, WC_NO_BEST_FIT_CHARS, atBuffer, -1, acString, BIG_STRING, NULL, NULL );
 									//	CP_UTF8, 0	
-		//	•ÏŠ·•¶š”‚É‚Íƒkƒ‹ƒ^[ƒ~ƒl[ƒ^‚ªŠÜ‚Ü‚ê‚Ä‚¢‚é‚Ì‚Å’ˆÓ
+		//	å¤‰æ›æ–‡å­—æ•°ã«ã¯ãƒŒãƒ«ã‚¿ãƒ¼ãƒŸãƒãƒ¼ã‚¿ãŒå«ã¾ã‚Œã¦ã„ã‚‹ã®ã§æ³¨æ„
 		WriteFile( hFile, acString, cbSize-1, &wrote, NULL );
 	}
 	FREE( pstAccel );
@@ -1528,18 +1528,18 @@ HRESULT AccelKeyListOutput( HWND hDlg )
 	SetEndOfFile( hFile );
 	CloseHandle( hFile );
 
-	MessageBox( hDlg, TEXT("ƒtƒ@ƒCƒ‹o—Í‚µ‚½‚æB"), TEXT("iEÍEj‚‚"), MB_OK | MB_ICONINFORMATION );
+	MessageBox( hDlg, TEXT("ãƒ•ã‚¡ã‚¤ãƒ«å‡ºåŠ›ã—ãŸã‚ˆã€‚"), TEXT("ï¼ˆãƒ»âˆ€ãƒ»ï¼‰ï½‚"), MB_OK | MB_ICONINFORMATION );
 
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	w’è‚ÌƒRƒ}ƒ“ƒh‚ªg‚í‚ê‚Ä‚é‚©‚Ç‚¤‚©Šm”F
-	@param[in]	hDlg		ƒ_ƒCƒ„ƒƒOƒnƒ“ƒhƒ‹
-	@param[in]	pstAccel	ƒAƒNƒZƒ‰ƒL[ƒe[ƒuƒ‹
-	@param[in]	*pltAccel	Šù‘¶‚Ì‚â‚Â‚Ìˆê——
-	@return		HRESULT		I—¹ó‘ÔƒR[ƒh@S_OK‚©‚Ô‚è–³‚µ@E_ACCESSDENIED‚©‚Ô‚è—L‚Á‚½
+	æŒ‡å®šã®ã‚³ãƒãƒ³ãƒ‰ãŒä½¿ã‚ã‚Œã¦ã‚‹ã‹ã©ã†ã‹ç¢ºèª
+	@param[in]	hDlg		ãƒ€ã‚¤ãƒ¤ãƒ­ã‚°ãƒãƒ³ãƒ‰ãƒ«
+	@param[in]	pstAccel	ã‚¢ã‚¯ã‚»ãƒ©ã‚­ãƒ¼ãƒ†ãƒ¼ãƒ–ãƒ«
+	@param[in]	*pltAccel	æ—¢å­˜ã®ã‚„ã¤ã®ä¸€è¦§
+	@return		HRESULT		çµ‚äº†çŠ¶æ…‹ã‚³ãƒ¼ãƒ‰ã€€S_OKã‹ã¶ã‚Šç„¡ã—ã€€E_ACCESSDENIEDã‹ã¶ã‚Šæœ‰ã£ãŸ
 */
 HRESULT AccelKeyBindExistCheck( HWND hDlg, LPACCEL pstAccel, list<ACCEL> *pltAccel )
 {
@@ -1551,14 +1551,14 @@ HRESULT AccelKeyBindExistCheck( HWND hDlg, LPACCEL pstAccel, list<ACCEL> *pltAcc
 
 	for( itAccel = (*pltAccel).begin(); itAccel != (*pltAccel).end(); itAccel++ )
 	{
-		//	“¯‚¶‚Ì‚ª‚ ‚é‚©‚Ç‚¤‚©’T‚·
+		//	åŒã˜ã®ãŒã‚ã‚‹ã‹ã©ã†ã‹æ¢ã™
 		//fVirt= itAccel->fVirt;
-		//fVirt &= ~(FVIRTKEY|FNOINVERT);•ÏŠ·‚É•t‚¯‘«‚µ‚Ä‚é‚Ì‚Å—v‚ç‚È‚¢
+		//fVirt &= ~(FVIRTKEY|FNOINVERT);å¤‰æ›æ™‚ã«ä»˜ã‘è¶³ã—ã¦ã‚‹ã®ã§è¦ã‚‰ãªã„
 		if( pstAccel->key == itAccel->key && pstAccel->fVirt == itAccel->fVirt )
 		{
-			//	“¯‚¶‚Ì‚ª‚ ‚Á‚½
+			//	åŒã˜ã®ãŒã‚ã£ãŸ
 			dCommand = itAccel->cmd;
-			StringCchCopy( atFuncName, MIN_STRING, TEXT("i–¼Ì•s–¾j") );
+			StringCchCopy( atFuncName, MIN_STRING, TEXT("ï¼ˆåç§°ä¸æ˜ï¼‰") );
 
 			for( i = 0; FULL_ITEMS > i; i++ )
 			{
@@ -1569,8 +1569,8 @@ HRESULT AccelKeyBindExistCheck( HWND hDlg, LPACCEL pstAccel, list<ACCEL> *pltAcc
 				}
 			}
 
-			StringCchPrintf( atMsg, MAX_STRING, TEXT("‚±‚ÌƒL[ƒoƒCƒ“ƒh‚Íu%sv‚Åg‚Á‚Ä‚é‚æB"), atFuncName );
-			MessageBox( hDlg, atMsg, TEXT("‚©‚Ô‚Á‚¿‚á‚Á‚½‚æ"), MB_OK | MB_ICONWARNING );
+			StringCchPrintf( atMsg, MAX_STRING, TEXT("ã“ã®ã‚­ãƒ¼ãƒã‚¤ãƒ³ãƒ‰ã¯ã€Œ%sã€ã§ä½¿ã£ã¦ã‚‹ã‚ˆã€‚"), atFuncName );
+			MessageBox( hDlg, atMsg, TEXT("ã‹ã¶ã£ã¡ã‚ƒã£ãŸã‚ˆ"), MB_OK | MB_ICONWARNING );
 
 			return E_ACCESSDENIED;
 		}
@@ -1581,12 +1581,12 @@ HRESULT AccelKeyBindExistCheck( HWND hDlg, LPACCEL pstAccel, list<ACCEL> *pltAcc
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	ƒAƒNƒZƒ‹ƒL[•ÒW‚ÌƒŠƒXƒgƒrƒ…[‚Éƒf[ƒ^‘
-	@param[in]	hDlg		ƒ_ƒCƒ„ƒƒOƒnƒ“ƒhƒ‹
-	@param[in]	iItem		‘€ì‚·‚és”Ô†
-	@param[in]	pstAccel	ƒAƒNƒZƒ‰ƒL[ƒe[ƒuƒ‹
-	@param[in]	*pltAccel	Šù‘¶‚Ì‚â‚Â‚Ìˆê——
-	@return		HRESULT		I—¹ó‘ÔƒR[ƒh
+	ã‚¢ã‚¯ã‚»ãƒ«ã‚­ãƒ¼ç·¨é›†ã®ãƒªã‚¹ãƒˆãƒ“ãƒ¥ãƒ¼ã«ãƒ‡ãƒ¼ã‚¿æ›¸è¾¼
+	@param[in]	hDlg		ãƒ€ã‚¤ãƒ¤ãƒ­ã‚°ãƒãƒ³ãƒ‰ãƒ«
+	@param[in]	iItem		æ“ä½œã™ã‚‹è¡Œç•ªå·
+	@param[in]	pstAccel	ã‚¢ã‚¯ã‚»ãƒ©ã‚­ãƒ¼ãƒ†ãƒ¼ãƒ–ãƒ«
+	@param[in]	*pltAccel	æ—¢å­˜ã®ã‚„ã¤ã®ä¸€è¦§
+	@return		HRESULT		çµ‚äº†çŠ¶æ…‹ã‚³ãƒ¼ãƒ‰
 */
 HRESULT AccelKeyBindListMod( HWND hDlg, INT iItem, LPACCEL pstAccel, list<ACCEL> *pltAccel )
 {
@@ -1597,9 +1597,9 @@ HRESULT AccelKeyBindListMod( HWND hDlg, INT iItem, LPACCEL pstAccel, list<ACCEL>
 	WORD	dCommand;
 	list<ACCEL>::iterator	itAccel;
 
-	//	ŠY“–s‚©‚çAƒRƒ}ƒ“ƒh”Ô†‚ğ‚Á‚Ä‚­‚é
+	//	è©²å½“è¡Œã‹ã‚‰ã€ã‚³ãƒãƒ³ãƒ‰ç•ªå·ã‚’æŒã£ã¦ãã‚‹
 	ZeroMemory( &stLvi, sizeof(stLvi) );
-	stLvi.mask     = LVIF_PARAM;	//	ƒRƒ}ƒ“ƒhƒR[ƒh‚ğŠm•Û‚·‚é
+	stLvi.mask     = LVIF_PARAM;	//	ã‚³ãƒãƒ³ãƒ‰ã‚³ãƒ¼ãƒ‰ã‚’ç¢ºä¿ã™ã‚‹
 	stLvi.iItem    = iItem;
 	ListView_GetItem( hLvWnd, &stLvi );
 	dCommand = stLvi.lParam;
@@ -1607,44 +1607,44 @@ HRESULT AccelKeyBindListMod( HWND hDlg, INT iItem, LPACCEL pstAccel, list<ACCEL>
 	for( itAccel = (*pltAccel).begin(); itAccel != (*pltAccel).end(); itAccel++ )
 	{
 		if( dCommand ==  itAccel->cmd ){	break;	}
-		//	ƒqƒbƒg‚µ‚½‚çƒ\ƒŒ‚Å‚¨‚‹
+		//	ãƒ’ãƒƒãƒˆã—ãŸã‚‰ã‚½ãƒ¬ã§ãŠï½‹
 	}
 
-	if( pstAccel )	//	•ÏXE’Ç‰Á
+	if( pstAccel )	//	å¤‰æ›´ãƒ»è¿½åŠ 
 	{
-		if( itAccel == (*pltAccel).end() )	//	’Ç‰Á
+		if( itAccel == (*pltAccel).end() )	//	è¿½åŠ 
 		{
 			pstAccel->cmd = dCommand;
 			(*pltAccel).push_back( *pstAccel );
 		}
-		else	//	•ÏX
+		else	//	å¤‰æ›´
 		{
 			itAccel->key   = pstAccel->key;
 			itAccel->fVirt = pstAccel->fVirt;
 		}
 		
-		//	•\¦—p•¶š—ñì‚Á‚Ä
+		//	è¡¨ç¤ºç”¨æ–‡å­—åˆ—ä½œã£ã¦
 		AccelKeyBindString( pstAccel, atBuffer, SUB_STRING );
 		ZeroMemory( &stLvi, sizeof(stLvi) );
-		stLvi.mask     = LVIF_TEXT;	//	ƒRƒ}ƒ“ƒhƒR[ƒh‚ğŠm•Û‚·‚é
+		stLvi.mask     = LVIF_TEXT;	//	ã‚³ãƒãƒ³ãƒ‰ã‚³ãƒ¼ãƒ‰ã‚’ç¢ºä¿ã™ã‚‹
 		stLvi.iItem    = iItem;
 		stLvi.iSubItem = 1;
 		stLvi.pszText  = atBuffer;
 		ListView_SetItem( hLvWnd, &stLvi );
 	}
-	else	//	‰ğœ
+	else	//	è§£é™¤
 	{
-		//	ƒqƒbƒg‚µ‚Ä‚È‚¢‚È‚ñ‚Ä‚±‚Æ‚Í–³‚¢‚Í‚¸‚¾‚ª
+		//	ãƒ’ãƒƒãƒˆã—ã¦ãªã„ãªã‚“ã¦ã“ã¨ã¯ç„¡ã„ã¯ãšã ãŒ
 		if( itAccel == (*pltAccel).end( ) ){	return E_HANDLE;	}
 
-		//	ŠY“–—v‘f‚ğíœ
+		//	è©²å½“è¦ç´ ã‚’å‰Šé™¤
 		(*pltAccel).erase( itAccel );
-		//	ƒzƒbƒgƒL[ƒRƒ“ƒgƒ[ƒ‹‚ğ‹ó‚É
+		//	ãƒ›ãƒƒãƒˆã‚­ãƒ¼ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ«ã‚’ç©ºã«
 		SendMessage( hHkcWnd, HKM_SETHOTKEY, 0, 0 );
-		//	ƒŠƒXƒgƒrƒ…[‚Ì•\¦‚à‹ó‚É‚·‚é
+		//	ãƒªã‚¹ãƒˆãƒ“ãƒ¥ãƒ¼ã®è¡¨ç¤ºã‚‚ç©ºã«ã™ã‚‹
 		ZeroMemory( atBuffer, sizeof(atBuffer) );
 		ZeroMemory( &stLvi, sizeof(stLvi) );
-		stLvi.mask     = LVIF_TEXT;	//	ƒRƒ}ƒ“ƒhƒR[ƒh‚ğŠm•Û‚·‚é
+		stLvi.mask     = LVIF_TEXT;	//	ã‚³ãƒãƒ³ãƒ‰ã‚³ãƒ¼ãƒ‰ã‚’ç¢ºä¿ã™ã‚‹
 		stLvi.iItem    = iItem;
 		stLvi.iSubItem = 1;
 		stLvi.pszText  = atBuffer;
@@ -1656,11 +1656,11 @@ HRESULT AccelKeyBindListMod( HWND hDlg, INT iItem, LPACCEL pstAccel, list<ACCEL>
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	ƒƒjƒ…[•¶š—ñ‚ÉAƒAƒNƒZƒ‰[ƒL[–¼Ì‚ğŠ„‚è“–‚Ä‚Ä‚¢‚­
-	@param[in]	hWnd		ƒƒjƒ…[‚Ì‚ ‚éƒEƒCƒ“ƒhƒEƒnƒ“ƒhƒ‹
-	@param[in]	pstAccel	“à—eƒe[ƒuƒ‹E–³‚¢‚ÍNULL
-	@param[in]	iEntry		ƒe[ƒuƒ‹‚ÌƒGƒ“ƒgƒŠ”
-	@return		HRESULT		I—¹ó‘ÔƒR[ƒh
+	ãƒ¡ãƒ‹ãƒ¥ãƒ¼æ–‡å­—åˆ—ã«ã€ã‚¢ã‚¯ã‚»ãƒ©ãƒ¼ã‚­ãƒ¼åç§°ã‚’å‰²ã‚Šå½“ã¦ã¦ã„ã
+	@param[in]	hWnd		ãƒ¡ãƒ‹ãƒ¥ãƒ¼ã®ã‚ã‚‹ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ãƒãƒ³ãƒ‰ãƒ«
+	@param[in]	pstAccel	å†…å®¹ãƒ†ãƒ¼ãƒ–ãƒ«ãƒ»ç„¡ã„æ™‚ã¯NULL
+	@param[in]	iEntry		ãƒ†ãƒ¼ãƒ–ãƒ«ã®ã‚¨ãƒ³ãƒˆãƒªæ•°
+	@return		HRESULT		çµ‚äº†çŠ¶æ…‹ã‚³ãƒ¼ãƒ‰
 */
 HRESULT AccelKeyMenuRewrite( HWND hWnd, LPACCEL pstAccel, CONST INT iEntry )
 {
@@ -1672,21 +1672,21 @@ HRESULT AccelKeyMenuRewrite( HWND hWnd, LPACCEL pstAccel, CONST INT iEntry )
 	BOOLEAN		bModify;
 	TCHAR		atBuffer[MAX_STRING], atBind[SUB_STRING];
 
-	hMenu = GetMenu( hWnd );	//	ƒTƒuƒƒjƒ…[‚Ü‚Å‘S•”ƒCƒP‚é
+	hMenu = GetMenu( hWnd );	//	ã‚µãƒ–ãƒ¡ãƒ‹ãƒ¥ãƒ¼ã¾ã§å…¨éƒ¨ã‚¤ã‚±ã‚‹
 
 	for( i = 0; FULL_ITEMS > i; i++ )
 	{
-		//	ŠÖŒW–³‚¢‚â‚Â‚Í”ò‚Î‚·
+		//	é–¢ä¿‚ç„¡ã„ã‚„ã¤ã¯é£›ã°ã™
 		if( 0 == gstContextItem[i].dCommandoID )	continue;
 
-		dCmd = gstContextItem[i].dCommandoID;	//	Šî–{“I‚É‚±‚ê‚Åƒqƒbƒg‚·‚é‚Í‚¸
+		dCmd = gstContextItem[i].dCommandoID;	//	åŸºæœ¬çš„ã«ã“ã‚Œã§ãƒ’ãƒƒãƒˆã™ã‚‹ã¯ãš
 		ZeroMemory( atBuffer, sizeof(atBuffer) );
 		iRslt = GetMenuString( hMenu, dCmd, atBuffer, MAX_STRING, MF_BYCOMMAND );
 		if( !(iRslt) )	continue;
 
 		bModify = FALSE;
 
-		//	æ‚Ì“à—e‚ğ”j‰ó‚·‚é
+		//	å…ˆã®å†…å®¹ã‚’ç ´å£Šã™ã‚‹
 		StringCchLength( atBuffer, MAX_STRING, &cchSz );
 		for( d = 0; cchSz > d; d++ )
 		{
@@ -1698,10 +1698,10 @@ HRESULT AccelKeyMenuRewrite( HWND hWnd, LPACCEL pstAccel, CONST INT iEntry )
 			}
 		}
 
-		//	‚±‚ÌƒRƒ}ƒ“ƒh‚ÌƒGƒ“ƒgƒŠ[‚Í‚ ‚é‚©
+		//	ã“ã®ã‚³ãƒãƒ³ãƒ‰ã®ã‚¨ãƒ³ãƒˆãƒªãƒ¼ã¯ã‚ã‚‹ã‹
 		for( j = 0; iEntry > j; j++ )
 		{
-			if( dCmd == pstAccel[j].cmd )	//	‚ ‚Á‚½‚çì¬
+			if( dCmd == pstAccel[j].cmd )	//	ã‚ã£ãŸã‚‰ä½œæˆ
 			{
 				ZeroMemory( atBind, sizeof(atBind) );
 				AccelKeyBindString( &(pstAccel[j]), atBind, SUB_STRING );
@@ -1716,11 +1716,11 @@ HRESULT AccelKeyMenuRewrite( HWND hWnd, LPACCEL pstAccel, CONST INT iEntry )
 
 		if( bModify )
 		{
-			//	•K—v‚É‰‚¶‚Äƒ`ƒFƒbƒNó‘Ô‚ğŠm•Û‚·‚é
+			//	å¿…è¦ã«å¿œã˜ã¦ãƒã‚§ãƒƒã‚¯çŠ¶æ…‹ã‚’ç¢ºä¿ã™ã‚‹
 			mRslt = GetMenuState( hMenu, dCmd, MF_BYCOMMAND );
 
 			ModifyMenu( hMenu, dCmd, (MF_CHECKED & mRslt), dCmd, atBuffer );
-			//	MF_BYCOMMAND | MF_STRING ‚Í—¼•û‚O‚È‚Ì‚ÅA•K—v‚È‚Ì‚Íƒ`ƒFƒbƒN‚Ì¥”ñ‚¾‚¯
+			//	MF_BYCOMMAND | MF_STRING ã¯ä¸¡æ–¹ï¼ãªã®ã§ã€å¿…è¦ãªã®ã¯ãƒã‚§ãƒƒã‚¯ã®æ˜¯éã ã‘
 		}
 	}
 

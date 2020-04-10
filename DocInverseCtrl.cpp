@@ -1,6 +1,6 @@
-/*! @file
-	@brief ¶‰E”½“]Aã‰º”½“]‚µ‚Ü‚·
-	‚±‚Ìƒtƒ@ƒCƒ‹‚Í DocInverseCtrl.cpp ‚Å‚·B
+ï»¿/*! @file
+	@brief å·¦å³åè»¢ã€ä¸Šä¸‹åè»¢ã—ã¾ã™
+	ã“ã®ãƒ•ã‚¡ã‚¤ãƒ«ã¯ DocInverseCtrl.cpp ã§ã™ã€‚
 	@author	SikigamiHNQ
 	@date	2012/04/11
 */
@@ -21,7 +21,7 @@ If not, see <http://www.gnu.org/licenses/>.
 #include "OrinrinEditor.h"
 //-------------------------------------------------------------------------------------------------
 
-//	”½“]—pƒp[ƒc‚ÍA•K—v‚É‚È‚Á‚½‚çƒ[ƒh‚·‚é‚æ‚¤‚É‚·‚é
+//	åè»¢ç”¨ãƒ‘ãƒ¼ãƒ„ã¯ã€å¿…è¦ã«ãªã£ãŸã‚‰ãƒ­ãƒ¼ãƒ‰ã™ã‚‹ã‚ˆã†ã«ã™ã‚‹
 
 
 
@@ -31,18 +31,18 @@ If not, see <http://www.gnu.org/licenses/>.
 
 typedef struct tagINVERSEPARTS
 {
-	TCHAR	atSrcStr[MIN_STRING];	//!<	Œ³•¶š—ñ
-	TCHAR	atDestStr[MIN_STRING];	//!<	•ÏŠ·Œã•¶š—ñ
+	TCHAR	atSrcStr[MIN_STRING];	//!<	å…ƒæ–‡å­—åˆ—
+	TCHAR	atDestStr[MIN_STRING];	//!<	å¤‰æ›å¾Œæ–‡å­—åˆ—
 
 } INVERSEPARTS, *LPINVERSEPARTS;
 //-------------------------------------------------------------------------------------------------
 
-extern list<ONEFILE>	gltMultiFiles;	//	•¡”ƒtƒ@ƒCƒ‹•Û
-extern FILES_ITR	gitFileIt;		//	¡Œ©‚Ä‚éƒtƒ@ƒCƒ‹‚Ì–{‘Ì
-extern INT			gixFocusPage;	//	’–Ú’†‚Ìƒy[ƒWE‚Æ‚è‚ ‚¦‚¸‚OE‚OƒCƒ“ƒfƒbƒNƒX
+extern list<ONEFILE>	gltMultiFiles;	//	è¤‡æ•°ãƒ•ã‚¡ã‚¤ãƒ«ä¿æŒ
+extern FILES_ITR	gitFileIt;		//	ä»Šè¦‹ã¦ã‚‹ãƒ•ã‚¡ã‚¤ãƒ«ã®æœ¬ä½“
+extern INT			gixFocusPage;	//	æ³¨ç›®ä¸­ã®ãƒšãƒ¼ã‚¸ãƒ»ã¨ã‚Šã‚ãˆãšï¼ãƒ»ï¼ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹
 
-static  vector<INVERSEPARTS>	gvcMirrorParts;	//!<	¶‰E”½“]—p“ü‘Öƒp[ƒc
-static  vector<INVERSEPARTS>	gvcUpsetParts;	//!<	ã‰º”½“]—p“ü‘Öƒp[ƒc
+static  vector<INVERSEPARTS>	gvcMirrorParts;	//!<	å·¦å³åè»¢ç”¨å…¥æ›¿ãƒ‘ãƒ¼ãƒ„
+static  vector<INVERSEPARTS>	gvcUpsetParts;	//!<	ä¸Šä¸‹åè»¢ç”¨å…¥æ›¿ãƒ‘ãƒ¼ãƒ„
 typedef vector<INVERSEPARTS>::iterator	PARTS_ITR;
 //-------------------------------------------------------------------------------------------------
 
@@ -60,9 +60,9 @@ UINT	InversePartsCheck( UINT, LPCTSTR, LPTSTR, UINT_PTR );
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	‰Šú‰»‚Æ”jŠü
-	@param[in]	dMode	”ñ‚O‰Šú‰»@‚O”jŠü
-	@return		HRESULT	I—¹ó‘ÔƒR[ƒh
+	åˆæœŸåŒ–ã¨ç ´æ£„
+	@param[in]	dMode	éï¼åˆæœŸåŒ–ã€€ï¼ç ´æ£„
+	@return		HRESULT	çµ‚äº†çŠ¶æ…‹ã‚³ãƒ¼ãƒ‰
 */
 HRESULT DocInverseInit( UINT dMode )
 {
@@ -84,19 +84,19 @@ HRESULT DocInverseInit( UINT dMode )
 
 #define INV_ITEMS	3
 /*!
-	”½“]ƒp[ƒc‚ğƒ[ƒh
-	@param[in]	dMode	”ñ‚O¶‰E@‚Oã‰º
-	@return		HRESULT	I—¹ó‘ÔƒR[ƒh
+	åè»¢ãƒ‘ãƒ¼ãƒ„ã‚’ãƒ­ãƒ¼ãƒ‰
+	@param[in]	dMode	éï¼å·¦å³ã€€ï¼ä¸Šä¸‹
+	@return		HRESULT	çµ‚äº†çŠ¶æ…‹ã‚³ãƒ¼ãƒ‰
 */
 HRESULT InversePartsLoad( UINT dMode )
 {
-	CONST WCHAR rtHead = 0xFEFF;	//	ƒ†ƒjƒR[ƒhƒeƒLƒXƒgƒwƒbƒ_
+	CONST WCHAR rtHead = 0xFEFF;	//	ãƒ¦ãƒ‹ã‚³ãƒ¼ãƒ‰ãƒ†ã‚­ã‚¹ãƒˆãƒ˜ãƒƒãƒ€
 	WCHAR	rtUniBuf;
 
 	HANDLE	hFile;
 	DWORD	readed;
 
-	LPVOID	pBuffer;	//	•¶š—ñƒoƒbƒtƒ@—pƒ|ƒCƒ“ƒ^[
+	LPVOID	pBuffer;	//	æ–‡å­—åˆ—ãƒãƒƒãƒ•ã‚¡ç”¨ãƒã‚¤ãƒ³ã‚¿ãƒ¼
 	INT		iByteSize;
 
 	LPTSTR	ptString;
@@ -113,20 +113,20 @@ HRESULT InversePartsLoad( UINT dMode )
 	INVERSEPARTS	stData;
 
 	UINT_PTR	loop;
-	list<INVERSEPARTS>	ltParts;	//	ƒp[ƒc“Çƒoƒbƒtƒ@
-	list<INVERSEPARTS>::iterator	itParts, itPtPos;	//	ƒoƒbƒtƒ@‚ÌƒCƒeƒŒ[ƒ^
+	list<INVERSEPARTS>	ltParts;	//	ãƒ‘ãƒ¼ãƒ„èª­è¾¼ãƒãƒƒãƒ•ã‚¡
+	list<INVERSEPARTS>::iterator	itParts, itPtPos;	//	ãƒãƒƒãƒ•ã‚¡ã®ã‚¤ãƒ†ãƒ¬ãƒ¼ã‚¿
 
 
 	StringCchCopy( atFileName, MAX_PATH, ExePathGet( ) );
 	PathAppend( atFileName, TEMPLATE_DIR );
 
-	if( dMode  )	//	¶‰E
+	if( dMode  )	//	å·¦å³
 	{
 		if( 1 <= gvcMirrorParts.size( ) )	return S_FALSE;
 
 		PathAppend( atFileName, AA_MIRROR_FILE );
 	}
-	else	//	ã‰º
+	else	//	ä¸Šä¸‹
 	{
 		if( 1 <= gvcUpsetParts.size(  ) )	return S_FALSE;
 
@@ -142,30 +142,30 @@ HRESULT InversePartsLoad( UINT dMode )
 
 	SetFilePointer( hFile, 0, NULL, FILE_BEGIN );
 	ReadFile( hFile, pBuffer, iByteSize, &readed, NULL );
-	CloseHandle( hFile );	//	“à—e‘S•”æ‚è‚ñ‚¾‚©‚çŠJ•ú
+	CloseHandle( hFile );	//	å†…å®¹å…¨éƒ¨å–ã‚Šè¾¼ã‚“ã ã‹ã‚‰é–‹æ”¾
 
-	//	ƒ†ƒjƒR[ƒhƒ`ƒFƒbƒN
+	//	ãƒ¦ãƒ‹ã‚³ãƒ¼ãƒ‰ãƒã‚§ãƒƒã‚¯
 	CopyMemory( &rtUniBuf, pBuffer, 2 );
-	if( rtHead == rtUniBuf )	//	ƒ†ƒjƒR[ƒhƒwƒbƒ_‚ª‚ ‚ê‚Î
-	{	//	•’Ê‚Íƒ†ƒjƒR[ƒh‚¶‚á‚È‚¢
+	if( rtHead == rtUniBuf )	//	ãƒ¦ãƒ‹ã‚³ãƒ¼ãƒ‰ãƒ˜ãƒƒãƒ€ãŒã‚ã‚Œã°
+	{	//	æ™®é€šã¯ãƒ¦ãƒ‹ã‚³ãƒ¼ãƒ‰ã˜ã‚ƒãªã„
 		ptString = (LPTSTR)pBuffer;
-		ptString++;	//	ƒ†ƒjƒR[ƒhƒwƒbƒ_•ªi‚ß‚Ä‚¨‚­
+		ptString++;	//	ãƒ¦ãƒ‹ã‚³ãƒ¼ãƒ‰ãƒ˜ãƒƒãƒ€åˆ†é€²ã‚ã¦ãŠã
 	}
-	else	//	‘½•ªSJIS‚Å‚ ‚é‚È‚ç
+	else	//	å¤šåˆ†SJISã§ã‚ã‚‹ãªã‚‰
 	{
 		pcText = (LPSTR)pBuffer;
-		ptString = SjisDecodeAlloc( pcText );	//	SJIS‚Ì“à—e‚ğƒ†ƒjƒR[ƒh‚É‚·‚é
+		ptString = SjisDecodeAlloc( pcText );	//	SJISã®å†…å®¹ã‚’ãƒ¦ãƒ‹ã‚³ãƒ¼ãƒ‰ã«ã™ã‚‹
 
-		FREE( pBuffer );	//	‚±‚Á‚¿‚ÅŠJ•ú
-		pBuffer = ptString;	//	ƒ|ƒCƒ“ƒg‚·‚é‚Æ‚±‚ë‚ğ•ÏX
+		FREE( pBuffer );	//	ã“ã£ã¡ã§é–‹æ”¾
+		pBuffer = ptString;	//	ãƒã‚¤ãƒ³ãƒˆã™ã‚‹ã¨ã“ã‚ã‚’å¤‰æ›´
 	}
 
 	StringCchLength( ptString, STRSAFE_MAX_CCH, &cchSize );
 
-	//	æ
+	//	å–è¾¼
 	ZeroMemory( atBuff, sizeof(atBuff) );
 
-	//ƒXƒ^ƒCƒŠƒbƒVƒ…‚É–{‘Ì“Ç
+	//ã‚¹ã‚¿ã‚¤ãƒªãƒƒã‚·ãƒ¥ã«æœ¬ä½“èª­è¾¼
 	dItem = 0;
 	for( nYct = 0, nXct = 0, caret = 0; caret <= cchSize; caret++, nXct++ )
 	{
@@ -174,73 +174,73 @@ HRESULT InversePartsLoad( UINT dMode )
  
 		atBuff[nYct][nXct] = ptString[caret];
 
-		//	‰üs‚Ü‚Å‚ğ‚PƒZƒbƒg‚Æ‚µA‘SŠp‹ó”’‚Å‹æØ‚Á‚Ä“Ç‚Ş
+		//	æ”¹è¡Œã¾ã§ã‚’ï¼‘ã‚»ãƒƒãƒˆã¨ã—ã€å…¨è§’ç©ºç™½ã§åŒºåˆ‡ã£ã¦èª­ã‚€
 		if( (TEXT('\r') == ptString[caret] && TEXT('\n') == ptString[caret + 1]) || 0x0000 == ptString[caret] )
 		{
 			//bEmpty = FALSE;
-			//if(0 == nXct && 0 == nYct ){	bEmpty = TRUE;	}	//	ƒ‰ƒXƒg‰üs‚ ‚è‚È‚ç‚±‚±‚É“ü‚éE•¶š—ñ–³‚µ‚È‚ç‰½‚à‚µ‚È‚¢
+			//if(0 == nXct && 0 == nYct ){	bEmpty = TRUE;	}	//	ãƒ©ã‚¹ãƒˆæ”¹è¡Œã‚ã‚Šãªã‚‰ã“ã“ã«å…¥ã‚‹ãƒ»æ–‡å­—åˆ—ç„¡ã—ãªã‚‰ä½•ã‚‚ã—ãªã„
 
-			atBuff[nYct][nXct] = 0x0000;	//	•¶š—ñ‚ÌI“_‚Íƒkƒ‹
-			nXct = -1;	//	ƒ‹[ƒv“ª‚Å{{‚³‚ê‚é‚½‚ßA‚O‚É‚ ‚¤‚æ‚¤‚É‚µ‚Ä‚¨‚­
-			nYct = 0;	//	Ÿ‚ÌƒGƒŒƒƒ“ƒg‚ÉƒXƒ^ƒCƒŠƒbƒVƒ…‚ÉˆÚ‚é
-			caret++;	//	‰üsƒR[ƒh•ª‚ğƒGƒŒƒKƒ“ƒg‚Éi‚ß‚é
+			atBuff[nYct][nXct] = 0x0000;	//	æ–‡å­—åˆ—ã®çµ‚ç‚¹ã¯ãƒŒãƒ«
+			nXct = -1;	//	ãƒ«ãƒ¼ãƒ—é ­ã§ï¼‹ï¼‹ã•ã‚Œã‚‹ãŸã‚ã€ï¼ã«ã‚ã†ã‚ˆã†ã«ã—ã¦ãŠã
+			nYct = 0;	//	æ¬¡ã®ã‚¨ãƒ¬ãƒ¡ãƒ³ãƒˆã«ã‚¹ã‚¿ã‚¤ãƒªãƒƒã‚·ãƒ¥ã«ç§»ã‚‹
+			caret++;	//	æ”¹è¡Œã‚³ãƒ¼ãƒ‰åˆ†ã‚’ã‚¨ãƒ¬ã‚¬ãƒ³ãƒˆã«é€²ã‚ã‚‹
 
-			//if( (0x0000 != atBuff[0][0]) && (TEXT('\r') != atBuff[0][0]) && !(bEmpty) )	//	“à—e‚ª‚ ‚é‚Ì‚È‚ç
+			//if( (0x0000 != atBuff[0][0]) && (TEXT('\r') != atBuff[0][0]) && !(bEmpty) )	//	å†…å®¹ãŒã‚ã‚‹ã®ãªã‚‰
 			if( (0x0000 != atBuff[0][0]) && (0 != dItem) )
 			{
-				//	ˆës–Ú‚Íƒwƒbƒ_‚Å‚ ‚é
+				//	å£±è¡Œç›®ã¯ãƒ˜ãƒƒãƒ€ã§ã‚ã‚‹
 
-				ZeroMemory( &stData, sizeof(INVERSEPARTS) );	//	ƒNƒŠƒ“ƒiƒbƒv
+				ZeroMemory( &stData, sizeof(INVERSEPARTS) );	//	ã‚¯ãƒªãƒ³ãƒŠãƒƒãƒ—
 				StringCchCopy( stData.atSrcStr,  MIN_STRING, atBuff[0] );
 				StringCchCopy( stData.atDestStr, MIN_STRING, atBuff[1] );
-				ltParts.push_back( stData );	//	‚Ü‚¸ƒoƒbƒtƒ@‚Ö
+				ltParts.push_back( stData );	//	ã¾ãšãƒãƒƒãƒ•ã‚¡ã¸
 
-				//	”½‘ÎŒü‚«‚à•K—v
+				//	åå¯¾å‘ãã‚‚å¿…è¦
 				ZeroMemory( &stData, sizeof(INVERSEPARTS) );
 				StringCchCopy( stData.atSrcStr,  MIN_STRING, atBuff[1] );
 				StringCchCopy( stData.atDestStr, MIN_STRING, atBuff[0] );
-				ltParts.push_back( stData );	//	‚Ü‚¸ƒoƒbƒtƒ@‚Ö
+				ltParts.push_back( stData );	//	ã¾ãšãƒãƒƒãƒ•ã‚¡ã¸
 
-			}//“à—e‚ª—L‚é‚©‚Ç‚¤‚©
+			}//å†…å®¹ãŒæœ‰ã‚‹ã‹ã©ã†ã‹
 
 			dItem++;
-			ZeroMemory( atBuff , sizeof(atBuff) );	//	ƒNƒŠƒ“ƒiƒbƒv
+			ZeroMemory( atBuff , sizeof(atBuff) );	//	ã‚¯ãƒªãƒ³ãƒŠãƒƒãƒ—
 		}
 
-		if( TEXT('@') == ptString[caret] )
+		if( TEXT('ã€€') == ptString[caret] )
 		{
-			atBuff[nYct][nXct] = 0x0000;	//	•¶š—ñ‚ÌI“_‚Íƒkƒ‹
-			nXct = -1;	//	ƒ‹[ƒv“ª‚Å{{‚³‚ê‚é‚½‚ßA‚O‚É‚ ‚¤‚æ‚¤‚É‚µ‚Ä‚¨‚­
-			nYct++;		//	Ÿ‚ÌParameter‚Ì‚½‚ß‚É
+			atBuff[nYct][nXct] = 0x0000;	//	æ–‡å­—åˆ—ã®çµ‚ç‚¹ã¯ãƒŒãƒ«
+			nXct = -1;	//	ãƒ«ãƒ¼ãƒ—é ­ã§ï¼‹ï¼‹ã•ã‚Œã‚‹ãŸã‚ã€ï¼ã«ã‚ã†ã‚ˆã†ã«ã—ã¦ãŠã
+			nYct++;		//	æ¬¡ã®Parameterã®ãŸã‚ã«
 		}
 	}
 
 	FREE( pBuffer );
 
-	//	•¶š”‚Ì‡”Ô‚É•À‚×’¼‚·‚×‚µ
+	//	æ–‡å­—æ•°ã®é †ç•ªã«ä¸¦ã¹ç›´ã™ã¹ã—
 	cchSize = 0;
 
 	loop = ltParts.size();
-	while( loop )	//	‘S‘Ì‚ğ‚İ‚È‚¢‚©‚ñ
+	while( loop )	//	å…¨ä½“ã‚’ã¿ãªã„ã‹ã‚“
 	{
-		itParts = ltParts.begin();	//	‚Æ‚è‚ ‚¦‚¸‚PŒÂ–Ú
-		StringCchLength( itParts->atSrcStr, MIN_STRING , &cchSize );	//	•¶š”Šm”F
+		itParts = ltParts.begin();	//	ã¨ã‚Šã‚ãˆãšï¼‘å€‹ç›®
+		StringCchLength( itParts->atSrcStr, MIN_STRING , &cchSize );	//	æ–‡å­—æ•°ç¢ºèª
 
 		for( itPtPos = ltParts.begin(); ltParts.end() != itPtPos; itPtPos++ )
 		{
 			StringCchLength( itPtPos->atSrcStr, MIN_STRING, &cchLen );
-			if( cchSize <  cchLen ){	itParts = itPtPos;	}	//	•¶š”‘½‚©‚Á‚½‚ç•ÏX
+			if( cchSize <  cchLen ){	itParts = itPtPos;	}	//	æ–‡å­—æ•°å¤šã‹ã£ãŸã‚‰å¤‰æ›´
 		}
 
-		ZeroMemory( &stData, sizeof(INVERSEPARTS) );	//	ƒNƒŠƒ“ƒiƒbƒv
+		ZeroMemory( &stData, sizeof(INVERSEPARTS) );	//	ã‚¯ãƒªãƒ³ãƒŠãƒƒãƒ—
 		StringCchCopy( stData.atSrcStr,  MIN_STRING, itParts->atSrcStr );
 		StringCchCopy( stData.atDestStr, MIN_STRING, itParts->atDestStr );
-		if( dMode ){	gvcMirrorParts.push_back( stData );	}	//	¶‰E
-		else{			gvcUpsetParts.push_back( stData );	}	//	ã‰º
+		if( dMode ){	gvcMirrorParts.push_back( stData );	}	//	å·¦å³
+		else{			gvcUpsetParts.push_back( stData );	}	//	ä¸Šä¸‹
 
-		ltParts.erase( itParts );	//	‹L˜^‚µ‚½‚ç‚»‚ê‚ÍÁ‚·
+		ltParts.erase( itParts );	//	è¨˜éŒ²ã—ãŸã‚‰ãã‚Œã¯æ¶ˆã™
 
-		loop = ltParts.size();	//	c‚è‚ª‚ ‚é‚©
+		loop = ltParts.size();	//	æ®‹ã‚ŠãŒã‚ã‚‹ã‹
 	}
 
 	return S_OK;
@@ -248,11 +248,11 @@ HRESULT InversePartsLoad( UINT dMode )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	w’ès‚Ì‘I‘ğ”ÍˆÍ‚ğƒeƒLƒXƒg‚ÅŠm•Û‚·‚éEfree‚ÍŒÄ‚ñ‚¾•û‚Å‚â‚é
-	@param[in]	itLine	w’ès‚ÌƒCƒeƒŒ[ƒ^
-	@param[out]	*piDot	‘I‘ğ”ÍˆÍŠJnˆÊ’uƒhƒbƒg‚ğ•Ô‚·
-	@param[out]	*piMozi	‘I‘ğ”ÍˆÍ‚Ìƒ†ƒjƒR[ƒh•¶š”‚ğ•Ô‚·
-	@return				Šm•Û‚µ‚½ƒ†ƒjƒR[ƒh•¶š—ñ
+	æŒ‡å®šè¡Œã®é¸æŠç¯„å›²ã‚’ãƒ†ã‚­ã‚¹ãƒˆã§ç¢ºä¿ã™ã‚‹ãƒ»freeã¯å‘¼ã‚“ã æ–¹ã§ã‚„ã‚‹
+	@param[in]	itLine	æŒ‡å®šè¡Œã®ã‚¤ãƒ†ãƒ¬ãƒ¼ã‚¿
+	@param[out]	*piDot	é¸æŠç¯„å›²é–‹å§‹ä½ç½®ãƒ‰ãƒƒãƒˆã‚’è¿”ã™
+	@param[out]	*piMozi	é¸æŠç¯„å›²ã®ãƒ¦ãƒ‹ã‚³ãƒ¼ãƒ‰æ–‡å­—æ•°ã‚’è¿”ã™
+	@return				ç¢ºä¿ã—ãŸãƒ¦ãƒ‹ã‚³ãƒ¼ãƒ‰æ–‡å­—åˆ—
 */
 LPTSTR SeledTextAlloc( LINE_ITR itLine, PINT piDot, PINT piMozi )
 {
@@ -265,17 +265,17 @@ LPTSTR SeledTextAlloc( LINE_ITR itLine, PINT piDot, PINT piMozi )
 
 	wstring	wsSrcBuff;
 
-	//	‚»‚Ìs‚Ì‘I‘ğ”ÍˆÍ‚ğŠm•Û‚·‚é
+	//	ãã®è¡Œã®é¸æŠç¯„å›²ã‚’ç¢ºä¿ã™ã‚‹
 	dLetters = itLine->vcLine.size( );
 
 	wsSrcBuff.clear();
-	iSelDot = -1;	//	‘I‘ğŠJnƒhƒbƒg‚ğ‹L˜^
+	iSelDot = -1;	//	é¸æŠé–‹å§‹ãƒ‰ãƒƒãƒˆã‚’è¨˜éŒ²
 	iDot = 0;
 	iMozi = 0;
 
 	for( j = 0; dLetters > j; j++ )
 	{
-		//	‘I‘ğ‚³‚ê‚Ä‚¢‚é•”•ª‚ğ•¶š—ñ‚ÉŠm•Û
+		//	é¸æŠã•ã‚Œã¦ã„ã‚‹éƒ¨åˆ†ã‚’æ–‡å­—åˆ—ã«ç¢ºä¿
 		if( CT_SELECT & itLine->vcLine.at( j ).mzStyle )
 		{
 			wsSrcBuff += itLine->vcLine.at( j ).cchMozi;
@@ -284,7 +284,7 @@ LPTSTR SeledTextAlloc( LINE_ITR itLine, PINT piDot, PINT piMozi )
 			if( 0 > iSelDot )	iSelDot = iDot;
 		}
 
-		iDot +=  itLine->vcLine.at( j ).rdWidth;	//	‚»‚±‚Ü‚Å‚Ìƒhƒbƒg”Šm”F
+		iDot +=  itLine->vcLine.at( j ).rdWidth;	//	ãã“ã¾ã§ã®ãƒ‰ãƒƒãƒˆæ•°ç¢ºèª
 	}
 
 	cchSz = wsSrcBuff.size();
@@ -302,12 +302,12 @@ LPTSTR SeledTextAlloc( LINE_ITR itLine, PINT piDot, PINT piMozi )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	‘I‘ğ”ÍˆÍ‚Ì‚`‚`‚ğ”½“]‚·‚é
-	@param[in]	dStyle	‹éŒ`‚©‚Ç‚¤‚©
-	@param[in]	dMode	”ñ‚O¶‰E@‚Oã‰º
-	@param[in]	pXdot	¡‚ÌƒhƒbƒgˆÊ’u‚ğó‚¯‚Ä–ß‚·
-	@param[in]	dLine	¡‚Ìs”
-	@return		HRESULT	I—¹ó‘ÔƒR[ƒh
+	é¸æŠç¯„å›²ã®ï¼¡ï¼¡ã‚’åè»¢ã™ã‚‹
+	@param[in]	dStyle	çŸ©å½¢ã‹ã©ã†ã‹
+	@param[in]	dMode	éï¼å·¦å³ã€€ï¼ä¸Šä¸‹
+	@param[in]	pXdot	ä»Šã®ãƒ‰ãƒƒãƒˆä½ç½®ã‚’å—ã‘ã¦æˆ»ã™
+	@param[in]	dLine	ä»Šã®è¡Œæ•°
+	@return		HRESULT	çµ‚äº†çŠ¶æ…‹ã‚³ãƒ¼ãƒ‰
 */
 HRESULT DocInverseTransform( UINT dStyle, UINT dMode, PINT pXdot, INT dLine )
 {
@@ -318,35 +318,35 @@ HRESULT DocInverseTransform( UINT dStyle, UINT dMode, PINT pXdot, INT dLine )
 	try{
 #endif
 
-	iLines = DocNowFilePageLineCount( );	//	ƒy[ƒW‘S‘Ì‚Ìs”
+	iLines = DocNowFilePageLineCount( );	//	ãƒšãƒ¼ã‚¸å…¨ä½“ã®è¡Œæ•°
 
-	//	ŠJn’n“_‚©‚çŠJn	//	D_SQUARE
+	//	é–‹å§‹åœ°ç‚¹ã‹ã‚‰é–‹å§‹	//	D_SQUARE
 	iTop = (*gitFileIt).vcCont.at( gixFocusPage ).dSelLineTop;
 	iBtm = (*gitFileIt).vcCont.at( gixFocusPage ).dSelLineBottom;
 	if( 0 >  iTop ){	iTop = 0;	}
 	if( 0 >  iBtm ){	iBtm = iLines - 1;	}
 
-	//	––’[‚ğŠm”FE“à—e‚ª‚È‚¢‚È‚çAg—ps–ß‚·
+	//	æœ«ç«¯ã‚’ç¢ºèªãƒ»å†…å®¹ãŒãªã„ãªã‚‰ã€ä½¿ç”¨è¡Œæˆ»ã™
 	iInX = DocLineParamGet( iBtm, NULL, NULL );
 	if( 0 == iInX ){	 iBtm--;	}
 
-	//	‚Í‚İo‚µ‚È‚¢‚©
+	//	ã¯ã¿å‡ºã—ãªã„ã‹
 	if( iLines <= iTop || iLines <= iBtm )	return E_OUTOFMEMORY;
 
-	//	‹éŒ`‚È‚çAŠes–ˆ‚É”½“]ˆ—E‘S‘Ì‚È‚çA‚l‚`‚w•‚É‡‚í‚¹‚é
+	//	çŸ©å½¢ãªã‚‰ã€å„è¡Œæ¯ã«åè»¢å‡¦ç†ãƒ»å…¨ä½“ãªã‚‰ã€ï¼­ï¼¡ï¼¸å¹…ã«åˆã‚ã›ã‚‹
 	if( dStyle & D_SQUARE )
 	{
-		if( dMode ){	DocMirrorTranceBox( iTop, iBtm );	}	//	¶‰E
-		else{			DocUpsetTranceBox( iTop, iBtm );	}	//	ã‰º
+		if( dMode ){	DocMirrorTranceBox( iTop, iBtm );	}	//	å·¦å³
+		else{			DocUpsetTranceBox( iTop, iBtm );	}	//	ä¸Šä¸‹
 	}
 	else
 	{
-		if( dMode ){	DocMirrorTranceLine( iTop, iBtm );	}	//	¶‰E
-		else{			DocUpsetTranceLine( iTop, iBtm );	}	//	ã‰º
+		if( dMode ){	DocMirrorTranceLine( iTop, iBtm );	}	//	å·¦å³
+		else{			DocUpsetTranceLine( iTop, iBtm );	}	//	ä¸Šä¸‹
 	}
 	ViewSelPageAll( -1 );
 
-	DocLetterPosGetAdjust( pXdot, dLine, 0 );	//	ƒJ[ƒ\ƒ‹ˆÊ’u‚ğ“K“–‚É•â³
+	DocLetterPosGetAdjust( pXdot, dLine, 0 );	//	ã‚«ãƒ¼ã‚½ãƒ«ä½ç½®ã‚’é©å½“ã«è£œæ­£
 	ViewDrawCaret( *pXdot, dLine, 1 );
 
 
@@ -361,10 +361,10 @@ HRESULT DocInverseTransform( UINT dStyle, UINT dMode, PINT pXdot, INT dLine )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	’Êí‘I‘ğ‚Ì‚Æ‚«‚Ì¶‰E”½“]ˆ—
-	@param[in]	iTop	ŠJns
-	@param[in]	iBtm	I—¹s
-	@return		HRESULT	I—¹ó‘ÔƒR[ƒh
+	é€šå¸¸é¸æŠã®ã¨ãã®å·¦å³åè»¢å‡¦ç†
+	@param[in]	iTop	é–‹å§‹è¡Œ
+	@param[in]	iBtm	çµ‚äº†è¡Œ
+	@return		HRESULT	çµ‚äº†çŠ¶æ…‹ã‚³ãƒ¼ãƒ‰
 */
 HRESULT DocMirrorTranceLine( INT iTop, INT iBtm )
 {
@@ -390,31 +390,31 @@ HRESULT DocMirrorTranceLine( INT iTop, INT iBtm )
 	try{
 #endif
 
-	InversePartsLoad( IV_MIRROR );	//	¶‰E‚Ìƒp[ƒcŠm”F
+	InversePartsLoad( IV_MIRROR );	//	å·¦å³ã®ãƒ‘ãƒ¼ãƒ„ç¢ºèª
 
-	//	‘I‘ğ”ÍˆÍ“à‚Å‚à‚Á‚Æ‚à’·‚¢ƒhƒbƒg”‚ğŠm”F
+	//	é¸æŠç¯„å›²å†…ã§ã‚‚ã£ã¨ã‚‚é•·ã„ãƒ‰ãƒƒãƒˆæ•°ã‚’ç¢ºèª
 	baseDot = DocPageMaxDotGet( iTop, iBtm );
 
 	itLine = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.begin();
 	std::advance( itLine, iTop );
 
-	//	¶‰E”½“]‚È‚çAˆës‚¸‚ÂŒ©‚Ä‚¢‚¯‚Î‚¢‚¢
+	//	å·¦å³åè»¢ãªã‚‰ã€å£±è¡Œãšã¤è¦‹ã¦ã„ã‘ã°ã„ã„
 	for( iLns = iTop; iBtm >= iLns; iLns++ )
 	{
 		wsInvBuff.clear(  );
 
 		iMzDot = DocLineParamGet( iLns, NULL, NULL );
-		if( 0 >= iMzDot )	continue;	//	‚»‚Ìs‚Ì“à—e‚ª‚È‚¢‚È‚ç‰½‚à‚µ‚È‚¢‚Å‚¨‚‹
+		if( 0 >= iMzDot )	continue;	//	ãã®è¡Œã®å†…å®¹ãŒãªã„ãªã‚‰ä½•ã‚‚ã—ãªã„ã§ãŠï½‹
 
-		iPadd = baseDot - iMzDot;	//	–„‚ß‚É•K—v‚È•Šm•Û
-		ptPadd = DocPaddingSpaceMake( iPadd );	//	‚»‚±‚Ü‚Å‚ğ–„‚ß‚é
+		iPadd = baseDot - iMzDot;	//	åŸ‹ã‚ã«å¿…è¦ãªå¹…ç¢ºä¿
+		ptPadd = DocPaddingSpaceMake( iPadd );	//	ãã“ã¾ã§ã‚’åŸ‹ã‚ã‚‹
 
-		//	ŠY“–s‚ğŠm•Û‚µ‚Ä
+		//	è©²å½“è¡Œã‚’ç¢ºä¿ã—ã¦
 		iBytes = DocLineTextGetAlloc( gitFileIt, gixFocusPage, D_UNI, iLns, (LPVOID *)(&ptString) );
 		if( 0 < iBytes )
 		{
 			StringCchLength( ptString, STRSAFE_MAX_CCH, &cchSz );
-			for( d = 0; cchSz > d; )	//	‡”Ô‚ÉŒ©‚Ä‚¢‚­
+			for( d = 0; cchSz > d; )	//	é †ç•ªã«è¦‹ã¦ã„ã
 			{
 				d += InversePartsCheck( IV_MIRROR, &(ptString[d]), atBuff, MIN_STRING );
 				wsInvBuff.insert( 0, atBuff );
@@ -422,25 +422,25 @@ HRESULT DocMirrorTranceLine( INT iTop, INT iBtm )
 		}
 		FREE( ptString );
 
-		//	Œ³•¶š—ñ‚Æ“ü‚ê‘Ö‚¦
-		cchSz = wsInvBuff.size() + 2;	//	g‚¢‰ñ‚µ’ˆÓ
+		//	å…ƒæ–‡å­—åˆ—ã¨å…¥ã‚Œæ›¿ãˆ
+		cchSz = wsInvBuff.size() + 2;	//	ä½¿ã„å›ã—æ³¨æ„
 		ptInvStr = (LPTSTR)malloc( cchSz * sizeof(TCHAR) );
 		StringCchCopy( ptInvStr, cchSz, wsInvBuff.c_str() );
 
-		DocLineErase( iLns, &bFirst );	//	æ‚¸‚»‚Ìs‚Ì“à—e‚ğíœ‚µ‚Ä
+		DocLineErase( iLns, &bFirst );	//	å…ˆãšãã®è¡Œã®å†…å®¹ã‚’å‰Šé™¤ã—ã¦
 		iDot = 0;	iGyou = iLns;
 		if( ptPadd ){	DocInsertString( &iDot, &iGyou, NULL, ptPadd, 0, bFirst );	bFirst  = FALSE;	}
 		DocInsertString( &iDot, &iGyou, NULL, ptInvStr, 0, bFirst );	bFirst  = FALSE;
-		//	–„‚ß•ª‚ğ‘‚«‚ñ‚ÅA‚Ğ‚Á‚­‚è•Ô‚Á‚½•¶š—ñ‚ğ‘‚«‚ß‚Î‚¢‚¢
+		//	åŸ‹ã‚åˆ†ã‚’æ›¸ãè¾¼ã‚“ã§ã€ã²ã£ãã‚Šè¿”ã£ãŸæ–‡å­—åˆ—ã‚’æ›¸ãè¾¼ã‚ã°ã„ã„
 
 		FREE( ptPadd );
 		FREE( ptInvStr );
 	}
-	//Œ³•¶š—ñ‚ğæ“ª‚©‚çŒ©‚Ä‚¢‚­B•¶š—ñ‚Æ‚µ‚ÄˆêŒÂ‚¸‚Â”äŠr‚µAƒqƒbƒg‚µ‚½‚ç
-	//“ü‚ê‘Ö‚¦‚ÄDEST‚Ìæ“ª‚É‹L˜^BŸXæ“ª‚É“ü‚ê‚ê‚Î¶‰E”½“]‚µ‚½‚Ì‚ª‚Å‚«‚éB
-	//ƒqƒbƒg‚µ‚È‚©‚Á‚½‚çŒ³•¶š‚ğ‚»‚Ì‚Ü‚Ü‹L˜^B
+	//å…ƒæ–‡å­—åˆ—ã‚’å…ˆé ­ã‹ã‚‰è¦‹ã¦ã„ãã€‚æ–‡å­—åˆ—ã¨ã—ã¦ä¸€å€‹ãšã¤æ¯”è¼ƒã—ã€ãƒ’ãƒƒãƒˆã—ãŸã‚‰
+	//å…¥ã‚Œæ›¿ãˆã¦DESTã®å…ˆé ­ã«è¨˜éŒ²ã€‚æ¬¡ã€…å…ˆé ­ã«å…¥ã‚Œã‚Œã°å·¦å³åè»¢ã—ãŸã®ãŒã§ãã‚‹ã€‚
+	//ãƒ’ãƒƒãƒˆã—ãªã‹ã£ãŸã‚‰å…ƒæ–‡å­—ã‚’ãã®ã¾ã¾è¨˜éŒ²ã€‚
 
-	//	––’[‹ó”’íœ‚ª•K—v
+	//	æœ«ç«¯ç©ºç™½å‰Šé™¤ãŒå¿…è¦
 
 #ifdef DO_TRY_CATCH
 	}
@@ -453,10 +453,10 @@ HRESULT DocMirrorTranceLine( INT iTop, INT iBtm )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	‹éŒ`‘I‘ğ‚Ì‚Æ‚«‚Ì¶‰E”½“]ˆ—
-	@param[in]	iTop	ŠJns
-	@param[in]	iBtm	I—¹s
-	@return		HRESULT	I—¹ó‘ÔƒR[ƒh
+	çŸ©å½¢é¸æŠã®ã¨ãã®å·¦å³åè»¢å‡¦ç†
+	@param[in]	iTop	é–‹å§‹è¡Œ
+	@param[in]	iBtm	çµ‚äº†è¡Œ
+	@return		HRESULT	çµ‚äº†çŠ¶æ…‹ã‚³ãƒ¼ãƒ‰
 */
 HRESULT DocMirrorTranceBox( INT iTop, INT iBtm )
 {
@@ -481,22 +481,22 @@ HRESULT DocMirrorTranceBox( INT iTop, INT iBtm )
 	try{
 #endif
 
-	InversePartsLoad( IV_MIRROR );	//	¶‰E‚Ìƒp[ƒcŠm”F
+	InversePartsLoad( IV_MIRROR );	//	å·¦å³ã®ãƒ‘ãƒ¼ãƒ„ç¢ºèª
 
 	itLine = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.begin();
 	std::advance( itLine, iTop );
 
-	//	¶‰E”½“]‚È‚çAˆës‚¸‚ÂŒ©‚Ä‚¢‚¯‚Î‚¢‚¢
+	//	å·¦å³åè»¢ãªã‚‰ã€å£±è¡Œãšã¤è¦‹ã¦ã„ã‘ã°ã„ã„
 	for( iLns = iTop; iBtm >= iLns; iLns++ )
 	{
 		wsInvBuff.clear(  );
 
-		//	‚»‚Ìs‚Ì‘I‘ğ”ÍˆÍ‚ğŠm•Û‚·‚é
+		//	ãã®è¡Œã®é¸æŠç¯„å›²ã‚’ç¢ºä¿ã™ã‚‹
 		ptString = SeledTextAlloc( itLine, &iSelDot, &iMozi );	itLine++;
 		StringCchLength( ptString, STRSAFE_MAX_CCH, &cchSz );
 
-		//	“à—e‚ğ‹t“]‚³‚¹‚é
-		if( 0 <  cchSz )	//	‚»‚Ìs‚Ì’†g‚ª‚ ‚Á‚½‚ç
+		//	å†…å®¹ã‚’é€†è»¢ã•ã›ã‚‹
+		if( 0 <  cchSz )	//	ãã®è¡Œã®ä¸­èº«ãŒã‚ã£ãŸã‚‰
 		{
 			for( d = 0; cchSz > d; )
 			{
@@ -504,16 +504,16 @@ HRESULT DocMirrorTranceBox( INT iTop, INT iBtm )
 				wsInvBuff.insert( 0, atBuff );
 			}
 
-			//	Œ³“à—eíœ‚µ‚ÄƒAƒ“ƒhƒD‹L˜^
+			//	å…ƒå†…å®¹å‰Šé™¤ã—ã¦ã‚¢ãƒ³ãƒ‰ã‚¥è¨˜éŒ²
 			DocStringErase( iSelDot, iLns, NULL, iMozi );
 			SqnAppendString( &((*gitFileIt).vcCont.at( gixFocusPage ).stUndoLog) , DO_DELETE, ptString, iSelDot, iLns, bFirst );	bFirst = FALSE;
-			FREE( ptString );	//	ƒAƒ“ƒhƒD‹L˜^‚µ‚Ä‚©‚çíœƒZƒˆ
+			FREE( ptString );	//	ã‚¢ãƒ³ãƒ‰ã‚¥è¨˜éŒ²ã—ã¦ã‹ã‚‰å‰Šé™¤ã‚»ãƒ¨
 
-			cchSz = wsInvBuff.size() + 2;	//	g‚¢‰ñ‚µ’ˆÓ
+			cchSz = wsInvBuff.size() + 2;	//	ä½¿ã„å›ã—æ³¨æ„
 			ptInvStr = (LPTSTR)malloc( cchSz * sizeof(TCHAR) );
 			StringCchCopy( ptInvStr, cchSz, wsInvBuff.c_str() );
 
-			//	‚Ğ‚Á‚­‚è•Ô‚µ‚½•¶š—ñ‚ğ‘}“ü
+			//	ã²ã£ãã‚Šè¿”ã—ãŸæ–‡å­—åˆ—ã‚’æŒ¿å…¥
 			iGyou = iLns;
 			DocInsertString( &iSelDot, &iGyou, NULL, ptInvStr, 0, FALSE );
 
@@ -533,10 +533,10 @@ HRESULT DocMirrorTranceBox( INT iTop, INT iBtm )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	’Êí‘I‘ğ‚Ì‚Æ‚«‚Ìã‰º”½“]ˆ—
-	@param[in]	iTop	ŠJns
-	@param[in]	iBtm	I—¹s
-	@return		HRESULT	I—¹ó‘ÔƒR[ƒh
+	é€šå¸¸é¸æŠã®ã¨ãã®ä¸Šä¸‹åè»¢å‡¦ç†
+	@param[in]	iTop	é–‹å§‹è¡Œ
+	@param[in]	iBtm	çµ‚äº†è¡Œ
+	@return		HRESULT	çµ‚äº†çŠ¶æ…‹ã‚³ãƒ¼ãƒ‰
 */
 HRESULT DocUpsetTranceLine( INT iTop, INT iBtm )
 {
@@ -555,36 +555,36 @@ HRESULT DocUpsetTranceLine( INT iTop, INT iBtm )
 	LINE_ITR	itLine;
 
 	wstring	wsInvBuff;
-	vector<wstring>	vcUpset;	//	•ÏŠ·Œ‹‰Ê‚Ìˆê•Û‘¶
+	vector<wstring>	vcUpset;	//	å¤‰æ›çµæœã®ä¸€æ™‚ä¿å­˜
 
 #ifdef DO_TRY_CATCH
 	try{
 #endif
 
-	InversePartsLoad( IV_UPSET );	//	ã‰º‚Ìƒp[ƒcŠm”F
+	InversePartsLoad( IV_UPSET );	//	ä¸Šä¸‹ã®ãƒ‘ãƒ¼ãƒ„ç¢ºèª
 
 	itLine = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.begin();
-	std::advance( itLine, iTop );	//	ŠJns‚Ü‚ÅˆÚ“®
+	std::advance( itLine, iTop );	//	é–‹å§‹è¡Œã¾ã§ç§»å‹•
 
-	iLns = (iBtm - iTop) + 1;	//	‘S‘Ìs”
-	vcUpset.resize( iLns  );	//	æ‚ÉŠm•Û‚µ‚Ä‚¨‚­
+	iLns = (iBtm - iTop) + 1;	//	å…¨ä½“è¡Œæ•°
+	vcUpset.resize( iLns  );	//	å…ˆã«ç¢ºä¿ã—ã¦ãŠã
 
-	//	ã‚©‚çˆ—‚µ‚Ä‚¢‚­
+	//	ä¸Šã‹ã‚‰å‡¦ç†ã—ã¦ã„ã
 	for( iLns = iTop, dL = 0; iBtm >= iLns; iLns++, dL++ )
 	{
 		vcUpset.at( dL ).clear( );
 
-		//	ŠY“–s‚ğŠm•Û‚µ‚Ä
+		//	è©²å½“è¡Œã‚’ç¢ºä¿ã—ã¦
 		iBytes = DocLineTextGetAlloc( gitFileIt, gixFocusPage, D_UNI, iLns, (LPVOID *)(&ptString) );
 		if( 0 < iBytes )
 		{
-			//	‘O‚©‚ç‡”Ô‚É”½“]•¶š‚Æ“ü‚ê‘Ö‚¦‚Ä‚¢‚­
+			//	å‰ã‹ã‚‰é †ç•ªã«åè»¢æ–‡å­—ã¨å…¥ã‚Œæ›¿ãˆã¦ã„ã
 			StringCchLength( ptString, STRSAFE_MAX_CCH, &cchSz );
 			for( d = 0; cchSz > d; )
 			{
 				d += InversePartsCheck( IV_UPSET, &(ptString[d]), atBuff, MIN_STRING );
 				vcUpset.at( dL ) += wstring(atBuff);	//wsInvBuff.push_back( atBuff );
-				//	‚Æ‚è‚ ‚¦‚¸‡”Ô‚É‚¢‚ê‚Ä‚¨‚¢‚ÄA‘‚«‚Ş‚Éreverse‚·‚ê‚Î‚¢‚¢
+				//	ã¨ã‚Šã‚ãˆãšé †ç•ªã«ã„ã‚Œã¦ãŠã„ã¦ã€æ›¸ãè¾¼ã‚€æ™‚ã«reverseã™ã‚Œã°ã„ã„
 			}
 		}
 		FREE( ptString );
@@ -592,9 +592,9 @@ HRESULT DocUpsetTranceLine( INT iTop, INT iBtm )
 
 	for( iLns = iTop, dL = vcUpset.size()-1; iBtm >= iLns; iLns++, dL-- )
 	{
-		DocLineErase( iLns, &bFirst );	//	æ‚¸‚»‚Ìs‚Ì“à—e‚ğíœ‚µ‚Ä
+		DocLineErase( iLns, &bFirst );	//	å…ˆãšãã®è¡Œã®å†…å®¹ã‚’å‰Šé™¤ã—ã¦
 
-		cchSz = vcUpset.at( dL ).size( );	//	“à—e‚ª‚ ‚ê‚Îˆ—‚·‚é
+		cchSz = vcUpset.at( dL ).size( );	//	å†…å®¹ãŒã‚ã‚Œã°å‡¦ç†ã™ã‚‹
 		if( 0 < cchSz )
 		{
 			cchSz += 2;
@@ -619,10 +619,10 @@ HRESULT DocUpsetTranceLine( INT iTop, INT iBtm )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	‹éŒ`‘I‘ğ‚Ì‚Æ‚«‚Ìã‰º”½“]ˆ—
-	@param[in]	iTop	ŠJns
-	@param[in]	iBtm	I—¹s
-	@return		HRESULT	I—¹ó‘ÔƒR[ƒh
+	çŸ©å½¢é¸æŠã®ã¨ãã®ä¸Šä¸‹åè»¢å‡¦ç†
+	@param[in]	iTop	é–‹å§‹è¡Œ
+	@param[in]	iBtm	çµ‚äº†è¡Œ
+	@return		HRESULT	çµ‚äº†çŠ¶æ…‹ã‚³ãƒ¼ãƒ‰
 */
 HRESULT DocUpsetTranceBox( INT iTop, INT iBtm )
 {
@@ -639,65 +639,65 @@ HRESULT DocUpsetTranceBox( INT iTop, INT iBtm )
 
 	LINE_ITR	itLine, itStart;
 
-	vector<wstring>	vcUpset;	//	•ÏŠ·Œ‹‰Ê‚Ìˆê•Û‘¶
+	vector<wstring>	vcUpset;	//	å¤‰æ›çµæœã®ä¸€æ™‚ä¿å­˜
 
 #ifdef DO_TRY_CATCH
 	try{
 #endif
-	InversePartsLoad( IV_UPSET );	//	ã‰º‚Ìƒp[ƒcŠm”F
+	InversePartsLoad( IV_UPSET );	//	ä¸Šä¸‹ã®ãƒ‘ãƒ¼ãƒ„ç¢ºèª
 
 	itLine = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.begin();
-	std::advance( itLine, iTop );	//	ŠJns‚Ü‚ÅˆÚ“®
+	std::advance( itLine, iTop );	//	é–‹å§‹è¡Œã¾ã§ç§»å‹•
 	itStart = itLine;
 
-	iLns = (iBtm - iTop) + 1;	//	‘S‘Ìs”
-	vcUpset.resize( iLns  );	//	æ‚ÉŠm•Û‚µ‚Ä‚¨‚­
+	iLns = (iBtm - iTop) + 1;	//	å…¨ä½“è¡Œæ•°
+	vcUpset.resize( iLns  );	//	å…ˆã«ç¢ºä¿ã—ã¦ãŠã
 
-	//	ã‚©‚çˆës‚¸‚ÂŒ©‚Ä‚¢‚­
+	//	ä¸Šã‹ã‚‰å£±è¡Œãšã¤è¦‹ã¦ã„ã
 	for( iLns = iTop, dL = 0; iBtm >= iLns; iLns++, dL++ )
 	{
 		vcUpset.at( dL ).clear( );
 
-		//	‚»‚Ìs‚Ì‘I‘ğ”ÍˆÍ‚ğŠm•Û‚·‚é
+		//	ãã®è¡Œã®é¸æŠç¯„å›²ã‚’ç¢ºä¿ã™ã‚‹
 		ptString = SeledTextAlloc( itLine, &iSelDot, &iMozi );	itLine++;
 		StringCchLength( ptString, STRSAFE_MAX_CCH, &cchSz );
 
-		//	“à—e‚ğ‹t“]‚³‚¹‚é
-		if( 0 <  cchSz )	//	‚»‚Ìs‚Ì’†g‚ª‚ ‚Á‚½‚ç
+		//	å†…å®¹ã‚’é€†è»¢ã•ã›ã‚‹
+		if( 0 <  cchSz )	//	ãã®è¡Œã®ä¸­èº«ãŒã‚ã£ãŸã‚‰
 		{
-			//	‘O‚©‚ç‡”Ô‚É”½“]•¶š‚Æ“ü‚ê‘Ö‚¦‚Ä‚¢‚­
+			//	å‰ã‹ã‚‰é †ç•ªã«åè»¢æ–‡å­—ã¨å…¥ã‚Œæ›¿ãˆã¦ã„ã
 			for( d = 0; cchSz > d; )
 			{
 				d += InversePartsCheck( IV_UPSET, &(ptString[d]), atBuff, MIN_STRING );
 				vcUpset.at( dL ) += wstring(atBuff);	//wsInvBuff.push_back( atBuff );
-				//	‚Æ‚è‚ ‚¦‚¸‡”Ô‚É‚¢‚ê‚Ä‚¨‚¢‚ÄA‘‚«‚Ş‚Éreverse‚·‚ê‚Î‚¢‚¢
+				//	ã¨ã‚Šã‚ãˆãšé †ç•ªã«ã„ã‚Œã¦ãŠã„ã¦ã€æ›¸ãè¾¼ã‚€æ™‚ã«reverseã™ã‚Œã°ã„ã„
 			}
 		}
 		FREE( ptString );
 	}
 
-	//	ã‚©‚ç“ü‚ê‘Ö‚¦‚Ä‚¢‚­
+	//	ä¸Šã‹ã‚‰å…¥ã‚Œæ›¿ãˆã¦ã„ã
 	itLine = itStart;
 	for( iLns = iTop, dL = vcUpset.size()-1; iBtm >= iLns; iLns++, dL-- )
 	{
-		//	‰ü‚ß‚Ä‘I‘ğ”ÍˆÍŠm•Û
+		//	æ”¹ã‚ã¦é¸æŠç¯„å›²ç¢ºä¿
 		ptString = SeledTextAlloc( itLine, &iSelDot, &iMozi );	itLine++;
 		if( 0 != iMozi )
 		{
-			//	Œ³“à—eíœ‚µ‚ÄƒAƒ“ƒhƒD‹L˜^
+			//	å…ƒå†…å®¹å‰Šé™¤ã—ã¦ã‚¢ãƒ³ãƒ‰ã‚¥è¨˜éŒ²
 			DocStringErase( iSelDot, iLns, NULL, iMozi );
 			SqnAppendString( &((*gitFileIt).vcCont.at( gixFocusPage ).stUndoLog) , DO_DELETE, ptString, iSelDot, iLns, bFirst );	bFirst = FALSE;
-			FREE( ptString );	//	ƒAƒ“ƒhƒD‹L˜^‚µ‚Ä‚©‚çíœƒZƒˆ
+			FREE( ptString );	//	ã‚¢ãƒ³ãƒ‰ã‚¥è¨˜éŒ²ã—ã¦ã‹ã‚‰å‰Šé™¤ã‚»ãƒ¨
 		}
 
-		cchSz = vcUpset.at( dL ).size() + 2;	//	g‚¢‰ñ‚µ’ˆÓ
+		cchSz = vcUpset.at( dL ).size() + 2;	//	ä½¿ã„å›ã—æ³¨æ„
 		ptInvStr = (LPTSTR)malloc( cchSz * sizeof(TCHAR) );
 		StringCchCopy( ptInvStr, cchSz, vcUpset.at( dL ).c_str() );
 
-		//	Œ³•¶š—ñ‚ÉŠY“–‚·‚éêŠ‚ª‚È‚©‚Á‚½‚çA––’[‚É‚µ‚Ä‚¨‚­
+		//	å…ƒæ–‡å­—åˆ—ã«è©²å½“ã™ã‚‹å ´æ‰€ãŒãªã‹ã£ãŸã‚‰ã€æœ«ç«¯ã«ã—ã¦ãŠã
 		if( 0 == iMozi ){	iSelDot = DocLineParamGet( iLns, NULL, NULL );	}
 
-		//	‚Ğ‚Á‚­‚è•Ô‚µ‚½•¶š—ñ‚ğ‘}“ü
+		//	ã²ã£ãã‚Šè¿”ã—ãŸæ–‡å­—åˆ—ã‚’æŒ¿å…¥
 		iGyou = iLns;
 		DocInsertString( &iSelDot, &iGyou, NULL, ptInvStr, 0 , bFirst );	bFirst = FALSE;
 	
@@ -716,12 +716,12 @@ HRESULT DocUpsetTranceBox( INT iTop, INT iBtm )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	Œ³•¶š—ñ‚ğó‚¯‚ÄA•ÏŠ·Œ‹‰Ê‚ğ–ß‚·
-	@param[in]	dMode		”ñ‚O¶‰E@‚Oã‰º
-	@param[in]	ptSource	Œ³•¶š—ñ
-	@param[out]	ptOutput	æ“ª•¶š‚Ì•ÏŠ·Œ‹‰Ê‚ğ–ß‚·ƒoƒbƒtƒ@
-	@param[in]	cchSz		ƒoƒbƒtƒ@‚Ì•¶š”
-	@return		UINT		Œ³•¶š—ñ‚ÌA•ÏŠ·‚µ‚½•¶š”B’Êí‚P
+	å…ƒæ–‡å­—åˆ—ã‚’å—ã‘ã¦ã€å¤‰æ›çµæœã‚’æˆ»ã™
+	@param[in]	dMode		éï¼å·¦å³ã€€ï¼ä¸Šä¸‹
+	@param[in]	ptSource	å…ƒæ–‡å­—åˆ—
+	@param[out]	ptOutput	å…ˆé ­æ–‡å­—ã®å¤‰æ›çµæœã‚’æˆ»ã™ãƒãƒƒãƒ•ã‚¡
+	@param[in]	cchSz		ãƒãƒƒãƒ•ã‚¡ã®æ–‡å­—æ•°
+	@return		UINT		å…ƒæ–‡å­—åˆ—ã®ã€å¤‰æ›ã—ãŸæ–‡å­—æ•°ã€‚é€šå¸¸ï¼‘
 */
 UINT InversePartsCheck( UINT dMode, LPCTSTR ptSource, LPTSTR ptOutput, UINT_PTR cchSz )
 {
@@ -744,25 +744,25 @@ UINT InversePartsCheck( UINT dMode, LPCTSTR ptSource, LPTSTR ptOutput, UINT_PTR 
 
 	ZeroMemory( ptOutput, cchSz * sizeof(TCHAR) );
 
-	ptOutput[0] = ptSource[0];	//	ƒfƒtƒHƒ‹ƒg
+	ptOutput[0] = ptSource[0];	//	ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆ
 
-	//	•ÏŠ·ƒe[ƒuƒ‹‚ª–³‚¢‚È‚ç‚»‚Ì‚Ü‚ÜƒRƒs‚Á‚Ä–ß‚¹‚Î‚¢‚¢
+	//	å¤‰æ›ãƒ†ãƒ¼ãƒ–ãƒ«ãŒç„¡ã„ãªã‚‰ãã®ã¾ã¾ã‚³ãƒ”ã£ã¦æˆ»ã›ã°ã„ã„
 	if( 0 == dParts ){	return 1;	}
 
-	//	‘S•¶š‚ğƒ`ƒFƒbƒN
+	//	å…¨æ–‡å­—ã‚’ãƒã‚§ãƒƒã‚¯
 	for( itParts = itBegin; itEnd != itParts; itParts++ )
 	{
 		StringCchLength( itParts->atSrcStr, MIN_STRING, &cchPrt );
-		//	ƒe[ƒuƒ‹‚Ì•¶š—ñ‚Æ”äŠr‚µ‚Ä‚¢‚­
+		//	ãƒ†ãƒ¼ãƒ–ãƒ«ã®æ–‡å­—åˆ—ã¨æ¯”è¼ƒã—ã¦ã„ã
 		if( 0 == StrCmpN( ptSource, itParts->atSrcStr, cchPrt ) )
 		{
 			StringCchCopy( ptOutput, cchSz, itParts->atDestStr );
 			break;
 		}
-		//	ƒqƒbƒg‚µ‚½‚çA•ÏŠ·Œê•¶š—ñ‚ğƒRƒs[‚µ‚ÄI‚í‚è
+		//	ãƒ’ãƒƒãƒˆã—ãŸã‚‰ã€å¤‰æ›èªæ–‡å­—åˆ—ã‚’ã‚³ãƒ”ãƒ¼ã—ã¦çµ‚ã‚ã‚Š
 	}
 
-//	StringCchLength( ptOutput, cchSz, &cchPrt );	//	’·‚³Šm”FE‚µ‚¿‚á‚¢‚©‚ñ
+//	StringCchLength( ptOutput, cchSz, &cchPrt );	//	é•·ã•ç¢ºèªãƒ»ã—ã¡ã‚ƒã„ã‹ã‚“
 
 	return cchPrt;
 }

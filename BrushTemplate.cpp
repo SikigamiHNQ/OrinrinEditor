@@ -1,6 +1,6 @@
-/*! @file
-	@brief ƒuƒ‰ƒVƒeƒ“ƒvƒŒ[ƒg‚Ì–Ê“|Œ©‚Ü‚·
-	‚±‚Ìƒtƒ@ƒCƒ‹‚Í BrushTemplate.cpp ‚Å‚·B
+ï»¿/*! @file
+	@brief ãƒ–ãƒ©ã‚·ãƒ†ãƒ³ãƒ—ãƒ¬ãƒ¼ãƒˆã®é¢å€’è¦‹ã¾ã™
+	ã“ã®ãƒ•ã‚¡ã‚¤ãƒ«ã¯ BrushTemplate.cpp ã§ã™ã€‚
 	@author	SikigamiHNQ
 	@date	2011/06/20
 */
@@ -16,7 +16,6 @@ You should have received a copy of the GNU General Public License along with thi
 If not, see <http://www.gnu.org/licenses/>.
 */
 //-------------------------------------------------------------------------------------------------
-
 #include "stdafx.h"
 #include "OrinrinEditor.h"
 //-------------------------------------------------------------------------------------------------
@@ -34,37 +33,37 @@ static  TBBUTTON	gstBrTBInfo[] = {
 };	//	
 //-------------------------------------------------------------------------------------------------
 
-extern HFONT	ghAaFont;		//	AA—pƒtƒHƒ“ƒg
+extern HFONT	ghAaFont;		//	AAç”¨ãƒ•ã‚©ãƒ³ãƒˆ
 
-extern INT		gbTmpltDock;	//	ƒeƒ“ƒvƒŒ‚ÌƒhƒbƒLƒ“ƒO
-extern BOOLEAN	gbDockTmplView;	//	‚­‚Á‚Â‚¢‚Ä‚éƒeƒ“ƒvƒŒ‚ÍŒ©‚¦‚Ä‚¢‚é‚©
+extern INT		gbTmpltDock;	//	ãƒ†ãƒ³ãƒ—ãƒ¬ã®ãƒ‰ãƒƒã‚­ãƒ³ã‚°
+extern BOOLEAN	gbDockTmplView;	//	ãã£ã¤ã„ã¦ã‚‹ãƒ†ãƒ³ãƒ—ãƒ¬ã¯è¦‹ãˆã¦ã„ã‚‹ã‹
 
-//extern  HWND	ghMainSplitWnd;	//	ƒƒCƒ“‚ÌƒXƒvƒŠƒbƒgƒo[ƒnƒ“ƒhƒ‹
-extern  LONG	grdSplitPos;	//	ƒXƒvƒŠƒbƒgƒo[‚ÌA¶‘¤‚ÌA‰æ–Ê‰E‚©‚ç‚ÌƒIƒtƒZƒbƒg
+//extern  HWND	ghMainSplitWnd;	//	ãƒ¡ã‚¤ãƒ³ã®ã‚¹ãƒ—ãƒªãƒƒãƒˆãƒãƒ¼ãƒãƒ³ãƒ‰ãƒ«
+extern  LONG	grdSplitPos;	//	ã‚¹ãƒ—ãƒªãƒƒãƒˆãƒãƒ¼ã®ã€å·¦å´ã®ã€ç”»é¢å³ã‹ã‚‰ã®ã‚ªãƒ•ã‚»ãƒƒãƒˆ
 
 static HIMAGELIST	ghBrushImgLst;
 
-static  UINT	gbBrushMode;	//!<	”ñ—ëƒuƒ‰ƒVƒ‚[ƒh
+static  UINT	gbBrushMode;	//!<	éé›¶ãƒ–ãƒ©ã‚·ãƒ¢ãƒ¼ãƒ‰
 
 static  ATOM	gBrTmplAtom;	//!<	
-static  HWND	ghBrTmplWnd;	//!<	ƒuƒ‰ƒVƒpƒŒƒbƒg–{‘ÌƒEƒCƒ“ƒhƒE
-static  HWND	ghBrTlBarWnd;	//!<	ƒc[ƒ‹ƒo[
-static  HWND	ghCtgryBxWnd;	//!<	ƒJƒeƒSƒŠƒRƒ“ƒ{ƒbƒNƒX
-static  HWND	ghLvItemWnd;	//!<	“à—eƒŠƒXƒgƒrƒ…[
-static  HWND	ghBrLvTipWnd;	//!<	BrushƒŠƒXƒgƒc[ƒ‹ƒ`ƒbƒv
+static  HWND	ghBrTmplWnd;	//!<	ãƒ–ãƒ©ã‚·ãƒ‘ãƒ¬ãƒƒãƒˆæœ¬ä½“ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦
+static  HWND	ghBrTlBarWnd;	//!<	ãƒ„ãƒ¼ãƒ«ãƒãƒ¼
+static  HWND	ghCtgryBxWnd;	//!<	ã‚«ãƒ†ã‚´ãƒªã‚³ãƒ³ãƒœãƒƒã‚¯ã‚¹
+static  HWND	ghLvItemWnd;	//!<	å†…å®¹ãƒªã‚¹ãƒˆãƒ“ãƒ¥ãƒ¼
+static  HWND	ghBrLvTipWnd;	//!<	Brushãƒªã‚¹ãƒˆãƒ„ãƒ¼ãƒ«ãƒãƒƒãƒ—
 
-static  HWND	ghMainWnd;		//!<	•ÒWƒrƒ…[‚Ì‚ ‚é–{‘ÌƒEƒCƒ“ƒhƒE
+static  HWND	ghMainWnd;		//!<	ç·¨é›†ãƒ“ãƒ¥ãƒ¼ã®ã‚ã‚‹æœ¬ä½“ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦
 
-static  UINT	gNowGroup;		//!<	ƒJƒeƒSƒŠ
+static  UINT	gNowGroup;		//!<	ã‚«ãƒ†ã‚´ãƒª
 
 static WNDPROC	gpfOrigBrushCtgryProc;	//!<	
 static WNDPROC	gpfOrigBrushItemProc;	//!<	
 
-static  UINT	gBrhClmCnt;	//!<	•\¦ƒJƒ‰ƒ€”
+static  UINT	gBrhClmCnt;	//!<	è¡¨ç¤ºã‚«ãƒ©ãƒ æ•°
 
 static WNDPROC	gpfOrigTBProc;	//!<	
 
-static vector<AATEMPLATE>	gvcBrTmpls;	//!<	ƒeƒ“ƒvƒŒ‚Ì•Û
+static vector<AATEMPLATE>	gvcBrTmpls;	//!<	ãƒ†ãƒ³ãƒ—ãƒ¬ã®ä¿æŒ
 //-------------------------------------------------------------------------------------------------
 
 
@@ -88,12 +87,12 @@ static LRESULT	CALLBACK gpfToolbarProc( HWND, UINT, WPARAM, LPARAM );
 
 
 /*!
-	ƒuƒ‰ƒVƒeƒ“ƒvƒŒƒEƒCƒ“ƒhƒE‚Ìì¬
-	@param[in]	hInstance	ƒAƒvƒŠ‚ÌƒCƒ“ƒXƒ^ƒ“ƒX
-	@param[in]	hParentWnd	ƒƒCƒ“ƒEƒCƒ“ƒhƒE‚Ìƒnƒ“ƒhƒ‹
+	ãƒ–ãƒ©ã‚·ãƒ†ãƒ³ãƒ—ãƒ¬ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ã®ä½œæˆ
+	@param[in]	hInstance	ã‚¢ãƒ—ãƒªã®ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹
+	@param[in]	hParentWnd	ãƒ¡ã‚¤ãƒ³ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ã®ãƒãƒ³ãƒ‰ãƒ«
 	@param[in]	pstFrame	
-	@param[in]	hMaaWnd		•¡”sƒeƒ“ƒvƒŒ‚ÌƒEƒCƒ“ƒhƒEƒnƒ“ƒhƒ‹
-	@return		ì‚Á‚½ƒrƒ…[‚ÌƒEƒCƒ“ƒhƒEƒnƒ“ƒhƒ‹
+	@param[in]	hMaaWnd		è¤‡æ•°è¡Œãƒ†ãƒ³ãƒ—ãƒ¬ã®ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ãƒãƒ³ãƒ‰ãƒ«
+	@return		ä½œã£ãŸãƒ“ãƒ¥ãƒ¼ã®ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ãƒãƒ³ãƒ‰ãƒ«
 */
 HWND BrushTmpleInitialise( HINSTANCE hInstance, HWND hParentWnd, LPRECT pstFrame, HWND hMaaWnd )
 {
@@ -113,7 +112,7 @@ HWND BrushTmpleInitialise( HINSTANCE hInstance, HWND hParentWnd, LPRECT pstFrame
 	TTTOOLINFO	stToolInfo;
 
 
-	//	”j‰ó
+	//	ç ´å£Š
 	if( !(hInstance) && !(hParentWnd) )
 	{
 		ImageList_Destroy( ghBrushImgLst  );
@@ -140,33 +139,33 @@ HWND BrushTmpleInitialise( HINSTANCE hInstance, HWND hParentWnd, LPRECT pstFrame
 
 	gbBrushMode = FALSE;
 
-//ƒeƒ“ƒvƒŒƒf[ƒ^“Ç‚İo‚µ
+//ãƒ†ãƒ³ãƒ—ãƒ¬ãƒ‡ãƒ¼ã‚¿èª­ã¿å‡ºã—
 	TemplateItemLoad( AA_BRUSH_FILE, BrushTmpleItemData );
 
 
 	InitWindowPos( INIT_LOAD, WDP_BRTMPL, &rect );
-	if( 0 == rect.right || 0 == rect.bottom )	//	•‚‚³‚ª‚O‚Íƒf[ƒ^–³‚µ
+	if( 0 == rect.right || 0 == rect.bottom )	//	å¹…é«˜ã•ãŒï¼ã¯ãƒ‡ãƒ¼ã‚¿ç„¡ã—
 	{
 		GetWindowRect( hParentWnd, &wdRect );
 		rect.left   = wdRect.right + 32;
 		rect.top    = wdRect.top + 32;
 		rect.right  = BT_WIDTH;
 		rect.bottom = BT_HEIGHT;
-		InitWindowPos( INIT_SAVE, WDP_BRTMPL, &rect );//‹N“®•Û‘¶
+		InitWindowPos( INIT_SAVE, WDP_BRTMPL, &rect );//èµ·å‹•æ™‚ä¿å­˜
 	}
 
-	//	ƒJƒ‰ƒ€”Šm”F
+	//	ã‚«ãƒ©ãƒ æ•°ç¢ºèª
 	gBrhClmCnt = InitParamValue( INIT_LOAD, VL_BRUSHTMP_CLM, 4 );
 
 	if( gbTmpltDock )
 	{
-		spPos = grdSplitPos - SPLITBAR_WIDTH;	//	‰E‚©‚ç‚ÌƒIƒtƒZƒbƒg
+		spPos = grdSplitPos - SPLITBAR_WIDTH;	//	å³ã‹ã‚‰ã®ã‚ªãƒ•ã‚»ãƒƒãƒˆ
 
 		hPrWnd    = hParentWnd;
 		dwExStyle = 0;
 		dwStyle   = WS_CHILD;
 
-		rect = *pstFrame;	//	ƒNƒ‰ƒCƒ„ƒ“ƒg‚Ég‚¦‚é—Ìˆæ
+		rect = *pstFrame;	//	ã‚¯ãƒ©ã‚¤ãƒ¤ãƒ³ãƒˆã«ä½¿ãˆã‚‹é ˜åŸŸ
 		rect.left  = rect.right - spPos;
 		rect.right = PLIST_DOCK;
 		rect.bottom >>= 1;
@@ -179,40 +178,40 @@ HWND BrushTmpleInitialise( HINSTANCE hInstance, HWND hParentWnd, LPRECT pstFrame
 	else
 	{
 		hPrWnd = NULL;
-		//	í‚ÉÅ‘S–Ê‚É•\¦‚ğH
+		//	å¸¸ã«æœ€å…¨é¢ã«è¡¨ç¤ºã‚’ï¼Ÿ
 		dwExStyle = WS_EX_TOOLWINDOW;
 		if( InitWindowTopMost( INIT_LOAD, WDP_BRTMPL, 0 ) ){	dwExStyle |=  WS_EX_TOPMOST;	}
 		dwStyle = WS_POPUP | WS_THICKFRAME | WS_CAPTION | WS_VISIBLE | WS_SYSMENU;
 	}
 
-	//	–{‘Ì
+	//	æœ¬ä½“
 	ghBrTmplWnd = CreateWindowEx( dwExStyle, BRUSHTEMPLATE_CLASS, TEXT("Brush Template"),
 		dwStyle, rect.left, rect.top, rect.right, rect.bottom, hPrWnd, NULL, hInstance, NULL);
 
-	//	ƒc[ƒ‹ƒo[
+	//	ãƒ„ãƒ¼ãƒ«ãƒãƒ¼
 	ghBrTlBarWnd = CreateWindowEx( WS_EX_CLIENTEDGE, TOOLBARCLASSNAME, TEXT("brtoolbar"), WS_CHILD | WS_VISIBLE | TBSTYLE_FLAT | TBSTYLE_LIST | TBSTYLE_TOOLTIPS, 0, 0, 0, 0, ghBrTmplWnd, (HMENU)IDW_BRUSH_TOOL_BAR, hInstance, NULL );
 
-	//	©“®ƒc[ƒ‹ƒ`ƒbƒvƒXƒ^ƒCƒ‹‚ğ’Ç‰Á
+	//	è‡ªå‹•ãƒ„ãƒ¼ãƒ«ãƒãƒƒãƒ—ã‚¹ã‚¿ã‚¤ãƒ«ã‚’è¿½åŠ 
 	SendMessage( ghBrTlBarWnd, TB_SETEXTENDEDSTYLE, 0, TBSTYLE_EX_MIXEDBUTTONS );
 
 	ghBrushImgLst = ImageList_Create( 16, 16, ILC_COLOR24 | ILC_MASK, 1, 1 );
 	hImg = LoadBitmap( hInstance, MAKEINTRESOURCE( (IDBMP_BRUSH_MODE) ) );
 	hMsq = LoadBitmap( hInstance, MAKEINTRESOURCE( (IDBMQ_BRUSH_MODE) ) );
-	ImageList_Add( ghBrushImgLst , hImg, hMsq );	//	ƒCƒ[ƒWƒŠƒXƒg‚ÉƒCƒ[ƒW‚ğ’Ç‰Á
+	ImageList_Add( ghBrushImgLst , hImg, hMsq );	//	ã‚¤ãƒ¡ãƒ¼ã‚¸ãƒªã‚¹ãƒˆã«ã‚¤ãƒ¡ãƒ¼ã‚¸ã‚’è¿½åŠ 
 	DeleteBitmap( hImg );	DeleteBitmap( hMsq );
 	SendMessage( ghBrTlBarWnd, TB_SETIMAGELIST, 0, (LPARAM)ghBrushImgLst );
 
 	SendMessage( ghBrTlBarWnd, TB_BUTTONSTRUCTSIZE, (WPARAM)sizeof(TBBUTTON), 0 );
-	//	ƒc[ƒ‹ƒ`ƒbƒv•¶š—ñ‚ğİ’èEƒ{ƒ^ƒ“ƒeƒLƒXƒg‚ªƒc[ƒ‹ƒ`ƒbƒv‚É‚È‚é
-	StringCchCopy( atBuffer, MAX_STRING, TEXT("ƒuƒ‰ƒVƒ‚[ƒh ON/OFF") );
+	//	ãƒ„ãƒ¼ãƒ«ãƒãƒƒãƒ—æ–‡å­—åˆ—ã‚’è¨­å®šãƒ»ãƒœã‚¿ãƒ³ãƒ†ã‚­ã‚¹ãƒˆãŒãƒ„ãƒ¼ãƒ«ãƒãƒƒãƒ—ã«ãªã‚‹
+	StringCchCopy( atBuffer, MAX_STRING, TEXT("ãƒ–ãƒ©ã‚·ãƒ¢ãƒ¼ãƒ‰ ON/OFF") );
 	gstBrTBInfo[0].iString = SendMessage( ghBrTlBarWnd, TB_ADDSTRING, 0, (LPARAM)atBuffer );
 
-	SendMessage( ghBrTlBarWnd , TB_ADDBUTTONS, (WPARAM)TB_ITEMS, (LPARAM)&gstBrTBInfo );	//	ƒc[ƒ‹ƒo[‚Éƒ{ƒ^ƒ“‚ğ‘}“ü
+	SendMessage( ghBrTlBarWnd , TB_ADDBUTTONS, (WPARAM)TB_ITEMS, (LPARAM)&gstBrTBInfo );	//	ãƒ„ãƒ¼ãƒ«ãƒãƒ¼ã«ãƒœã‚¿ãƒ³ã‚’æŒ¿å…¥
 
-	SendMessage( ghBrTlBarWnd , TB_AUTOSIZE, 0, 0 );	//	ƒ{ƒ^ƒ“‚ÌƒTƒCƒY‚É‡‚í‚¹‚Äƒc[ƒ‹ƒo[‚ğƒŠƒTƒCƒY
-	InvalidateRect( ghBrTlBarWnd , NULL, TRUE );		//	ƒNƒ‰ƒCƒAƒ“ƒg‘S‘Ì‚ğÄ•`‰æ‚·‚é–½—ß
+	SendMessage( ghBrTlBarWnd , TB_AUTOSIZE, 0, 0 );	//	ãƒœã‚¿ãƒ³ã®ã‚µã‚¤ã‚ºã«åˆã‚ã›ã¦ãƒ„ãƒ¼ãƒ«ãƒãƒ¼ã‚’ãƒªã‚µã‚¤ã‚º
+	InvalidateRect( ghBrTlBarWnd , NULL, TRUE );		//	ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆå…¨ä½“ã‚’å†æç”»ã™ã‚‹å‘½ä»¤
 
-	//	ƒc[ƒ‹ƒo[ƒTƒuƒNƒ‰ƒX‰»
+	//	ãƒ„ãƒ¼ãƒ«ãƒãƒ¼ã‚µãƒ–ã‚¯ãƒ©ã‚¹åŒ–
 	gpfOrigTBProc = SubclassWindow( ghBrTlBarWnd, gpfToolbarProc );
 
 	GetClientRect( ghBrTlBarWnd, &tbRect );
@@ -223,7 +222,7 @@ HWND BrushTmpleInitialise( HINSTANCE hInstance, HWND hParentWnd, LPRECT pstFrame
 
 	GetClientRect( ghBrTmplWnd, &clRect );
 
-	//	ƒJƒeƒSƒŠƒRƒ“ƒ{ƒbƒNƒX
+	//	ã‚«ãƒ†ã‚´ãƒªã‚³ãƒ³ãƒœãƒƒã‚¯ã‚¹
 	ghCtgryBxWnd = CreateWindowEx( 0, WC_COMBOBOX, TEXT("BrCategory"),
 		WS_CHILD | WS_VISIBLE | WS_BORDER | CBS_DROPDOWNLIST,
 		0, tbRect.bottom, clRect.right, 127, ghBrTmplWnd,
@@ -241,7 +240,7 @@ HWND BrushTmpleInitialise( HINSTANCE hInstance, HWND hParentWnd, LPRECT pstFrame
 
 	GetClientRect( ghCtgryBxWnd, &cbxRect );
 
-	//	ˆê——ƒŠƒXƒgƒrƒ…[
+	//	ä¸€è¦§ãƒªã‚¹ãƒˆãƒ“ãƒ¥ãƒ¼
 	ghLvItemWnd = CreateWindowEx( 0, WC_LISTVIEW, TEXT("brushitem"),
 		WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | LVS_REPORT | LVS_NOSORTHEADER | LVS_NOCOLUMNHEADER | LVS_SINGLESEL,
 		0, tbRect.bottom + cbxRect.bottom, clRect.right, clRect.bottom - (cbxRect.bottom + tbRect.bottom),
@@ -255,7 +254,7 @@ HWND BrushTmpleInitialise( HINSTANCE hInstance, HWND hParentWnd, LPRECT pstFrame
 	stLvColm.mask     = LVCF_FMT | LVCF_WIDTH | LVCF_TEXT | LVCF_SUBITEM;
 	stLvColm.fmt      = LVCFMT_LEFT;
 	stLvColm.pszText  = TEXT("Brush");
-	stLvColm.cx       = 10;	//	Œã‚Å‡‚í‚¹‚é‚Ì‚Å“K“–‚Å—Ç‚¢
+	stLvColm.cx       = 10;	//	å¾Œã§åˆã‚ã›ã‚‹ã®ã§é©å½“ã§è‰¯ã„
 	stLvColm.iSubItem = 0;
 
 	for( i = 0; gBrhClmCnt > i; i++ )
@@ -264,14 +263,14 @@ HWND BrushTmpleInitialise( HINSTANCE hInstance, HWND hParentWnd, LPRECT pstFrame
 		ListView_InsertColumn( ghLvItemWnd, i, &stLvColm );
 	}
 
-	BrushTmpleItemListOn( 0 );	//	’†g’Ç‰Á
+	BrushTmpleItemListOn( 0 );	//	ä¸­èº«è¿½åŠ 
 
-	//	ƒŠƒXƒgƒrƒ…[ƒc[ƒ‹ƒ`ƒbƒv
+	//	ãƒªã‚¹ãƒˆãƒ“ãƒ¥ãƒ¼ãƒ„ãƒ¼ãƒ«ãƒãƒƒãƒ—
 	ghBrLvTipWnd = CreateWindowEx( WS_EX_TOPMOST, TOOLTIPS_CLASS, NULL, TTS_NOPREFIX | TTS_ALWAYSTIP,
 		CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, ghBrTmplWnd, NULL, hInstance, NULL );
 //	SetWindowFont( ghBrLvTipWnd, GetStockFont(DEFAULT_GUI_FONT), FALSE );
 
-	//	ƒc[ƒ‹ƒ`ƒbƒv‚ğƒR[ƒ‹ƒoƒbƒN‚ÅŠ„‚è•t‚¯
+	//	ãƒ„ãƒ¼ãƒ«ãƒãƒƒãƒ—ã‚’ã‚³ãƒ¼ãƒ«ãƒãƒƒã‚¯ã§å‰²ã‚Šä»˜ã‘
 	ZeroMemory( &stToolInfo, sizeof(TTTOOLINFO) );
 	stToolInfo.cbSize   = sizeof(TTTOOLINFO);
 	stToolInfo.uFlags   = TTF_SUBCLASS;
@@ -279,9 +278,9 @@ HWND BrushTmpleInitialise( HINSTANCE hInstance, HWND hParentWnd, LPRECT pstFrame
 	stToolInfo.hwnd     = ghLvItemWnd;
 	stToolInfo.uId      = IDLV_BT_ITEMVIEW;
 	GetClientRect( ghLvItemWnd, &stToolInfo.rect );
-	stToolInfo.lpszText = LPSTR_TEXTCALLBACK;	//	ƒRƒŒ‚ğw’è‚·‚é‚ÆƒR[ƒ‹ƒoƒbƒN‚É‚È‚é
+	stToolInfo.lpszText = LPSTR_TEXTCALLBACK;	//	ã‚³ãƒ¬ã‚’æŒ‡å®šã™ã‚‹ã¨ã‚³ãƒ¼ãƒ«ãƒãƒƒã‚¯ã«ãªã‚‹
 	SendMessage( ghBrLvTipWnd, TTM_ADDTOOL, 0, (LPARAM)&stToolInfo );
-	SendMessage( ghBrLvTipWnd, TTM_SETMAXTIPWIDTH, 0, 0 );	//	ƒ`ƒbƒv‚Ì•B‚Oİ’è‚Å‚¢‚¢B‚±‚ê‚µ‚Æ‚©‚È‚¢‚Æ‰üs‚³‚ê‚È‚¢
+	SendMessage( ghBrLvTipWnd, TTM_SETMAXTIPWIDTH, 0, 0 );	//	ãƒãƒƒãƒ—ã®å¹…ã€‚ï¼è¨­å®šã§ã„ã„ã€‚ã“ã‚Œã—ã¨ã‹ãªã„ã¨æ”¹è¡Œã•ã‚Œãªã„
 
 
 	if( !(gbTmpltDock) )
@@ -295,9 +294,9 @@ HWND BrushTmpleInitialise( HINSTANCE hInstance, HWND hParentWnd, LPRECT pstFrame
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	ƒtƒ[ƒeƒBƒ“ƒOƒuƒ‰ƒVƒeƒ“ƒvƒŒ‚ÌˆÊ’uƒŠƒZƒbƒg
-	@param[in]	hMainWnd	ƒƒCƒ“ƒEƒCƒ“ƒhƒEƒnƒ“ƒhƒ‹
-	@return	HRESULT	I—¹ó‘ÔƒR[ƒh
+	ãƒ•ãƒ­ãƒ¼ãƒ†ã‚£ãƒ³ã‚°ãƒ–ãƒ©ã‚·ãƒ†ãƒ³ãƒ—ãƒ¬ã®ä½ç½®ãƒªã‚»ãƒƒãƒˆ
+	@param[in]	hMainWnd	ãƒ¡ã‚¤ãƒ³ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ãƒãƒ³ãƒ‰ãƒ«
+	@return	HRESULT	çµ‚äº†çŠ¶æ…‹ã‚³ãƒ¼ãƒ‰
 */
 HRESULT BrushTmplePositionReset( HWND hMainWnd )
 {
@@ -316,9 +315,9 @@ HRESULT BrushTmplePositionReset( HWND hMainWnd )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	ƒhƒbƒLƒ“ƒOó‘Ô‚Å”­¶E‚­‚Á‚Â‚¢‚Ä‚éƒEƒCƒ“ƒhƒE‚ªƒŠƒTƒCƒY‚³‚ê‚½‚ç
-	@param[in]	hPrntWnd	‚­‚Á‚Â‚¢‚Ä‚éƒEƒCƒ“ƒhƒEƒnƒ“ƒhƒ‹
-	@param[in]	pstFrame	g‚¦‚éƒTƒCƒY
+	ãƒ‰ãƒƒã‚­ãƒ³ã‚°çŠ¶æ…‹ã§ç™ºç”Ÿãƒ»ãã£ã¤ã„ã¦ã‚‹ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ãŒãƒªã‚µã‚¤ã‚ºã•ã‚ŒãŸã‚‰
+	@param[in]	hPrntWnd	ãã£ã¤ã„ã¦ã‚‹ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ãƒãƒ³ãƒ‰ãƒ«
+	@param[in]	pstFrame	ä½¿ãˆã‚‹ã‚µã‚¤ã‚º
 */
 VOID BrushTmpleResize( HWND hPrntWnd, LPRECT pstFrame )
 {
@@ -328,10 +327,10 @@ VOID BrushTmpleResize( HWND hPrntWnd, LPRECT pstFrame )
 	//gbTmpltDock
 	if( !(ghBrTmplWnd) )	return;
 
-	//	”ñ•\¦‚È‚ç‰½‚à‚µ‚È‚¢‚Å‚¨‚‹
+	//	éè¡¨ç¤ºãªã‚‰ä½•ã‚‚ã—ãªã„ã§ãŠï½‹
 	if( !(gbDockTmplView) )	return;
 
-	rect = *pstFrame;	//	ƒNƒ‰ƒCƒ„ƒ“ƒg‚Ég‚¦‚é—Ìˆæ
+	rect = *pstFrame;	//	ã‚¯ãƒ©ã‚¤ãƒ¤ãƒ³ãƒˆã«ä½¿ãˆã‚‹é ˜åŸŸ
 	rect.left    = rect.right - (grdSplitPos - SPLITBAR_WIDTH);
 	rect.right   = (grdSplitPos - SPLITBAR_WIDTH);
 	rect.bottom >>= 1;
@@ -348,14 +347,14 @@ VOID BrushTmpleResize( HWND hPrntWnd, LPRECT pstFrame )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	ƒc[ƒ‹ƒo[ƒTƒuƒNƒ‰ƒX
-	WindowsXP‚ÅAƒc[ƒ‹ƒo[‚Ìƒ{ƒ^ƒ“ã‚Åƒ}ƒEƒX‚Ì¶ƒ{ƒ^ƒ“‚ğ‰Ÿ‚µ‚½‚Ü‚Ü‰Eƒ{ƒ^ƒ“‚ğ‰Ÿ‚·‚ÆA
-	‚»‚êˆÈ~‚Ìƒ}ƒEƒX‘€ì‚ğ³í‚Éó‚¯•t‚¯‚È‚­‚È‚éB‚»‚ê‚Ì‘Îô
-	@param[in]	hWnd	eƒEƒCƒ“ƒhƒE‚Ìƒnƒ“ƒhƒ‹
-	@param[in]	msg		ƒEƒCƒ“ƒhƒEƒƒbƒZ[ƒW‚Ì¯•Ê”Ô†
-	@param[in]	wParam	’Ç‰Á‚Ìî•ñ‚P
-	@param[in]	lParam	’Ç‰Á‚Ìî•ñ‚Q
-	@return	ˆ—‚µ‚½Œ‹‰Ê‚Æ‚©
+	ãƒ„ãƒ¼ãƒ«ãƒãƒ¼ã‚µãƒ–ã‚¯ãƒ©ã‚¹
+	WindowsXPã§ã€ãƒ„ãƒ¼ãƒ«ãƒãƒ¼ã®ãƒœã‚¿ãƒ³ä¸Šã§ãƒã‚¦ã‚¹ã®å·¦ãƒœã‚¿ãƒ³ã‚’æŠ¼ã—ãŸã¾ã¾å³ãƒœã‚¿ãƒ³ã‚’æŠ¼ã™ã¨ã€
+	ãã‚Œä»¥é™ã®ãƒã‚¦ã‚¹æ“ä½œã‚’æ­£å¸¸ã«å—ã‘ä»˜ã‘ãªããªã‚‹ã€‚ãã‚Œã®å¯¾ç­–
+	@param[in]	hWnd	è¦ªã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ã®ãƒãƒ³ãƒ‰ãƒ«
+	@param[in]	msg		ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã®è­˜åˆ¥ç•ªå·
+	@param[in]	wParam	è¿½åŠ ã®æƒ…å ±ï¼‘
+	@param[in]	lParam	è¿½åŠ ã®æƒ…å ±ï¼’
+	@return	å‡¦ç†ã—ãŸçµæœã¨ã‹
 */
 LRESULT CALLBACK gpfToolbarProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
 {
@@ -373,13 +372,13 @@ LRESULT CALLBACK gpfToolbarProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 
 
 /*!
-	ƒEƒCƒ“ƒhƒEƒvƒƒV[ƒWƒƒ
-	@param[in]	hWnd	eƒEƒCƒ“ƒhƒE‚Ìƒnƒ“ƒhƒ‹
-	@param[in]	message	ƒEƒCƒ“ƒhƒEƒƒbƒZ[ƒW‚Ì¯•Ê”Ô†
-	@param[in]	wParam	’Ç‰Á‚Ìî•ñ‚P
-	@param[in]	lParam	’Ç‰Á‚Ìî•ñ‚Q
-	@retval 0	ƒƒbƒZ[ƒWˆ—Ï‚İ
-	@retval no0	‚±‚±‚Å‚Íˆ—‚¹‚¸Ÿ‚É‰ñ‚·
+	ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ãƒ—ãƒ­ã‚·ãƒ¼ã‚¸ãƒ£
+	@param[in]	hWnd	è¦ªã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ã®ãƒãƒ³ãƒ‰ãƒ«
+	@param[in]	message	ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã®è­˜åˆ¥ç•ªå·
+	@param[in]	wParam	è¿½åŠ ã®æƒ…å ±ï¼‘
+	@param[in]	lParam	è¿½åŠ ã®æƒ…å ±ï¼’
+	@retval 0	ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸å‡¦ç†æ¸ˆã¿
+	@retval no0	ã“ã“ã§ã¯å‡¦ç†ã›ãšæ¬¡ã«å›ã™
 */
 LRESULT CALLBACK BrushTmpleProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam )
 {
@@ -387,7 +386,7 @@ LRESULT CALLBACK BrushTmpleProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM 
 	{
 		HANDLE_MSG( hWnd, WM_SIZE,        Btp_OnSize );	
 		HANDLE_MSG( hWnd, WM_COMMAND,     Btp_OnCommand );	
-		HANDLE_MSG( hWnd, WM_NOTIFY,      Btp_OnNotify );	//	ƒRƒ‚ƒ“ƒRƒ“ƒgƒ[ƒ‹‚ÌŒÂ•ÊƒCƒxƒ“ƒg
+		HANDLE_MSG( hWnd, WM_NOTIFY,      Btp_OnNotify );	//	ã‚³ãƒ¢ãƒ³ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ«ã®å€‹åˆ¥ã‚¤ãƒ™ãƒ³ãƒˆ
 		HANDLE_MSG( hWnd, WM_CONTEXTMENU, Btp_OnContextMenu );
 
 		case WM_MOUSEWHEEL:	SendMessage( ghLvItemWnd, WM_MOUSEWHEEL, wParam, lParam );	return 0;
@@ -405,7 +404,7 @@ LRESULT CALLBACK BrushTmpleProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM 
 				SendMessage( ghBrTlBarWnd, TB_SETSTATE, IDM_BRUSH_ON_OFF, (TBSTATE_CHECKED | TBSTATE_ENABLED) );
 				gbBrushMode = TRUE;
 			}
-			ViewBrushStyleSetting( gbBrushMode, NULL );	//	ƒrƒ…[ƒEƒCƒ“ƒhƒE‚Éƒ‚[ƒh•t‚¯‚é
+			ViewBrushStyleSetting( gbBrushMode, NULL );	//	ãƒ“ãƒ¥ãƒ¼ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ã«ãƒ¢ãƒ¼ãƒ‰ä»˜ã‘ã‚‹
 			return gbBrushMode;
 
 		default:	break;
@@ -416,12 +415,12 @@ LRESULT CALLBACK BrushTmpleProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM 
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	COMMANDƒƒbƒZ[ƒW‚Ìó‚¯æ‚èBƒ{ƒ^ƒ“‰Ÿ‚³‚ê‚½‚Æ‚©‚Å”­¶
-	@param[in]	hWnd		ƒEƒCƒ“ƒhƒEƒnƒ“ƒhƒ‹
-	@param[in]	id			ƒƒbƒZ[ƒW‚ğ”­¶‚³‚¹‚½qƒEƒCƒ“ƒhƒE‚Ì¯•Êq	LOWORD(wParam)
-	@param[in]	hWndCtl		ƒƒbƒZ[ƒW‚ğ”­¶‚³‚¹‚½qƒEƒCƒ“ƒhƒE‚Ìƒnƒ“ƒhƒ‹	lParam
-	@param[in]	codeNotify	’Ê’mƒƒbƒZ[ƒW	HIWORD(wParam)
-	@return		‚È‚µ
+	COMMANDãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã®å—ã‘å–ã‚Šã€‚ãƒœã‚¿ãƒ³æŠ¼ã•ã‚ŒãŸã¨ã‹ã§ç™ºç”Ÿ
+	@param[in]	hWnd		ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ãƒãƒ³ãƒ‰ãƒ«
+	@param[in]	id			ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’ç™ºç”Ÿã•ã›ãŸå­ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ã®è­˜åˆ¥å­	LOWORD(wParam)
+	@param[in]	hWndCtl		ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’ç™ºç”Ÿã•ã›ãŸå­ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ã®ãƒãƒ³ãƒ‰ãƒ«	lParam
+	@param[in]	codeNotify	é€šçŸ¥ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸	HIWORD(wParam)
+	@return		ãªã—
 */
 VOID Btp_OnCommand( HWND hWnd, INT id, HWND hWndCtl, UINT codeNotify )
 {
@@ -435,17 +434,17 @@ VOID Btp_OnCommand( HWND hWnd, INT id, HWND hWndCtl, UINT codeNotify )
 
 	switch( id )
 	{
-		case IDCB_BT_CATEGORY:	//	ƒJƒeƒSƒŠ‘I‘ğƒRƒ“ƒ{ƒbƒNƒX
+		case IDCB_BT_CATEGORY:	//	ã‚«ãƒ†ã‚´ãƒªé¸æŠã‚³ãƒ³ãƒœãƒƒã‚¯ã‚¹
 			if( 0 < gvcBrTmpls.size() )
 			{
-				if( CBN_SELCHANGE == codeNotify )	//	‘I‘ğ•ÏX‚³‚ê‚½‚ç
+				if( CBN_SELCHANGE == codeNotify )	//	é¸æŠå¤‰æ›´ã•ã‚ŒãŸã‚‰
 				{
 					rslt = ComboBox_GetCurSel( ghCtgryBxWnd );
 					gNowGroup = rslt;
 
 					BrushTmpleItemListOn( rslt );
 
-					//	Brush‰ğœ
+					//	Brushè§£é™¤
 					gbBrushMode = FALSE;
 					SendMessage( ghBrTlBarWnd, TB_SETSTATE, IDM_BRUSH_ON_OFF, TBSTATE_ENABLED );
 					StringCchCopy( atItem, SUB_STRING, gvcBrTmpls.at( gNowGroup ).vcItems.at( 0 ).c_str( ) );
@@ -454,10 +453,10 @@ VOID Btp_OnCommand( HWND hWnd, INT id, HWND hWndCtl, UINT codeNotify )
 			}
 			break;
 
-		case IDM_BRUSH_ON_OFF:	//	‚±‚±‚É—ˆ‚é“_‚ÅON/OFFØ‚è‘Ö‚í‚Á‚Ä‚é
+		case IDM_BRUSH_ON_OFF:	//	ã“ã“ã«æ¥ã‚‹æ™‚ç‚¹ã§ON/OFFåˆ‡ã‚Šæ›¿ã‚ã£ã¦ã‚‹
 			lRslt = SendMessage( ghBrTlBarWnd, TB_GETSTATE, IDM_BRUSH_ON_OFF, 0 );
 			gbBrushMode = (lRslt & TBSTATE_CHECKED) ? TRUE : FALSE;
-			ViewBrushStyleSetting( gbBrushMode, NULL );	//	ó‘Ô‚ğ‚¨‚­‚é
+			ViewBrushStyleSetting( gbBrushMode, NULL );	//	çŠ¶æ…‹ã‚’ãŠãã‚‹
 			break;
 
 		case  IDM_WINDOW_CHANGE:	WindowFocusChange( WND_BRUSH,  1 );	break;
@@ -492,7 +491,7 @@ VOID Btp_OnCommand( HWND hWnd, INT id, HWND hWndCtl, UINT codeNotify )
 			}
 			break;
 
-		case IDM_TOPMOST_TOGGLE:	//	íÅ‘S–Ê‚Æ’ÊíƒEƒCƒ“ƒhƒE‚ÌƒgƒOƒ‹
+		case IDM_TOPMOST_TOGGLE:	//	å¸¸æ™‚æœ€å…¨é¢ã¨é€šå¸¸ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ã®ãƒˆã‚°ãƒ«
 			rdExStyle = GetWindowLongPtr( hWnd, GWL_EXSTYLE );
 			if( WS_EX_TOPMOST & rdExStyle )
 			{
@@ -506,7 +505,7 @@ VOID Btp_OnCommand( HWND hWnd, INT id, HWND hWndCtl, UINT codeNotify )
 			}
 			break;
 
-		//	ƒeƒ“ƒvƒŒƒtƒ@ƒCƒ‹ƒŠƒ[ƒh
+		//	ãƒ†ãƒ³ãƒ—ãƒ¬ãƒ•ã‚¡ã‚¤ãƒ«ãƒªãƒ­ãƒ¼ãƒ‰
 		case IDM_TMPLT_RELOAD:	BrushTmpleItemReload( hWnd );	break;
 
 		default:	break;
@@ -517,11 +516,11 @@ VOID Btp_OnCommand( HWND hWnd, INT id, HWND hWndCtl, UINT codeNotify )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	ƒTƒCƒY•ÏX‚³‚ê‚½
-	@param[in]	hWnd	ƒEƒCƒ“ƒhƒEƒnƒ“ƒhƒ‹
-	@param[in]	state	‚È‚É‚©‚Ìó‘Ô
-	@param[in]	cx		•ÏX‚³‚ê‚½ƒNƒ‰ƒCƒ„ƒ“ƒg•
-	@param[in]	cy		•ÏX‚³‚ê‚½ƒNƒ‰ƒCƒ„ƒ“ƒg‚‚³
+	ã‚µã‚¤ã‚ºå¤‰æ›´ã•ã‚ŒãŸ
+	@param[in]	hWnd	ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ãƒãƒ³ãƒ‰ãƒ«
+	@param[in]	state	ãªã«ã‹ã®çŠ¶æ…‹
+	@param[in]	cx		å¤‰æ›´ã•ã‚ŒãŸã‚¯ãƒ©ã‚¤ãƒ¤ãƒ³ãƒˆå¹…
+	@param[in]	cy		å¤‰æ›´ã•ã‚ŒãŸã‚¯ãƒ©ã‚¤ãƒ¤ãƒ³ãƒˆé«˜ã•
 */
 VOID Btp_OnSize( HWND hWnd, UINT state, INT cx, INT cy )
 {
@@ -530,7 +529,7 @@ VOID Btp_OnSize( HWND hWnd, UINT state, INT cx, INT cy )
 	RECT	cbxRect, tbrRect, rect;
 
 	if( !(ghBrTlBarWnd) )	return;
-	MoveWindow( ghBrTlBarWnd, 0, 0, 0, 0, TRUE );	//	ƒc[ƒ‹ƒo[‚Í”’l‚È‚­‚Ä‚àŸè‚É‡‚í‚¹‚Ä‚­‚ê‚é
+	MoveWindow( ghBrTlBarWnd, 0, 0, 0, 0, TRUE );	//	ãƒ„ãƒ¼ãƒ«ãƒãƒ¼ã¯æ•°å€¤ãªãã¦ã‚‚å‹æ‰‹ã«åˆã‚ã›ã¦ãã‚Œã‚‹
 	GetClientRect( ghBrTlBarWnd, &tbrRect );
 
 	if( !(ghCtgryBxWnd) )	return;
@@ -554,11 +553,11 @@ VOID Btp_OnSize( HWND hWnd, UINT state, INT cx, INT cy )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	ƒm[ƒeƒBƒtƒ@ƒCƒƒbƒZ[ƒW‚Ìˆ—
-	@param[in]	hWnd		eƒEƒCƒ“ƒhƒE‚Ìƒnƒ“ƒhƒ‹
-	@param[in]	idFrom		NOTIFY‚ğ”­¶‚³‚¹‚½ƒRƒ“ƒgƒ[ƒ‹‚Ì‚h‚c
-	@param[in]	pstNmhdr	NOTIFY‚ÌÚ×
-	@return		ˆ—‚µ‚½“à—e‚Æ‚©
+	ãƒãƒ¼ãƒ†ã‚£ãƒ•ã‚¡ã‚¤ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã®å‡¦ç†
+	@param[in]	hWnd		è¦ªã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ã®ãƒãƒ³ãƒ‰ãƒ«
+	@param[in]	idFrom		NOTIFYã‚’ç™ºç”Ÿã•ã›ãŸã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ«ã®ï¼©ï¼¤
+	@param[in]	pstNmhdr	NOTIFYã®è©³ç´°
+	@return		å‡¦ç†ã—ãŸå†…å®¹ã¨ã‹
 */
 LRESULT Btp_OnNotify( HWND hWnd, INT idFrom, LPNMHDR pstNmhdr )
 {
@@ -583,7 +582,7 @@ LRESULT Btp_OnNotify( HWND hWnd, INT idFrom, LPNMHDR pstNmhdr )
 		iSubItem = stHitTestInfo.iSubItem;
 		iPos = iItem * gBrhClmCnt + iSubItem;
 
-		//	•’Ê‚ÌƒNƒ‹ƒbƒN‚É‚Â‚¢‚Ä
+		//	æ™®é€šã®ã‚¯ãƒ«ãƒƒã‚¯ã«ã¤ã„ã¦
 		if( NM_CLICK == nmCode )
 		{
 			TRACE( TEXT("BRUSH TMPL[%d x %d]"), iItem, iSubItem );
@@ -592,17 +591,17 @@ LRESULT Btp_OnNotify( HWND hWnd, INT idFrom, LPNMHDR pstNmhdr )
 			{
 				items = gvcBrTmpls.at( gNowGroup ).vcItems.size( );
 
-				if( 0 <= iPos && iPos <  items )	//	‚È‚ñ‚©‘I‘ğ‚µ‚½
+				if( 0 <= iPos && iPos <  items )	//	ãªã‚“ã‹é¸æŠã—ãŸ
 				{
 					StringCchCopy( atItem, SUB_STRING, gvcBrTmpls.at( gNowGroup ).vcItems.at( iPos ).c_str( ) );
 
-					//	ƒuƒ‰ƒVƒZƒbƒg
+					//	ãƒ–ãƒ©ã‚·ã‚»ãƒƒãƒˆ
 					gbBrushMode = TRUE;
 					SendMessage( ghBrTlBarWnd, TB_SETSTATE, IDM_BRUSH_ON_OFF, (TBSTATE_CHECKED | TBSTATE_ENABLED) );
-					//	ƒrƒ…[ƒEƒCƒ“ƒhƒE‚Éƒ‚[ƒh•t‚¯‚é
+					//	ãƒ“ãƒ¥ãƒ¼ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ã«ãƒ¢ãƒ¼ãƒ‰ä»˜ã‘ã‚‹
 					ViewBrushStyleSetting( gbBrushMode, atItem );
 
-					ViewFocusSet(  );	//	20110720	ƒtƒH[ƒJƒX‚ğ•`‰æ‚É–ß‚·
+					ViewFocusSet(  );	//	20110720	ãƒ•ã‚©ãƒ¼ã‚«ã‚¹ã‚’æç”»ã«æˆ»ã™
 				}
 			}
 			else
@@ -612,17 +611,17 @@ LRESULT Btp_OnNotify( HWND hWnd, INT idFrom, LPNMHDR pstNmhdr )
 		}
 	}
 
-	return 0;	//	‰½‚à‚È‚¢‚È‚ç‚O‚ğ–ß‚·
+	return 0;	//	ä½•ã‚‚ãªã„ãªã‚‰ï¼ã‚’æˆ»ã™
 }
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	ƒRƒ“ƒeƒLƒXƒgƒƒjƒ…[ŒÄ‚Ñ‚¾‚µƒAƒNƒVƒ‡ƒ“(—v‚Í‰EƒNƒ‹ƒbƒNj
-	@param[in]	hWnd		ƒEƒCƒ“ƒhƒEƒnƒ“ƒhƒ‹
-	@param[in]	hWndContext	ƒRƒ“ƒeƒLƒXƒg‚ª”­¶‚µ‚½ƒEƒCƒ“ƒhƒE‚Ìƒnƒ“ƒhƒ‹
-	@param[in]	xPos		ƒXƒNƒŠ[ƒ“‚wÀ•W
-	@param[in]	yPos		ƒXƒNƒŠ[ƒ“‚xÀ‹Æ
-	@return		–³‚µ
+	ã‚³ãƒ³ãƒ†ã‚­ã‚¹ãƒˆãƒ¡ãƒ‹ãƒ¥ãƒ¼å‘¼ã³ã ã—ã‚¢ã‚¯ã‚·ãƒ§ãƒ³(è¦ã¯å³ã‚¯ãƒ«ãƒƒã‚¯ï¼‰
+	@param[in]	hWnd		ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ãƒãƒ³ãƒ‰ãƒ«
+	@param[in]	hWndContext	ã‚³ãƒ³ãƒ†ã‚­ã‚¹ãƒˆãŒç™ºç”Ÿã—ãŸã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ã®ãƒãƒ³ãƒ‰ãƒ«
+	@param[in]	xPos		ã‚¹ã‚¯ãƒªãƒ¼ãƒ³ï¼¸åº§æ¨™
+	@param[in]	yPos		ã‚¹ã‚¯ãƒªãƒ¼ãƒ³ï¼¹åº§æ¥­
+	@return		ç„¡ã—
 */
 VOID Btp_OnContextMenu( HWND hWnd, HWND hWndContext, UINT xPos, UINT yPos )
 {
@@ -632,20 +631,20 @@ VOID Btp_OnContextMenu( HWND hWnd, HWND hWndContext, UINT xPos, UINT yPos )
 
 	POINT	stPoint;
 
-	stPoint.x = (SHORT)xPos;	//	‰æ–ÊÀ•W‚Íƒ}ƒCƒiƒX‚à‚ ‚è‚¤‚é
+	stPoint.x = (SHORT)xPos;	//	ç”»é¢åº§æ¨™ã¯ãƒã‚¤ãƒŠã‚¹ã‚‚ã‚ã‚Šã†ã‚‹
 	stPoint.y = (SHORT)yPos;
 
 	hMenu = LoadMenu( GetModuleHandle(NULL), MAKEINTRESOURCE(IDM_TEMPLATE_POPUP) );
 	hSubMenu = GetSubMenu( hMenu, 0 );
 
-	//	ˆê‘Ì‰»‚È‚çè‘O•\¦‚ğíœ
+	//	ä¸€ä½“åŒ–ãªã‚‰æ‰‹å‰è¡¨ç¤ºã‚’å‰Šé™¤
 	if( gbTmpltDock ){	DeleteMenu( hSubMenu, IDM_TOPMOST_TOGGLE, MF_BYCOMMAND );	}
 
 	rdExStyle = GetWindowLongPtr( hWnd, GWL_EXSTYLE );
 	if( WS_EX_TOPMOST & rdExStyle ){	CheckMenuItem( hSubMenu , IDM_TOPMOST_TOGGLE, MF_BYCOMMAND | MF_CHECKED );	}
 
 	dRslt = TrackPopupMenu( hSubMenu, 0, stPoint.x, stPoint.y, 0, hWnd, NULL );
-	//	‘I‘ğ‚¹‚¸‚Å‚O‚©|‚PHA‘I‘ğ‚µ‚½‚ç‚»‚Ìƒƒjƒ…[‚Ì‚h‚c‚ÅWM_COMMAND‚ª”­s
+	//	é¸æŠã›ãšã§ï¼ã‹ï¼ï¼‘ï¼Ÿã€é¸æŠã—ãŸã‚‰ãã®ãƒ¡ãƒ‹ãƒ¥ãƒ¼ã®ï¼©ï¼¤ã§WM_COMMANDãŒç™ºè¡Œ
 	DestroyMenu( hMenu );
 
 	return;
@@ -653,28 +652,28 @@ VOID Btp_OnContextMenu( HWND hWnd, HWND hWndContext, UINT xPos, UINT yPos )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	ƒZƒbƒg–¼Ì‚ÆA“à—e•¨i‚Ç‚Á‚¿‚©‚Ì‚İ—LŒøj‚ğˆës‚Ã‚Âó‚¯æ‚é
-	@param[in]	ptName	ƒZƒbƒg–¼ÌE–³Œø‚È‚çNULLE‚±‚Á‚¿‚Ì‘¶İ—Dæ
-	@param[in]	ptLine	€–Ú‚Ì“à—eE–³Œø‚È‚çNULLE—¼•ûNULL‚Å––’[ˆ—
-	@param[in]	cchSize	‚Ç‚Á‚¿‚©‚Ì“à—e‚Ì•¶š”
-	@return		“Á‚ÉˆÓ–¡‚Í‚È‚¢
+	ã‚»ãƒƒãƒˆåç§°ã¨ã€å†…å®¹ç‰©ï¼ˆã©ã£ã¡ã‹ã®ã¿æœ‰åŠ¹ï¼‰ã‚’å£±è¡Œã¥ã¤å—ã‘å–ã‚‹
+	@param[in]	ptName	ã‚»ãƒƒãƒˆåç§°ãƒ»ç„¡åŠ¹ãªã‚‰NULLãƒ»ã“ã£ã¡ã®å­˜åœ¨å„ªå…ˆ
+	@param[in]	ptLine	é …ç›®ã®å†…å®¹ãƒ»ç„¡åŠ¹ãªã‚‰NULLãƒ»ä¸¡æ–¹NULLã§æœ«ç«¯å‡¦ç†
+	@param[in]	cchSize	ã©ã£ã¡ã‹ã®å†…å®¹ã®æ–‡å­—æ•°
+	@return		ç‰¹ã«æ„å‘³ã¯ãªã„
 */
 UINT CALLBACK BrushTmpleItemData( LPTSTR ptName, LPCTSTR ptLine, INT cchSize )
 {
-//	—¼•ûNULL‚¾‚Á‚½‚çA–{‘Ì‚É’Ç‰Áˆ—‚ğ‚·‚ê
+//	ä¸¡æ–¹NULLã ã£ãŸã‚‰ã€æœ¬ä½“ã«è¿½åŠ å‡¦ç†ã‚’ã™ã‚Œ
 	static AATEMPLATE	cstItem;
 
 
-	if( ptName )	//	ƒZƒbƒg–¼ÌEŠJn‚Å‚à‚ ‚é
+	if( ptName )	//	ã‚»ãƒƒãƒˆåç§°ãƒ»é–‹å§‹ã§ã‚‚ã‚ã‚‹
 	{
 		StringCchCopy( cstItem.atCtgryName, SUB_STRING, ptName );
 		cstItem.vcItems.clear(  );
 	}
-	else if( ptLine )	//	–{‘Ìƒf[ƒ^
+	else if( ptLine )	//	æœ¬ä½“ãƒ‡ãƒ¼ã‚¿
 	{
 		cstItem.vcItems.push_back( wstring( ptLine ) );
 	}
-	else	//	‚Ç‚Á‚¿‚àNULLAƒZƒbƒgI—¹
+	else	//	ã©ã£ã¡ã‚‚NULLã€ã‚»ãƒƒãƒˆçµ‚äº†
 	{
 		gvcBrTmpls.push_back( cstItem );
 	}
@@ -684,9 +683,9 @@ UINT CALLBACK BrushTmpleItemData( LPTSTR ptName, LPCTSTR ptLine, INT cchSize )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	ƒAƒCƒeƒ€‚ğƒŠƒXƒg‚É“WŠJ
-	@param[in]	listNum	“WŠJ‚µ‚½‚¢ƒZƒbƒg”Ô†E‚OƒCƒ“ƒfƒbƒNƒX
-	@return	UINT	ƒAƒCƒeƒ€‚ÌŒÂ”
+	ã‚¢ã‚¤ãƒ†ãƒ ã‚’ãƒªã‚¹ãƒˆã«å±•é–‹
+	@param[in]	listNum	å±•é–‹ã—ãŸã„ã‚»ãƒƒãƒˆç•ªå·ãƒ»ï¼ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹
+	@return	UINT	ã‚¢ã‚¤ãƒ†ãƒ ã®å€‹æ•°
 */
 UINT BrushTmpleItemListOn( UINT listNum )
 {
@@ -720,7 +719,7 @@ UINT BrushTmpleItemListOn( UINT listNum )
 		else						ListView_SetItem( ghLvItemWnd, &stLvi );
 	}
 
-	//	ƒuƒ`‚±‚ñ‚¾‚ç•’²®
+	//	ãƒ–ãƒã“ã‚“ã ã‚‰å¹…èª¿æ•´
 	GetClientRect( ghLvItemWnd, &rect );
 	width = rect.right / gBrhClmCnt;
 	for( i = 0; gBrhClmCnt > i; i++ ){	ListView_SetColumnWidth( ghLvItemWnd, i, width );	}
@@ -731,26 +730,26 @@ UINT BrushTmpleItemListOn( UINT listNum )
 
 
 /*!
-	ƒAƒCƒeƒ€ƒtƒ@ƒCƒ‹Å“Ç
-	@param[in]	hWnd		ƒEƒCƒ“ƒhƒEƒnƒ“ƒhƒ‹
-	@return		HRESULT	I—¹ó‘ÔƒR[ƒh
+	ã‚¢ã‚¤ãƒ†ãƒ ãƒ•ã‚¡ã‚¤ãƒ«æœ€èª­è¾¼
+	@param[in]	hWnd		ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ãƒãƒ³ãƒ‰ãƒ«
+	@return		HRESULT	çµ‚äº†çŠ¶æ…‹ã‚³ãƒ¼ãƒ‰
 */
 HRESULT BrushTmpleItemReload( HWND hWnd )
 {
 	TEMPL_ITR	itTmpl;
 
-	gNowGroup = 0;	//	‚Æ‚è‚ ‚¦‚¸‚O‚É–ß‚·
+	gNowGroup = 0;	//	ã¨ã‚Šã‚ãˆãšï¼ã«æˆ»ã™
 
-	gbBrushMode = 0;	//	‘I‘ğÁ‚µ‚Ä‹ó‚É‚µ‚Ä‚¨‚­
+	gbBrushMode = 0;	//	é¸æŠæ¶ˆã—ã¦ç©ºã«ã—ã¦ãŠã
 	ViewBrushStyleSetting( gbBrushMode, TEXT("") );
 
 	for( itTmpl = gvcBrTmpls.begin( );  gvcBrTmpls.end( ) != itTmpl; itTmpl++ ){	itTmpl->vcItems.clear();	}
-	gvcBrTmpls.clear(  );	//	ˆê’U“à—e”j‰ó
+	gvcBrTmpls.clear(  );	//	ä¸€æ—¦å†…å®¹ç ´å£Š
 	
-	//	ƒJƒeƒSƒŠƒRƒ“ƒ{ƒbƒNƒX‚Ì’†g‚ğ‘S”j‰ó
+	//	ã‚«ãƒ†ã‚´ãƒªã‚³ãƒ³ãƒœãƒƒã‚¯ã‚¹ã®ä¸­èº«ã‚’å…¨ç ´å£Š
 	while( ComboBox_GetCount( ghCtgryBxWnd )  ){	ComboBox_DeleteString( ghCtgryBxWnd, 0 );	}
 
-	TemplateItemLoad( AA_BRUSH_FILE, BrushTmpleItemData );	//	Ä‚Ñƒ[ƒh
+	TemplateItemLoad( AA_BRUSH_FILE, BrushTmpleItemData );	//	å†ã³ãƒ­ãƒ¼ãƒ‰
 
 	for( itTmpl = gvcBrTmpls.begin( );  gvcBrTmpls.end( ) != itTmpl; itTmpl++ )
 	{
@@ -758,7 +757,7 @@ HRESULT BrushTmpleItemReload( HWND hWnd )
 	}
 	ComboBox_SetCurSel( ghCtgryBxWnd, 0 );
 
-	BrushTmpleItemListOn( 0 );	//	‚O•Å‚ğ•\¦
+	BrushTmpleItemListOn( 0 );	//	ï¼é ã‚’è¡¨ç¤º
 
 	return S_OK;
 }
@@ -766,11 +765,11 @@ HRESULT BrushTmpleItemReload( HWND hWnd )
 
 
 /*!
-	ƒJƒeƒSƒŠƒRƒ“ƒ{ƒbƒNƒXƒTƒuƒNƒ‰ƒX
-	@param[in]	hWnd	ƒEƒCƒ“ƒhƒEƒnƒ“ƒhƒ‹
-	@param[in]	msg		ƒEƒCƒ“ƒhƒEƒƒbƒZ[ƒW‚Ì¯•Ê”Ô†
-	@param[in]	wParam	’Ç‰Á‚Ìî•ñ‚P
-	@param[in]	lParam	’Ç‰Á‚Ìî•ñ‚Q
+	ã‚«ãƒ†ã‚´ãƒªã‚³ãƒ³ãƒœãƒƒã‚¯ã‚¹ã‚µãƒ–ã‚¯ãƒ©ã‚¹
+	@param[in]	hWnd	ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ãƒãƒ³ãƒ‰ãƒ«
+	@param[in]	msg		ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã®è­˜åˆ¥ç•ªå·
+	@param[in]	wParam	è¿½åŠ ã®æƒ…å ±ï¼‘
+	@param[in]	lParam	è¿½åŠ ã®æƒ…å ±ï¼’
 */
 LRESULT CALLBACK gpfBrushCtgryProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
 {
@@ -803,11 +802,11 @@ LRESULT CALLBACK gpfBrushCtgryProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM l
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	ƒAƒCƒeƒ€ƒŠƒXƒgƒrƒ…[ƒTƒuƒNƒ‰ƒX
-	@param[in]	hWnd	ƒEƒCƒ“ƒhƒEƒnƒ“ƒhƒ‹
-	@param[in]	msg		ƒEƒCƒ“ƒhƒEƒƒbƒZ[ƒW‚Ì¯•Ê”Ô†
-	@param[in]	wParam	’Ç‰Á‚Ìî•ñ‚P
-	@param[in]	lParam	’Ç‰Á‚Ìî•ñ‚Q
+	ã‚¢ã‚¤ãƒ†ãƒ ãƒªã‚¹ãƒˆãƒ“ãƒ¥ãƒ¼ã‚µãƒ–ã‚¯ãƒ©ã‚¹
+	@param[in]	hWnd	ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ãƒãƒ³ãƒ‰ãƒ«
+	@param[in]	msg		ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã®è­˜åˆ¥ç•ªå·
+	@param[in]	wParam	è¿½åŠ ã®æƒ…å ±ï¼‘
+	@param[in]	lParam	è¿½åŠ ã®æƒ…å ±ï¼’
 */
 LRESULT CALLBACK gpfBrushItemProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
 {
@@ -815,7 +814,7 @@ LRESULT CALLBACK gpfBrushItemProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lP
 
 	switch( msg )
 	{
-		HANDLE_MSG( hWnd, WM_NOTIFY, Blv_OnNotify );	//	ƒRƒ‚ƒ“ƒRƒ“ƒgƒ[ƒ‹‚ÌŒÂ•ÊƒCƒxƒ“ƒg
+		HANDLE_MSG( hWnd, WM_NOTIFY, Blv_OnNotify );	//	ã‚³ãƒ¢ãƒ³ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ«ã®å€‹åˆ¥ã‚¤ãƒ™ãƒ³ãƒˆ
 
 		case WM_COMMAND:
 			id = LOWORD(wParam);
@@ -838,11 +837,11 @@ LRESULT CALLBACK gpfBrushItemProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lP
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	ƒm[ƒeƒBƒtƒ@ƒCƒƒbƒZ[ƒW‚Ìˆ—
-	@param[in]	hWnd		eƒEƒCƒ“ƒhƒE‚Ìƒnƒ“ƒhƒ‹
-	@param[in]	idFrom		NOTIFY‚ğ”­¶‚³‚¹‚½ƒRƒ“ƒgƒ[ƒ‹‚Ì‚h‚c
-	@param[in]	pstNmhdr	NOTIFY‚ÌÚ×
-	@return		ˆ—‚µ‚½“à—e‚Æ‚©
+	ãƒãƒ¼ãƒ†ã‚£ãƒ•ã‚¡ã‚¤ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã®å‡¦ç†
+	@param[in]	hWnd		è¦ªã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ã®ãƒãƒ³ãƒ‰ãƒ«
+	@param[in]	idFrom		NOTIFYã‚’ç™ºç”Ÿã•ã›ãŸã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ«ã®ï¼©ï¼¤
+	@param[in]	pstNmhdr	NOTIFYã®è©³ç´°
+	@return		å‡¦ç†ã—ãŸå†…å®¹ã¨ã‹
 */
 LRESULT Blv_OnNotify( HWND hWnd, INT idFrom, LPNMHDR pstNmhdr )
 {
@@ -856,7 +855,7 @@ LRESULT Blv_OnNotify( HWND hWnd, INT idFrom, LPNMHDR pstNmhdr )
 
 	pstLv = (LPNMLISTVIEW)pstNmhdr;
 
-	//	ƒŠƒXƒgƒrƒ…[©‘Ì‚ÌƒvƒƒV[ƒWƒƒ‚È‚Ì‚Å
+	//	ãƒªã‚¹ãƒˆãƒ“ãƒ¥ãƒ¼è‡ªä½“ã®ãƒ—ãƒ­ã‚·ãƒ¼ã‚¸ãƒ£ãªã®ã§
 	hLvWnd = hWnd;
 	nmCode = pstLv->hdr.code;
 
@@ -884,7 +883,7 @@ LRESULT Blv_OnNotify( HWND hWnd, INT idFrom, LPNMHDR pstNmhdr )
 			{
 				items = gvcBrTmpls.at( gNowGroup ).vcItems.size( );
 
-				if( 0 <= iPos && iPos <  items )	//	‚È‚ñ‚©‘I‘ğ‚µ‚½
+				if( 0 <= iPos && iPos <  items )	//	ãªã‚“ã‹é¸æŠã—ãŸ
 				{
 					StringCchCopy( atItem, SUB_STRING, gvcBrTmpls.at( gNowGroup ).vcItems.at( iPos ).c_str( ) );
 					iDot = ViewStringWidthGet( atItem );

@@ -1,6 +1,6 @@
-/*! @file
-	@brief •¶š‚Ì’Ç‰ÁíœŒn‚Ì–Ê“|‚İ‚Ü‚·
-	‚±‚Ìƒtƒ@ƒCƒ‹‚Í DocInsDelCtrl.cpp ‚Å‚·B
+ï»¿/*! @file
+	@brief æ–‡å­—ã®è¿½åŠ å‰Šé™¤ç³»ã®é¢å€’ã¿ã¾ã™
+	ã“ã®ãƒ•ã‚¡ã‚¤ãƒ«ã¯ DocInsDelCtrl.cpp ã§ã™ã€‚
 	@author	SikigamiHNQ
 	@date	2011/04/24
 */
@@ -23,27 +23,27 @@ If not, see <http://www.gnu.org/licenses/>.
 
 typedef struct tagPAGENUMINFO
 {
-	UINT	dStartNum;	//	ŠJn”Ô†
-	UINT	bInUnder;	//	”ñ‚O•Å‰º•”@‚O•Åæ“ª
-	UINT	bOverride;	//	s“à—e‚Éã‘
-	TCHAR	atStyle[MAX_PATH];	//	‘®
+	UINT	dStartNum;	//	é–‹å§‹ç•ªå·
+	UINT	bInUnder;	//	éï¼é ä¸‹éƒ¨ã€€ï¼é å…ˆé ­
+	UINT	bOverride;	//	è¡Œå†…å®¹ã«ä¸Šæ›¸
+	TCHAR	atStyle[MAX_PATH];	//	æ›¸å¼
 
 } PAGENUMINFO, *LPPAGENUMINFO;
 //-------------------------------------------------------------------------------------------------
 
-extern FILES_ITR	gitFileIt;	//	¡Œ©‚Ä‚éƒtƒ@ƒCƒ‹‚Ì–{‘Ì
-//#define gstFile	(*gitFileIt)	//!<	ƒCƒeƒŒ[ƒ^‚ğ\‘¢‘Ì‚ÆŒ©‚È‚·
+extern FILES_ITR	gitFileIt;	//	ä»Šè¦‹ã¦ã‚‹ãƒ•ã‚¡ã‚¤ãƒ«ã®æœ¬ä½“
+//#define gstFile	(*gitFileIt)	//!<	ã‚¤ãƒ†ãƒ¬ãƒ¼ã‚¿ã‚’æ§‹é€ ä½“ã¨è¦‹ãªã™
 
-extern INT		gixFocusPage;	//	’–Ú’†‚Ìƒy[ƒWE‚Æ‚è‚ ‚¦‚¸‚OE‚OƒCƒ“ƒfƒbƒNƒX
+extern INT		gixFocusPage;	//	æ³¨ç›®ä¸­ã®ãƒšãƒ¼ã‚¸ãƒ»ã¨ã‚Šã‚ãˆãšï¼ãƒ»ï¼ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹
 
-extern  UINT	gbUniPad;		//	ƒpƒfƒBƒ“ƒO‚Éƒ†ƒjƒR[ƒh‚ğ‚Â‚©‚Á‚ÄAƒhƒbƒg‚ğŒ©‚¹‚È‚¢‚æ‚¤‚É‚·‚é
-extern  UINT	gbUniRadixHex;	//	ƒ†ƒjƒR[ƒh”’lQÆ‚ª‚P‚Ui”‚Å‚ ‚é‚©
+extern  UINT	gbUniPad;		//	ãƒ‘ãƒ‡ã‚£ãƒ³ã‚°ã«ãƒ¦ãƒ‹ã‚³ãƒ¼ãƒ‰ã‚’ã¤ã‹ã£ã¦ã€ãƒ‰ãƒƒãƒˆã‚’è¦‹ã›ãªã„ã‚ˆã†ã«ã™ã‚‹
+extern  UINT	gbUniRadixHex;	//	ãƒ¦ãƒ‹ã‚³ãƒ¼ãƒ‰æ•°å€¤å‚ç…§ãŒï¼‘ï¼–é€²æ•°ã§ã‚ã‚‹ã‹
 
-extern  UINT	gdRightRuler;	//	‰Eü‚ÌˆÊ’u
+extern  UINT	gdRightRuler;	//	å³ç·šã®ä½ç½®
 //-------------------------------------------------------------------------------------------------
 
 /*
-”ÍˆÍ‘I‘ğ’†‚ÉAALT¶‰E‚µ‚½‚çA‚»‚±‚Ì•”•ª‚ªƒXƒ‰ƒCƒh‚·‚é‚Æ‚©Bˆës‘I‘ğ’†‚Ì‚İH
+ç¯„å›²é¸æŠä¸­ã«ã€ALTå·¦å³ã—ãŸã‚‰ã€ãã“ã®éƒ¨åˆ†ãŒã‚¹ãƒ©ã‚¤ãƒ‰ã™ã‚‹ã¨ã‹ã€‚å£±è¡Œé¸æŠä¸­ã®ã¿ï¼Ÿ
 */
 
 HRESULT	DocInputReturn( INT, INT );
@@ -54,10 +54,10 @@ HRESULT	DocDelayPageNumInsert( FILES_ITR, INT, LPPAGENUMINFO, LPCTSTR );
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	ŠY“–‚Ìƒ†ƒjƒR[ƒh•¶š‚ªAƒVƒtƒgJIS‚É•ÏŠ·o—ˆ‚é‚©‚Ç‚¤‚©Šm”F
-	@param[in]	cchMozi	Šm”F‚µ‚½‚¢•¶šœR
-	@param[out]	pcSjis	•ÏŠ·‚µ‚½Œ‹‰Ê‚ğ“ü‚ê‚éƒoƒbƒtƒ@‚Ö‚Ìƒ|ƒCƒ“ƒ^E‚P‚OƒoƒCƒg‚Æ‚é‚±‚Æ
-	@return				”ñ‚O“]Š·‚Å‚«‚é@‚O–³—
+	è©²å½“ã®ãƒ¦ãƒ‹ã‚³ãƒ¼ãƒ‰æ–‡å­—ãŒã€ã‚·ãƒ•ãƒˆJISã«å¤‰æ›å‡ºæ¥ã‚‹ã‹ã©ã†ã‹ç¢ºèª
+	@param[in]	cchMozi	ç¢ºèªã—ãŸã„æ–‡å­—å½
+	@param[out]	pcSjis	å¤‰æ›ã—ãŸçµæœã‚’å…¥ã‚Œã‚‹ãƒãƒƒãƒ•ã‚¡ã¸ã®ãƒã‚¤ãƒ³ã‚¿ãƒ»ï¼‘ï¼ãƒã‚¤ãƒˆã¨ã‚‹ã“ã¨
+	@return				éï¼è»¢æ›ã§ãã‚‹ã€€ï¼ç„¡ç†
 */
 BOOLEAN DocIsSjisTrance( TCHAR cchMozi, LPSTR pcSjis )
 {
@@ -66,9 +66,9 @@ BOOLEAN DocIsSjisTrance( TCHAR cchMozi, LPSTR pcSjis )
 	BOOL	bCant = FALSE;
 	INT		iRslt;
 /*
-	ƒVƒtƒgJIS‚É‚Å‚«‚È‚¢ƒ†ƒjƒR[ƒh•¶š‚É‚Â‚¢‚Ä
-	WideCharToMultiByte‚ÅA•ÏŠ·•s‰Â‚ª”­¶‚µ‚½ê‡‚Ìƒtƒ‰ƒO‚ğŠm”F‚µ‚ÄA
-	‚»‚¢‚Â‚Íu&#dddd;vu&#xhhhh;v‚É•ÏŠ·‚·‚é‚æ‚¤‚É‚·‚éE
+	ã‚·ãƒ•ãƒˆJISã«ã§ããªã„ãƒ¦ãƒ‹ã‚³ãƒ¼ãƒ‰æ–‡å­—ã«ã¤ã„ã¦
+	WideCharToMultiByteã§ã€å¤‰æ›ä¸å¯ãŒç™ºç”Ÿã—ãŸå ´åˆã®ãƒ•ãƒ©ã‚°ã‚’ç¢ºèªã—ã¦ã€
+	ãã„ã¤ã¯ã€Œ&#dddd;ã€ã€Œ&#xhhhh;ã€ã«å¤‰æ›ã™ã‚‹ã‚ˆã†ã«ã™ã‚‹ãƒ»
 */
 	assert( pcSjis );
 
@@ -79,44 +79,44 @@ BOOLEAN DocIsSjisTrance( TCHAR cchMozi, LPSTR pcSjis )
 
 	if( bCant )
 	{
-	//	TRACE( TEXT("SJIS•s‰Â(%d:%X)"), cchMozi, cchMozi );
+	//	TRACE( TEXT("SJISä¸å¯(%d:%X)"), cchMozi, cchMozi );
 		if( gbUniRadixHex ){	StringCchPrintfA( acSjis, 10, ("&#x%X;"), cchMozi );	}
 		else{					StringCchPrintfA( acSjis, 10, ("&#%d;"),  cchMozi );	}
 	}
 
 #ifdef SPMOZI_ENCODE
-	if( IsSpMozi( cchMozi ) )	//	‹@íˆË‘¶•¶š•ÏŠ·
+	if( IsSpMozi( cchMozi ) )	//	æ©Ÿç¨®ä¾å­˜æ–‡å­—å¤‰æ›
 	{
 		if( gbUniRadixHex ){	StringCchPrintfA( acSjis, 10, ("&#x%X;"), cchMozi );	}
 		else{					StringCchPrintfA( acSjis, 10, ("&#%d;"),  cchMozi );	}
 
-		bCant = TRUE;	//	ƒ†ƒjƒR[ƒh‚Ì‚İ•¶š‚Æ‚µ‚Äˆµ‚¤
+		bCant = TRUE;	//	ãƒ¦ãƒ‹ã‚³ãƒ¼ãƒ‰ã®ã¿æ–‡å­—ã¨ã—ã¦æ‰±ã†
 	}
 #endif
 
-	StringCchCopyA( pcSjis, 10, acSjis );	//	•ÏŠ·Œ‹‰Ê‚ğ–ß‚·
+	StringCchCopyA( pcSjis, 10, acSjis );	//	å¤‰æ›çµæœã‚’æˆ»ã™
 
 	return bCant ? FALSE : TRUE;
 }
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	š‚ÌƒoƒCƒg”‚ğŠm”F
-	@param[in,out]	pstLet	•¶šƒf[ƒ^“ü‚ê‚½‚èo‚µ‚½‚è
-	@return	INT_PTR	ƒoƒCƒg”
+	å­—ã®ãƒã‚¤ãƒˆæ•°ã‚’ç¢ºèª
+	@param[in,out]	pstLet	æ–‡å­—ãƒ‡ãƒ¼ã‚¿å…¥ã‚ŒãŸã‚Šå‡ºã—ãŸã‚Š
+	@return	INT_PTR	ãƒã‚¤ãƒˆæ•°
 */
 INT_PTR DocLetterByteCheck( LPLETTER pstLet )
 {
-	pstLet->mzByte = strlen( pstLet->acSjis );	//	’Êí‚ÌA‚à‚µ‚­‚Íƒ†ƒjƒR[ƒhƒXƒ^ƒCƒ‹
+	pstLet->mzByte = strlen( pstLet->acSjis );	//	é€šå¸¸ã®ã€ã‚‚ã—ãã¯ãƒ¦ãƒ‹ã‚³ãƒ¼ãƒ‰ã‚¹ã‚¿ã‚¤ãƒ«
 
-	if( pstLet->mzStyle & CT_CANTSJIS ){	pstLet->mzByte += 4;	}	//	”’lQÆ‚Ìæ“ª‚Ì•‚Í‚TƒoƒCƒgŒvZ•K—v
+	if( pstLet->mzStyle & CT_CANTSJIS ){	pstLet->mzByte += 4;	}	//	æ•°å€¤å‚ç…§ã®å…ˆé ­ã®ï¼†ã¯ï¼•ãƒã‚¤ãƒˆè¨ˆç®—å¿…è¦
 
-	if( 1 == pstLet->mzByte )	//	‚PƒoƒCƒg‚¾‚¯‚ÇÀ‚Íˆá‚¤ƒ„ƒc‚ğ’T‚·
+	if( 1 == pstLet->mzByte )	//	ï¼‘ãƒã‚¤ãƒˆã ã‘ã©å®Ÿã¯é•ã†ãƒ¤ãƒ„ã‚’æ¢ã™
 	{
-		//	”¼ŠpƒJƒ^ƒJƒi
+		//	åŠè§’ã‚«ã‚¿ã‚«ãƒŠ
 		if( 0xA1 <= (BYTE)(pstLet->acSjis[0]) && (BYTE)(pstLet->acSjis[0]) <= 0xDF ){	pstLet->mzByte =  2;	}
 
-		//	HTML“Áê‹L†
+		//	HTMLç‰¹æ®Šè¨˜å·
 		else if( '"' == pstLet->acSjis[0] ){	pstLet->mzByte = strlen( ("&quot;") );	}
 		else if( '<' == pstLet->acSjis[0] ){	pstLet->mzByte = strlen( ("&lt;") );	}
 		else if( '>' == pstLet->acSjis[0] ){	pstLet->mzByte = strlen( ("&gt;") );	}
@@ -128,17 +128,17 @@ INT_PTR DocLetterByteCheck( LPLETTER pstLet )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	•¶šƒf[ƒ^ì‚éE•s—v‚È‚çƒoƒCƒg”‚¾‚¯Šm•Û‚Å‚«‚é
-	@param[in]	pstLttr	•¶šƒf[ƒ^“ü‚ê‚é\‘¢‘Ì‚Ö‚Ìƒ|ƒCƒ“ƒ^[ENULL‰Â
-	@param[in]	ch		ƒf[ƒ^ì‚è‚½‚¢•¶š
-	@return		‰üs‚ÌŸ‚ÌˆÊ’u
+	æ–‡å­—ãƒ‡ãƒ¼ã‚¿ä½œã‚‹ãƒ»ä¸è¦ãªã‚‰ãƒã‚¤ãƒˆæ•°ã ã‘ç¢ºä¿ã§ãã‚‹
+	@param[in]	pstLttr	æ–‡å­—ãƒ‡ãƒ¼ã‚¿å…¥ã‚Œã‚‹æ§‹é€ ä½“ã¸ã®ãƒã‚¤ãƒ³ã‚¿ãƒ¼ãƒ»NULLå¯
+	@param[in]	ch		ãƒ‡ãƒ¼ã‚¿ä½œã‚ŠãŸã„æ–‡å­—
+	@return		æ”¹è¡Œã®æ¬¡ã®ä½ç½®
 */
 INT_PTR DocLetterDataCheck( LPLETTER pstLttr, TCHAR ch )
 {
 	INT_PTR	iByte;
-	LETTER	stTemp;	//	‚±‚Ì”Ÿ”“à—pEƒf[ƒ^•s—v‚Ég‚¤ƒ_ƒ~[ŒN
+	LETTER	stTemp;	//	ã“ã®å‡½æ•°å†…ç”¨ãƒ»ãƒ‡ãƒ¼ã‚¿ä¸è¦æ™‚ã«ä½¿ã†ãƒ€ãƒŸãƒ¼å›
 
-	if( !(pstLttr) ){	pstLttr = &stTemp;	}	//	ƒ_ƒ~[ŒN
+	if( !(pstLttr) ){	pstLttr = &stTemp;	}	//	ãƒ€ãƒŸãƒ¼å›
 
 	ZeroMemory( pstLttr, sizeof(LETTER) );
 	pstLttr->cchMozi = ch;
@@ -146,19 +146,19 @@ INT_PTR DocLetterDataCheck( LPLETTER pstLttr, TCHAR ch )
 	pstLttr->mzStyle = CT_NORMAL;
 	if( iswspace( ch ) ){	pstLttr->mzStyle |= CT_SPACE;	}
 	if( !( DocIsSjisTrance( ch, pstLttr->acSjis ) ) ){	pstLttr->mzStyle |= CT_CANTSJIS;	}
-	//	”ñƒVƒtƒgJIS•¶š‚ğŠm”F
-	iByte = DocLetterByteCheck( pstLttr  );	//	ƒoƒCƒg”Šm”F
+	//	éã‚·ãƒ•ãƒˆJISæ–‡å­—ã‚’ç¢ºèª
+	iByte = DocLetterByteCheck( pstLttr  );	//	ãƒã‚¤ãƒˆæ•°ç¢ºèª
 
 	return iByte;
 }
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	•¶š—ñ‚Ì‰üsˆ—‚ğ‚·‚é
-	@param[in]	xDot	ƒLƒƒƒŒƒbƒg‚ÌƒhƒbƒgˆÊ’u
-	@param[in]	yLine	‘ÎÛ‚Ìs”Ô†Eâ‘Î‚OƒCƒ“ƒfƒbƒNƒX‚©
-	@param[in]	bFirst	ƒAƒ“ƒhƒDˆ—‚Ìæ“ª‚©‚Ç‚¤‚©
-	@return		HRESULT	I—¹ó‘ÔƒR[ƒh
+	æ–‡å­—åˆ—ã®æ”¹è¡Œå‡¦ç†ã‚’ã™ã‚‹
+	@param[in]	xDot	ã‚­ãƒ£ãƒ¬ãƒƒãƒˆã®ãƒ‰ãƒƒãƒˆä½ç½®
+	@param[in]	yLine	å¯¾è±¡ã®è¡Œç•ªå·ãƒ»çµ¶å¯¾ï¼ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã‹
+	@param[in]	bFirst	ã‚¢ãƒ³ãƒ‰ã‚¥å‡¦ç†ã®å…ˆé ­ã‹ã©ã†ã‹
+	@return		HRESULT	çµ‚äº†çŠ¶æ…‹ã‚³ãƒ¼ãƒ‰
 */
 HRESULT DocCrLfAdd( INT xDot, INT yLine, BOOLEAN bFirst )
 {
@@ -169,10 +169,10 @@ HRESULT DocCrLfAdd( INT xDot, INT yLine, BOOLEAN bFirst )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	w’ès‚ÌƒhƒbƒgˆÊ’u(ƒLƒƒƒŒƒbƒgˆÊ’u)‚Å‰üs‚·‚é
-	@param[in]	nowDot	¡‚ÌƒLƒƒƒŒƒbƒg‚ÌƒhƒbƒgˆÊ’u
-	@param[in]	rdLine	‘ÎÛ‚Ìs”Ô†Eâ‘Î‚OƒCƒ“ƒfƒbƒNƒX‚©
-	@return		HRESULT	I—¹ó‘ÔƒR[ƒh
+	æŒ‡å®šè¡Œã®ãƒ‰ãƒƒãƒˆä½ç½®(ã‚­ãƒ£ãƒ¬ãƒƒãƒˆä½ç½®)ã§æ”¹è¡Œã™ã‚‹
+	@param[in]	nowDot	ä»Šã®ã‚­ãƒ£ãƒ¬ãƒƒãƒˆã®ãƒ‰ãƒƒãƒˆä½ç½®
+	@param[in]	rdLine	å¯¾è±¡ã®è¡Œç•ªå·ãƒ»çµ¶å¯¾ï¼ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã‹
+	@return		HRESULT	çµ‚äº†çŠ¶æ…‹ã‚³ãƒ¼ãƒ‰
 */
 HRESULT DocInputReturn( INT nowDot, INT rdLine )
 {
@@ -193,63 +193,63 @@ HRESULT DocInputReturn( INT nowDot, INT rdLine )
 
 	ZeroONELINE( &stLine );
 
-	iLetter = DocLetterPosGetAdjust( &nowDot, rdLine, 0 );	//	¡‚Ì•¶šˆÊ’u‚ğŠm”F
+	iLetter = DocLetterPosGetAdjust( &nowDot, rdLine, 0 );	//	ä»Šã®æ–‡å­—ä½ç½®ã‚’ç¢ºèª
 
-	//	•¶š”Šm”F
+	//	æ–‡å­—æ•°ç¢ºèª
 	itLine = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.begin();
 	std::advance( itLine, rdLine );
 
 	iCount = itLine->vcLine.size( );
 
-	if( iLetter < iCount )	//	‚à‚µs‚Ì“r’†‚Å‰üs‚µ‚½‚çH
+	if( iLetter < iCount )	//	ã‚‚ã—è¡Œã®é€”ä¸­ã§æ”¹è¡Œã—ãŸã‚‰ï¼Ÿ
 	{
 		ltLineItr = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.begin( );
 		std::advance( ltLineItr, (rdLine+1) );
 
-		//	¡‚Ìs‚ÌŸ‚ÌêŠ‚És‚Ìƒf[ƒ^‚ğ‘}“ü
+		//	ä»Šã®è¡Œã®æ¬¡ã®å ´æ‰€ã«è¡Œã®ãƒ‡ãƒ¼ã‚¿ã‚’æŒ¿å…¥
 		(*gitFileIt).vcCont.at( gixFocusPage ).ltPage.insert( ltLineItr, stLine );
 
-		//	‚»‚Ìs‚ÌA•¶šƒf[ƒ^‚Ìæ“ª‚ğ‚Æ‚é
+		//	ãã®è¡Œã®ã€æ–‡å­—ãƒ‡ãƒ¼ã‚¿ã®å…ˆé ­ã‚’ã¨ã‚‹
 		ltLineItr = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.begin( );
-		std::advance( ltLineItr, (rdLine+1) );	//	’Ç‰Á‚µ‚½s‚Ü‚ÅˆÚ“®
+		std::advance( ltLineItr, (rdLine+1) );	//	è¿½åŠ ã—ãŸè¡Œã¾ã§ç§»å‹•
 
-		//	‚Ô‚Á‚½Ø‚Á‚½êŠ‚ğİ’è‚µ‚È‚¨‚µ‚Ä
+		//	ã¶ã£ãŸåˆ‡ã£ãŸå ´æ‰€ã‚’è¨­å®šã—ãªãŠã—ã¦
 		itLine = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.begin();
 		std::advance( itLine, rdLine );
 
 		vcLtrItr  = itLine->vcLine.begin( );
-		vcLtrItr += iLetter;	//	¡‚Ì•¶šˆÊ’u‚ğ¦‚µ‚½
-		vcLtrEnd  = itLine->vcLine.end( );	//	––’[
+		vcLtrItr += iLetter;	//	ä»Šã®æ–‡å­—ä½ç½®ã‚’ç¤ºã—ãŸ
+		vcLtrEnd  = itLine->vcLine.end( );	//	æœ«ç«¯
 
-		//	‚»‚Ì•”•ª‚ğŸ‚Ìs‚ÉƒRƒs[‚·‚é
+		//	ãã®éƒ¨åˆ†ã‚’æ¬¡ã®è¡Œã«ã‚³ãƒ”ãƒ¼ã™ã‚‹
 		std::copy( vcLtrItr, vcLtrEnd, back_inserter(ltLineItr->vcLine) );
 
-		//	Œ³‚Ì•¶š—ñ‚ğíœ‚·‚é
+		//	å…ƒã®æ–‡å­—åˆ—ã‚’å‰Šé™¤ã™ã‚‹
 		itLine->vcLine.erase( vcLtrItr, vcLtrEnd );
 
 
-		//	‘ƒhƒbƒg”ÄŒvZ
+		//	ç·ãƒ‰ãƒƒãƒˆæ•°å†è¨ˆç®—
 		DocLineParamGet( rdLine,   NULL, NULL );
 		DocLineParamGet( rdLine+1, NULL, NULL );
 	}
-	else	//	––’[‚Å‰üs‚µ‚½
+	else	//	æœ«ç«¯ã§æ”¹è¡Œã—ãŸ
 	{
-		if( (iLines - 1) == rdLine )	//	EOF“I‚È‚Æ‚±‚ë
+		if( (iLines - 1) == rdLine )	//	EOFçš„ãªã¨ã“ã‚
 		{
 			(*gitFileIt).vcCont.at( gixFocusPage ).ltPage.push_back( stLine );
 		}
 		else
 		{
 			ltLineItr = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.begin( );
-			std::advance( ltLineItr, (rdLine+1) );	//	¡‚Ìs‚ğ¦‚µ‚½
+			std::advance( ltLineItr, (rdLine+1) );	//	ä»Šã®è¡Œã‚’ç¤ºã—ãŸ
 
-			//	Ÿ‚ÌêŠ‚És‚Ìƒf[ƒ^‚ğ‘}“ü
+			//	æ¬¡ã®å ´æ‰€ã«è¡Œã®ãƒ‡ãƒ¼ã‚¿ã‚’æŒ¿å…¥
 			(*gitFileIt).vcCont.at( gixFocusPage ).ltPage.insert( ltLineItr, stLine );
 		}
 	}
 
-	DocBadSpaceCheck( rdLine   );	//	‚±‚±‚Å‹ó”’ƒ`ƒFƒL
-	DocBadSpaceCheck( rdLine+1 );	//	‹ó”’ƒ`ƒFƒLEŸ‚Ìs‚àŠm”F
+	DocBadSpaceCheck( rdLine   );	//	ã“ã“ã§ç©ºç™½ãƒã‚§ã‚­
+	DocBadSpaceCheck( rdLine+1 );	//	ç©ºç™½ãƒã‚§ã‚­ãƒ»æ¬¡ã®è¡Œã‚‚ç¢ºèª
 
 #ifdef DO_TRY_CATCH
 	}
@@ -262,16 +262,16 @@ HRESULT DocInputReturn( INT nowDot, INT rdLine )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	w’ès‚ÌƒhƒbƒgˆÊ’u(ƒLƒƒƒŒƒbƒgˆÊ’u)‚ÅƒoƒbƒNƒXƒy[ƒX‰Ÿ‚µ‚½
-	@param[in]	pdDot	¡‚ÌƒLƒƒƒŒƒbƒg‚ÌƒhƒbƒgˆÊ’u‚Ì’l‚Ö‚Ìƒ|ƒCƒ“ƒ^[
-	@param[in]	pdLine	‘ÎÛ‚Ìs”Ô†Eâ‘Î‚OƒCƒ“ƒfƒbƒNƒX‚©
-	@return	INT	”ñ‚O‰üs‚ ‚Á‚½@‚Oˆës‚Ì‚İ
+	æŒ‡å®šè¡Œã®ãƒ‰ãƒƒãƒˆä½ç½®(ã‚­ãƒ£ãƒ¬ãƒƒãƒˆä½ç½®)ã§ãƒãƒƒã‚¯ã‚¹ãƒšãƒ¼ã‚¹æŠ¼ã—ãŸ
+	@param[in]	pdDot	ä»Šã®ã‚­ãƒ£ãƒ¬ãƒƒãƒˆã®ãƒ‰ãƒƒãƒˆä½ç½®ã®å€¤ã¸ã®ãƒã‚¤ãƒ³ã‚¿ãƒ¼
+	@param[in]	pdLine	å¯¾è±¡ã®è¡Œç•ªå·ãƒ»çµ¶å¯¾ï¼ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã‹
+	@return	INT	éï¼æ”¹è¡Œã‚ã£ãŸã€€ï¼å£±è¡Œã®ã¿
 */
 INT DocInputBkSpace( PINT pdDot, PINT pdLine )
 {
 	INT_PTR	iLines;
 	INT		iLetter, width = 0, neDot, bCrLf = 0;
-	INT		dLine = *pdLine;	//	”Ÿ”“à‚Åg‚¤s”Ô†E’²®‚É’ˆÓ
+	INT		dLine = *pdLine;	//	å‡½æ•°å†…ã§ä½¿ã†è¡Œç•ªå·ãƒ»èª¿æ•´ã«æ³¨æ„
 	TCHAR	ch;
 
 	LINE_ITR	itLine;
@@ -279,54 +279,54 @@ INT DocInputBkSpace( PINT pdDot, PINT pdLine )
 
 	iLines = DocNowFilePageLineCount( );
 
-	if( iLines <=  dLine )	return 0;	//	‚Í‚İo‚µ‚Ä‚½‚çƒAƒEƒcI
+	if( iLines <=  dLine )	return 0;	//	ã¯ã¿å‡ºã—ã¦ãŸã‚‰ã‚¢ã‚¦ãƒ„ï¼
 
-	iLetter = DocLetterPosGetAdjust( pdDot, dLine, 0 );	//	¡‚Ì•¶šˆÊ’u‚ğŠm”F
+	iLetter = DocLetterPosGetAdjust( pdDot, dLine, 0 );	//	ä»Šã®æ–‡å­—ä½ç½®ã‚’ç¢ºèª
 	neDot = *pdDot;
 
-//	TRACE( TEXT("Œã‹ó”’[D%d C%d]"), neDot, iLetter );
+//	TRACE( TEXT("å¾Œç©ºç™½[D%d C%d]"), neDot, iLetter );
 
-	if( 0 == iLetter && 0 == dLine )	return 0;	//	æ“ª‚©‚ÂÅ‰‚Ìs‚È‚çA‚È‚É‚à‚µ‚È‚¢
+	if( 0 == iLetter && 0 == dLine )	return 0;	//	å…ˆé ­ã‹ã¤æœ€åˆã®è¡Œãªã‚‰ã€ãªã«ã‚‚ã—ãªã„
 
-	//	ƒoƒbƒNƒXƒy[ƒX‚Æ‚ÍAˆë•¶š–ß‚Á‚ÄDELETE‚Å‚ ‚é
+	//	ãƒãƒƒã‚¯ã‚¹ãƒšãƒ¼ã‚¹ã¨ã¯ã€å£±æ–‡å­—æˆ»ã£ã¦DELETEã§ã‚ã‚‹
 
-	if( 0 != iLetter )	//	s‚Ìæ“ª‚Å‚È‚¢‚È‚ç
+	if( 0 != iLetter )	//	è¡Œã®å…ˆé ­ã§ãªã„ãªã‚‰
 	{
-		iLetter--;	//	ƒLƒƒƒŒƒbƒgˆê‚Â–ß‚·
+		iLetter--;	//	ã‚­ãƒ£ãƒ¬ãƒƒãƒˆä¸€ã¤æˆ»ã™
 		itLine = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.begin();
 		std::advance( itLine, dLine );
 
 		width = itLine->vcLine.at( iLetter ).rdWidth;
 		ch    = itLine->vcLine.at( iLetter ).cchMozi;
 
-		*pdDot = neDot - width;	//	•¶š••ªƒhƒbƒg‚à–ß‚µ‚Ä
+		*pdDot = neDot - width;	//	æ–‡å­—å¹…åˆ†ãƒ‰ãƒƒãƒˆã‚‚æˆ»ã—ã¦
 		bCrLf = 0;
 
 		SqnAppendLetter( &((*gitFileIt).vcCont.at( gixFocusPage ).stUndoLog), DO_DELETE, ch, *pdDot, dLine, TRUE );
 	}
-	else	//	s‚Ìæ“ª‚Å‚ ‚é‚È‚ç
+	else	//	è¡Œã®å…ˆé ­ã§ã‚ã‚‹ãªã‚‰
 	{
-		dLine--;	*pdLine = dLine;	//	‘O‚Ìs‚ÉˆÚ“®‚µ‚Ä
+		dLine--;	*pdLine = dLine;	//	å‰ã®è¡Œã«ç§»å‹•ã—ã¦
 		neDot = DocLineParamGet( dLine, &iLetter, NULL );
-		*pdDot = neDot;	//	CARETˆÊ’u’²®
+		*pdDot = neDot;	//	CARETä½ç½®èª¿æ•´
 		bCrLf = 1;
 
-		//	‚±‚±‚Å‚â‚Á‚Ä–â‘è–³‚¢‚Í‚¸
+		//	ã“ã“ã§ã‚„ã£ã¦å•é¡Œç„¡ã„ã¯ãš
 		SqnAppendString( &((*gitFileIt).vcCont.at( gixFocusPage ).stUndoLog), DO_DELETE, CH_CRLFW, *pdDot, dLine, TRUE );
 	}
 
 	DocLetterErase( *pdDot, dLine, iLetter );
-	DocBadSpaceCheck( dLine );	//	—Ç‚­‚È‚¢ƒXƒy[ƒX‚ğ’²‚×‚Ä‚¨‚­
+	DocBadSpaceCheck( dLine );	//	è‰¯ããªã„ã‚¹ãƒšãƒ¼ã‚¹ã‚’èª¿ã¹ã¦ãŠã
 
 	return bCrLf;
 }
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	w’ès‚ÌƒhƒbƒgˆÊ’u(ƒLƒƒƒŒƒbƒgˆÊ’u)‚ÅƒfƒŠ[ƒg‰Ÿ‚µ‚½
-	@param[in]	xDot	¡‚ÌƒLƒƒƒŒƒbƒg‚ÌƒhƒbƒgˆÊ’u
-	@param[in]	yLine	‘ÎÛ‚Ìs”Ô†Eâ‘Î‚OƒCƒ“ƒfƒbƒNƒX‚©
-	@return	INT			”ñ‚O‰üsíœE‚O•¶šíœ
+	æŒ‡å®šè¡Œã®ãƒ‰ãƒƒãƒˆä½ç½®(ã‚­ãƒ£ãƒ¬ãƒƒãƒˆä½ç½®)ã§ãƒ‡ãƒªãƒ¼ãƒˆæŠ¼ã—ãŸ
+	@param[in]	xDot	ä»Šã®ã‚­ãƒ£ãƒ¬ãƒƒãƒˆã®ãƒ‰ãƒƒãƒˆä½ç½®
+	@param[in]	yLine	å¯¾è±¡ã®è¡Œç•ªå·ãƒ»çµ¶å¯¾ï¼ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã‹
+	@return	INT			éï¼æ”¹è¡Œå‰Šé™¤ãƒ»ï¼æ–‡å­—å‰Šé™¤
 */
 INT DocInputDelete( INT xDot, INT yLine )
 {
@@ -338,17 +338,17 @@ INT DocInputDelete( INT xDot, INT yLine )
 	LINE_ITR	itLine;
 
 	iLines = DocNowFilePageLineCount( );
-	if( iLines <= yLine )	return 0;	//	‚Í‚İo‚µ‚Ä‚½‚çƒAƒEƒcI
+	if( iLines <= yLine )	return 0;	//	ã¯ã¿å‡ºã—ã¦ãŸã‚‰ã‚¢ã‚¦ãƒ„ï¼
 
-	iLetter = DocLetterPosGetAdjust( &xDot, yLine, 0 );	//	¡‚Ì•¶šˆÊ’u‚ğŠm”F
+	iLetter = DocLetterPosGetAdjust( &xDot, yLine, 0 );	//	ä»Šã®æ–‡å­—ä½ç½®ã‚’ç¢ºèª
 
-//	TRACE( TEXT("íœ[D%d C%d]"), xDot, iLetter );
+//	TRACE( TEXT("å‰Šé™¤[D%d C%d]"), xDot, iLetter );
 
-	DocLineParamGet( yLine, &iCount, NULL );	//	‚±‚Ìs‚Ì•¶š”‚ğ“l—¯
+	DocLineParamGet( yLine, &iCount, NULL );	//	ã“ã®è¡Œã®æ–‡å­—æ•°ã‚’æ–—ç•™
 
 	if( iCount <= iLetter )
 	{
-		if( iLines <= (yLine+1) )	return 0;	//	Š®‘S‚É––’[‚È‚ç‰½‚à‚µ‚È‚¢
+		if( iLines <= (yLine+1) )	return 0;	//	å®Œå…¨ã«æœ«ç«¯ãªã‚‰ä½•ã‚‚ã—ãªã„
 		ch = CC_LF;
 	}
 	else
@@ -362,7 +362,7 @@ INT DocInputDelete( INT xDot, INT yLine )
 	iCrLf = DocLetterErase( xDot, yLine, iLetter );
 	if( 0 > iCrLf ){	return -1;	}
 
-	DocBadSpaceCheck( yLine );	//	—Ç‚­‚È‚¢ƒXƒy[ƒX‚ğ’²‚×‚Ä‚¨‚­
+	DocBadSpaceCheck( yLine );	//	è‰¯ããªã„ã‚¹ãƒšãƒ¼ã‚¹ã‚’èª¿ã¹ã¦ãŠã
 
 	if( 0 < iCrLf )
 	{
@@ -380,11 +380,11 @@ INT DocInputDelete( INT xDot, INT yLine )
 
 
 /*!
-	w’ès‚ÌƒhƒbƒgˆÊ’u(ƒLƒƒƒŒƒbƒgˆÊ’u)‚Åˆë•¶šíœ
-	@param[in]	xDot	¡‚ÌƒLƒƒƒŒƒbƒg‚ÌƒhƒbƒgˆÊ’u‚Ì’l
-	@param[in]	yLine	‘ÎÛ‚Ìs”Ô†Eâ‘Î‚OƒCƒ“ƒfƒbƒNƒX‚©
-	@param[in]	iLetter	‘ÎÛ‚Ì•¶šˆÊ’u
-	@return	INT			³F‰üsíœE‚OF•¶šíœ@•‰FˆÙí”­¶
+	æŒ‡å®šè¡Œã®ãƒ‰ãƒƒãƒˆä½ç½®(ã‚­ãƒ£ãƒ¬ãƒƒãƒˆä½ç½®)ã§å£±æ–‡å­—å‰Šé™¤
+	@param[in]	xDot	ä»Šã®ã‚­ãƒ£ãƒ¬ãƒƒãƒˆã®ãƒ‰ãƒƒãƒˆä½ç½®ã®å€¤
+	@param[in]	yLine	å¯¾è±¡ã®è¡Œç•ªå·ãƒ»çµ¶å¯¾ï¼ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã‹
+	@param[in]	iLetter	å¯¾è±¡ã®æ–‡å­—ä½ç½®
+	@return	INT			æ­£ï¼šæ”¹è¡Œå‰Šé™¤ãƒ»ï¼ï¼šæ–‡å­—å‰Šé™¤ã€€è² ï¼šç•°å¸¸ç™ºç”Ÿ
 */
 INT DocLetterErase( INT xDot, INT yLine, INT iLetter )
 {
@@ -394,17 +394,17 @@ INT DocLetterErase( INT xDot, INT yLine, INT iLetter )
 	LINE_ITR	itLine;
 
 
-	iRslt = DocLineParamGet( yLine, &iCount, NULL );	//	‚±‚Ìs‚Ì•¶š”‚ğ“l—¯
+	iRslt = DocLineParamGet( yLine, &iCount, NULL );	//	ã“ã®è¡Œã®æ–‡å­—æ•°ã‚’æ–—ç•™
 	if( 0 > iRslt ){	return -1;	}
 
-	//	‚±‚±‚©‚çDELETE‚Ìˆ—
-	if( iCount > iLetter )	//	––’[‚Å‚È‚¢‚È‚çA¡‚Ì•¶šÁ‚¹‚ÎOK
+	//	ã“ã“ã‹ã‚‰DELETEã®å‡¦ç†
+	if( iCount > iLetter )	//	æœ«ç«¯ã§ãªã„ãªã‚‰ã€ä»Šã®æ–‡å­—æ¶ˆã›ã°OK
 	{
 		itLine = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.begin();
 		std::advance( itLine, yLine );
 
 		vcLtrItr  = itLine->vcLine.begin( );
-		vcLtrItr += iLetter;	//	¡‚Ì•¶šˆÊ’u‚ğ¦‚µ‚½
+		vcLtrItr += iLetter;	//	ä»Šã®æ–‡å­—ä½ç½®ã‚’ç¤ºã—ãŸ
 
 		DocIterateDelete( vcLtrItr, yLine );
 		return 0;
@@ -415,15 +415,15 @@ INT DocLetterErase( INT xDot, INT yLine, INT iLetter )
 		return 1;
 	}
 
-//	return 0;	//	§Œä‚ª“n‚ç‚È‚¢ƒR[ƒh
+//	return 0;	//	åˆ¶å¾¡ãŒæ¸¡ã‚‰ãªã„ã‚³ãƒ¼ãƒ‰
 }
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	w’ès‚Ì“à—e‚ğíœ‚·‚éE‰üs‚Í‚»‚Ì‚Ü‚Ü
-	@param[in]	yLine	‘ÎÛ‚Ìs”Ô†
-	@param[in]	pFirst	ƒAƒ“ƒhƒD‚Ì”ñ‚O‰‚ß‚Ä‚ÌƒOƒ‹[ƒv@‚O‘±‚«‚Ìˆ—
-	@return	HRESULT	I—¹ó‘ÔƒR[ƒh
+	æŒ‡å®šè¡Œã®å†…å®¹ã‚’å‰Šé™¤ã™ã‚‹ãƒ»æ”¹è¡Œã¯ãã®ã¾ã¾
+	@param[in]	yLine	å¯¾è±¡ã®è¡Œç•ªå·
+	@param[in]	pFirst	ã‚¢ãƒ³ãƒ‰ã‚¥ã®éï¼åˆã‚ã¦ã®ã‚°ãƒ«ãƒ¼ãƒ—ã€€ï¼ç¶šãã®å‡¦ç†
+	@return	HRESULT	çµ‚äº†çŠ¶æ…‹ã‚³ãƒ¼ãƒ‰
 */
 HRESULT DocLineErase( INT yLine, PBOOLEAN pFirst )
 {
@@ -435,23 +435,23 @@ HRESULT DocLineErase( INT yLine, PBOOLEAN pFirst )
 
 	wsString.clear( );
 
-	dLines = DocNowFilePageLineCount(  );//DocPageParamGet( NULL, NULL );	//	s”Šm”F
-	if( dLines <= yLine )	return E_OUTOFMEMORY;	//	‚Í‚İo‚µŠm”F
+	dLines = DocNowFilePageLineCount(  );//DocPageParamGet( NULL, NULL );	//	è¡Œæ•°ç¢ºèª
+	if( dLines <= yLine )	return E_OUTOFMEMORY;	//	ã¯ã¿å‡ºã—ç¢ºèª
 
-	DocLineParamGet( yLine, &iMozis, NULL );	//	w’ès‚Ì•¶š”Šm•Û
+	DocLineParamGet( yLine, &iMozis, NULL );	//	æŒ‡å®šè¡Œã®æ–‡å­—æ•°ç¢ºä¿
 
-	if( 0 >= iMozis )	return  E_ABORT;	//	•¶š‚ª‚È‚¢‚È‚ç‚·‚é‚±‚Æ–³‚¢
+	if( 0 >= iMozis )	return  E_ABORT;	//	æ–‡å­—ãŒãªã„ãªã‚‰ã™ã‚‹ã“ã¨ç„¡ã„
 
 	itLine = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.begin();
 	std::advance( itLine, yLine );
 
-	for( i = 0; iMozis > i; i++ )	//	‘S•¶š‚ğŠm•Û
+	for( i = 0; iMozis > i; i++ )	//	å…¨æ–‡å­—ã‚’ç¢ºä¿
 	{
 		wsString += itLine->vcLine.at( i ).cchMozi;
 	}
 
-	cchSize = wsString.size(  ) + 1;	//	NULLƒ^[ƒ~ƒl[ƒ^•ª‘«‚·
-	cbSize = cchSize * sizeof(TCHAR);	//	ƒ†ƒjƒR[ƒh‚È‚Ì‚ÅƒoƒCƒg”‚Í‚Q”{‚Å‚ ‚é
+	cchSize = wsString.size(  ) + 1;	//	NULLã‚¿ãƒ¼ãƒŸãƒãƒ¼ã‚¿åˆ†è¶³ã™
+	cbSize = cchSize * sizeof(TCHAR);	//	ãƒ¦ãƒ‹ã‚³ãƒ¼ãƒ‰ãªã®ã§ãƒã‚¤ãƒˆæ•°ã¯ï¼’å€ã§ã‚ã‚‹
 
 	ptBuffer = (LPTSTR)malloc( cbSize );
 	ZeroMemory( ptBuffer, cbSize );
@@ -459,24 +459,24 @@ HRESULT DocLineErase( INT yLine, PBOOLEAN pFirst )
 	SqnAppendString( &((*gitFileIt).vcCont.at( gixFocusPage ).stUndoLog), DO_DELETE, ptBuffer, 0, yLine, *pFirst );
 	*pFirst = FALSE;
 
-	//	íœˆ—
+	//	å‰Šé™¤å‡¦ç†
 	itLine->vcLine.clear();
 
-	DocLineParamGet( yLine, NULL, NULL );	//	s“à—e‚ÌÄŒvZ
-	DocPageParamGet( NULL, NULL );	//	ÄŒvZ
+	DocLineParamGet( yLine, NULL, NULL );	//	è¡Œå†…å®¹ã®å†è¨ˆç®—
+	DocPageParamGet( NULL, NULL );	//	å†è¨ˆç®—
 
-	DocBadSpaceCheck( yLine );	//	ƒŠƒZƒbƒg‚É•K—v
-	ViewRedrawSetLine( yLine );	//	—v‚ç‚È‚¢‚©‚à
+	DocBadSpaceCheck( yLine );	//	ãƒªã‚»ãƒƒãƒˆã«å¿…è¦
+	ViewRedrawSetLine( yLine );	//	è¦ã‚‰ãªã„ã‹ã‚‚
 
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	‘ÎÛ•¶š‚ÌƒCƒeƒŒ[ƒ^‚Æs‚ğó‚¯‚ÄA‚»‚Ì•¶š‚ğíœ‚·‚é
-	@param[in]	itLtr	‘ÎÛ•¶š‚ÌƒCƒeƒŒ[ƒ^
-	@param[in]	dBsLine	‘ÎÛ‚Ìs”Ô†Eâ‘Î‚OƒCƒ“ƒfƒbƒNƒX‚©
-	@return	INT			”ñ‚O‰üsíœE‚O•¶šíœ
+	å¯¾è±¡æ–‡å­—ã®ã‚¤ãƒ†ãƒ¬ãƒ¼ã‚¿ã¨è¡Œã‚’å—ã‘ã¦ã€ãã®æ–‡å­—ã‚’å‰Šé™¤ã™ã‚‹
+	@param[in]	itLtr	å¯¾è±¡æ–‡å­—ã®ã‚¤ãƒ†ãƒ¬ãƒ¼ã‚¿
+	@param[in]	dBsLine	å¯¾è±¡ã®è¡Œç•ªå·ãƒ»çµ¶å¯¾ï¼ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã‹
+	@return	INT			éï¼æ”¹è¡Œå‰Šé™¤ãƒ»ï¼æ–‡å­—å‰Šé™¤
 */
 INT DocIterateDelete( LETR_ITR itLtr, INT dBsLine )
 {
@@ -497,18 +497,18 @@ INT DocIterateDelete( LETR_ITR itLtr, INT dBsLine )
 
 	(*gitFileIt).vcCont.at( gixFocusPage ).dByteSz -= bySz;
 
-//	DocBadSpaceCheck( dBsLine );	//	‚Â‚¢‚Å‚É—Ç‚­‚È‚¢ƒXƒy[ƒX‚ğ’²‚×‚Ä‚¨‚­
-	//	‚±‚±‚Å’²‚×‚é‚Æd‚»‚¤‚È‚Ì‚ÅA‚à‚Á‚Æã‚Ì‚Ù‚¤‚Å“Z‚ß‚Äƒ`ƒFƒL‚é‚Ù‚¤‚ª‚æ‚¢
+//	DocBadSpaceCheck( dBsLine );	//	ã¤ã„ã§ã«è‰¯ããªã„ã‚¹ãƒšãƒ¼ã‚¹ã‚’èª¿ã¹ã¦ãŠã
+	//	ã“ã“ã§èª¿ã¹ã‚‹ã¨é‡ãã†ãªã®ã§ã€ã‚‚ã£ã¨ä¸Šã®ã»ã†ã§çºã‚ã¦ãƒã‚§ã‚­ã‚‹ã»ã†ãŒã‚ˆã„
 
 	return width;
 }
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	‘ÎÛs‚ÌAŸ‚Ìs‚ğA‘ÎÛs‚Ì––”ö‚É‚­‚Á‚Â‚¯‚éB––’[‚ÅDELETE‘€ì
-	@param[in]	dBsLine	‘ÎÛ‚Ìs”Ô†Eâ‘Î‚OƒCƒ“ƒfƒbƒNƒX
-	@return		“Á‚ÉˆÓ–¡‚Í‚È‚¢
-	@return		HRESULT	I—¹ó‘ÔƒR[ƒh
+	å¯¾è±¡è¡Œã®ã€æ¬¡ã®è¡Œã‚’ã€å¯¾è±¡è¡Œã®æœ«å°¾ã«ãã£ã¤ã‘ã‚‹ã€‚æœ«ç«¯ã§DELETEæ“ä½œ
+	@param[in]	dBsLine	å¯¾è±¡ã®è¡Œç•ªå·ãƒ»çµ¶å¯¾ï¼ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹
+	@return		ç‰¹ã«æ„å‘³ã¯ãªã„
+	@return		HRESULT	çµ‚äº†çŠ¶æ…‹ã‚³ãƒ¼ãƒ‰
 */
 HRESULT DocLineCombine( INT dBsLine )
 {
@@ -522,33 +522,33 @@ HRESULT DocLineCombine( INT dBsLine )
 	
 	if( itLineNx == (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.end() )	return E_ACCESSDENIED;
 
-	//	‘I‘ğ”ÍˆÍ‚ ‚é‚ÉƒAƒ“ƒhƒD‚µ‚ÄA‘I‘ğ”ÍˆÍ‚ª€‚ñ‚Å‚éó‘Ô‚ÅØ‚èæ‚è‚·‚é‚Æ‚±‚±‚Å—‚¿‚é
-	vcLtrNxItr = itLineNx->vcLine.begin(  );	//	Ÿ‚Ìs‚Ìæ“ª
-	vcLtrNxEnd = itLineNx->vcLine.end(  );	//	Ÿ‚Ìs‚ÌK”ö
+	//	é¸æŠç¯„å›²ã‚ã‚‹æ™‚ã«ã‚¢ãƒ³ãƒ‰ã‚¥ã—ã¦ã€é¸æŠç¯„å›²ãŒæ­»ã‚“ã§ã‚‹çŠ¶æ…‹ã§åˆ‡ã‚Šå–ã‚Šã™ã‚‹ã¨ã“ã“ã§è½ã¡ã‚‹
+	vcLtrNxItr = itLineNx->vcLine.begin(  );	//	æ¬¡ã®è¡Œã®å…ˆé ­
+	vcLtrNxEnd = itLineNx->vcLine.end(  );	//	æ¬¡ã®è¡Œã®å°»å°¾
 
 	itLine = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.begin();
 	std::advance( itLine, dBsLine );
 	std::copy( vcLtrNxItr, vcLtrNxEnd, back_inserter( itLine->vcLine ) );
 
-	DocLineParamGet( dBsLine , NULL, NULL );	//	ŒÄ‚Ño‚¹‚Î’†‚Å–Ê“|‚İ‚Ä‚­‚ê‚é
+	DocLineParamGet( dBsLine , NULL, NULL );	//	å‘¼ã³å‡ºã›ã°ä¸­ã§é¢å€’ã¿ã¦ãã‚Œã‚‹
 
 	ltLineItr  = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.begin(  );
-	std::advance( ltLineItr, dBsLine+1 );	//	Ÿ‚Ìs
+	std::advance( ltLineItr, dBsLine+1 );	//	æ¬¡ã®è¡Œ
 
 	(*gitFileIt).vcCont.at( gixFocusPage ).ltPage.erase( ltLineItr );
 
-	DocBadSpaceCheck( dBsLine );	//	‚Â‚¢‚Å‚É—Ç‚­‚È‚¢ƒXƒy[ƒX‚ğ’²‚×‚Ä‚¨‚­
+	DocBadSpaceCheck( dBsLine );	//	ã¤ã„ã§ã«è‰¯ããªã„ã‚¹ãƒšãƒ¼ã‚¹ã‚’èª¿ã¹ã¦ãŠã
 
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	w’ès‚ÌƒhƒbƒgˆÊ’u(ƒLƒƒƒŒƒbƒgˆÊ’u)‚Éˆë•¶š’Ç‰Á‚µ‚ÄƒAƒ“ƒhƒD‹L˜^‚·‚é
-	@param[in]	pxDot	‘}“ü‚·‚éƒhƒbƒgˆÊ’u‚Ö‚Ìƒ|ƒCƒ“ƒ^[
-	@param[in]	yLine	‘ÎÛ‚Ìs”Ô†Eâ‘Î‚OƒCƒ“ƒfƒbƒNƒX‚©
-	@param[in]	ch		’Ç‰Á‚µ‚½‚¢•¶š
-	@return		INT		’Ç‰Á‚µ‚½•¶š‚Ìƒhƒbƒg”
+	æŒ‡å®šè¡Œã®ãƒ‰ãƒƒãƒˆä½ç½®(ã‚­ãƒ£ãƒ¬ãƒƒãƒˆä½ç½®)ã«å£±æ–‡å­—è¿½åŠ ã—ã¦ã‚¢ãƒ³ãƒ‰ã‚¥è¨˜éŒ²ã™ã‚‹
+	@param[in]	pxDot	æŒ¿å…¥ã™ã‚‹ãƒ‰ãƒƒãƒˆä½ç½®ã¸ã®ãƒã‚¤ãƒ³ã‚¿ãƒ¼
+	@param[in]	yLine	å¯¾è±¡ã®è¡Œç•ªå·ãƒ»çµ¶å¯¾ï¼ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã‹
+	@param[in]	ch		è¿½åŠ ã—ãŸã„æ–‡å­—
+	@return		INT		è¿½åŠ ã—ãŸæ–‡å­—ã®ãƒ‰ãƒƒãƒˆæ•°
 */
 INT DocInsertLetter( PINT pxDot, INT yLine, TCHAR ch )
 {
@@ -557,20 +557,20 @@ INT DocInsertLetter( PINT pxDot, INT yLine, TCHAR ch )
 	SqnAppendLetter( &((*gitFileIt).vcCont.at( gixFocusPage ).stUndoLog), DO_INSERT, ch, *pxDot, yLine, TRUE );
 
 	width = DocInputLetter( *pxDot, yLine, ch );
-	*pxDot += width;	//	“r’†‚Å‚à‚¢‚¯‚é
+	*pxDot += width;	//	é€”ä¸­ã§ã‚‚ã„ã‘ã‚‹
 
-	DocBadSpaceCheck( yLine );	//	‚±‚±‚Å‹ó”’ƒ`ƒFƒL
+	DocBadSpaceCheck( yLine );	//	ã“ã“ã§ç©ºç™½ãƒã‚§ã‚­
 
 	return width;
 }
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	w’ès‚ÌƒhƒbƒgˆÊ’u(ƒLƒƒƒŒƒbƒgˆÊ’u)‚Éˆë•¶š’Ç‰Á‚·‚éE‚±‚Ì”Ÿ”“à‚Å‚ÍƒAƒ“ƒhƒD‚Ì–Ê“|‚ÍŒ©‚È‚¢
-	@param[in]	nowDot	‘}“ü‚·‚éƒhƒbƒgˆÊ’u
-	@param[in]	rdLine	‘ÎÛ‚Ìs”Ô†Eâ‘Î‚OƒCƒ“ƒfƒbƒNƒX‚©
-	@param[in]	ch		’Ç‰Á‚µ‚½‚¢•¶š
-	@return		INT		’Ç‰Á‚µ‚½•¶š‚Ìƒhƒbƒg”
+	æŒ‡å®šè¡Œã®ãƒ‰ãƒƒãƒˆä½ç½®(ã‚­ãƒ£ãƒ¬ãƒƒãƒˆä½ç½®)ã«å£±æ–‡å­—è¿½åŠ ã™ã‚‹ãƒ»ã“ã®å‡½æ•°å†…ã§ã¯ã‚¢ãƒ³ãƒ‰ã‚¥ã®é¢å€’ã¯è¦‹ãªã„
+	@param[in]	nowDot	æŒ¿å…¥ã™ã‚‹ãƒ‰ãƒƒãƒˆä½ç½®
+	@param[in]	rdLine	å¯¾è±¡ã®è¡Œç•ªå·ãƒ»çµ¶å¯¾ï¼ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã‹
+	@param[in]	ch		è¿½åŠ ã—ãŸã„æ–‡å­—
+	@return		INT		è¿½åŠ ã—ãŸæ–‡å­—ã®ãƒ‰ãƒƒãƒˆæ•°
 */
 INT DocInputLetter( INT nowDot, INT rdLine, TCHAR ch )
 {
@@ -579,7 +579,7 @@ INT DocInputLetter( INT nowDot, INT rdLine, TCHAR ch )
 	LETR_ITR	vcItr;
 	LINE_ITR	itLine;
 
-	//	ƒAƒ“ƒhƒDƒŠƒhƒD‚ÍŒÄ‚ñ‚¾‚Æ‚±‚ë‚Å
+	//	ã‚¢ãƒ³ãƒ‰ã‚¥ãƒªãƒ‰ã‚¥ã¯å‘¼ã‚“ã ã¨ã“ã‚ã§
 
 #ifdef DO_TRY_CATCH
 	try{
@@ -587,7 +587,7 @@ INT DocInputLetter( INT nowDot, INT rdLine, TCHAR ch )
 
 	if( 0 == ch )
 	{
-		TRACE( TEXT("NULL•¶š‚ª“ü‚Á‚½") );
+		TRACE( TEXT("NULLæ–‡å­—ãŒå…¥ã£ãŸ") );
 		return 0;
 	}
 
@@ -595,26 +595,26 @@ INT DocInputLetter( INT nowDot, INT rdLine, TCHAR ch )
 
 	if( iLines <= rdLine )
 	{
-		TRACE( TEXT("OutOfRange w’è[%d] s”[%d]"), rdLine, iLines );
+		TRACE( TEXT("OutOfRange æŒ‡å®š[%d] è¡Œæ•°[%d]"), rdLine, iLines );
 		return 0;
 	}
 
-	iLetter = DocLetterPosGetAdjust( &nowDot, rdLine, 0 );	//	¡‚Ì•¶šˆÊ’u‚ğŠm”F
+	iLetter = DocLetterPosGetAdjust( &nowDot, rdLine, 0 );	//	ä»Šã®æ–‡å­—ä½ç½®ã‚’ç¢ºèª
 
 	itLine = (*gitFileIt).vcCont.at( gixFocusPage ).ltPage.begin();
-	std::advance( itLine, rdLine );	//	‘ÎÛs‚Ü‚ÅƒCƒeƒŒ[ƒg‚·‚é
+	std::advance( itLine, rdLine );	//	å¯¾è±¡è¡Œã¾ã§ã‚¤ãƒ†ãƒ¬ãƒ¼ãƒˆã™ã‚‹
 
-	//	•¶š”Šm”F
+	//	æ–‡å­—æ•°ç¢ºèª
 	iCount = itLine->vcLine.size( );
 
-	//	ƒf[ƒ^ì¬
-	DocLetterDataCheck( &stLetter, ch );	//	w’ès‚ÌƒhƒbƒgˆÊ’u(ƒLƒƒƒŒƒbƒgˆÊ’u)‚Éˆë•¶š’Ç‰Á‚·‚é‚Æ‚«
+	//	ãƒ‡ãƒ¼ã‚¿ä½œæˆ
+	DocLetterDataCheck( &stLetter, ch );	//	æŒ‡å®šè¡Œã®ãƒ‰ãƒƒãƒˆä½ç½®(ã‚­ãƒ£ãƒ¬ãƒƒãƒˆä½ç½®)ã«å£±æ–‡å­—è¿½åŠ ã™ã‚‹ã¨ã
 
-	if( iLetter >=  iCount )	//	•¶š”“¯‚¶‚È‚ç––’[‚É’Ç‰Á‚Æ‚¢‚¤‚±‚Æ
+	if( iLetter >=  iCount )	//	æ–‡å­—æ•°åŒã˜ãªã‚‰æœ«ç«¯ã«è¿½åŠ ã¨ã„ã†ã“ã¨
 	{
 		itLine->vcLine.push_back( stLetter );
 	}
-	else	//	‚»‚¤‚Å‚È‚¢‚È‚ç“r’†‚É’Ç‰Á
+	else	//	ãã†ã§ãªã„ãªã‚‰é€”ä¸­ã«è¿½åŠ 
 	{
 		vcItr = itLine->vcLine.begin( );
 		vcItr += iLetter;
@@ -626,7 +626,7 @@ INT DocInputLetter( INT nowDot, INT rdLine, TCHAR ch )
 
 	(*gitFileIt).vcCont.at( gixFocusPage ).dByteSz += stLetter.mzByte;
 
-//	DocBadSpaceCheck( rdLine );	ŒÄ‚ñ‚¾‚Æ‚±‚ë‚Å‚Ü‚Æ‚ß‚Ä‚â‚é
+//	DocBadSpaceCheck( rdLine );	å‘¼ã‚“ã ã¨ã“ã‚ã§ã¾ã¨ã‚ã¦ã‚„ã‚‹
 
 #ifdef DO_TRY_CATCH
 	}
@@ -639,41 +639,41 @@ INT DocInputLetter( INT nowDot, INT rdLine, TCHAR ch )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	w’ès‚ÌƒhƒbƒgˆÊ’u‚Å•¶š”•ªíœ‚·‚éE‰üs‚Í“ó•¶šè—L
-	@param[in]	xDot	¡‚ÌƒLƒƒƒŒƒbƒg‚ÌƒhƒbƒgˆÊ’u
-	@param[in]	yLine	‘ÎÛ‚Ìs”Ô†Eâ‘Î‚OƒCƒ“ƒfƒbƒNƒX‚©
-	@param[in]	ptDummy	–¢g—pENULL‚Å
-	@param[in]	cchSize	íœ‚·‚é•¶š”
-	@return		INT		‚O‰üs–³‚µ@‚P`‰üs‚ğƒTƒN‚Á‚½‰ñ”
+	æŒ‡å®šè¡Œã®ãƒ‰ãƒƒãƒˆä½ç½®ã§æ–‡å­—æ•°åˆ†å‰Šé™¤ã™ã‚‹ãƒ»æ”¹è¡Œã¯å¼æ–‡å­—å æœ‰
+	@param[in]	xDot	ä»Šã®ã‚­ãƒ£ãƒ¬ãƒƒãƒˆã®ãƒ‰ãƒƒãƒˆä½ç½®
+	@param[in]	yLine	å¯¾è±¡ã®è¡Œç•ªå·ãƒ»çµ¶å¯¾ï¼ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã‹
+	@param[in]	ptDummy	æœªä½¿ç”¨ãƒ»NULLã§
+	@param[in]	cchSize	å‰Šé™¤ã™ã‚‹æ–‡å­—æ•°
+	@return		INT		ï¼æ”¹è¡Œç„¡ã—ã€€ï¼‘ï½æ”¹è¡Œã‚’ã‚µã‚¯ã£ãŸå›æ•°
 */
 INT DocStringErase( INT xDot, INT yLine, LPTSTR ptDummy, INT cchSize )
 {
 	INT	i, iCrLf, iLetter, rdCnt;
 
-	//	¡‚Ì•¶šˆÊ’uEƒLƒƒƒŒƒbƒg‚æ‚è––”ö•ûŒü‚Éíœ‚·‚é‚Ì‚ÅA‚±‚ÌˆÊ’u‚Í•Ï‚í‚ç‚È‚¢
-	iLetter = DocLetterPosGetAdjust( &xDot, yLine, 0 );	//	¡‚Ì•¶šˆÊ’u‚ğŠm”F
+	//	ä»Šã®æ–‡å­—ä½ç½®ãƒ»ã‚­ãƒ£ãƒ¬ãƒƒãƒˆã‚ˆã‚Šæœ«å°¾æ–¹å‘ã«å‰Šé™¤ã™ã‚‹ã®ã§ã€ã“ã®ä½ç½®ã¯å¤‰ã‚ã‚‰ãªã„
+	iLetter = DocLetterPosGetAdjust( &xDot, yLine, 0 );	//	ä»Šã®æ–‡å­—ä½ç½®ã‚’ç¢ºèª
 
 	rdCnt = 0;
-	for( i = 0; cchSize > i; i++ )	//	DEL˜A‘Å‚Á‚Ä‚±‚Æ
+	for( i = 0; cchSize > i; i++ )	//	DELé€£æ‰“ã£ã¦ã“ã¨
 	{
 		iCrLf = DocLetterErase( xDot, yLine, iLetter );
-		if( 0 >  iCrLf )	break;	//	ˆÙí”­¶
+		if( 0 >  iCrLf )	break;	//	ç•°å¸¸ç™ºç”Ÿ
 		if( iCrLf ){	i++;	rdCnt++;	}
 	}
 
-	DocBadSpaceCheck( yLine );	//	—Ç‚­‚È‚¢ƒXƒy[ƒX‚ğ’²‚×‚Ä‚¨‚­
+	DocBadSpaceCheck( yLine );	//	è‰¯ããªã„ã‚¹ãƒšãƒ¼ã‚¹ã‚’èª¿ã¹ã¦ãŠã
 
 	return rdCnt;
 }
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	w’ès‚ÌƒhƒbƒgˆÊ’u(ƒLƒƒƒŒƒbƒgˆÊ’u)‚É•¶š—ñ‚ğ’Ç‰Á‚·‚éE‚±‚Á‚¿‚ª‰ºˆÊ”Ÿ”
-	@param[in]	pNowDot	¡‚ÌƒLƒƒƒŒƒbƒg‚ÌƒhƒbƒgˆÊ’u‚Ìƒ|ƒCƒ“ƒ^[
-	@param[in]	pdLine	‘ÎÛ‚Ìs”Ô†Eâ‘Î‚OƒCƒ“ƒfƒbƒNƒX‚©
-	@param[in]	ptStr	’Ç‰Á‚µ‚½‚¢•¶š—ñ
-	@param[in]	cchSize	•¶š—ñ‚Ì•¶š”Eƒkƒ‹ƒ^[ƒ~ƒl[ƒ^ŠÜ‚Ü‚¸
-	@return		INT		‚O‰üs–³‚µ@‚P`‰üs‚µ‚½‰ñ”
+	æŒ‡å®šè¡Œã®ãƒ‰ãƒƒãƒˆä½ç½®(ã‚­ãƒ£ãƒ¬ãƒƒãƒˆä½ç½®)ã«æ–‡å­—åˆ—ã‚’è¿½åŠ ã™ã‚‹ãƒ»ã“ã£ã¡ãŒä¸‹ä½å‡½æ•°
+	@param[in]	pNowDot	ä»Šã®ã‚­ãƒ£ãƒ¬ãƒƒãƒˆã®ãƒ‰ãƒƒãƒˆä½ç½®ã®ãƒã‚¤ãƒ³ã‚¿ãƒ¼
+	@param[in]	pdLine	å¯¾è±¡ã®è¡Œç•ªå·ãƒ»çµ¶å¯¾ï¼ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã‹
+	@param[in]	ptStr	è¿½åŠ ã—ãŸã„æ–‡å­—åˆ—
+	@param[in]	cchSize	æ–‡å­—åˆ—ã®æ–‡å­—æ•°ãƒ»ãƒŒãƒ«ã‚¿ãƒ¼ãƒŸãƒãƒ¼ã‚¿å«ã¾ãš
+	@return		INT		ï¼æ”¹è¡Œç„¡ã—ã€€ï¼‘ï½æ”¹è¡Œã—ãŸå›æ•°
 */
 INT DocStringAdd( PINT pNowDot, PINT pdLine, LPCTSTR ptStr, INT cchSize )
 {
@@ -690,17 +690,17 @@ INT DocStringAdd( PINT pNowDot, PINT pdLine, LPCTSTR ptStr, INT cchSize )
 #endif
 	for( i = 0; cchSize > i; i++ )
 	{
-		if( CC_CR == ptStr[i] && CC_LF == ptStr[i+1] )	//	‰üs‚Å‚ ‚Á‚½‚ç
+		if( CC_CR == ptStr[i] && CC_LF == ptStr[i+1] )	//	æ”¹è¡Œã§ã‚ã£ãŸã‚‰
 		{
 			DocInputReturn( insDot, *pdLine );
-			i++;			//	0x0D,0x0A‚¾‚©‚çAˆë•¶š”ò‚Î‚·‚Ì‚ªƒ|ƒCƒ“ƒg
-			(*pdLine)++;	//	‰üs‚µ‚½‚©‚çFocus‚ÍŸ‚Ìs‚Ö
-			insDot =  0;	//	‚»‚µ‚Äs‚Ìæ“ª‚Å‚ ‚é
-			dCrLf++;		//	‰üs‚µ‚½‰ñ”ƒJƒEƒ“ƒg
+			i++;			//	0x0D,0x0Aã ã‹ã‚‰ã€å£±æ–‡å­—é£›ã°ã™ã®ãŒãƒã‚¤ãƒ³ãƒˆ
+			(*pdLine)++;	//	æ”¹è¡Œã—ãŸã‹ã‚‰Focusã¯æ¬¡ã®è¡Œã¸
+			insDot =  0;	//	ãã—ã¦è¡Œã®å…ˆé ­ã§ã‚ã‚‹
+			dCrLf++;		//	æ”¹è¡Œã—ãŸå›æ•°ã‚«ã‚¦ãƒ³ãƒˆ
 		}
 		else if( CC_TAB == ptStr[i] )
 		{
-			//	ƒ^ƒu‚Í‘}“ü‚µ‚È‚¢
+			//	ã‚¿ãƒ–ã¯æŒ¿å…¥ã—ãªã„
 		}
 		else
 		{
@@ -718,7 +718,7 @@ INT DocStringAdd( PINT pNowDot, PINT pdLine, LPCTSTR ptStr, INT cchSize )
 #ifdef DO_TRY_CATCH
 	try{
 #endif
-	//	‚±‚±‚Å‹ó”’ƒ`ƒFƒLEŠJns‚©‚çI—¹s‚Ü‚Åƒuƒ“ƒuƒ“‚·‚é
+	//	ã“ã“ã§ç©ºç™½ãƒã‚§ã‚­ãƒ»é–‹å§‹è¡Œã‹ã‚‰çµ‚äº†è¡Œã¾ã§ãƒ–ãƒ³ãƒ–ãƒ³ã™ã‚‹
 	for( i = dLn; *pdLine >= i; i++ )
 	{
 		DocBadSpaceCheck( i );
@@ -729,7 +729,7 @@ INT DocStringAdd( PINT pNowDot, PINT pdLine, LPCTSTR ptStr, INT cchSize )
 	catch( exception &err ){	return (INT)ETC_MSG( err.what(), 0 );	}
 	catch( ... ){	return (INT)ETC_MSG( ("etc error"), 0 );	}
 #endif
-	//	ƒAƒ“ƒhƒDƒŠƒhƒD‚Í‚±‚±‚Å‚Í‚È‚­ŒÄ‚ñ‚¾‚Ù‚¤‚Å–Ê“|Œ©‚é‚Ù‚¤‚ª‚¢‚¢
+	//	ã‚¢ãƒ³ãƒ‰ã‚¥ãƒªãƒ‰ã‚¥ã¯ã“ã“ã§ã¯ãªãå‘¼ã‚“ã ã»ã†ã§é¢å€’è¦‹ã‚‹ã»ã†ãŒã„ã„
 
 	*pNowDot = insDot;
 
@@ -738,13 +738,13 @@ INT DocStringAdd( PINT pNowDot, PINT pdLine, LPCTSTR ptStr, INT cchSize )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	w’ès‚ÌƒhƒbƒgˆÊ’u(ƒLƒƒƒŒƒbƒgˆÊ’u)‚É•¶š—ñ‚ğ‹éŒ`‚Å’Ç‰Á‚·‚é
-	@param[in]	pNowDot	¡‚ÌƒLƒƒƒŒƒbƒg‚ÌƒhƒbƒgˆÊ’u‚Ìƒ|ƒCƒ“ƒ^[
-	@param[in]	pdLine	‘ÎÛ‚Ìs”Ô†Eâ‘Î‚OƒCƒ“ƒfƒbƒNƒX‚©
-	@param[in]	ptStr	’Ç‰Á‚µ‚½‚¢•¶š—ñ
-	@param[in]	cchSize	•¶š—ñ‚Ì•¶š”Eƒkƒ‹ƒ^[ƒ~ƒl[ƒ^ŠÜ‚Ü‚¸
-	@param[out]	*ppstPt	Še‘}“üêŠ‚ğ“ü‚ê‚éƒoƒbƒtƒ@‚Ìƒ|ƒCƒ“ƒ^‚ğƒ|ƒCƒ“ƒ^
-	@return		INT		ˆ—‚µ‚½s”
+	æŒ‡å®šè¡Œã®ãƒ‰ãƒƒãƒˆä½ç½®(ã‚­ãƒ£ãƒ¬ãƒƒãƒˆä½ç½®)ã«æ–‡å­—åˆ—ã‚’çŸ©å½¢ã§è¿½åŠ ã™ã‚‹
+	@param[in]	pNowDot	ä»Šã®ã‚­ãƒ£ãƒ¬ãƒƒãƒˆã®ãƒ‰ãƒƒãƒˆä½ç½®ã®ãƒã‚¤ãƒ³ã‚¿ãƒ¼
+	@param[in]	pdLine	å¯¾è±¡ã®è¡Œç•ªå·ãƒ»çµ¶å¯¾ï¼ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã‹
+	@param[in]	ptStr	è¿½åŠ ã—ãŸã„æ–‡å­—åˆ—
+	@param[in]	cchSize	æ–‡å­—åˆ—ã®æ–‡å­—æ•°ãƒ»ãƒŒãƒ«ã‚¿ãƒ¼ãƒŸãƒãƒ¼ã‚¿å«ã¾ãš
+	@param[out]	*ppstPt	å„æŒ¿å…¥å ´æ‰€ã‚’å…¥ã‚Œã‚‹ãƒãƒƒãƒ•ã‚¡ã®ãƒã‚¤ãƒ³ã‚¿ã‚’ãƒã‚¤ãƒ³ã‚¿
+	@return		INT		å‡¦ç†ã—ãŸè¡Œæ•°
 */
 INT DocSquareAdd( PINT pNowDot, PINT pdLine, LPCTSTR ptStr, INT cchSize, LPPOINT *ppstPt )
 {
@@ -763,14 +763,14 @@ INT DocSquareAdd( PINT pNowDot, PINT pdLine, LPCTSTR ptStr, INT cchSize, LPPOINT
 	do
 	{
 		dBaseDot  = *pNowDot;
-		DocLetterPosGetAdjust( &dBaseDot, dBaseLine, 0 );	//	êŠ‡‚í‚¹
+		DocLetterPosGetAdjust( &dBaseDot, dBaseLine, 0 );	//	å ´æ‰€åˆã‚ã›
 
-		ptSprt = StrStr( ptCaret, CH_CRLFW );	//	‰üs‚Ì‚Æ‚±‚ë‚Ü‚Å
+		ptSprt = StrStr( ptCaret, CH_CRLFW );	//	æ”¹è¡Œã®ã¨ã“ã‚ã¾ã§
 		if( !(ptSprt) ){	ptSprt = ptStr + cchSize;	}
-		//	––’[‚Ü‚Å‰üs‚ª‚È‚©‚Á‚½‚çA––’[•¶š‚ÌˆÊ’u‚ğ“ü‚ê‚é
-		cchMozi = ptSprt - ptCaret;	//	‚»‚±‚Ü‚Å‚Ì•¶š”‹‚ß‚Ä
+		//	æœ«ç«¯ã¾ã§æ”¹è¡ŒãŒãªã‹ã£ãŸã‚‰ã€æœ«ç«¯æ–‡å­—ã®ä½ç½®ã‚’å…¥ã‚Œã‚‹
+		cchMozi = ptSprt - ptCaret;	//	ãã“ã¾ã§ã®æ–‡å­—æ•°æ±‚ã‚ã¦
 		
-		//	Šes‚Ì’Ç‰ÁêŠ‚ğŠo‚¦‚Ä‚¨‚­
+		//	å„è¡Œã®è¿½åŠ å ´æ‰€ã‚’è¦šãˆã¦ãŠã
 		pstBuf = (LPPOINT)realloc( *ppstPt, ( sizeof(POINT) * (dCrLf+1) ) );
 
 		if( pstBuf ){	*ppstPt = pstBuf;	}
@@ -781,14 +781,14 @@ INT DocSquareAdd( PINT pNowDot, PINT pdLine, LPCTSTR ptStr, INT cchSize, LPPOINT
 		pstBuf->y = dBaseLine;
 		DocStringAdd( &dBaseDot, &dBaseLine, ptCaret, cchMozi );
 
-		ptCaret = NextLineW( ptSprt );	//	Ÿ‚Ìs‚Ìæ“ª‚ÉˆÚ“®
-		if( *ptCaret  ){	dBaseLine++;	}	//	sˆÊ’u‚ài‚ß‚é
+		ptCaret = NextLineW( ptSprt );	//	æ¬¡ã®è¡Œã®å…ˆé ­ã«ç§»å‹•
+		if( *ptCaret  ){	dBaseLine++;	}	//	è¡Œä½ç½®ã‚‚é€²ã‚ã‚‹
 
 		dCrLf++;
 
-	}while( *ptCaret  );	//	ƒf[ƒ^—L‚éŒÀ‚èƒ‹[ƒv‚Å’T‚·
+	}while( *ptCaret  );	//	ãƒ‡ãƒ¼ã‚¿æœ‰ã‚‹é™ã‚Šãƒ«ãƒ¼ãƒ—ã§æ¢ã™
 
-	*pdLine  = dBaseLine;	//	––’[ˆÊ’u‚ğ‘‚«–ß‚·
+	*pdLine  = dBaseLine;	//	æœ«ç«¯ä½ç½®ã‚’æ›¸ãæˆ»ã™
 	*pNowDot = dBaseDot;
 
 	return dCrLf;
@@ -796,10 +796,10 @@ INT DocSquareAdd( PINT pNowDot, PINT pdLine, LPCTSTR ptStr, INT cchSize, LPPOINT
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	Œ»İ•Å‚Ì––’[‚É‰üs‚ğ’Ç‰Á‚·‚é
-	@param[in]	addLine	’Ç‰Á‚·‚és”
-	@param[in]	pFirst	ƒAƒ“ƒhƒD‚Ì”ñ‚O‰‚ß‚Ä‚ÌƒOƒ‹[ƒv@‚O‘±‚«‚Ìˆ—
-	@return		‘S‘Ì‚Ìs”
+	ç¾åœ¨é ã®æœ«ç«¯ã«æ”¹è¡Œã‚’è¿½åŠ ã™ã‚‹
+	@param[in]	addLine	è¿½åŠ ã™ã‚‹è¡Œæ•°
+	@param[in]	pFirst	ã‚¢ãƒ³ãƒ‰ã‚¥ã®éï¼åˆã‚ã¦ã®ã‚°ãƒ«ãƒ¼ãƒ—ã€€ï¼ç¶šãã®å‡¦ç†
+	@return		å…¨ä½“ã®è¡Œæ•°
 */
 INT DocAdditionalLine( INT addLine, PBOOLEAN pFirst )
 {
@@ -809,12 +809,12 @@ INT DocAdditionalLine( INT addLine, PBOOLEAN pFirst )
 	LPTSTR		ptBuffer = NULL;
 
 	iLines = DocNowFilePageLineCount( );
-	//	‚±‚Ì•Å‚Ìs”
+	//	ã“ã®é ã®è¡Œæ•°
 
-	//	’Ç‰Á‚·‚é‚Ì‚ÍÅIs‚Ì––’[
+	//	è¿½åŠ ã™ã‚‹ã®ã¯æœ€çµ‚è¡Œã®æœ«ç«¯
 	dBaseLine = iLines - 1;
 
-	cchMozi = CH_CRLF_CCH * addLine;	//	‰üs‚Ì•¶š”{‚Ê‚é‚½[‚İ‚Ë[‚½
+	cchMozi = CH_CRLF_CCH * addLine;	//	æ”¹è¡Œã®æ–‡å­—æ•°ï¼‹ã¬ã‚‹ãŸãƒ¼ã¿ã­ãƒ¼ãŸ
 	cbSize  = (cchMozi + 1) * sizeof(TCHAR);
 	ptBuffer = (LPTSTR)malloc( cbSize );
 
@@ -822,7 +822,7 @@ INT DocAdditionalLine( INT addLine, PBOOLEAN pFirst )
 	for( i = 0; addLine >  i; i++ )
 	{
 		StringCchCat( ptBuffer, cchMozi + 1, CH_CRLFW );
-		ViewRedrawSetLine( dBaseLine + i  );	//	Ä•`‰æs‚ğŠm’è‚µ‚Ä‚¨‚­
+		ViewRedrawSetLine( dBaseLine + i  );	//	å†æç”»è¡Œã‚’ç¢ºå®šã—ã¦ãŠã
 	}
 
 	dBaseDot = DocLineParamGet( dBaseLine, NULL, NULL );
@@ -838,51 +838,51 @@ INT DocAdditionalLine( INT addLine, PBOOLEAN pFirst )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	‹éŒ`“\•t‚ğ‚·‚é‘O‚ÉA	ê‚Ìó‹µ‚ğŠm”F‚µ‚ÄA•K—v‚È‚ç®Œ`‚·‚é
-	@param[in]	xDot		’Ç‰ÁŠJn‚·‚éƒhƒbƒgˆÊ’u
-	@param[in]	yLine		’Ç‰ÁŠJn‚·‚és”Ô†
-	@param[in]	dNeedLine	g‚¤s”
-	@param[in]	bFirst		ƒAƒ“ƒhƒD‚Ì”ñ‚O‰‚ß‚Ä‚ÌƒOƒ‹[ƒv@‚O‘±‚«‚Ìˆ—
-	@return		INT		”ñ‚O‚µ‚È‚©‚Á‚½@‚Oˆ—‚µ‚½
+	çŸ©å½¢è²¼ä»˜ã‚’ã™ã‚‹å‰ã«ã€	å ´ã®çŠ¶æ³ã‚’ç¢ºèªã—ã¦ã€å¿…è¦ãªã‚‰æ•´å½¢ã™ã‚‹
+	@param[in]	xDot		è¿½åŠ é–‹å§‹ã™ã‚‹ãƒ‰ãƒƒãƒˆä½ç½®
+	@param[in]	yLine		è¿½åŠ é–‹å§‹ã™ã‚‹è¡Œç•ªå·
+	@param[in]	dNeedLine	ä½¿ã†è¡Œæ•°
+	@param[in]	bFirst		ã‚¢ãƒ³ãƒ‰ã‚¥ã®éï¼åˆã‚ã¦ã®ã‚°ãƒ«ãƒ¼ãƒ—ã€€ï¼ç¶šãã®å‡¦ç†
+	@return		INT		éï¼ã—ãªã‹ã£ãŸã€€ï¼å‡¦ç†ã—ãŸ
 */
 INT DocSquareAddPreMod( INT xDot, INT yLine, INT dNeedLine, BOOLEAN bFirst )
 {
-//	s‘‚â‚·‚Ì‚ÆAŠ’è‚ÌˆÊ’u‚Ü‚ÅƒXƒy[ƒX‚Å–„‚ß‚é
+//	è¡Œå¢—ã‚„ã™ã®ã¨ã€æ‰€å®šã®ä½ç½®ã¾ã§ã‚¹ãƒšãƒ¼ã‚¹ã§åŸ‹ã‚ã‚‹
 	INT_PTR	iLines;
 	INT		iBaseDot, iBaseLine, iMinus, i;
 	UINT	cchBuf;
 	LPTSTR	ptBuffer = NULL;
 
 
-	//	‚±‚Ì•Å‚Ìs”
+	//	ã“ã®é ã®è¡Œæ•°
 	iLines = DocNowFilePageLineCount( );
 
-	//	‘S‘Ìs”‚æ‚èA’Ç‰Ás”‚ª‘½‚©‚Á‚½‚çA‰üs‘‚â‚·
+	//	å…¨ä½“è¡Œæ•°ã‚ˆã‚Šã€è¿½åŠ è¡Œæ•°ãŒå¤šã‹ã£ãŸã‚‰ã€æ”¹è¡Œå¢—ã‚„ã™
 	if( iLines < (dNeedLine + yLine) )
 	{
-		iMinus = (dNeedLine + yLine) - iLines;	//	’Ç‰Á‚·‚és”
+		iMinus = (dNeedLine + yLine) - iLines;	//	è¿½åŠ ã™ã‚‹è¡Œæ•°
 
 		DocAdditionalLine( iMinus, &bFirst );//	bFirst = FALSE;
 
-		//	‚±‚Ì•Å‚Ìs”æ‚è’¼‚µ
+		//	ã“ã®é ã®è¡Œæ•°å–ã‚Šç›´ã—
 		iLines = DocNowFilePageLineCount( );
 	}
 
-	//	Šes‚Ìƒhƒbƒg”‚ğŠm”F‚µ‚ÄA‘«‚è‚È‚¢‚Æ‚±‚ë‚ğƒpƒfƒBƒ“ƒO‚·‚é
-	//‘½‚¢•ª‚É‚Í–â‘è–³‚µE‘«‚è‚È‚¢‚Ì‚ª‚RˆÈ‰º‚È‚ç–³‹A‚ ‚Æ‚Í“K“–‚ÉƒpƒfƒBƒ“ƒO‚ğì‚é
-	//—Ç‚¢Š´‚¶‚Ì”‚ª–³‚©‚Á‚½‚ç‘Œ¸‚µ‚Äì‚ê‚é‚Ü‚Å‚³‚ª‚·
+	//	å„è¡Œã®ãƒ‰ãƒƒãƒˆæ•°ã‚’ç¢ºèªã—ã¦ã€è¶³ã‚Šãªã„ã¨ã“ã‚ã‚’ãƒ‘ãƒ‡ã‚£ãƒ³ã‚°ã™ã‚‹
+	//å¤šã„åˆ†ã«ã¯å•é¡Œç„¡ã—ãƒ»è¶³ã‚Šãªã„ã®ãŒï¼“ä»¥ä¸‹ãªã‚‰ç„¡è¦–ã€ã‚ã¨ã¯é©å½“ã«ãƒ‘ãƒ‡ã‚£ãƒ³ã‚°ã‚’ä½œã‚‹
+	//è‰¯ã„æ„Ÿã˜ã®æ•°ãŒç„¡ã‹ã£ãŸã‚‰å¢—æ¸›ã—ã¦ä½œã‚Œã‚‹ã¾ã§ã•ãŒã™
 	for( i = 0; dNeedLine > i; i++ )
 	{
 		iBaseLine = yLine + i;
 		iBaseDot  = DocLineParamGet( iBaseLine, NULL, NULL );
-		//	Šî€‚©‚ç‘¶İƒhƒbƒg‚ğˆø‚­‚ÆA{‚È‚ç‘«‚è‚È‚¢
+		//	åŸºæº–ã‹ã‚‰å­˜åœ¨ãƒ‰ãƒƒãƒˆã‚’å¼•ãã¨ã€ï¼‹ãªã‚‰è¶³ã‚Šãªã„
 		iMinus    = xDot - iBaseDot;
 
 		if( gbUniPad  ){	if( 0 >= iMinus )	continue;	}
-		else{	if( 3 >= iMinus )	continue;	}	//	—]‚é‚©‚RˆÈ‰º‚È‚ç‹C‚É‚·‚é•K—v‚Í–³‚¢
+		else{	if( 3 >= iMinus )	continue;	}	//	ä½™ã‚‹ã‹ï¼“ä»¥ä¸‹ãªã‚‰æ°—ã«ã™ã‚‹å¿…è¦ã¯ç„¡ã„
 
 		ptBuffer = DocPaddingSpaceWithPeriod( iMinus, NULL, NULL, NULL, FALSE );
-		if( !ptBuffer )	//	‚Ü‚¸‚ÍãY—í‚É”[‚ß‚é‚Ì‚ğ‚İ‚ÄAƒ_ƒ‚È‚çƒYƒŒ‚ ‚è‚ÅÄŒvZ
+		if( !ptBuffer )	//	ã¾ãšã¯ç¶ºéº—ã«ç´ã‚ã‚‹ã®ã‚’è©¦ã¿ã¦ã€ãƒ€ãƒ¡ãªã‚‰ã‚ºãƒ¬ã‚ã‚Šã§å†è¨ˆç®—
 		{	ptBuffer = DocPaddingSpaceWithGap( iMinus, NULL, NULL );	}
 		if( !ptBuffer ){	continue;	}
 		StringCchLength( ptBuffer, STRSAFE_MAX_CCH, &cchBuf );
@@ -900,14 +900,14 @@ INT DocSquareAddPreMod( INT xDot, INT yLine, INT dNeedLine, BOOLEAN bFirst )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	•¶š—ñi‹éŒ`‚àƒAƒŠj‚ğ‘}“ü‚·‚é
-	@param[in,out]	pNowDot	¡‚ÌƒLƒƒƒŒƒbƒg‚ÌƒhƒbƒgˆÊ’u
-	@param[in,out]	pdLine	‘ÎÛ‚Ìs”Ô†Eâ‘Î‚OƒCƒ“ƒfƒbƒNƒX‚©
-	@param[in,out]	pdMozi	¡‚ÌƒLƒƒƒŒƒbƒg‚Ì•¶š”ENULL‚Å‚à‚¨‚‹
-	@param[in]		ptText	‘}“ü‚·‚é•¶š—ñ
-	@param[in]		dStyle	‹éŒ`‚©‚Ç‚¤‚©A•s‰Â‹“Á•Ê‚©
-	@param[in]		bFirst	ƒAƒ“ƒhƒD—pE‚±‚ê‚ªÅ‰‚ÌƒAƒNƒVƒ‡ƒ“‚©
-	@return		‚Oˆës‚Å‚·‚ñ‚¾@”ñ‚O•¡”s‚É“n‚Á‚½
+	æ–‡å­—åˆ—ï¼ˆçŸ©å½¢ã‚‚ã‚¢ãƒªï¼‰ã‚’æŒ¿å…¥ã™ã‚‹
+	@param[in,out]	pNowDot	ä»Šã®ã‚­ãƒ£ãƒ¬ãƒƒãƒˆã®ãƒ‰ãƒƒãƒˆä½ç½®
+	@param[in,out]	pdLine	å¯¾è±¡ã®è¡Œç•ªå·ãƒ»çµ¶å¯¾ï¼ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã‹
+	@param[in,out]	pdMozi	ä»Šã®ã‚­ãƒ£ãƒ¬ãƒƒãƒˆã®æ–‡å­—æ•°ãƒ»NULLã§ã‚‚ãŠï½‹
+	@param[in]		ptText	æŒ¿å…¥ã™ã‚‹æ–‡å­—åˆ—
+	@param[in]		dStyle	çŸ©å½¢ã‹ã©ã†ã‹ã€ä¸å¯è¦–ç‰¹åˆ¥ã‹
+	@param[in]		bFirst	ã‚¢ãƒ³ãƒ‰ã‚¥ç”¨ãƒ»ã“ã‚ŒãŒæœ€åˆã®ã‚¢ã‚¯ã‚·ãƒ§ãƒ³ã‹
+	@return		ï¼å£±è¡Œã§ã™ã‚“ã ã€€éï¼è¤‡æ•°è¡Œã«æ¸¡ã£ãŸ
 */
 INT DocInsertString( PINT pNowDot, PINT pdLine, PINT pdMozi, LPCTSTR ptText, UINT dStyle, BOOLEAN bFirst )
 {
@@ -920,22 +920,22 @@ INT DocInsertString( PINT pNowDot, PINT pdLine, PINT pdMozi, LPCTSTR ptText, UIN
 	dBaseLine = *pdLine;
 	dLastLine = *pdLine;
 
-	if( !(ptText)  )	return 0;	//	‘}“ü•¶š—ñ‚ª‚È‚¢‚È‚ç’¼‚®I‚í‚Á‚Ä‚æ‚¢
+	if( !(ptText)  )	return 0;	//	æŒ¿å…¥æ–‡å­—åˆ—ãŒãªã„ãªã‚‰ç›´ãçµ‚ã‚ã£ã¦ã‚ˆã„
 
 	StringCchLength( ptText, STRSAFE_MAX_CCH, &cchSize );
 
-	if( dStyle &  D_SQUARE )	//	‹éŒ`—p
+	if( dStyle &  D_SQUARE )	//	çŸ©å½¢ç”¨
 	{
-		//	g‚¤s”
+		//	ä½¿ã†è¡Œæ•°
 		dNeedLine = DocStringInfoCount( ptText, cchSize, NULL, NULL );
 
 		bFirst = DocSquareAddPreMod( *pNowDot, *pdLine, dNeedLine, bFirst );
-		//	’†‚ÅƒAƒ“ƒhƒD’Ç‰Á‚Ü‚Å‚â‚éB
+		//	ä¸­ã§ã‚¢ãƒ³ãƒ‰ã‚¥è¿½åŠ ã¾ã§ã‚„ã‚‹ã€‚
 
-		pstPoint = NULL;	//	NULL‰»•K{
+		pstPoint = NULL;	//	NULLåŒ–å¿…é ˆ
 		dCrLf = DocSquareAdd( pNowDot, pdLine, ptText, cchSize, &pstPoint );
 
-		//	“\•t‘O‚Ì®Œ`‚ğŠÜ‚ß‚Ä‚PGroup‚Æ‚µ‚Äˆµ‚¤•K—v‚ª‚ ‚é
+		//	è²¼ä»˜å‰ã®æ•´å½¢ã‚’å«ã‚ã¦ï¼‘Groupã¨ã—ã¦æ‰±ã†å¿…è¦ãŒã‚ã‚‹
 		SqnAppendSquare( &((*gitFileIt).vcCont.at( gixFocusPage ).stUndoLog), DO_INSERT, ptText, pstPoint, dCrLf, bFirst );
 		bFirst = FALSE;
 
@@ -945,13 +945,13 @@ INT DocInsertString( PINT pNowDot, PINT pdLine, PINT pdMozi, LPCTSTR ptText, UIN
 	}
 	else
 	{
-		//	‚±‚Ì’†‚Å‰üs‚Æ‚©–Ê“|Œ©‚é
+		//	ã“ã®ä¸­ã§æ”¹è¡Œã¨ã‹é¢å€’è¦‹ã‚‹
 		dCrLf = DocStringAdd( pNowDot, pdLine, ptText, cchSize );
 
 		SqnAppendString( &((*gitFileIt).vcCont.at( gixFocusPage ).stUndoLog), DO_INSERT, ptText, dBaseDot, dBaseLine, bFirst );
 		bFirst = FALSE;
 
-		dLastLine = DocPageParamGet( NULL, NULL );//ÄŒvZ•K—v‚©H
+		dLastLine = DocPageParamGet( NULL, NULL );//å†è¨ˆç®—å¿…è¦ã‹ï¼Ÿ
 	}
 
 	if( dCrLf )
@@ -963,9 +963,9 @@ INT DocInsertString( PINT pNowDot, PINT pdLine, PINT pdMozi, LPCTSTR ptText, UIN
 		ViewRedrawSetLine( *pdLine );
 	}
 
-	if( pdMozi ){	*pdMozi = DocLetterPosGetAdjust( pNowDot, *pdLine , 0 );	}	//	¡‚Ì•¶šˆÊ’u‚ğŠm”F
+	if( pdMozi ){	*pdMozi = DocLetterPosGetAdjust( pNowDot, *pdLine , 0 );	}	//	ä»Šã®æ–‡å­—ä½ç½®ã‚’ç¢ºèª
 
-	//	ƒ„ƒoƒCó‘Ô‚Ì‚Æ‚«‚Í‘€ì‚µ‚È‚¢‚æ‚¤‚É‚·‚é
+	//	ãƒ¤ãƒã‚¤çŠ¶æ…‹ã®ã¨ãã¯æ“ä½œã—ãªã„ã‚ˆã†ã«ã™ã‚‹
 	if( !(D_INVISI & dStyle) )	ViewDrawCaret( *pNowDot, *pdLine, TRUE );
 
 
@@ -974,12 +974,12 @@ INT DocInsertString( PINT pNowDot, PINT pdLine, PINT pdMozi, LPCTSTR ptText, UIN
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	ƒNƒŠƒbƒvƒ{[ƒh‚Ì•¶š—ñ‚ğ‘}“ü‚·‚éE‚¢‚í‚ä‚é“\‚è•t‚¯
-	@param[in,out]	pNowDot	¡‚ÌƒLƒƒƒŒƒbƒg‚ÌƒhƒbƒgˆÊ’u
-	@param[in,out]	pdLine	‘ÎÛ‚Ìs”Ô†Eâ‘Î‚OƒCƒ“ƒfƒbƒNƒX‚©
-	@param[in,out]	pdMozi	¡‚ÌƒLƒƒƒŒƒbƒg‚Ì•¶š”
-	@param[in]		bSqMode	”ñ‚O‹­§‹éŒ`“\•tE“à—e‘‚â‚·‚È‚çFlag‚É’ˆÓ
-	@return		‚Oˆës‚Å‚·‚ñ‚¾@”ñ‚O•¡”s‚É“n‚Á‚½
+	ã‚¯ãƒªãƒƒãƒ—ãƒœãƒ¼ãƒ‰ã®æ–‡å­—åˆ—ã‚’æŒ¿å…¥ã™ã‚‹ãƒ»ã„ã‚ã‚†ã‚‹è²¼ã‚Šä»˜ã‘
+	@param[in,out]	pNowDot	ä»Šã®ã‚­ãƒ£ãƒ¬ãƒƒãƒˆã®ãƒ‰ãƒƒãƒˆä½ç½®
+	@param[in,out]	pdLine	å¯¾è±¡ã®è¡Œç•ªå·ãƒ»çµ¶å¯¾ï¼ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã‹
+	@param[in,out]	pdMozi	ä»Šã®ã‚­ãƒ£ãƒ¬ãƒƒãƒˆã®æ–‡å­—æ•°
+	@param[in]		bSqMode	éï¼å¼·åˆ¶çŸ©å½¢è²¼ä»˜ãƒ»å†…å®¹å¢—ã‚„ã™ãªã‚‰Flagã«æ³¨æ„
+	@return		ï¼å£±è¡Œã§ã™ã‚“ã ã€€éï¼è¤‡æ•°è¡Œã«æ¸¡ã£ãŸ
 */
 INT DocInputFromClipboard( PINT pNowDot, PINT pdLine, PINT pdMozi, UINT bSqMode )
 {
@@ -990,17 +990,17 @@ INT DocInputFromClipboard( PINT pNowDot, PINT pdLine, PINT pdMozi, UINT bSqMode 
 	UINT	dSqSel, iLines;
 
 
-	//	ƒNƒŠƒbƒvƒ{[ƒh‚©‚çƒf[ƒ^‚ğ’¸‚­
+	//	ã‚¯ãƒªãƒƒãƒ—ãƒœãƒ¼ãƒ‰ã‹ã‚‰ãƒ‡ãƒ¼ã‚¿ã‚’é ‚ã
 	ptString = DocClipboardDataGet( &dStyle );
 	if( !(ptString) )
 	{
-		NotifyBalloonExist( TEXT("ƒeƒLƒXƒg‚¶‚á‚È‚¢‚İ‚½‚¢B\t\n“\‚è•t‚¯‚ç‚ê‚È‚¢‚æB"), TEXT("‚¨—Ó‚©‚ç‚Ì‚¨’m‚ç‚¹"), NIIF_INFO );
+		NotifyBalloonExist( TEXT("ãƒ†ã‚­ã‚¹ãƒˆã˜ã‚ƒãªã„ã¿ãŸã„ã€‚\t\nè²¼ã‚Šä»˜ã‘ã‚‰ã‚Œãªã„ã‚ˆã€‚"), TEXT("ãŠç‡ã‹ã‚‰ã®ãŠçŸ¥ã‚‰ã›"), NIIF_INFO );
 		return 0;
 	}
 
 	StringCchLength( ptString, STRSAFE_MAX_CCH, &cchSize );
 
-	//	ƒ^ƒu‚ğƒk‚­
+	//	ã‚¿ãƒ–ã‚’ãƒŒã
 	for( i = 0; cchSize > i; )
 	{
 		if( CC_TAB == ptString[i] )
@@ -1015,21 +1015,21 @@ INT DocInputFromClipboard( PINT pNowDot, PINT pdLine, PINT pdMozi, UINT bSqMode 
 		i++;
 	}
 
-	bSelect = IsSelecting( &dSqSel );	//	‘I‘ğó‘Ô‚Å‚ ‚é‚©
+	bSelect = IsSelecting( &dSqSel );	//	é¸æŠçŠ¶æ…‹ã§ã‚ã‚‹ã‹
 	if( bSelect )
 	{
 		DocSelRangeGet( &dTop, &dBtm );
 		dCrLf = DocSelectedDelete( pNowDot, pdLine, dSqSel, TRUE );
-		if( dCrLf  )	//	ˆ—‚µ‚½sˆÈ~‘Sæ‚Á‘Ö‚¦
+		if( dCrLf  )	//	å‡¦ç†ã—ãŸè¡Œä»¥é™å…¨å–ã£æ›¿ãˆ
 		{
-			iLines = DocPageParamGet( NULL, NULL );	//	ÄŒvZ‚à—v‚é‚©‚àEEE
+			iLines = DocPageParamGet( NULL, NULL );	//	å†è¨ˆç®—ã‚‚è¦ã‚‹ã‹ã‚‚ãƒ»ãƒ»ãƒ»
 			for( i = *pdLine; iLines >= i; i++ ){	ViewRedrawSetLine(  i );	}
 		}
 		else{	ViewRedrawSetLine( *pdLine );	}
 
 	}
 
-	if( bSqMode )	dStyle |= D_SQUARE;	//	‹éŒ`‘}“ü‚Æ‚µ‚Äˆµ‚¤‚©
+	if( bSqMode )	dStyle |= D_SQUARE;	//	çŸ©å½¢æŒ¿å…¥ã¨ã—ã¦æ‰±ã†ã‹
 	dCrLf = DocInsertString( pNowDot, pdLine, pdMozi, ptString, dStyle, TRUE );
 
 	FREE( ptString );
@@ -1041,22 +1041,22 @@ INT DocInputFromClipboard( PINT pNowDot, PINT pdLine, PINT pdMozi, UINT bSqMode 
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	‘I‘ğ”ÍˆÍ‚Ìƒf[ƒ^‚ğƒNƒŠƒbƒvƒ{[ƒh‚·‚é
-	@param[in]	bStyle	‚Pƒ†ƒjƒR[ƒh‚©ƒVƒtƒgJIS‚ÅA‹éŒ`‚©‚Ç‚¤‚©
-	@return				ƒRƒs[‚µ‚½ƒoƒCƒg”ENULLƒ^[ƒ~ƒl[ƒ^‚àŠÜ‚Ş
+	é¸æŠç¯„å›²ã®ãƒ‡ãƒ¼ã‚¿ã‚’ã‚¯ãƒªãƒƒãƒ—ãƒœãƒ¼ãƒ‰ã™ã‚‹
+	@param[in]	bStyle	ï¼‘ãƒ¦ãƒ‹ã‚³ãƒ¼ãƒ‰ã‹ã‚·ãƒ•ãƒˆJISã§ã€çŸ©å½¢ã‹ã©ã†ã‹
+	@return				ã‚³ãƒ”ãƒ¼ã—ãŸãƒã‚¤ãƒˆæ•°ãƒ»NULLã‚¿ãƒ¼ãƒŸãƒãƒ¼ã‚¿ã‚‚å«ã‚€
 */
 INT DocExClipSelect( UINT bStyle )
 {
 	INT	cbSize;
 	LPVOID	pString = NULL;
 
-	//	SJIS‚Ìê‡‚ÍAƒ†ƒjƒR[ƒh•¶š‚Í&#dddd;‚ÅŠm•Û‚³‚ê‚é
+	//	SJISã®å ´åˆã¯ã€ãƒ¦ãƒ‹ã‚³ãƒ¼ãƒ‰æ–‡å­—ã¯&#dddd;ã§ç¢ºä¿ã•ã‚Œã‚‹
 
 	cbSize = DocSelectTextGetAlloc( bStyle, &pString, NULL );
 
 	TRACE( TEXT("BYTE:%d"), cbSize );
 
-	//	‚à‚µ‘I‘ğ”ÍˆÍ‚È‚©‚Á‚½‚çAFocuss‚Ì“à—e‚ğƒRƒs‚é‚Æ‚©
+	//	ã‚‚ã—é¸æŠç¯„å›²ãªã‹ã£ãŸã‚‰ã€Focusè¡Œã®å†…å®¹ã‚’ã‚³ãƒ”ã‚‹ã¨ã‹
 
 	DocClipboardDataSet( pString, cbSize, bStyle );
 
@@ -1067,14 +1067,14 @@ INT DocExClipSelect( UINT bStyle )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	ƒNƒŠƒbƒvƒ{[ƒh‚Ìƒf[ƒ^‚ğ‚¢‚½‚¾‚­
-	@param[in]	pdStyle	‹éŒ`‚©‚Ç‚¤‚©‚ğŠm”F
-	@return		Šm•Û‚µ‚½•¶š—ñEmalloc‚µ‚Ä‚é‚Ì‚ÅA”Ÿ”ŒÄ‚ñ‚¾•û‚Åfree–Y‚ê‚È‚¢‚æ‚¤‚É
+	ã‚¯ãƒªãƒƒãƒ—ãƒœãƒ¼ãƒ‰ã®ãƒ‡ãƒ¼ã‚¿ã‚’ã„ãŸã ã
+	@param[in]	pdStyle	çŸ©å½¢ã‹ã©ã†ã‹ã‚’ç¢ºèª
+	@return		ç¢ºä¿ã—ãŸæ–‡å­—åˆ—ãƒ»mallocã—ã¦ã‚‹ã®ã§ã€å‡½æ•°å‘¼ã‚“ã æ–¹ã§freeå¿˜ã‚Œãªã„ã‚ˆã†ã«
 */
 LPTSTR DocClipboardDataGet( PUINT pdStyle )
 {
 	LPTSTR	ptString = NULL, ptClipTxt;
-	LPSTR	pcStr, pcClipTp;	//	•ÏŠ·—p—Õ
+	LPSTR	pcStr, pcClipTp;	//	å¤‰æ›ç”¨è‡¨æ™‚
 	DWORD	cbSize;
 	UINT	ixSqrFmt, dEnumFmt;
 	INT		ixCount, iC;
@@ -1082,39 +1082,39 @@ LPTSTR DocClipboardDataGet( PUINT pdStyle )
 
 	ixSqrFmt = RegisterClipboardFormat( CLIP_SQUARE );
 
-	//	ƒNƒŠƒbƒvƒ{[ƒh‚Ì’†g‚ğƒ`ƒFƒLE‚Ç‚Á‚¿‚É‚µ‚Ä‚àƒ†ƒjƒR[ƒhƒeƒLƒXƒgƒtƒ‰ƒO‚Í‚ ‚é
+	//	ã‚¯ãƒªãƒƒãƒ—ãƒœãƒ¼ãƒ‰ã®ä¸­èº«ã‚’ãƒã‚§ã‚­ãƒ»ã©ã£ã¡ã«ã—ã¦ã‚‚ãƒ¦ãƒ‹ã‚³ãƒ¼ãƒ‰ãƒ†ã‚­ã‚¹ãƒˆãƒ•ãƒ©ã‚°ã¯ã‚ã‚‹
 	if( IsClipboardFormatAvailable( CF_UNICODETEXT ) )
 	{
-		if( pdStyle )	//	‹éŒ`‚Å‚ ‚é‚©
+		if( pdStyle )	//	çŸ©å½¢ã§ã‚ã‚‹ã‹
 		{
 			if( IsClipboardFormatAvailable( ixSqrFmt ) ){	*pdStyle = D_SQUARE;	}
 		}
 
-		OpenClipboard( NULL );	//	ƒNƒŠƒbƒvƒ{[ƒh‚ğƒI[ƒ|ƒ“‚·‚é
-		//	ŠJ‚¯‚Á•ú‚µ‚¾‚Æ‘¼‚ÌƒAƒvƒŠ‚É–À˜f‚È‚Ì‚Å‚·‚®•Â‚ß‚é‚æ‚¤‚É
+		OpenClipboard( NULL );	//	ã‚¯ãƒªãƒƒãƒ—ãƒœãƒ¼ãƒ‰ã‚’ã‚ªãƒ¼ãƒãƒ³ã™ã‚‹
+		//	é–‹ã‘ã£æ”¾ã—ã ã¨ä»–ã®ã‚¢ãƒ—ãƒªã«è¿·æƒ‘ãªã®ã§ã™ãé–‰ã‚ã‚‹ã‚ˆã†ã«
 
-		dEnumFmt = 0;	//	‰Šú’l‚Í‚O
+		dEnumFmt = 0;	//	åˆæœŸå€¤ã¯ï¼
 		ixCount = CountClipboardFormats(  );
 		for( iC = 0; ixCount > iC; iC++ )
-		{	//	‡”Ô‚É—ñ‹“‚µ‚ÄAæ‚Éƒqƒbƒg‚µ‚½ƒtƒH[ƒ}ƒbƒg‚Åˆµ‚¤
+		{	//	é †ç•ªã«åˆ—æŒ™ã—ã¦ã€å…ˆã«ãƒ’ãƒƒãƒˆã—ãŸãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆã§æ‰±ã†
 			dEnumFmt = EnumClipboardFormats( dEnumFmt );
 			if( CF_UNICODETEXT == dEnumFmt || CF_TEXT == dEnumFmt ){	break;	}
 		}
 		if( 0 == dEnumFmt ){	return NULL;	}
-		//	‚»‚êˆÈã—ñ‹“‚ª–³‚¢‚©A”Ÿ”¸”s‚È‚ç‚O‚É‚È‚é
+		//	ãã‚Œä»¥ä¸Šåˆ—æŒ™ãŒç„¡ã„ã‹ã€å‡½æ•°å¤±æ•—ãªã‚‰ï¼ã«ãªã‚‹
 
-		//	ƒNƒŠƒbƒvƒ{[ƒh‚Ìƒf[ƒ^‚ğƒQƒbƒcI
-		//	ƒnƒ“ƒhƒ‹‚ÌƒI[ƒi[‚ÍƒNƒŠƒbƒvƒ{[ƒh‚È‚Ì‚ÅA‚±‚¿‚ç‚©‚ç‚Í‘€ì‚µ‚È‚¢‚æ‚¤‚É
-		//	’†g‚Ì•ÏX‚È‚Ç‚à‚Á‚Ä‚Ì‚Ù‚©‚Å‚ ‚é
+		//	ã‚¯ãƒªãƒƒãƒ—ãƒœãƒ¼ãƒ‰ã®ãƒ‡ãƒ¼ã‚¿ã‚’ã‚²ãƒƒãƒ„ï¼
+		//	ãƒãƒ³ãƒ‰ãƒ«ã®ã‚ªãƒ¼ãƒŠãƒ¼ã¯ã‚¯ãƒªãƒƒãƒ—ãƒœãƒ¼ãƒ‰ãªã®ã§ã€ã“ã¡ã‚‰ã‹ã‚‰ã¯æ“ä½œã—ãªã„ã‚ˆã†ã«
+		//	ä¸­èº«ã®å¤‰æ›´ãªã©ã‚‚ã£ã¦ã®ã»ã‹ã§ã‚ã‚‹
 		hClipData = GetClipboardData( dEnumFmt );
 
 		if( CF_UNICODETEXT == dEnumFmt )
 		{
-			//	æ“¾ƒf[ƒ^‚ğˆ—BTEXT‚È‚çAƒnƒ“ƒhƒ‹‚ÍƒOƒ[ƒoƒ‹ƒƒ‚ƒŠƒnƒ“ƒhƒ‹
-			//	V‚½‚ÉƒRƒs[‚³‚ê‚½‚çƒnƒ“ƒhƒ‹‚Í–³Œø‚É‚È‚é‚Ì‚ÅA’†g‚ğƒRƒs[‚¹‚æ
+			//	å–å¾—ãƒ‡ãƒ¼ã‚¿ã‚’å‡¦ç†ã€‚TEXTãªã‚‰ã€ãƒãƒ³ãƒ‰ãƒ«ã¯ã‚°ãƒ­ãƒ¼ãƒãƒ«ãƒ¡ãƒ¢ãƒªãƒãƒ³ãƒ‰ãƒ«
+			//	æ–°ãŸã«ã‚³ãƒ”ãƒ¼ã•ã‚ŒãŸã‚‰ãƒãƒ³ãƒ‰ãƒ«ã¯ç„¡åŠ¹ã«ãªã‚‹ã®ã§ã€ä¸­èº«ã‚’ã‚³ãƒ”ãƒ¼ã›ã‚ˆ
 			ptClipTxt = (LPTSTR)GlobalLock( hClipData );
 			cbSize    = GlobalSize( (HGLOBAL)hClipData );
-			//	Šm•Ûo—ˆ‚é‚Ì‚ÍƒoƒCƒgƒTƒCƒYEƒeƒLƒXƒg‚¾‚Æ––”ö‚ÌNULLƒ^[ƒ~ƒl[ƒ^ŠÜ‚Ş
+			//	ç¢ºä¿å‡ºæ¥ã‚‹ã®ã¯ãƒã‚¤ãƒˆã‚µã‚¤ã‚ºãƒ»ãƒ†ã‚­ã‚¹ãƒˆã ã¨æœ«å°¾ã®NULLã‚¿ãƒ¼ãƒŸãƒãƒ¼ã‚¿å«ã‚€
 
 			if( 0 < cbSize )
 			{
@@ -1122,7 +1122,7 @@ LPTSTR DocClipboardDataGet( PUINT pdStyle )
 				StringCchCopy( ptString, (cbSize / 2), ptClipTxt );
 			}
 		}
-		else	//	”ñƒ†ƒjƒR[ƒh‚ª—Dæ‚³‚ê‚Ä‚¢‚éê‡
+		else	//	éãƒ¦ãƒ‹ã‚³ãƒ¼ãƒ‰ãŒå„ªå…ˆã•ã‚Œã¦ã„ã‚‹å ´åˆ
 		{
 			pcClipTp = (LPSTR)GlobalLock( hClipData );
 			cbSize   = GlobalSize( (HGLOBAL)hClipData );
@@ -1132,13 +1132,13 @@ LPTSTR DocClipboardDataGet( PUINT pdStyle )
 				pcStr = (LPSTR)malloc( cbSize );
 				StringCchCopyA( pcStr, cbSize, pcClipTp );
 
-				ptString = SjisDecodeAlloc( pcStr );	//	SJIS‚Ì“à—e‚ğƒ†ƒjƒR[ƒh‚É‚·‚é
+				ptString = SjisDecodeAlloc( pcStr );	//	SJISã®å†…å®¹ã‚’ãƒ¦ãƒ‹ã‚³ãƒ¼ãƒ‰ã«ã™ã‚‹
 				free( pcStr );
 			}
 		}
 
 
-		//	g‚¢I‚í‚Á‚½‚ç•Â‚¶‚Ä‚¨‚­
+		//	ä½¿ã„çµ‚ã‚ã£ãŸã‚‰é–‰ã˜ã¦ãŠã
 		GlobalUnlock( hClipData );
 		CloseClipboard(  );
 	}
@@ -1148,11 +1148,11 @@ LPTSTR DocClipboardDataGet( PUINT pdStyle )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	ƒNƒŠƒbƒvƒ{[ƒh‚É•¶š—ñ“\‚è•t‚¯
-	@param[in]	pDatum	“\‚è•t‚¯‚½‚¢•¶š—ñEƒ†ƒj‚©SJIS
-	@param[in]	cbSize	•¶š—ñ‚ÌANULL‚ğŠÜ‚ñ‚¾ƒoƒCƒg”
-	@param[in]	dStyle	‹éŒ`‚©‚Æ‚©‚»‚¤‚¢‚¤w’è
-	@return	HRESULT	I—¹ó‘ÔƒR[ƒh
+	ã‚¯ãƒªãƒƒãƒ—ãƒœãƒ¼ãƒ‰ã«æ–‡å­—åˆ—è²¼ã‚Šä»˜ã‘
+	@param[in]	pDatum	è²¼ã‚Šä»˜ã‘ãŸã„æ–‡å­—åˆ—ãƒ»ãƒ¦ãƒ‹ã‹SJIS
+	@param[in]	cbSize	æ–‡å­—åˆ—ã®ã€NULLã‚’å«ã‚“ã ãƒã‚¤ãƒˆæ•°
+	@param[in]	dStyle	çŸ©å½¢ã‹ã¨ã‹ãã†ã„ã†æŒ‡å®š
+	@return	HRESULT	çµ‚äº†çŠ¶æ…‹ã‚³ãƒ¼ãƒ‰
 */
 HRESULT DocClipboardDataSet( LPVOID pDatum, INT cbSize, UINT dStyle )
 {
@@ -1162,32 +1162,32 @@ HRESULT DocClipboardDataSet( LPVOID pDatum, INT cbSize, UINT dStyle )
 	HRESULT	hRslt;
 	UINT	ixFormat, ixSqrFmt;
 
-	//	ƒIƒŠƒWƒiƒ‹ƒtƒH[ƒ}ƒbƒg–¼‚ğ’è‹`‚µ‚Ä‚¨‚­
+	//	ã‚ªãƒªã‚¸ãƒŠãƒ«ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆåã‚’å®šç¾©ã—ã¦ãŠã
 	ixFormat = RegisterClipboardFormat( CLIP_FORMAT );
 	ixSqrFmt = RegisterClipboardFormat( CLIP_SQUARE );
 
-	//	ƒNƒŠƒbƒv‚·‚éƒf[ƒ^‚Í‹¤—Lƒƒ‚ƒŠ‚É“ü‚ê‚é
+	//	ã‚¯ãƒªãƒƒãƒ—ã™ã‚‹ãƒ‡ãƒ¼ã‚¿ã¯å…±æœ‰ãƒ¡ãƒ¢ãƒªã«å…¥ã‚Œã‚‹
 	hGlobal = GlobalAlloc( GHND, cbSize );
 	pBuffer = GlobalLock( hGlobal );
 	CopyMemory( pBuffer, pDatum, cbSize );
 	GlobalUnlock( hGlobal );
 
-	//	ƒNƒŠƒbƒvƒ{[ƒhƒI[ƒ|ƒ“
+	//	ã‚¯ãƒªãƒƒãƒ—ãƒœãƒ¼ãƒ‰ã‚ªãƒ¼ãƒãƒ³
 	OpenClipboard( NULL );
 
-	//	’†g‚ğÁ‚µ‚¿‚á‚¤
+	//	ä¸­èº«ã‚’æ¶ˆã—ã¡ã‚ƒã†
 	EmptyClipboard(  );
 
-	//	‹¤—Lƒƒ‚ƒŠ‚Éƒuƒb‚ñ‚¾ƒf[ƒ^‚ğƒNƒŠƒbƒy‚·‚é
+	//	å…±æœ‰ãƒ¡ãƒ¢ãƒªã«ãƒ–ãƒƒè¾¼ã‚“ã ãƒ‡ãƒ¼ã‚¿ã‚’ã‚¯ãƒªãƒƒãƒšã™ã‚‹
 	if( dStyle & D_UNI )	hClip = SetClipboardData( CF_UNICODETEXT, hGlobal );
 	else					hClip = SetClipboardData( CF_TEXT, hGlobal );
 
 	if( hClip )
 	{
 		SetClipboardData( ixFormat, hGlobal );
-		//	ƒNƒŠƒbƒ|‚ªãè‚­‚¢‚Á‚½‚çAƒIƒŠƒWƒiƒ‹–¼‚Å‚à‹L˜^‚µ‚Ä‚¨‚­
+		//	ã‚¯ãƒªãƒƒãƒãŒä¸Šæ‰‹ãã„ã£ãŸã‚‰ã€ã‚ªãƒªã‚¸ãƒŠãƒ«åã§ã‚‚è¨˜éŒ²ã—ã¦ãŠã
 
-		if( dStyle & D_SQUARE  )	//	‹éŒ`‘I‘ğ‚¾‚Á‚½‚ç
+		if( dStyle & D_SQUARE  )	//	çŸ©å½¢é¸æŠã ã£ãŸã‚‰
 		{
 			SetClipboardData( ixSqrFmt, hGlobal );
 		}
@@ -1196,12 +1196,12 @@ HRESULT DocClipboardDataSet( LPVOID pDatum, INT cbSize, UINT dStyle )
 	}
 	else
 	{
-		//	“o˜^¸”s‚Ìê‡‚ÍA©•ª‚Å‹¤—Lƒƒ‚ƒŠ‚ğ”j‰ó‚¹‚È‚¢‚©‚ñ
+		//	ç™»éŒ²å¤±æ•—ã®å ´åˆã¯ã€è‡ªåˆ†ã§å…±æœ‰ãƒ¡ãƒ¢ãƒªã‚’ç ´å£Šã›ãªã„ã‹ã‚“
 		GlobalFree( hGlobal );
 		hRslt = E_OUTOFMEMORY;
 	}
 
-	//	ƒNƒŠƒbƒvƒ{[ƒh•Â‚¶‚éE•Â‚¶‚½‚ç‘¦CHAIN‚ª”­¶‚·‚éE”Ÿ”“à‚Å”­¶‚³‚¹‚Ä‚éH
+	//	ã‚¯ãƒªãƒƒãƒ—ãƒœãƒ¼ãƒ‰é–‰ã˜ã‚‹ãƒ»é–‰ã˜ãŸã‚‰å³CHAINãŒç™ºç”Ÿã™ã‚‹ãƒ»å‡½æ•°å†…ã§ç™ºç”Ÿã•ã›ã¦ã‚‹ï¼Ÿ
 	CloseClipboard(  );
 
 	TRACE( TEXT("COPY DONE") );
@@ -1211,9 +1211,9 @@ HRESULT DocClipboardDataSet( LPVOID pDatum, INT cbSize, UINT dStyle )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	ƒNƒŠƒbƒvƒ{[ƒh‚É‚P•¶š‚¾‚¯“ü‚ê‚é
-	@param[in]	ch	“ü‚ê‚½‚¢•¶š
-	@return	HRESULT	I—¹ó‘ÔƒR[ƒh
+	ã‚¯ãƒªãƒƒãƒ—ãƒœãƒ¼ãƒ‰ã«ï¼‘æ–‡å­—ã ã‘å…¥ã‚Œã‚‹
+	@param[in]	ch	å…¥ã‚ŒãŸã„æ–‡å­—
+	@return	HRESULT	çµ‚äº†çŠ¶æ…‹ã‚³ãƒ¼ãƒ‰
 */
 HRESULT DocClipLetter( TCHAR ch )
 {
@@ -1229,16 +1229,16 @@ HRESULT DocClipLetter( TCHAR ch )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	•Å‘S‘Ì‚ğƒRƒs[‚·‚é
-	@param[in]	bStyle	ƒ†ƒjƒR[ƒh‚©ƒVƒtƒgJIS
-	@return		HRESULT	I—¹ó‘ÔƒR[ƒh
+	é å…¨ä½“ã‚’ã‚³ãƒ”ãƒ¼ã™ã‚‹
+	@param[in]	bStyle	ãƒ¦ãƒ‹ã‚³ãƒ¼ãƒ‰ã‹ã‚·ãƒ•ãƒˆJIS
+	@return		HRESULT	çµ‚äº†çŠ¶æ…‹ã‚³ãƒ¼ãƒ‰
 */
 HRESULT DocPageAllCopy( UINT bStyle )
 {
 	INT	cbSize;
 	LPVOID	pString = NULL;
 
-	//	SJIS‚Ìê‡‚ÍAƒ†ƒjƒR[ƒh•¶š‚Í&#dddd;‚ÅŠm•Û‚³‚ê‚é
+	//	SJISã®å ´åˆã¯ã€ãƒ¦ãƒ‹ã‚³ãƒ¼ãƒ‰æ–‡å­—ã¯&#dddd;ã§ç¢ºä¿ã•ã‚Œã‚‹
 
 //	cbSize = DocPageTextAllGetAlloc( bStyle, &pString );
 	cbSize = DocPageGetAlloc( bStyle, &pString );
@@ -1255,8 +1255,8 @@ HRESULT DocPageAllCopy( UINT bStyle )
 
 
 /*!
-	Šes‚Ì––’[‚©‚ç‚W‚O‚O‚­‚ç‚¢‚Ü‚Å‚ğAw’è‚µ‚½•¶š‚Å–„‚ß‚éB
-	@param[in]	ptFill	–„‚ß•¶š—ñ
+	å„è¡Œã®æœ«ç«¯ã‹ã‚‰ï¼˜ï¼ï¼ãã‚‰ã„ã¾ã§ã‚’ã€æŒ‡å®šã—ãŸæ–‡å­—ã§åŸ‹ã‚ã‚‹ã€‚
+	@param[in]	ptFill	åŸ‹ã‚æ–‡å­—åˆ—
 */
 HRESULT DocScreenFill( LPTSTR ptFill )
 {
@@ -1267,54 +1267,54 @@ HRESULT DocScreenFill( LPTSTR ptFill )
 	LPTSTR		ptBuffer;
 	wstring		wsBuffer;
 
-	//	Œ»İs”‚ÆA‰Eƒhƒbƒg”Eƒ‹[ƒ‰ˆÊ’u‚ğg‚¤
+	//	ç¾åœ¨è¡Œæ•°ã¨ã€å³ãƒ‰ãƒƒãƒˆæ•°ãƒ»ãƒ«ãƒ¼ãƒ©ä½ç½®ã‚’ä½¿ã†
 	dLines = DocNowFilePageLineCount( );
 	dRiDot = gdRightRuler;
 
-	//	‘I‘ğ”ÍˆÍ‚ ‚é‚È‚ç‚»‚Á‚¿—DæB‚È‚¢‚È‚ç‰æ–Ê‘S‘Ì
+	//	é¸æŠç¯„å›²ã‚ã‚‹ãªã‚‰ãã£ã¡å„ªå…ˆã€‚ãªã„ãªã‚‰ç”»é¢å…¨ä½“
 	iTop    = (*gitFileIt).vcCont.at( gixFocusPage ).dSelLineTop;
 	iBottom = (*gitFileIt).vcCont.at( gixFocusPage ).dSelLineBottom;
 	if( 0 > iTop || 0 > iBottom ){	iTop = 0;	iBottom = dLines - 1;	bSel = FALSE;	}
 
-	ViewSelPageAll( -1 );	//	‘I‘ğ”ÍˆÍ–³‚­‚È‚é
+	ViewSelPageAll( -1 );	//	é¸æŠç¯„å›²ç„¡ããªã‚‹
 
-	//	–„‚ß•¶š—ñ‚Ì•
+	//	åŸ‹ã‚æ–‡å­—åˆ—ã®å¹…
 	mDot = ViewStringWidthGet( ptFill );
 
 	bFirst = TRUE;
-	//	Šes–ˆ‚É’Ç‰Á‚·‚éŠ´‚¶‚Å
+	//	å„è¡Œæ¯ã«è¿½åŠ ã™ã‚‹æ„Ÿã˜ã§
 	for( i = iTop; iBottom >= i; i++ )
 	{
-		nDot = DocLineParamGet( i , NULL, NULL );	//	ŒÄ‚Ño‚¹‚Î’†‚Å–Ê“|‚İ‚Ä‚­‚ê‚é
-		sDot = dRiDot - nDot;	//	c‚èƒhƒbƒg
-		if( 0 >= sDot ){	continue;	}	//	‰E’[’´‚¦‚Ä‚é‚È‚ç‚È‚É‚à‚¹‚ñ‚Å‚¢‚¢
+		nDot = DocLineParamGet( i , NULL, NULL );	//	å‘¼ã³å‡ºã›ã°ä¸­ã§é¢å€’ã¿ã¦ãã‚Œã‚‹
+		sDot = dRiDot - nDot;	//	æ®‹ã‚Šãƒ‰ãƒƒãƒˆ
+		if( 0 >= sDot ){	continue;	}	//	å³ç«¯è¶…ãˆã¦ã‚‹ãªã‚‰ãªã«ã‚‚ã›ã‚“ã§ã„ã„
 
-		iUnt = (sDot / mDot) + 1;	//	–„‚ß‚é•ªE‚Í‚İo‚µE“K“–‚Å—Ç‚¢
+		iUnt = (sDot / mDot) + 1;	//	åŸ‹ã‚ã‚‹åˆ†ãƒ»ã¯ã¿å‡ºã—ãƒ»é©å½“ã§è‰¯ã„
 
-		//	“ü‚ê‚é•¶š—ñì¬
+		//	å…¥ã‚Œã‚‹æ–‡å­—åˆ—ä½œæˆ
 		wsBuffer.clear( );
 		for( j = 0; iUnt > j; j++ ){	wsBuffer += wstring( ptFill );	}
 
 		cchSize = wsBuffer.size( ) + 1;
 		ptBuffer = (LPTSTR)malloc( cchSize * sizeof(TCHAR) );
 		StringCchCopy( ptBuffer, cchSize, wsBuffer.c_str( ) );
-		//	––’[‚Éƒuƒ`‚±‚Ş
+		//	æœ«ç«¯ã«ãƒ–ãƒã“ã‚€
 		DocInsertString( &nDot, &i, NULL, ptBuffer, 0, bFirst );	bFirst = FALSE;
 		FREE(ptBuffer);
 
-		DocBadSpaceCheck( i );	//	‚±‚±‚Å‹ó”’ƒ`ƒFƒLE‚ ‚Ü‚èˆÓ–¡‚Í‚È‚¢‚ªFŠ·‚¦‚Í•K—v
+		DocBadSpaceCheck( i );	//	ã“ã“ã§ç©ºç™½ãƒã‚§ã‚­ãƒ»ã‚ã¾ã‚Šæ„å‘³ã¯ãªã„ãŒè‰²æ›ãˆã¯å¿…è¦
 	}
 
-	if( !(bSel) )	//	”ñ‘I‘ğó‘Ô‚Å
+	if( !(bSel) )	//	éé¸æŠçŠ¶æ…‹ã§
 	{
-		remain = 40 - dLines;	//	‚Æ‚è‚ ‚¦‚¸‚S‚Os‚Æ‚·‚é
-		if( 0 < remain )	//	‘«‚è‚È‚¢‚È‚ç
+		remain = 40 - dLines;	//	ã¨ã‚Šã‚ãˆãšï¼”ï¼è¡Œã¨ã™ã‚‹
+		if( 0 < remain )	//	è¶³ã‚Šãªã„ãªã‚‰
 		{
-			DocAdditionalLine( remain, &bFirst );	//	‚Æ‚è‚ ‚¦‚¸‰üs‚µ‚Ä
+			DocAdditionalLine( remain, &bFirst );	//	ã¨ã‚Šã‚ãˆãšæ”¹è¡Œã—ã¦
 			dLines = DocNowFilePageLineCount( );
-			iUnt  = (dRiDot / mDot) + 1;	//	–„‚ß‚é•ªE‚Í‚İo‚µE“K“–‚Å—Ç‚¢
+			iUnt  = (dRiDot / mDot) + 1;	//	åŸ‹ã‚ã‚‹åˆ†ãƒ»ã¯ã¿å‡ºã—ãƒ»é©å½“ã§è‰¯ã„
 
-			//	“ü‚ê‚é•¶š—ñì¬
+			//	å…¥ã‚Œã‚‹æ–‡å­—åˆ—ä½œæˆ
 			wsBuffer.clear( );
 			for( j = 0; iUnt > j; j++ ){	wsBuffer += wstring( ptFill );	}
 			cchSize = wsBuffer.size( ) + 1;
@@ -1326,11 +1326,11 @@ HRESULT DocScreenFill( LPTSTR ptFill )
 
 			for( i = iTop; iBottom >= i; i++ )
 			{
-				//	––’[‚Éƒuƒ`‚±‚Ş
-				nDot = DocLineParamGet( i , NULL, NULL );	//	‘½•ª‚O‚ÌƒnƒY
+				//	æœ«ç«¯ã«ãƒ–ãƒã“ã‚€
+				nDot = DocLineParamGet( i , NULL, NULL );	//	å¤šåˆ†ï¼ã®ãƒã‚º
 				DocInsertString( &nDot, &i, NULL, ptBuffer, 0, bFirst );	bFirst = FALSE;
 
-				DocBadSpaceCheck( i );	//	‚±‚±‚Å‹ó”’ƒ`ƒFƒLE‚ ‚Ü‚èˆÓ–¡‚Í‚È‚¢‚ªFŠ·‚¦‚Í•K—v
+				DocBadSpaceCheck( i );	//	ã“ã“ã§ç©ºç™½ãƒã‚§ã‚­ãƒ»ã‚ã¾ã‚Šæ„å‘³ã¯ãªã„ãŒè‰²æ›ãˆã¯å¿…è¦
 			}
 
 			FREE(ptBuffer);
@@ -1345,13 +1345,13 @@ HRESULT DocScreenFill( LPTSTR ptFill )
 
 
 /*!
-	•Å”Ô†‘}“üİ’èƒ_ƒCƒ„ƒƒO‚ÌƒƒbƒZ[ƒWƒnƒ“ƒhƒ‰‚Å‚·B
-	@param[in]	hDlg		ƒ_ƒCƒ„ƒƒOƒnƒ“ƒhƒ‹
-	@param[in]	message		ƒEƒCƒ“ƒhƒEƒƒbƒZ[ƒW‚Ì¯•Ê”Ô†
-	@param[in]	wParam		’Ç‰Á‚Ìî•ñ‚P
-	@param[in]	lParam		’Ç‰Á‚Ìî•ñ‚Q
-	@retval 0	ƒƒbƒZ[ƒW‚Íˆ—‚µ‚Ä‚¢‚È‚¢
-	@retval no0	‚È‚ñ‚©ˆ—‚³‚ê‚½
+	é ç•ªå·æŒ¿å…¥è¨­å®šãƒ€ã‚¤ãƒ¤ãƒ­ã‚°ã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ãƒãƒ³ãƒ‰ãƒ©ã§ã™ã€‚
+	@param[in]	hDlg		ãƒ€ã‚¤ãƒ¤ãƒ­ã‚°ãƒãƒ³ãƒ‰ãƒ«
+	@param[in]	message		ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã®è­˜åˆ¥ç•ªå·
+	@param[in]	wParam		è¿½åŠ ã®æƒ…å ±ï¼‘
+	@param[in]	lParam		è¿½åŠ ã®æƒ…å ±ï¼’
+	@retval 0	ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã¯å‡¦ç†ã—ã¦ã„ãªã„
+	@retval no0	ãªã‚“ã‹å‡¦ç†ã•ã‚ŒãŸ
 */
 INT_PTR CALLBACK PageNumDlgProc( HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam )
 {
@@ -1396,10 +1396,10 @@ INT_PTR CALLBACK PageNumDlgProc( HWND hDlg, UINT message, WPARAM wParam, LPARAM 
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	•Å”Ô†‘}“ü‚ÌƒAƒŒ
-	@param[in]	hInst	ƒAƒvƒŠ‚ÌÀ‘¶
-	@param[in]	hWnd	eƒEƒCƒ“ƒhƒEƒnƒ“ƒhƒ‹ENULL‚Å”j‰óˆ—
-	@return		HRESULT	I—¹ó‘ÔƒR[ƒh
+	é ç•ªå·æŒ¿å…¥ã®ã‚¢ãƒ¬
+	@param[in]	hInst	ã‚¢ãƒ—ãƒªã®å®Ÿå­˜
+	@param[in]	hWnd	è¦ªã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ãƒãƒ³ãƒ‰ãƒ«ãƒ»NULLã§ç ´å£Šå‡¦ç†
+	@return		HRESULT	çµ‚äº†çŠ¶æ…‹ã‚³ãƒ¼ãƒ‰
 */
 HRESULT DocPageNumInsert( HINSTANCE hInst, HWND hWnd )
 {
@@ -1411,30 +1411,30 @@ HRESULT DocPageNumInsert( HINSTANCE hInst, HWND hWnd )
 	TCHAR		atText[MAX_PATH];
 	PAGENUMINFO	stInfo;
 
-	//	¡‚Ì•Å‚ğ‘Ò”ğ
+	//	ä»Šã®é ã‚’å¾…é¿
 	dNowPageBuffer = gixFocusPage;
 
-	maxPage = DocNowFilePageCount(  );	//	•Å”‚ğŠm”F
+	maxPage = DocNowFilePageCount(  );	//	é æ•°ã‚’ç¢ºèª
 
 	ZeroMemory( &stInfo, sizeof(PAGENUMINFO) );
 	stInfo.dStartNum = 1;
 
-	//	İ’è‚ğŠm”F
-	stInfo.bInUnder  = InitParamValue( INIT_LOAD, VL_PAGE_UNDER,   BST_UNCHECKED );	//	•Å”Ô†‚ğÅ‰ºs‚É‘}“ü‚·‚é‚©
-	stInfo.bOverride = InitParamValue( INIT_LOAD, VL_PAGE_OVWRITE, BST_UNCHECKED );	//	ŠY“–s‚Ì“à—e‚ğíœ‚µ‚Äã‘‚·‚é‚©
+	//	è¨­å®šã‚’ç¢ºèª
+	stInfo.bInUnder  = InitParamValue( INIT_LOAD, VL_PAGE_UNDER,   BST_UNCHECKED );	//	é ç•ªå·ã‚’æœ€ä¸‹è¡Œã«æŒ¿å…¥ã™ã‚‹ã‹
+	stInfo.bOverride = InitParamValue( INIT_LOAD, VL_PAGE_OVWRITE, BST_UNCHECKED );	//	è©²å½“è¡Œã®å†…å®¹ã‚’å‰Šé™¤ã—ã¦ä¸Šæ›¸ã™ã‚‹ã‹
 
-	//	•¶š—ñƒtƒH[ƒ}ƒbƒg
-	StringCchCopy( stInfo.atStyle, MAX_PATH, TEXT("%u") );	//	ƒfƒtƒHİ’è
+	//	æ–‡å­—åˆ—ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆ
+	StringCchCopy( stInfo.atStyle, MAX_PATH, TEXT("%u") );	//	ãƒ‡ãƒ•ã‚©è¨­å®š
 	InitParamString( INIT_LOAD, VS_PAGE_FORMAT, stInfo.atStyle );
 
 	iRslt = DialogBoxParam( hInst, MAKEINTRESOURCE(IDD_PAGENUMBER_DLG), hWnd, PageNumDlgProc, (LPARAM)(&stInfo) );
-	if( IDOK == iRslt )	//	‘}“ü‚·‚é
+	if( IDOK == iRslt )	//	æŒ¿å…¥ã™ã‚‹
 	{
-#pragma message("ƒfƒBƒŒƒCƒ[ƒh‚µ‚½‚çA•Å”Ô†‘}“ü‚ª‚¨‚©‚µ‚­‚È‚é‚Í‚¸")
-		ixNumber = stInfo.dStartNum;	//	ŠJn”Ô†‚É‚Â‚¢‚Ä
+#pragma message("ãƒ‡ã‚£ãƒ¬ã‚¤ãƒ­ãƒ¼ãƒ‰ã—ãŸã‚‰ã€é ç•ªå·æŒ¿å…¥ãŒãŠã‹ã—ããªã‚‹ã¯ãš")
+		ixNumber = stInfo.dStartNum;	//	é–‹å§‹ç•ªå·ã«ã¤ã„ã¦
 
 		InitParamString( INIT_SAVE, VS_PAGE_FORMAT, stInfo.atStyle );
-		//	İ’è‚ğ•Û‘¶
+		//	è¨­å®šã‚’ä¿å­˜
 		InitParamValue( INIT_SAVE, VL_PAGE_UNDER,   stInfo.bInUnder );
 		InitParamValue( INIT_SAVE, VL_PAGE_OVWRITE, stInfo.bOverride );
 
@@ -1442,36 +1442,36 @@ HRESULT DocPageNumInsert( HINSTANCE hInst, HWND hWnd )
 		{
 			StringCchPrintf( atText, MAX_PATH, stInfo.atStyle, ixNumber );
 
-			if( NowPageInfoGet( iNow, NULL ) )	//	ƒfƒBƒŒ‚Á‚Ä‚È‚¢‚È‚ç‚O
+			if( NowPageInfoGet( iNow, NULL ) )	//	ãƒ‡ã‚£ãƒ¬ã£ã¦ãªã„ãªã‚‰ï¼
 			{
-				//	ƒfƒBƒŒƒC•¶š—ñ‚ğ‘€ì‚·‚é‚©
+				//	ãƒ‡ã‚£ãƒ¬ã‚¤æ–‡å­—åˆ—ã‚’æ“ä½œã™ã‚‹ã‹
 				DocDelayPageNumInsert( gitFileIt, iNow, &stInfo, atText );
 
-				//	“WŠJ‚·‚éE•Å‚ª‘½‚¢‚Æd‚¢E‚µ‚È‚­‚Ä‚¢‚¢
+				//	å±•é–‹ã™ã‚‹ãƒ»é ãŒå¤šã„ã¨é‡ã„ãƒ»ã—ãªãã¦ã„ã„
 				//DocDelayPageLoad( gitFileIt, iNow );
 			}
 			else
 			{
-				gixFocusPage = iNow;	//	“à•”‘€ì
-				if( stInfo.bInUnder )	//	•ÅÅ‰º•”‚É‘}“ü
+				gixFocusPage = iNow;	//	å†…éƒ¨æ“ä½œ
+				if( stInfo.bInUnder )	//	é æœ€ä¸‹éƒ¨ã«æŒ¿å…¥
 				{
-					if( stInfo.bOverride )	//	ŠY“–sÁ‚µ‚Ä‘}“ü‚Å‚ ‚é
+					if( stInfo.bOverride )	//	è©²å½“è¡Œæ¶ˆã—ã¦æŒ¿å…¥ã§ã‚ã‚‹
 					{
 						iLine = DocPageParamGet( NULL, NULL );
 						iLine--;	if( 0 > iLine ){	iLine = 0;	}
-						DocLineErase( iLine , &bFirst );	//	’†‚ÅƒAƒ“ƒhƒD‘€ì•ÏŠ·
+						DocLineErase( iLine , &bFirst );	//	ä¸­ã§ã‚¢ãƒ³ãƒ‰ã‚¥æ“ä½œå¤‰æ›
 					}
 					else
 					{
 						iLine = DocAdditionalLine( 1, &bFirst );//	bFirst =  FALSE;
 					}
 				}
-				else	//	ˆës–Ú‚É‘}“ü
+				else	//	å£±è¡Œç›®ã«æŒ¿å…¥
 				{
 					iDot = 0;	iLine = 0;
-					if( stInfo.bOverride )	//	ŠY“–sÁ‚µ‚Ä‘}“ü‚Å‚ ‚é
+					if( stInfo.bOverride )	//	è©²å½“è¡Œæ¶ˆã—ã¦æŒ¿å…¥ã§ã‚ã‚‹
 					{
-						DocLineErase( 0 , &bFirst );	//	’†‚ÅƒAƒ“ƒhƒD‘€ì•ÏŠ·
+						DocLineErase( 0 , &bFirst );	//	ä¸­ã§ã‚¢ãƒ³ãƒ‰ã‚¥æ“ä½œå¤‰æ›
 					}
 					else
 					{
@@ -1481,12 +1481,12 @@ HRESULT DocPageNumInsert( HINSTANCE hInst, HWND hWnd )
 				}
 				iDot = 0;
 
-				//	•Å”Ô†‚Ì“à—e‘}“ü
+				//	é ç•ªå·ã®å†…å®¹æŒ¿å…¥
 				DocInsertString( &iDot, &iLine, NULL, atText, 0, bFirst );	bFirst = FALSE;
 			}
 		}
 
-		//	•ÅŒ³‚É–ß‚·
+		//	é å…ƒã«æˆ»ã™
 		gixFocusPage = dNowPageBuffer;
 
 		ViewRedrawSetLine( -1 );
@@ -1497,80 +1497,80 @@ HRESULT DocPageNumInsert( HINSTANCE hInst, HWND hWnd )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	ƒfƒBƒŒƒC‚µ‚Ä‚é•Å‚É•Å”Ô†‚ğ‘}“ü
-	@param[in]	itFile		‘ÎÛ‚Ìƒtƒ@ƒCƒ‹
-	@param[in]	iPage		‚»‚Ìƒtƒ@ƒCƒ‹‚Ì•Å
-	@param[in]	pstInfo		•Å”Ô†‚Ìˆ—•û–@
-	@param[in]	ptPageText	‘}“ü‚·‚é•¶š—ñE•Å”Ô†
-	@return	HRESULT	I—¹ó‘ÔƒR[ƒh
+	ãƒ‡ã‚£ãƒ¬ã‚¤ã—ã¦ã‚‹é ã«é ç•ªå·ã‚’æŒ¿å…¥
+	@param[in]	itFile		å¯¾è±¡ã®ãƒ•ã‚¡ã‚¤ãƒ«
+	@param[in]	iPage		ãã®ãƒ•ã‚¡ã‚¤ãƒ«ã®é 
+	@param[in]	pstInfo		é ç•ªå·ã®å‡¦ç†æ–¹æ³•
+	@param[in]	ptPageText	æŒ¿å…¥ã™ã‚‹æ–‡å­—åˆ—ãƒ»é ç•ªå·
+	@return	HRESULT	çµ‚äº†çŠ¶æ…‹ã‚³ãƒ¼ãƒ‰
 */
 HRESULT DocDelayPageNumInsert( FILES_ITR itFile, INT iPage, LPPAGENUMINFO pstInfo, LPCTSTR ptPageText )
 {
-	UINT_PTR	cchPgTx;	//	•Å•¶š—ñ‚Ì•¶š”
+	UINT_PTR	cchPgTx;	//	é æ–‡å­—åˆ—ã®æ–‡å­—æ•°
 	UINT_PTR	cchSrc, cchSize;
 	LPTSTR	ptWork, ptMoto, ptNext, ptCaret, ptPrev;
 
-	//	‚ ‚è“¾‚È‚¢‚Í‚¸‚¾‚ª
+	//	ã‚ã‚Šå¾—ãªã„ã¯ãšã ãŒ
 	if( !(itFile->vcCont.at( iPage ).ptRawData) )	return E_NOTIMPL;
 
 	ptMoto = itFile->vcCont.at( iPage ).ptRawData;
 
-	StringCchLength( ptPageText, MAX_PATH, &cchPgTx );	//	ƒLƒ‚¤‚¿’ˆÓ
-	//cchPgTx += 4;	//	‰üs•ª‚Ì—]—T‚ğŠm•Û‚µ‚Ä‚¨‚­
+	StringCchLength( ptPageText, MAX_PATH, &cchPgTx );	//	ã‚­ãƒ¡ã†ã¡æ³¨æ„
+	//cchPgTx += 4;	//	æ”¹è¡Œåˆ†ã®ä½™è£•ã‚’ç¢ºä¿ã—ã¦ãŠã
 
 	StringCchLength( ptMoto, STRSAFE_MAX_CCH, &cchSrc );
 
-	//	ƒ[ƒN—ÌˆæŠm•ÛE–{•¶{•Å•¶š—ñ{‰üsE‚ ‚Ü‚è‚Í‹C‚É‚µ‚È‚¢
+	//	ãƒ¯ãƒ¼ã‚¯é ˜åŸŸç¢ºä¿ãƒ»æœ¬æ–‡ï¼‹é æ–‡å­—åˆ—ï¼‹æ”¹è¡Œãƒ»ã‚ã¾ã‚Šã¯æ°—ã«ã—ãªã„
 	cchSize = cchSrc + cchPgTx + 4;
 	ptWork = (LPTSTR)malloc( cchSize * sizeof(TCHAR) );
 	ZeroMemory( ptWork, cchSize * sizeof(TCHAR) );
 
-	//	ÅŒã”ö‚È‚çAæ‚É–{•¶‚¢‚ê‚ÄA•Å•¶š—ñ’Ç‰Á‚·‚é‚©A––’[s‚Ìæ“ª‚Éã‘‚«{NULL
-	//	æ“ª‚È‚çAæ‚É•Å•¶š—ñ‚¢‚ê‚ÄA–{•¶’Ç‰Á‚·‚é‚©A–{•¶“ós–Ú‚©‚ç’Ç‰Á
-	if( pstInfo->bInUnder )	//	––”ö
+	//	æœ€å¾Œå°¾ãªã‚‰ã€å…ˆã«æœ¬æ–‡ã„ã‚Œã¦ã€é æ–‡å­—åˆ—è¿½åŠ ã™ã‚‹ã‹ã€æœ«ç«¯è¡Œã®å…ˆé ­ã«ä¸Šæ›¸ãï¼‹NULL
+	//	å…ˆé ­ãªã‚‰ã€å…ˆã«é æ–‡å­—åˆ—ã„ã‚Œã¦ã€æœ¬æ–‡è¿½åŠ ã™ã‚‹ã‹ã€æœ¬æ–‡å¼è¡Œç›®ã‹ã‚‰è¿½åŠ 
+	if( pstInfo->bInUnder )	//	æœ«å°¾
 	{
-		StringCchCopy( ptWork, cchSize, ptMoto );	//	æ‚É–{•¶
+		StringCchCopy( ptWork, cchSize, ptMoto );	//	å…ˆã«æœ¬æ–‡
 
-		if( pstInfo->bOverride )	//	ã‘
+		if( pstInfo->bOverride )	//	ä¸Šæ›¸
 		{
 			ptNext = ptMoto;
 			ptCaret = ptMoto;
 			do{
-				ptPrev = ptNext;	//	¡‚ÌŠJnˆÊ’u‚ğ•Û‘¶
-				ptNext = NextLineW( ptCaret );	//	Ÿ‚ğŠm”F
-				ptCaret = ptNext;	//	Ÿ‚ÌŠJnˆÊ’u
+				ptPrev = ptNext;	//	ä»Šã®é–‹å§‹ä½ç½®ã‚’ä¿å­˜
+				ptNext = NextLineW( ptCaret );	//	æ¬¡ã‚’ç¢ºèª
+				ptCaret = ptNext;	//	æ¬¡ã®é–‹å§‹ä½ç½®
 
-			}while( ptNext );	//	NULL‚È‚ç––’[‚Ü‚ÅƒCƒb‚½‚Æ‚¢‚¤‚±‚Æ
+			}while( ptNext );	//	NULLãªã‚‰æœ«ç«¯ã¾ã§ã‚¤ãƒƒãŸã¨ã„ã†ã“ã¨
 
 			StringCchCopy( ptPrev, (cchPgTx + 4), ptPageText );
-			//	Å’á‚Å‚à•Å•¶š—ñ{—]—T•ª‚Íc‚Á‚Ä‚é
+			//	æœ€ä½ã§ã‚‚é æ–‡å­—åˆ—ï¼‹ä½™è£•åˆ†ã¯æ®‹ã£ã¦ã‚‹
 		}
-		else	//	‘}“ü
+		else	//	æŒ¿å…¥
 		{
-			StringCchCat( ptWork, cchSize, TEXT("\r\n") );	//	‰½‚É‚µ‚Ä‚à‰üs
-			StringCchCat( ptWork, cchSize, ptPageText );	//	‚»‚µ‚Ä’Ç‰Á
+			StringCchCat( ptWork, cchSize, TEXT("\r\n") );	//	ä½•ã«ã—ã¦ã‚‚æ”¹è¡Œ
+			StringCchCat( ptWork, cchSize, ptPageText );	//	ãã—ã¦è¿½åŠ 
 		}
 	}
-	else	//	“ª
+	else	//	é ­
 	{
-		StringCchCopy( ptWork, cchSize, ptPageText );	//	æ“ª‚Å‚ ‚é
-		StringCchCat( ptWork, cchSize, TEXT("\r\n") );	//	‰½‚É‚µ‚Ä‚à‰üs
+		StringCchCopy( ptWork, cchSize, ptPageText );	//	å…ˆé ­ã§ã‚ã‚‹
+		StringCchCat( ptWork, cchSize, TEXT("\r\n") );	//	ä½•ã«ã—ã¦ã‚‚æ”¹è¡Œ
 
-		if( pstInfo->bOverride )	//	ã‘
+		if( pstInfo->bOverride )	//	ä¸Šæ›¸
 		{
-			//	Ÿ‚Ìs‚Ìæ“ª‚©‚ç’Ç‰Á
+			//	æ¬¡ã®è¡Œã®å…ˆé ­ã‹ã‚‰è¿½åŠ 
 			ptNext = NextLineW( ptMoto );
 			if( ptNext )	StringCchCat( ptWork, cchSize, ptNext );
-			//	Ÿ‚Ìs‚ª–³‚©‚Á‚½‚çA‰½‚à‚·‚é•K—v‚Í–³‚¢
+			//	æ¬¡ã®è¡ŒãŒç„¡ã‹ã£ãŸã‚‰ã€ä½•ã‚‚ã™ã‚‹å¿…è¦ã¯ç„¡ã„
 		}
-		else	//	‘}“ü
+		else	//	æŒ¿å…¥
 		{
-			//	‘}“ü‚È‚ç‚»‚Ì‚Ü‚Ü’Ç‰Á‚·‚ê‚Î‚æ‚ë‚µ
+			//	æŒ¿å…¥ãªã‚‰ãã®ã¾ã¾è¿½åŠ ã™ã‚Œã°ã‚ˆã‚ã—
 			StringCchCat( ptWork, cchSize, ptMoto );
 		}
 	}
 
-	//	ƒƒ‚ƒŠ—Ìˆæ•t‚¯‘Ö‚¦‚Ä‚¨‚‹Eæ‚ÉŒ³•¶š—ñ‚ÍƒtƒŠ[‚µ‚¿‚á‚¤
+	//	ãƒ¡ãƒ¢ãƒªé ˜åŸŸä»˜ã‘æ›¿ãˆã¦ãŠï½‹ãƒ»å…ˆã«å…ƒæ–‡å­—åˆ—ã¯ãƒ•ãƒªãƒ¼ã—ã¡ã‚ƒã†
 	FREE( itFile->vcCont.at( iPage ).ptRawData );
 	itFile->vcCont.at( iPage ).ptRawData = ptWork;
 
