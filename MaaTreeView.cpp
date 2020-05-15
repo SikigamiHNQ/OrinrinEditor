@@ -206,7 +206,7 @@ HRESULT TreeInitialise( HWND hWnd, HINSTANCE hInst, LPRECT ptRect )
 
 	ZeroMemory( &stTcItem, sizeof(stTcItem) );
 	stTcItem.mask = TCIF_TEXT;
-	stTcItem.pszText = TEXT("全て");	TabCtrl_InsertItem( ghTabWnd, 0, &stTcItem );
+	stTcItem.pszText = TEXT("全部");	TabCtrl_InsertItem( ghTabWnd, 0, &stTcItem );
 	stTcItem.pszText = TEXT("使用");	TabCtrl_InsertItem( ghTabWnd, 1, &stTcItem );
 
 	//	選ばれしファイルをタブ的に追加？　タブ幅はウインドウ幅

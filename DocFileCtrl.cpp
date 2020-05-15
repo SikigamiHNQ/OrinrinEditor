@@ -1,6 +1,6 @@
-/*! @file
-	@brief �t�@�C���ɕۑ��E�J���̖ʓ|���܂�
-	���̃t�@�C���� DocFileCtrl.cpp �ł��B
+﻿/*! @file
+	@brief ファイルに保存・開くの面倒見ます
+	このファイルは DocFileCtrl.cpp です。
 	@author	SikigamiHNQ
 	@date	2011/04/27
 */
@@ -21,18 +21,18 @@ If not, see <http://www.gnu.org/licenses/>.
 #include "OrinrinEditor.h"
 //-------------------------------------------------------------------------------------------------
 
-//	TODO:	�ۑ�����Ƃ��A�������O�̃t�@�C��������΁A���������Ď����Ńo�b�N�A�b�v�����
+//	TODO:	保存するとき、同じ名前のファイルがあれば、日時をつけて自動でバックアップを取る
 
-//	TODO:	�ۑ�����Ƃ��A���j�R�[�h��SJIS���I���o����悤�ɁE�f�t�H��SJIS�ł�����
+//	TODO:	保存するとき、ユニコードかSJISか選択出来るように・デフォはSJISでいいか
 
 
-extern list<ONEFILE>	gltMultiFiles;	//!<	�����t�@�C���ێ�
-extern FILES_ITR	gitFileIt;			//!<	�����Ă�t�@�C���̖{��
-extern INT		gixFocusPage;			//!<	���ڒ��̃y�[�W�E�Ƃ肠�����O�E�O�C���f�b�N�X
+extern list<ONEFILE>	gltMultiFiles;	//!<	複数ファイル保持
+extern FILES_ITR	gitFileIt;			//!<	今見てるファイルの本体
+extern INT		gixFocusPage;			//!<	注目中のページ・とりあえず０・０インデックス
 
-extern  UINT	gbAutoBUmsg;			//		�����o�b�N�A�b�v���b�Z�[�W�o�����H
+extern  UINT	gbAutoBUmsg;			//		自動バックアップメッセージ出すか？
 
-extern  UINT	gbSaveMsgOn;			//		�ۑ����b�Z�[�W�o�����H
+extern  UINT	gbSaveMsgOn;			//		保存メッセージ出すか？
 
 static TCHAR	gatBackUpDirty[MAX_PATH];
 
@@ -45,9 +45,9 @@ INT	DocUnicode2UTF8( LPVOID * );
 
 
 /*!
-	�Y������t�@�C���͊J���ς�
-	@param[in]	ptFile	�m�F�������t�@�C����
-	@return	UINT	���F�����@�P�ȏ�F�q�b�g�������UNIQUE�ԍ�
+	該当するファイルは開き済か
+	@param[in]	ptFile	確認したいファイル名
+	@return	UINT	負：無し　１以上：ヒットしたやつのUNIQUE番号
 */
 LPARAM DocOpendFileCheck( LPTSTR ptFile )
 {
@@ -55,7 +55,7 @@ LPARAM DocOpendFileCheck( LPTSTR ptFile )
 
 	for( itFile = gltMultiFiles.begin(); gltMultiFiles.end() != itFile; itFile++ )
 	{
-		//	�q�b�g�����炻��ł���
+		//	ヒットしたらそれでおｋ
 		if( !( StrCmp( itFile->atFileName, ptFile ) ) ){	return  itFile->dUnique;	}
 	}
 
@@ -64,9 +64,9 @@ LPARAM DocOpendFileCheck( LPTSTR ptFile )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	�t�@�C������ǂݍ���
-	@param[in]	hWnd	�e�ɂ���E�C���h�E�n���h��
-	@return		HRESULT	�I����ԃR�[�h
+	ファイルから読み込む
+	@param[in]	hWnd	親にするウインドウハンドル
+	@return		HRESULT	終了状態コード
 */
 HRESULT DocFileOpen( HWND hWnd )
 {
@@ -83,61 +83,61 @@ HRESULT DocFileOpen( HWND hWnd )
 
 	stOpenFile.lStructSize     = sizeof(OPENFILENAME);
 	stOpenFile.hwndOwner       = hWnd;
-	stOpenFile.lpstrFilter     = TEXT("�A�X�L�[�A�[�g�t�@�C�� ( mlt, ast, txt )\0*.mlt;*.ast;*.txt\0�S�Ă̌`��(*.*)\0*.*\0\0");
+	stOpenFile.lpstrFilter     = TEXT("AA文件 ( mlt, ast, txt )\0*.mlt;*.ast;*.txt\0所有格式(*.*)\0*.*\0\0");
 	stOpenFile.nFilterIndex    = 1;
 	stOpenFile.lpstrFile       = atFilePath;
 	stOpenFile.nMaxFile        = MAX_PATH;
 	stOpenFile.lpstrFileTitle  = atFileName;
 	stOpenFile.nMaxFileTitle   = MAX_STRING;
 //	stOpenFile.lpstrInitialDir = 
-	stOpenFile.lpstrTitle      = TEXT("�J���t�@�C�����w�肵�Ă�����");
+	stOpenFile.lpstrTitle      = TEXT("请您指定一下要打开的文件吧");
 	stOpenFile.Flags           = OFN_EXPLORER | OFN_HIDEREADONLY;
 	stOpenFile.lpstrDefExt     = TEXT("mlt");
 
-	//������ FileOpenDialogue ���o��
+	//ここで FileOpenDialogue を出す
 	bOpened = GetOpenFileName( &stOpenFile );
 
 	ViewFocusSet(  );
 
-	if( !(bOpened) ){	return  E_ABORT;	}	//	�L�����Z�����Ă��牽�����Ȃ�
+	if( !(bOpened) ){	return  E_ABORT;	}	//	キャンセルしてたら何もしない
 
-	DocDoOpenFile( hWnd, atFilePath );	//	�t�@�C�����w�肵�ēǂݍ��ގ�
+	DocDoOpenFile( hWnd, atFilePath );	//	ファイルを指定して読み込む時
 
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	�t�@�C�������󂯂āA�I�[�|����������
-	@param[in]	hWnd	�e�ɂ���E�C���h�E�n���h��
-	@param[in]	ptFile	�J���t�@�C���t���p�X
-	@return	HRESULT	�I����ԃR�[�h
+	ファイル名を受けて、オーポン処理する
+	@param[in]	hWnd	親にするウインドウハンドル
+	@param[in]	ptFile	開くファイルフルパス
+	@return	HRESULT	終了状態コード
 */
 HRESULT DocDoOpenFile( HWND hWnd, LPTSTR ptFile )
 {
 	LPARAM	dNumber;
 
-	//	�����̃t�@�C�����J�����Ƃ����炻�������t�H�[�J�X���邾���ɂ���̂��ǂ��͂�
+	//	既存のファイルを開こうとしたらそっちをフォーカスするだけにするのが良いはず
 	dNumber = DocOpendFileCheck( ptFile );
-	if( 1 <= dNumber )	//	�����̃t�@�C���q�b�g�E�������Ɉړ�����
+	if( 1 <= dNumber )	//	既存のファイルヒット・そっちに移動する
 	{
-		if( SUCCEEDED( MultiFileTabSelect( dNumber ) ) )	//	�Y���̃^�u�Ƀt�H�[�J�X�ڂ���
+		if( SUCCEEDED( MultiFileTabSelect( dNumber ) ) )	//	該当のタブにフォーカス移して
 		{
-			DocMultiFileSelect( dNumber );	//	���̃^�u�̃t�@�C����\��
+			DocMultiFileSelect( dNumber );	//	そのタブのファイルを表示
 			return S_OK;
 		}
 	}
 
-	dNumber = DocFileInflate( ptFile  );	//	�t�@�C�������󂯂āA�J���Ē��g�W�J
+	dNumber = DocFileInflate( ptFile  );	//	ファイル名を受けて、開いて中身展開
 	if( !(dNumber) )
 	{
-		MessageBox( hWnd, TEXT("�t�@�C�����J���Ȃ�������"), TEXT("���ӂ���̂��m�点"), MB_OK | MB_ICONERROR );
+		MessageBox( hWnd, TEXT("文件打开失败了哦。"), TEXT("阿燐燐向您确认"), MB_OK | MB_ICONERROR );
 		return E_HANDLE;
 	}
 	else
 	{
-		MultiFileTabAppend( dNumber, ptFile );	//	�_�C�����O����t�@�C���I�[�|��
-		OpenHistoryLogging( hWnd , ptFile );	//	�t�@�C���I�[�|���L�^��ǉ�
+		MultiFileTabAppend( dNumber, ptFile );	//	ダイヤログからファイルオーポン
+		OpenHistoryLogging( hWnd , ptFile );	//	ファイルオーポン記録を追加
 	}
 
 	return S_OK;
@@ -146,24 +146,24 @@ HRESULT DocDoOpenFile( HWND hWnd, LPTSTR ptFile )
 
 
 /*!
-	�o�b�N�A�b�v�f�B���N�g���[���m��
-	@param[in]	ptCurrent	��f�B���N�g��
+	バックアップディレクトリーを確保
+	@param[in]	ptCurrent	基準ディレクトリ
 */
 VOID DocBackupDirectoryInit( LPTSTR ptCurrent )
 {
 	StringCchCopy( gatBackUpDirty, MAX_PATH, ptCurrent );
 	PathAppend( gatBackUpDirty, BACKUP_DIR );
 	CreateDirectory( gatBackUpDirty, NULL );
-	//	�߂Ƀf�B���N�g�����������生�������s���邾���Ȃ̂Ŗ�薳��
+	//	已にディレクトリがあったら函数が失敗するだけなので問題無い
 
 	return;
 }
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	�C���^�[�o���Ŏ����ۑ�
-	@param[in]	hWnd	�E�C���h�E�n���h���E�ǂ��̃E�C���h�E�n���h�����͔�Œ�
-	@return		HRESULT	�I����ԃR�[�h
+	インターバルで自動保存
+	@param[in]	hWnd	ウインドウハンドル・どこのウインドウハンドルかは非固定
+	@return		HRESULT	終了状態コード
 */
 HRESULT DocFileBackup( HWND hWnd )
 {
@@ -175,10 +175,10 @@ HRESULT DocFileBackup( HWND hWnd )
 	HANDLE	hFile;
 	DWORD	wrote;
 
-	LPTSTR	ptExten;	//	�t�@�C�����̊g���q
+	LPTSTR	ptExten;	//	ファイル名の拡張子
 	TCHAR	atExBuf[10];
 
-	LPVOID	pBuffer;	//	������o�b�t�@�p�|�C���^�[
+	LPVOID	pBuffer;	//	文字列バッファ用ポインター
 	INT		iByteSize, iNullTmt, iCrLf;
 
 	LPVOID	pbSplit;
@@ -186,7 +186,7 @@ HRESULT DocFileBackup( HWND hWnd )
 
 	INT		isAST, isMLT, idExten;
 
-	UINT_PTR	iPages, i;	//	�Ő�
+	UINT_PTR	iPages, i;	//	頁数
 
 	FILES_ITR	itFile;
 
@@ -194,15 +194,15 @@ HRESULT DocFileBackup( HWND hWnd )
 	ZeroMemory( atFileName, sizeof(atFileName) );
 	ZeroMemory( atBuffer,   sizeof(atBuffer) );
 
-//�����t�@�C���A�e�t�@�C�����Z�[�u����ɂ́H
+//複数ファイル、各ファイルをセーブするには？
 	for( itFile = gltMultiFiles.begin(); itFile != gltMultiFiles.end(); itFile++ )
 	{
-		iPages = itFile->vcCont.size( );	//	���Ő�
+		iPages = itFile->vcCont.size( );	//	総頁数
 
 		if( 1 >= iPages )	isMLT = FALSE;
 		else				isMLT = TRUE;
 
-		isAST = PageListIsNamed( itFile );	//	�łɖ��O���t���Ă�H
+		isAST = PageListIsNamed( itFile );	//	頁に名前が付いてる？
 
 		if( isAST ){		idExten = 0;	}	//	AST
 		else if( isMLT ){	idExten = 1;	}	//	MLT
@@ -210,7 +210,7 @@ HRESULT DocFileBackup( HWND hWnd )
 
 		StringCchCopy( atBuffer, MAX_PATH, itFile->atFileName );
 
-		if( atBuffer[0] == NULL )	//	���̖��ݒ���
+		if( atBuffer[0] == NULL )	//	名称未設定状態
 		{
 			StringCchCopy( atFileName, MAX_STRING, itFile->atDummyName );
 		}
@@ -220,44 +220,44 @@ HRESULT DocFileBackup( HWND hWnd )
 			StringCchCopy( atFileName, MAX_STRING, atBuffer );
 		}
 
-		//	�g���q���m�F�E�h�b�g���݂���`��
-		ptExten = PathFindExtension( atFileName );	//	�g���q�������Ȃ�NULL�A�Ƃ��������[�ɂȂ�
+		//	拡張子を確認・ドット込みだよ～ん
+		ptExten = PathFindExtension( atFileName );	//	拡張子が無いならNULL、というか末端になる
 		if( 0 == *ptExten )
 		{
-			//	�g���q�w�肪�Ȃ��Ȃ炻�̂܂ܑΉ��̂���������
+			//	拡張子指定がないならそのまま対応のをくっつける
 			StringCchCopy( ptExten, 5, aatExte[idExten] );
 		}
-		else	//	�����̊g���q����������
+		else	//	既存の拡張子があったら
 		{
 			StringCchCopy( atExBuf, 10, ptExten );
-			CharLower( atExBuf );	//	��r�̂��߂ɏ������ɂ����Ⴄ
+			CharLower( atExBuf );	//	比較のために小文字にしちゃう
 
-			if( isAST )	//	AST�͗D��I�ɓK�p
+			if( isAST )	//	ASTは優先的に適用
 			{
-				if( StrCmp( atExBuf , aatExte[0] ) )	//	����AST����Ȃ�������ύX
+				if( StrCmp( atExBuf , aatExte[0] ) )	//	もしASTじゃなかったら変更
 				{
 					StringCchCopy( ptExten, 5, aatExte[0] );
 				}
 			}
-			else if( isMLT )	//	���O�������Ǖ����łȂ�MLT����Ȃ��ƃ_��
+			else if( isMLT )	//	名前無いけど複数頁ならMLTじゃないとダメ
 			{
-				if( StrCmp( atExBuf , aatExte[1] ) )	//	����MLT����Ȃ�������ύX
+				if( StrCmp( atExBuf , aatExte[1] ) )	//	もしMLTじゃなかったら変更
 				{
 					StringCchCopy( ptExten, 5, aatExte[1] );
 				}
 			}
-			//	�ꖇ�Ȃ�ATXT�ł�MLT�ł��C�ɂ��Ȃ��Ă悩�΂�
+			//	一枚なら、TXTでもMLTでも気にしなくてよかばい
 		}
 
 		StringCchCopy( atFilePath, MAX_PATH, gatBackUpDirty );
-		PathAppend( atFilePath, atFileName );	//	Backup�t�@�C����
+		PathAppend( atFilePath, atFileName );	//	Backupファイル名
 
 
 		hFile = CreateFile( atFilePath, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL );
 		if( INVALID_HANDLE_VALUE == hFile )
 		{
-			NotifyBalloonExist( TEXT("�o�b�N�A�b�v���o���Ȃ�������E�E�E"), TEXT("�ُ픭��"), NIIF_ERROR );
-			//	gbAutoBUmsg	�o�b�N�A�b�v�o���Ȃ��������b�Z�[�W�͏�ɕ\����������
+			NotifyBalloonExist( TEXT("备份失败了哦……"), TEXT("发生异常"), NIIF_ERROR );
+			//	gbAutoBUmsg	バックアップ出来なかったメッセージは常に表示がいいか
 			return E_HANDLE;
 		}
 
@@ -278,7 +278,7 @@ HRESULT DocFileBackup( HWND hWnd )
 			StringCchPrintfA( (LPSTR)pbSplit, 30, ("%s%s"), MLT_SEPARATERA, CH_CRLFA );
 		}
 
-		for( i = 0; iPages > i; i++ )	//	�S�ŕۑ�
+		for( i = 0; iPages > i; i++ )	//	全頁保存
 		{
 			if( isAST )
 			{
@@ -295,7 +295,7 @@ HRESULT DocFileBackup( HWND hWnd )
 			iByteSize = DocPageTextGetAlloc( itFile, i, D_SJIS, &pBuffer, TRUE );
 
 			if( (i+1) == iPages ){	iByteSize -=  iCrLf;	}
-			//	�ŏI�ł̖��[�̉��s�͕s�v�̂͂�
+			//	最終頁の末端の改行は不要のはず
 			WriteFile( hFile, pBuffer, iByteSize - iNullTmt, &wrote, NULL );
 
 			FREE( pBuffer );
@@ -307,22 +307,22 @@ HRESULT DocFileBackup( HWND hWnd )
 		FREE( pbSplit );
 	}
 
-	if( gbAutoBUmsg ){	NotifyBalloonExist( TEXT("��ƒ��̃t�@�C�����o�b�N�A�b�v�ۑ�������B"), TEXT("���ӂ���̂��m�点"), NIIF_INFO );	}
+	if( gbAutoBUmsg ){	NotifyBalloonExist( TEXT("已经将编辑状态的文件备份了哦。"), TEXT("阿燐燐向您确认"), NIIF_INFO );	}
 
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	�t�@�C���ɕۑ�����
-	@param[in]	hWnd	�e�ɂ���E�C���h�E�n���h��
-	@param[in]	bStyle	�㏑�������l�[�����E�t�H�[�}�b�g�I���̓_�C�����O�ł��
-	@return		HRESULT	�I����ԃR�[�h
+	ファイルに保存する
+	@param[in]	hWnd	親にするウインドウハンドル
+	@param[in]	bStyle	上書きかリネームか・フォーマット選択はダイヤログでやる
+	@return		HRESULT	終了状態コード
 */
 HRESULT DocFileSave( HWND hWnd, UINT bStyle )
 {
 	CONST  TCHAR	aatExte[3][5] = { {TEXT(".ast")}, {TEXT(".mlt")}, {TEXT(".txt")} };
-	CONST  WCHAR	rtHead = 0xFEFF;	//	���j�R�[�h�e�L�X�g�w�b�_
+	CONST  WCHAR	rtHead = 0xFEFF;	//	ユニコードテキストヘッダ
 
 	SYSTEMTIME		stSysTile;
 	OPENFILENAME	stSaveFile;
@@ -335,10 +335,10 @@ HRESULT DocFileSave( HWND hWnd, UINT bStyle )
 	HANDLE	hFile;
 	DWORD	wrote;
 
-	LPTSTR	ptExten;	//	�t�@�C�����̊g���q
+	LPTSTR	ptExten;	//	ファイル名の拡張子
 	TCHAR	atExBuf[10];
 
-	LPVOID	pBuffer;	//	������o�b�t�@�p�|�C���^�[
+	LPVOID	pBuffer;	//	文字列バッファ用ポインター
 	INT		iByteSize, iNullTmt, iCrLf;
 
 	LPVOID	pbSplit;
@@ -349,10 +349,10 @@ HRESULT DocFileSave( HWND hWnd, UINT bStyle )
 	BOOLEAN	bForceMLT = FALSE;
 	BOOLEAN	bNoName = FALSE;
 
-	BOOLEAN	bUtf8 = FALSE;	//	�t�s�e�W�ŕۑ��Z��
-	BOOLEAN	bUnic = FALSE;	//	���j�R�[�h�ŕۑ��Z��
+	BOOLEAN	bUtf8 = FALSE;	//	ＵＴＦ８で保存セヨ
+	BOOLEAN	bUnic = FALSE;	//	ユニコードで保存セヨ
 
-	UINT_PTR	iPages, i;	//	�Ő�
+	UINT_PTR	iPages, i;	//	頁数
 
 	ZeroMemory( &stSaveFile, sizeof(OPENFILENAME) );
 
@@ -360,20 +360,20 @@ HRESULT DocFileSave( HWND hWnd, UINT bStyle )
 	ZeroMemory( atFileName,  sizeof(atFileName) );
 	ZeroMemory( atBuffer,  sizeof(atBuffer) );
 
-	//	�ۑ����͏�ɑI�����Ă���t�@�C����ۑ�
+	//	保存時は常に選択しているファイルを保存
 
-	iPages = DocNowFilePageCount( );	//	���Ő�
+	iPages = DocNowFilePageCount( );	//	総頁数
 	if( 1 >= iPages )	isMLT = FALSE;
 	else				isMLT = TRUE;
 
-//�����̊g���q��AST�Ȃ�A�����D�悷��
+//既存の拡張子がASTなら、それを優先する
 
-	isAST = PageListIsNamed( gitFileIt );	//	�łɖ��O���t���Ă�H
+	isAST = PageListIsNamed( gitFileIt );	//	頁に名前が付いてる？
 
 	//if( isAST ){		idExten = 0;	}	//	AST
 	//else if( isMLT ){	idExten = 1;	}	//	MLT
 	//else{				idExten = 2;	}	//	TXT
-	//	txt�͎g�p���Ȃ����Ƃɂ���
+	//	txtは使用しないことにする
 	if( isAST ){	idExten = 0;	}	//	AST
 	else{			idExten = 1;	}	//	MLT
 
@@ -384,23 +384,23 @@ HRESULT DocFileSave( HWND hWnd, UINT bStyle )
 
 	if( NULL == (*gitFileIt).atFileName[0] )	bNoName = TRUE;
 
-	//	���l�[�����A�t�@�C����������������ۑ��_�C�����O�J��
+	//	リネームか、ファイル名が無かったら保存ダイヤログ開く
 	if( (bStyle & D_RENAME) || bNoName )
 	{
 
-		//������ FileSaveDialogue ���o��
+		//ここで FileSaveDialogue を出す
 		stSaveFile.lStructSize     = sizeof(OPENFILENAME);
 		stSaveFile.hwndOwner       = hWnd;
-		stSaveFile.lpstrFilter     = TEXT("[ShiftJIS]�A�X�L�[�A�[�g�t�@�C�� ( mlt, ast, txt )\0*.mlt;*.ast;*.txt\0[UTF8]�A�X�L�[�A�[�g�t�@�C�� ( mlt, ast, txt )\0*.mlt;*.ast;*.txt\0\0");
-		stSaveFile.nFilterIndex    = 1;	//	�f�t�H�̃t�B���^�I����
+		stSaveFile.lpstrFilter     = TEXT("[ShiftJIS]AA文件 ( mlt, ast, txt )\0*.mlt;*.ast;*.txt\0[UTF8]AA文件 ( mlt, ast, txt )\0*.mlt;*.ast;*.txt\0\0");
+		stSaveFile.nFilterIndex    = 1;	//	デフォのフィルタ選択肢
 		stSaveFile.lpstrFile       = atFilePath;
 		stSaveFile.nMaxFile        = MAX_PATH;
 		stSaveFile.lpstrFileTitle  = atFileName;
 		stSaveFile.nMaxFileTitle   = MAX_STRING;
 //		stSaveFile.lpstrInitialDir = 
-		stSaveFile.lpstrTitle      = TEXT("�ۑ�����t�@�C�������w�肵�Ă�");
+		stSaveFile.lpstrTitle      = TEXT("请您指定要保存的文件名呢");
 		stSaveFile.Flags           = OFN_EXPLORER | OFN_OVERWRITEPROMPT | OFN_HIDEREADONLY;
-		//�f�t�H���g�g���q�̎w��E���ƂŖʓ|���Ă邩�炱���ł͂��Ȃ������ǂ�
+		//デフォルト拡張子の指定・あとで面倒見てるからここではしない方が良い
 		//	stSaveFile.lpstrDefExt = TEXT("ast");
 		//	stSaveFile.lpstrDefExt = TEXT("mlt");
 
@@ -409,50 +409,50 @@ HRESULT DocFileSave( HWND hWnd, UINT bStyle )
 		ViewFocusSet(  );
 
 		if( !(bOpened) ){	return  E_ABORT;	}
-		//	�L�����Z�����Ă��牽�����Ȃ�
+		//	キャンセルしてたら何もしない
 
-		//�I�������t�B���^�ԍ����P�C���f�b�N�X�œ���
+		//選択したフィルタ番号が１インデックスで入る
 		if(  2 == stSaveFile.nFilterIndex ){	bUtf8 = TRUE;	}
-		//	�t�s�e�W�ŕۑ��E���j�R�[�h����ϊ�����΂�낵
+		//	ＵＴＦ８で保存・ユニコードから変換すればよろし
 
 		if( bUnic || bUtf8 )
-		{	//	�������̂܂܃G�N�X�|�[�g���悤�Ƃ��Ă��疳��
+		{	//	名無しのままエクスポートしようとしてたら無効
 			if( NULL == (*gitFileIt).atFileName[0] )
 			{
-				MessageBox( hWnd, TEXT("��ɒʏ�̕ۑ������Ă���G�N�X�|�[�g���ĂˁB"), TEXT("���ӂ���̂��m�点"), MB_OK | MB_ICONINFORMATION );
+				MessageBox( hWnd, TEXT("请先使用SJIS编码保存一遍之后再进行其他格式的转换呢。"), TEXT("阿燐燐向您确认"), MB_OK | MB_ICONINFORMATION );
 				return E_FAIL;
 			}
 		}
-		else{	bLastChg = TRUE;	}	//	�V�K�ۑ��E���l�[���ۑ�
-		//	����t�H�[�}�b�g�̏ꍇ�̓G�N�X�|�[�g�Ƃ��A������Ԃɂ͉e�����Ȃ��悤�ɂ���
+		else{	bLastChg = TRUE;	}	//	新規保存・リネーム保存
+		//	特殊フォーマットの場合はエクスポートとし、内部状態には影響しないようにする
 	}
 
-	//	�g���q���m�F�E�h�b�g���݂���`��E�g���q�̈ʒu�̃|�C���^�m��
-	ptExten = PathFindExtension( atFilePath );	//	�g���q�������Ȃ疖�[�ɂȂ�
+	//	拡張子を確認・ドット込みだよ～ん・拡張子の位置のポインタ確保
+	ptExten = PathFindExtension( atFilePath );	//	拡張子が無いなら末端になる
 	if( 0 == *ptExten )
 	{
-		//	�g���q�w�肪�Ȃ��Ȃ炻�̂܂ܑΉ��̂���������
+		//	拡張子指定がないならそのまま対応のをくっつける
 		StringCchCopy( ptExten, 5, aatExte[idExten] );
 		bExtChg = TRUE;
 	}
-	else	//	�����̊g���q����������
+	else	//	既存の拡張子があったら
 	{
 		StringCchCopy( atExBuf, 10, ptExten );
-		CharLower( atExBuf );	//	��r�̂��߂ɏ������ɂ����Ⴄ
+		CharLower( atExBuf );	//	比較のために小文字にしちゃう
 
-		//	�����̊g���q���AAST�Ȃ炻���D�悷��
-		if( !( StrCmp( atExBuf, aatExte[0] ) ) )	//	AST�ł���Ȃ�
+		//	既存の拡張子が、ASTならそれを優先する
+		if( !( StrCmp( atExBuf, aatExte[0] ) ) )	//	ASTであるなら
 		{
-			//	AST�`�����ێ�����
+			//	AST形式を維持する
 			isAST = TRUE;	isMLT = FALSE;	idExten = 0;
 		}
 
-		//	�ۑ�����g���q��MLT�ŁA������AST���烊�l�[���Ȃ�m�F
+		//	保存する拡張子がMLTで、既存のASTからリネームなら確認
 		if( !( StrCmp( atExBuf, aatExte[1] ) ) )
 		{
-			if( isAST && (bStyle & D_RENAME) )	//	����AST�����l�[���Ȃ�
+			if( isAST && (bStyle & D_RENAME) )	//	既存ASTかつリネームなら
 			{
-				mbRslt = MessageBox( hWnd, TEXT("MLT�ŕۑ�����ƕŖ��̂��Ȃ��Ȃ����Ⴄ��B\r\n����ł��ǂ������H"), TEXT("���ӂ���̊m�F"), MB_OKCANCEL | MB_ICONQUESTION );
+				mbRslt = MessageBox( hWnd, TEXT("使用MLT格式保存的话页名称就会丢失哦。\r\n真的关系吗？"), TEXT("阿燐燐向您确认"), MB_OKCANCEL | MB_ICONQUESTION );
 				if( IDOK != mbRslt )	return E_ABORT;
 
 				isMLT = TRUE;	isAST = FALSE;	idExten = 1;
@@ -460,36 +460,36 @@ HRESULT DocFileSave( HWND hWnd, UINT bStyle )
 			}
 		}
 
-		if( isAST )	//	AST�͗D��I�ɓK�p
+		if( isAST )	//	ASTは優先的に適用
 		{
-			if( StrCmp( atExBuf , aatExte[0] ) )	//	����AST����Ȃ�������ύX
+			if( StrCmp( atExBuf , aatExte[0] ) )	//	もしASTじゃなかったら変更
 			{
 				StringCchCopy( ptExten, 5, aatExte[0] );
 				bExtChg = TRUE;
 			}
 		}
-		else if( isMLT )	//	���O�������Ǖ����łȂ�MLT����Ȃ��ƃ_��
+		else if( isMLT )	//	名前無いけど複数頁ならMLTじゃないとダメ
 		{
-			if( StrCmp( atExBuf , aatExte[1] ) )	//	����MLT����Ȃ�������ύX
+			if( StrCmp( atExBuf , aatExte[1] ) )	//	もしMLTじゃなかったら変更
 			{
 				StringCchCopy( ptExten, 5, aatExte[1] );
 				bExtChg = TRUE;
 			}
 		}
-		//	�ꖇ�Ȃ�ATXT�ł�MLT�ł��C�ɂ��Ȃ��Ă悩�΂�
+		//	一枚なら、TXTでもMLTでも気にしなくてよかばい
 	}
 
 
-	//	�㏑���Ȃ璼�O�̏�Ԃ̃o�b�N�A�b�v�Ƃ����ׂ�
-	//	�������O�̃t�@�C��������΁A���Ă��Ƃ�
+	//	上書きなら直前の状態のバックアップとか取るべき
+	//	同じ名前のファイルがあれば、ってことで
 
-	//	�I���W�i���t�@�C�����ɒ���
+	//	オリジナルファイル名に注意
 	if( !(bUnic) &&  !(bUtf8) ){	StringCchCopy( (*gitFileIt).atFileName, MAX_PATH, atFilePath );	}
 
 	hFile = CreateFile( atFilePath, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL );
 	if( INVALID_HANDLE_VALUE == hFile )
 	{
-		MessageBox( hWnd, TEXT("�t�@�C�����J���Ȃ�������"), TEXT("���ӂ���̂��m�点"), MB_OK | MB_ICONERROR );
+		MessageBox( hWnd, TEXT("打开文件失败了哦"), TEXT("阿燐燐向您确认"), MB_OK | MB_ICONERROR );
 		return E_HANDLE;
 	}
 
@@ -497,7 +497,7 @@ HRESULT DocFileSave( HWND hWnd, UINT bStyle )
 	iCrLf = CH_CRLF_CCH;
 	SetFilePointer( hFile, 0, NULL, FILE_BEGIN );
 
-	if( bUnic )	//	���j�R�[�h���[�h�Ȃ�ABOM������
+	if( bUnic )	//	ユニコードモードなら、BOMをつける
 	{
 		WriteFile( hFile, &rtHead, 2, &wrote, NULL );
 		iNullTmt = 2;
@@ -518,30 +518,30 @@ HRESULT DocFileSave( HWND hWnd, UINT bStyle )
 			cbSplSz = (MLT_SPRT_CCH + CH_CRLF_CCH) * sizeof(TCHAR);
 			StringCchPrintfW( (LPTSTR)pbSplit, 15, TEXT("%s%s"), MLT_SEPARATERW, CH_CRLFW );
 		}
-		else	//	UTF8�̏ꍇ�́AASCII�����͂��̂܂܂ł���
+		else	//	UTF8の場合は、ASCII文字はそのままでおｋ
 		{
 			cbSplSz = MLT_SPRT_CCH + CH_CRLF_CCH;
 			StringCchPrintfA( (LPSTR)pbSplit, 30, ("%s%s"), MLT_SEPARATERA, CH_CRLFA );
 		}
 	}
 
-	//	�{���̎捞�̓��j�R�[�h�ł��K�v������
+	//	本文の取込はユニコードでやる必要がある
 	if( bUnic || bUtf8 ){	bStyle |= D_UNI;	}
 
-	for( i = 0; iPages > i; i++ )	//	�S�ŕۑ�
+	for( i = 0; iPages > i; i++ )	//	全頁保存
 	{
-		if( isAST )	//	�`�r�s�̏ꍇ�́A�Ő擪�Ƀ^�C�g���������Ă�
+		if( isAST )	//	ＡＳＴの場合は、頁先頭にタイトルが入ってる
 		{
-			//	�Ԃ�l�̊m�ۃo�C�g���ɂ͂m�t�k�k�^�[�~�l�[�^�܂�ł�̂Œ���
+			//	返り値の確保バイト数にはＮＵＬＬターミネータ含んでるので注意
 			cbSplSz = DocAstSeparatorGetAlloc( gitFileIt, i, bStyle, &pbSplit );
 
 			if( bUtf8 ){	cbSplSz = DocUnicode2UTF8( &pbSplit );	}
-			//	pbSplit�̒��g��t���ւ���
+			//	pbSplitの中身を付け替える
 
 			WriteFile( hFile , pbSplit, (cbSplSz- iNullTmt), &wrote, NULL );
 			FREE(pbSplit);
 		}
-		else	//	MLT�̏ꍇ�́A��ڈȍ~�ŋ�؂肪�K�v
+		else	//	MLTの場合は、二つ目以降で区切りが必要
 		{
 			if( 1 <= i ){	WriteFile( hFile , pbSplit, cbSplSz, &wrote, NULL );	}
 			if( bForceMLT ){	DocAstSeparatorGetAlloc( gitFileIt, i, 0, NULL );	}
@@ -550,9 +550,9 @@ HRESULT DocFileSave( HWND hWnd, UINT bStyle )
 		iByteSize = DocPageTextGetAlloc( gitFileIt, i, bStyle, &pBuffer, TRUE );
 
 		if( bUtf8 ){	iByteSize = DocUnicode2UTF8( &pBuffer );	}
-		//	pBuffer�̒��g��t���ւ���
+		//	pBufferの中身を付け替える
 
-		if( (i+1) == iPages ){	iByteSize -=  iCrLf;	}	//	�ŏI�ł̖��[�̉��s�͕s�v�̂͂�
+		if( (i+1) == iPages ){	iByteSize -=  iCrLf;	}	//	最終頁の末端の改行は不要のはず
 		WriteFile( hFile, pBuffer, iByteSize - iNullTmt, &wrote, NULL );
 
 		FREE( pBuffer );
@@ -563,43 +563,43 @@ HRESULT DocFileSave( HWND hWnd, UINT bStyle )
 
 	FREE( pbSplit );
 
-	//	�G�N�X�|�[�g�Ȃ̂ŕۑ����ĂȂ����Ƃ�
+	//	エクスポートなので保存してないことに
 	if( !(bUnic) &&  !(bUtf8) ){	DocModifyContent( FALSE );	}
 
-	//	�Ȃ񂩃��b�Z�[�W
-	if( bExtChg )	//	�g���q�ύX�����ꍇ
+	//	なんかメッセージ
+	if( bExtChg )	//	拡張子変更した場合
 	{
-		//InitLastOpen( INIT_SAVE, atFilePath );	//	���X�g�I�[�|��������
-		MultiFileTabRename( (*gitFileIt).dUnique, atFilePath );	//	�^�u���̕ύX
+		//InitLastOpen( INIT_SAVE, atFilePath );	//	ラストオーポンを書換
+		MultiFileTabRename( (*gitFileIt).dUnique, atFilePath );	//	タブ名称変更
 		AppTitleChange( atFilePath );
-		StringCchPrintf( atBuffer, MAX_STRING, TEXT("�g���q�� %s �ɂ��ĕۑ�������B"), aatExte[idExten] );
-		NotifyBalloonExist( atBuffer, TEXT("���ӂ���̂��m�点"), NIIF_INFO );
+		StringCchPrintf( atBuffer, MAX_STRING, TEXT("已经保存为 %s 格式的文件了哦。"), aatExte[idExten] );
+		NotifyBalloonExist( atBuffer, TEXT("阿燐燐向您确认"), NIIF_INFO );
 
-		OpenHistoryLogging( hWnd , atFilePath );	//	�t�@�C�����ύX�����̂ŋL�^��蒼��
+		OpenHistoryLogging( hWnd , atFilePath );	//	ファイル名変更したので記録取り直し
 	}
 	else
 	{
-		//	20110713	�V�K�����l�[�����Ă��烉�X�g�I�[�|��������
+		//	20110713	新規かリネームしてたらラストオーポンを書換
 		if( bLastChg )
 		{
 			//InitLastOpen( INIT_SAVE, atFilePath );
-			MultiFileTabRename( (*gitFileIt).dUnique, atFilePath );	//	�^�u���̕ύX
+			MultiFileTabRename( (*gitFileIt).dUnique, atFilePath );	//	タブ名称変更
 			AppTitleChange( atFilePath );
 
-			OpenHistoryLogging( hWnd , atFilePath );	//	�t�@�C�����ύX�����̂ŋL�^��蒼��
+			OpenHistoryLogging( hWnd , atFilePath );	//	ファイル名変更したので記録取り直し
 		}
 
 		if( bUnic || bUtf8 )
 		{
-			NotifyBalloonExist( TEXT("�t�@�C���̃G�N�X�|�[�g������B"), TEXT("���ӂ���̂��m�点"), NIIF_INFO );
+			NotifyBalloonExist( TEXT("文件的导出已经成功了哦。"), TEXT("阿燐燐向您确认"), NIIF_INFO );
 		}
 		else
 		{
-			if( gbSaveMsgOn ){	NotifyBalloonExist( TEXT("�t�@�C����ۑ�������B"), TEXT("���ӂ���̂��m�点"), NIIF_INFO );	}
+			if( gbSaveMsgOn ){	NotifyBalloonExist( TEXT("文件已经保存了哦。"), TEXT("阿燐燐向您确认"), NIIF_INFO );	}
 		}
 	}
 
-	//	�ňꗗ�̏�������
+	//	頁一覧の書き直し
 	if( bForceMLT ){	PageListViewRewrite( -1 );	}
 
 	return S_OK;
@@ -607,19 +607,19 @@ HRESULT DocFileSave( HWND hWnd, UINT bStyle )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	���j�R�[�h��������󂯎���āA�t�s�e�W�̃A�h���X���m�ۂ��Ă��ǂ��B
-	@param[in,out]	pText	���I���j�R�[�h��������E���I�t�s�e�W����������B�������̈�������
-	@return	INT	�m�ۂ����o�C�g���ENULL�^�[�~�l�[�^�܂�
+	ユニコード文字列を受け取って、ＵＴＦ８のアドレスを確保してもどす。
+	@param[in,out]	pText	動的ユニコード文字列受取・動的ＵＴＦ８文字列入れる。メモリの扱い注意
+	@return	INT	確保したバイト数・NULLターミネータ含む
 */
 INT DocUnicode2UTF8( LPVOID *pText )
 {
-	UINT_PTR	cchSz;	//	���j�R�[�h�p
-	INT	cbSize, rslt;	//	UTF8�p
-	LPVOID		pUtf8;	//	�m��
+	UINT_PTR	cchSz;	//	ユニコード用
+	INT	cbSize, rslt;	//	UTF8用
+	LPVOID		pUtf8;	//	確保
 
 	StringCchLength( (LPTSTR)(*pText), STRSAFE_MAX_CCH, &cchSz );
 
-	//	�K�v�o�C�g���m�F
+	//	必要バイト数確認
 	cbSize = WideCharToMultiByte( CP_UTF8, 0, (LPTSTR)(*pText), -1, NULL, 0, NULL, NULL );
 	TRACE( TEXT("cbSize[%d]"), cbSize );
 	pUtf8 = (LPSTR)malloc( cbSize );
@@ -627,21 +627,21 @@ INT DocUnicode2UTF8( LPVOID *pText )
 	rslt = WideCharToMultiByte( CP_UTF8, 0, (LPTSTR)(*pText), -1, (LPSTR)(pUtf8), cbSize, NULL, NULL );
 	TRACE( TEXT("rslt[%d]"), rslt );
 
-	FREE( *pText );	//	���j�R�[�h������̂ق��͔j�󂷂�
+	FREE( *pText );	//	ユニコード文字列のほうは破壊する
 
-	*pText = pUtf8;	//	�t�s�e�W�̂ق��ɕt���ւ���
+	*pText = pUtf8;	//	ＵＴＦ８のほうに付け替える
 
 	return cbSize;
 }
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	�y�[�W���O��AST��؂�t���Ŋm�ۂ���Efree�͌Ă񂾕��ł��
-	@param[in]	itFile	�m�ۂ���Ŕԍ�
-	@param[in]	dPage	�m�ۂ���Ŕԍ�
-	@param[in]	bStyle	�P���j�R�[�h���V�t�gJIS�ŁA��`���ǂ���
-	@param[out]	pText	�m�ۂ����̈��Ԃ��E���C�h�������}���`�����ɂȂ�ENULL�Ȃ�Ŗ����폜����
-	@return				�m�ۂ����o�C�g���ENULL�^�[�~�l�[�^�܂�
+	ページ名前をAST区切り付きで確保する・freeは呼んだ方でやる
+	@param[in]	itFile	確保する頁番号
+	@param[in]	dPage	確保する頁番号
+	@param[in]	bStyle	１ユニコードかシフトJISで、矩形かどうか
+	@param[out]	pText	確保した領域を返す・ワイド文字かマルチ文字になる・NULLなら頁名を削除する
+	@return				確保したバイト数・NULLターミネータ含む
 */
 INT DocAstSeparatorGetAlloc( FILES_ITR itFile, INT dPage, UINT bStyle, LPVOID *pText )
 {
@@ -659,7 +659,7 @@ INT DocAstSeparatorGetAlloc( FILES_ITR itFile, INT dPage, UINT bStyle, LPVOID *p
 
 	if( bStyle & D_UNI )
 	{
-		cbSize = (cchSize + 1) *  sizeof(TCHAR);	//	NULL�^�[�~�l�[�^
+		cbSize = (cchSize + 1) *  sizeof(TCHAR);	//	NULLターミネータ
 
 		*pText = (LPTSTR)malloc( cbSize );
 		ZeroMemory( *pText, cbSize );
@@ -668,7 +668,7 @@ INT DocAstSeparatorGetAlloc( FILES_ITR itFile, INT dPage, UINT bStyle, LPVOID *p
 	else
 	{
 		cbSize = WideCharToMultiByte( CP_ACP, WC_NO_BEST_FIT_CHARS, atBuffer, cchSize, NULL, 0, NULL, NULL );
-		cbSize++;	//	NULL�^�[�~�l�[�^
+		cbSize++;	//	NULLターミネータ
 		*pText = (LPSTR)malloc( cbSize );
 		ZeroMemory( *pText, cbSize );
 		WideCharToMultiByte( CP_ACP, WC_NO_BEST_FIT_CHARS, atBuffer, cchSize, (LPSTR)(*pText), cbSize, NULL, NULL );
@@ -679,11 +679,11 @@ INT DocAstSeparatorGetAlloc( FILES_ITR itFile, INT dPage, UINT bStyle, LPVOID *p
 //-------------------------------------------------------------------------------------------------Yippee-ki-yay!
 
 /*!
-	�摜�ŕł�ۑ��EBMP��PNG�AJPEG�͌����ĂȂ�
-	@param[in]	hWnd	�e�ɂ���E�C���h�E�n���h��
-	@param[in]	bStyle	�Ȃ񂩃t���O�E�Ƃ�₦�����g�p
-	@param[in]	hFont	�`��Ɏg���t�H���g�󂯎��
-	@return		HRESULT	�I����ԃR�[�h
+	画像で頁を保存・BMPかPNG、JPEGは向いてない
+	@param[in]	hWnd	親にするウインドウハンドル
+	@param[in]	bStyle	なんかフラグ・とりやえず未使用
+	@param[in]	hFont	描画に使うフォント受け取る
+	@return		HRESULT	終了状態コード
 */
 HRESULT DocImageSave( HWND hWnd, UINT bStyle, HFONT hFont )
 {
@@ -710,10 +710,10 @@ HRESULT DocImageSave( HWND hWnd, UINT bStyle, HFONT hFont )
 
 
 
-	//	�Ƃ肠���Ã_�~�[���O�Ńt�@�C��
+	//	とりあえづダミー名前でファイル
 	StringCchCopy( atOutName, MAX_PATH, gitFileIt->atFileName );
-	//	�g���q���I����D�悷��悤�ɂ����Ⴄ
-	PathRemoveExtension( atOutName );	//	�g���q���ځ`��
+	//	拡張子より選択を優先するようにしちゃう
+	PathRemoveExtension( atOutName );	//	拡張子あぼ～ん
 
 	StringCchPrintf( atPart, MIN_STRING, TEXT("_Page%d"), gixFocusPage );
 	StringCchCat( atOutName, MAX_PATH, atPart );
@@ -721,14 +721,14 @@ HRESULT DocImageSave( HWND hWnd, UINT bStyle, HFONT hFont )
 	ZeroMemory( &stSaveFile, sizeof(OPENFILENAME) );
 	stSaveFile.lStructSize     = sizeof(OPENFILENAME);
 	stSaveFile.hwndOwner       = hWnd;
-	stSaveFile.lpstrFilter     = TEXT("BMP �t�@�C�� ( *.bmp )\0*.bmp\0PNG �t�@�C�� ( *.png )\0*.png\0\0");
-	stSaveFile.nFilterIndex    = 1;	//	�f�t�H�̃t�B���^�I����
+	stSaveFile.lpstrFilter     = TEXT("BMP 文件 ( *.bmp )\0*.bmp\0PNG 文件 ( *.png )\0*.png\0\0");
+	stSaveFile.nFilterIndex    = 1;	//	デフォのフィルタ選択肢
 	stSaveFile.lpstrFile       = atOutName;
 	stSaveFile.nMaxFile        = MAX_PATH;
 	stSaveFile.lpstrFileTitle  = atFileName;
 	stSaveFile.nMaxFileTitle   = MAX_STRING;
 //		stSaveFile.lpstrInitialDir = 
-	stSaveFile.lpstrTitle      = TEXT("�ۑ�����t�@�C�����ƌ`�����w�肵�Ă�����");
+	stSaveFile.lpstrTitle      = TEXT("请您指定要保存的文件名和格式哦");
 	stSaveFile.Flags           = OFN_EXPLORER | OFN_OVERWRITEPROMPT | OFN_HIDEREADONLY;
 
 	bOpened = GetSaveFileName( &stSaveFile );
@@ -737,29 +737,29 @@ HRESULT DocImageSave( HWND hWnd, UINT bStyle, HFONT hFont )
 
 	if( !(bOpened) ){	return  E_ABORT;	}
 
-	//�I�������t�B���^�ԍ����P�C���f�b�N�X�œ���
+	//選択したフィルタ番号が１インデックスで入る
 	switch( stSaveFile.nFilterIndex )
 	{
 		default:	bType = ISAVE_BMP;	break;
 		case  2:	bType = ISAVE_PNG;	break;
 	}
 
-	dLines = DocNowFilePageLineCount(  );//DocPageParamGet( NULL , NULL );	//	�v��͍̂s��
+	dLines = DocNowFilePageLineCount(  );//DocPageParamGet( NULL , NULL );	//	要るのは行数
 	iDotX  = DocPageMaxDotGet( -1, -1 );
 	iDotY  = dLines * LINE_HEIGHT;
-	//	������Ɨ]�T����Ƃ�
+	//	ちゅっと余裕いれとく
 	iDotX += 8;
 	iDotY += 8;
 
 	SetRect( &rect, 4, 4, iDotX - 4, iDotY- 4 );
 
-	TRACE( TEXT("�T�C�Y %d x %d"), iDotX, iDotY );
+	TRACE( TEXT("大小 %d x %d"), iDotX, iDotY );
 
 	iByteSize = DocPageTextGetAlloc( gitFileIt, gixFocusPage, D_UNI, &pBuffer, TRUE );
 	ptText = (LPTSTR)pBuffer;
 	StringCchLength( ptText, STRSAFE_MAX_CCH, &cchSize );
 
-	//	�`��p�r�b�g�}�b�v�쐬
+	//	描画用ビットマップ作成
 	hdc = GetDC( hWnd );
 
 	hBitmap = CreateCompatibleBitmap( hdc, iDotX, iDotY );
@@ -775,17 +775,17 @@ HRESULT DocImageSave( HWND hWnd, UINT bStyle, HFONT hFont )
 	iLine  = 0;
 	cchLen = 0;
 	start  = 0;
-	//	������S�̂����Ă���
+	//	文字列全体を見ていく
 	for( caret = 0; cchSize > caret; )
 	{
-		if( TEXT('\r') == ptText[caret] )	//	��s�̏I���
+		if( TEXT('\r') == ptText[caret] )	//	壱行の終わり
 		{
 			TextOut( hMemDC, 0, iLine, &(ptText[start]), cchLen );
-			cchLen = 0;	//	���������Z�b�g
-			caret += 2;	//	���̍s�̊J�n�ʒu
-			start = caret;	//	�J�n�ʒu�m�F
+			cchLen = 0;	//	文字数リセット
+			caret += 2;	//	次の行の開始位置
+			start = caret;	//	開始位置確認
 
-			iLine += LINE_HEIGHT;	//	�`��x�ʒu
+			iLine += LINE_HEIGHT;	//	描画Ｙ位置
 		}
 		else
 		{
@@ -793,7 +793,7 @@ HRESULT DocImageSave( HWND hWnd, UINT bStyle, HFONT hFont )
 			caret++;
 		}
 	}
-	//	�Ō�̍s�`��
+	//	最後の行描画
 	TextOut( hMemDC, 0, iLine, &(ptText[start]), cchLen );
 
 
@@ -801,13 +801,13 @@ HRESULT DocImageSave( HWND hWnd, UINT bStyle, HFONT hFont )
 
 	if( SUCCEEDED( ImageFileSaveDC( hMemDC, atOutName, bType ) ) )
 	{
-		//	��������
-		TRACE( TEXT("�ۑ� %s"), atOutName );
+		//	せいこう
+		TRACE( TEXT("保存 %s"), atOutName );
 	}
 	else
 	{
-		//	�����ς�
-		TRACE( TEXT("���s %s"), atOutName );
+		//	しっぱい
+		TRACE( TEXT("失败 %s"), atOutName );
 	}
 
 	SelectBitmap( hMemDC, hOldBmp );
@@ -822,9 +822,9 @@ HRESULT DocImageSave( HWND hWnd, UINT bStyle, HFONT hFont )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	MLT2HTML���g���āA���J���Ă���t�@�C����HTML�G�N�X�|�[�g
-	@param[in]	hWnd	�e�ɂ���E�C���h�E�n���h��
-	@return		HRESULT	�I����ԃR�[�h
+	MLT2HTMLを使って、今開いているファイルをHTMLエクスポート
+	@param[in]	hWnd	親にするウインドウハンドル
+	@return		HRESULT	終了状態コード
 */
 HRESULT DocHtmlExport( HWND hWnd )
 {
@@ -840,10 +840,10 @@ HRESULT DocHtmlExport( HWND hWnd )
 
 	StringCchCopy( atFilePath, MAX_PATH, (*gitFileIt).atFileName );
 
-	//	���J���Ă���t�@�C�������ۑ��Ȃ�A�`���[�V
+	//	今開いているファイルが未保存なら、チューシ
 	if( gitFileIt->dModify || ( NULL == atFilePath[0] ) )
 	{
-		MessageBox( hWnd, TEXT("��Ƀt�@�C����ۑ����Ă���ɂ��ĂˁB"), TEXT("�t�@�C�����ۑ�����ĂȂ���"), MB_OK | MB_ICONERROR );
+		MessageBox( hWnd, TEXT("请先保存文件再进行其他步骤哦。"), TEXT("文件还没有保存哦"), MB_OK | MB_ICONERROR );
 		return E_ABORT;
 	}
 	PathQuoteSpaces( atFilePath );
@@ -852,7 +852,7 @@ HRESULT DocHtmlExport( HWND hWnd )
 	InitParamString( INIT_LOAD, VS_EXT_M2H_PATH, atExePath );
 	if( NULL == atExePath[0] )
 	{
-		MessageBox( hWnd, TEXT("MLT2HTML.exe ��ݒ肵�Ă����ĂˁB"), TEXT("�O���c�[����������"), MB_OK | MB_ICONERROR );
+		MessageBox( hWnd, TEXT("请先设定MLT2HTML.exe哦。"), TEXT("缺少外部工具哦"), MB_OK | MB_ICONERROR );
 		return E_ABORT;
 	}
 	PathQuoteSpaces( atExePath );
@@ -860,7 +860,7 @@ HRESULT DocHtmlExport( HWND hWnd )
 	ZeroMemory( atCommandLine,  sizeof(atCommandLine) );
 
 	StringCchPrintf( atCommandLine, BIG_STRING + 10, TEXT("%s %s"), atExePath, atFilePath );
-	//	�p�X�Ɋ܂܂��X�y�[�X������Ƃ��������Ȃ�����R�}���̂ŃN�I�[�g���Ă���
+	//	パスに含まれるスペースがあるとおかしくなったらコマルのでクオートしておく
 
 	ZeroMemory( &stProInfo, sizeof(PROCESS_INFORMATION) );
 
@@ -871,7 +871,7 @@ HRESULT DocHtmlExport( HWND hWnd )
 
 	CloseHandle( stProInfo.hThread );
 
-	WaitForSingleObject( stProInfo.hProcess, INFINITE );	//	�����E�G�C�g�E���ԂȂ������H
+	WaitForSingleObject( stProInfo.hProcess, INFINITE );	//	無限ウエイト・あぶないかも？
 
 	CloseHandle( stProInfo.hProcess );
 

@@ -1,0 +1,315 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{30415D19-CFC4-446B-A442-08C5ED7E789A}</ProjectGuid>
+    <RootNamespace>OrinrinEditor</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <SpectreMitigation>false</SpectreMitigation>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>16.0.29511.113</_ProjectFileVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
+    <IntDir>$(Configuration)\</IntDir>
+    <LinkIncremental>true</LinkIncremental>
+    <LibraryPath>C:\WinDDK\7600.16385.1\lib\ATL\i386;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>C:\Kikaku\07_OrinrinEditor\spool</OutDir>
+    <IntDir>$(Configuration)\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+    <ReferencePath>C:\WinDDK\7600.16385.1\inc\atl71;$(ReferencePath)</ReferencePath>
+    <LibraryPath>C:\WinDDK\7600.16385.1\lib\ATL\i386;C:\Kikaku\07_OrinrinEditor\imgctl-127;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\WinDDK\7600.16385.1\inc\atl71;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <PrecompiledHeader />
+      <WarningLevel>Level4</WarningLevel>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <AdditionalIncludeDirectories>C:\WinDDK\7600.16385.1\inc\atl71;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <TargetMachine>MachineX86</TargetMachine>
+      <AdditionalDependencies>SQLite3.lib;atlthunk.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <TargetMachine>MachineX86</TargetMachine>
+      <IgnoreSpecificDefaultLibraries>/NODEFAULTLIB:library</IgnoreSpecificDefaultLibraries>
+      <AdditionalDependencies>atlthunk.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="BrushTemplate.cpp" />
+    <ClCompile Include="ContextCtrl.cpp" />
+    <ClCompile Include="DocAdjustant.cpp" />
+    <ClCompile Include="DocCore.cpp" />
+    <ClCompile Include="DocFileCtrl.cpp" />
+    <ClCompile Include="DocInsDelCtrl.cpp" />
+    <ClCompile Include="DocInverseCtrl.cpp" />
+    <ClCompile Include="DocMiscellaneous.cpp" />
+    <ClCompile Include="DocOperateLog.cpp" />
+    <ClCompile Include="DocPreview.cpp" />
+    <ClCompile Include="DocSearchCtrl.cpp" />
+    <ClCompile Include="DocSelect.cpp" />
+    <ClCompile Include="DraughtBoard.cpp" />
+    <ClCompile Include="FrameCtrl.cpp" />
+    <ClCompile Include="HoverTip.cpp" />
+    <ClCompile Include="LayerBox.cpp" />
+    <ClCompile Include="LineTemplate.cpp" />
+    <ClCompile Include="MaaCatalogue.cpp" />
+    <ClCompile Include="MaaItems.cpp" />
+    <ClCompile Include="MaaSqlManipulate.cpp" />
+    <ClCompile Include="MaaTemplate.cpp" />
+    <ClCompile Include="MaaTreeView.cpp" />
+    <ClCompile Include="MiniTemplate.cpp" />
+    <ClCompile Include="MoziScript.cpp" />
+    <ClCompile Include="OrinrinEditor.cpp" />
+    <ClCompile Include="PageCtrl.cpp" />
+    <ClCompile Include="SplitBar.cpp" />
+    <ClCompile Include="stdafx.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="ToolBar.cpp" />
+    <ClCompile Include="TraceCtrl.cpp" />
+    <ClCompile Include="UnicodePalette.cpp" />
+    <ClCompile Include="UserDefinition.cpp" />
+    <ClCompile Include="VerticalScript.cpp" />
+    <ClCompile Include="ViewCaret.cpp" />
+    <ClCompile Include="ViewCentral.cpp" />
+    <ClCompile Include="ViewKeyButton.cpp" />
+    <ClCompile Include="ViewSelect.cpp" />
+    <ClCompile Include="ViewTrace.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Entity.h" />
+    <ClInclude Include="imgctl.h" />
+    <ClInclude Include="MaaTemplate.h" />
+    <ClInclude Include="OrinrinEditor.h" />
+    <ClInclude Include="Resource.h" />
+    <ClInclude Include="SplitBar.h" />
+    <ClInclude Include="sqlite3.h" />
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="targetver.h" />
+    <ClInclude Include="UnicodePalette.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="OrinrinEditor.ico" />
+    <Image Include="resource\AllSelect.bmp" />
+    <Image Include="resource\AllSelect_q.bmp" />
+    <Image Include="resource\arrow_leftright.bmp" />
+    <Image Include="resource\arrow_leftright_q.bmp" />
+    <Image Include="resource\arrow_updown.bmp" />
+    <Image Include="resource\arrow_updown_q.bmp" />
+    <Image Include="resource\Box1.bmp" />
+    <Image Include="resource\Box10.bmp" />
+    <Image Include="resource\Box11.bmp" />
+    <Image Include="resource\Box12.bmp" />
+    <Image Include="resource\Box13.bmp" />
+    <Image Include="resource\Box14.bmp" />
+    <Image Include="resource\Box15.bmp" />
+    <Image Include="resource\Box16.bmp" />
+    <Image Include="resource\Box17.bmp" />
+    <Image Include="resource\Box18.bmp" />
+    <Image Include="resource\Box19.bmp" />
+    <Image Include="resource\Box2.bmp" />
+    <Image Include="resource\Box20.bmp" />
+    <Image Include="resource\Box3.bmp" />
+    <Image Include="resource\Box4.bmp" />
+    <Image Include="resource\Box5.bmp" />
+    <Image Include="resource\Box6.bmp" />
+    <Image Include="resource\Box7.bmp" />
+    <Image Include="resource\Box8.bmp" />
+    <Image Include="resource\Box9.bmp" />
+    <Image Include="resource\BoxInsert.bmp" />
+    <Image Include="resource\BoxInsert_q.bmp" />
+    <Image Include="resource\BoxSelect.bmp" />
+    <Image Include="resource\BoxSelect_q.bmp" />
+    <Image Include="resource\Box_q.bmp" />
+    <Image Include="resource\BrushMode.bmp" />
+    <Image Include="resource\BrushMode_q.bmp" />
+    <Image Include="resource\ColourTag.bmp" />
+    <Image Include="resource\ColourTag_q.bmp" />
+    <Image Include="resource\Copy.bmp" />
+    <Image Include="resource\Copy_q.bmp" />
+    <Image Include="resource\Cut.bmp" />
+    <Image Include="resource\Cut_q.bmp" />
+    <Image Include="resource\DecrementDot.bmp" />
+    <Image Include="resource\DecrementDot_q.bmp" />
+    <Image Include="resource\Delete.bmp" />
+    <Image Include="resource\Delete_q.bmp" />
+    <Image Include="resource\directory.ico" />
+    <Image Include="resource\dir_extra.ico" />
+    <Image Include="resource\dir_open.ico" />
+    <Image Include="resource\DotSplitLeft.bmp" />
+    <Image Include="resource\DotSplitLeft_q.bmp" />
+    <Image Include="resource\DotSplitRight.bmp" />
+    <Image Include="resource\DotSplitRight_q.bmp" />
+    <Image Include="resource\DraughtBoard.bmp" />
+    <Image Include="resource\DraughtBoard_q.bmp" />
+    <Image Include="resource\Extract.bmp" />
+    <Image Include="resource\ExtractLayer.bmp" />
+    <Image Include="resource\ExtractLayer_q.bmp" />
+    <Image Include="resource\Extract_q.bmp" />
+    <Image Include="resource\FileCreate.bmp" />
+    <Image Include="resource\FileCreate_q.bmp" />
+    <Image Include="resource\FileOpen.bmp" />
+    <Image Include="resource\FileOpen_q.bmp" />
+    <Image Include="resource\FileSave.bmp" />
+    <Image Include="resource\FileSave_q.bmp" />
+    <Image Include="resource\file_ast.ico" />
+    <Image Include="resource\file_etc.ico" />
+    <Image Include="resource\file_mlt.ico" />
+    <Image Include="resource\Frame.bmp" />
+    <Image Include="resource\FramePadding.bmp" />
+    <Image Include="resource\FramePadding_q.bmp" />
+    <Image Include="resource\Frame_q.bmp" />
+    <Image Include="resource\HeadSpaceAdd.bmp" />
+    <Image Include="resource\HeadSpaceAdd_q.bmp" />
+    <Image Include="resource\HeadSpaceDel.bmp" />
+    <Image Include="resource\HeadSpaceDel_q.bmp" />
+    <Image Include="resource\IncrementDot.bmp" />
+    <Image Include="resource\IncrementDot_q.bmp" />
+    <Image Include="resource\LaayerOverWrite.bmp" />
+    <Image Include="resource\LaayerOverWrite_q.bmp" />
+    <Image Include="resource\LayerBox.bmp" />
+    <Image Include="resource\LayerBox_q.bmp" />
+    <Image Include="resource\LayerInsert.bmp" />
+    <Image Include="resource\LayerInsert_q.bmp" />
+    <Image Include="resource\LayerTextEdit.bmp" />
+    <Image Include="resource\LayerTextEdit_q.bmp" />
+    <Image Include="resource\LinesShiftLeft.bmp" />
+    <Image Include="resource\LinesShiftLeft_q.bmp" />
+    <Image Include="resource\LinesShiftRight.bmp" />
+    <Image Include="resource\LinesShiftRight_q.bmp" />
+    <Image Include="resource\MoziAdv.bmp" />
+    <Image Include="resource\MoziAdv_q.bmp" />
+    <Image Include="resource\MoziScript.bmp" />
+    <Image Include="resource\MoziScript_q.bmp" />
+    <Image Include="resource\MoziWrite.bmp" />
+    <Image Include="resource\PageCombine.bmp" />
+    <Image Include="resource\PageCombine_q.bmp" />
+    <Image Include="resource\PageCreate.bmp" />
+    <Image Include="resource\PageCreate_q.bmp" />
+    <Image Include="resource\PageDelete.bmp" />
+    <Image Include="resource\PageDelete_q.bmp" />
+    <Image Include="resource\PageDivide.bmp" />
+    <Image Include="resource\PageDivide_q.bmp" />
+    <Image Include="resource\PageDuplicate.bmp" />
+    <Image Include="resource\PageDuplicate_q.bmp" />
+    <Image Include="resource\PageInsert.bmp" />
+    <Image Include="resource\PageInsert_q.bmp" />
+    <Image Include="resource\PageNameChange.bmp" />
+    <Image Include="resource\PageNameChange_q.bmp" />
+    <Image Include="resource\PageSjisCopy.bmp" />
+    <Image Include="resource\PageSjisCopy_q.bmp" />
+    <Image Include="resource\PageUnderShift.bmp" />
+    <Image Include="resource\PageUnderShift_q.bmp" />
+    <Image Include="resource\PageUpperShift.bmp" />
+    <Image Include="resource\PageUpperShift_q.bmp" />
+    <Image Include="resource\Paste.bmp" />
+    <Image Include="resource\Paste_q.bmp" />
+    <Image Include="resource\Preview.bmp" />
+    <Image Include="resource\PreviewAll.bmp" />
+    <Image Include="resource\PreviewAll_q.bmp" />
+    <Image Include="resource\Preview_q.bmp" />
+    <Image Include="resource\Redo.bmp" />
+    <Image Include="resource\Redo_q.bmp" />
+    <Image Include="resource\Refresh.bmp" />
+    <Image Include="resource\Refresh_q.bmp" />
+    <Image Include="resource\RightGuide.bmp" />
+    <Image Include="resource\RightGuide_q.bmp" />
+    <Image Include="resource\RightShift.bmp" />
+    <Image Include="resource\RightShift_q.bmp" />
+    <Image Include="resource\Setting.bmp" />
+    <Image Include="resource\Setting_q.bmp" />
+    <Image Include="resource\SJIScopy.bmp" />
+    <Image Include="resource\SJIScopy_q.bmp" />
+    <Image Include="resource\TailLetterDel.bmp" />
+    <Image Include="resource\TailLetterDel_q.bmp" />
+    <Image Include="resource\TailSpaceDel.bmp" />
+    <Image Include="resource\TailSpaceDel_q.bmp" />
+    <Image Include="resource\thumbnail.bmp" />
+    <Image Include="resource\thumbnail_q.bmp" />
+    <Image Include="resource\TraceMode.bmp" />
+    <Image Include="resource\TraceMode_q.bmp" />
+    <Image Include="resource\Undo.bmp" />
+    <Image Include="resource\Undo_q.bmp" />
+    <Image Include="resource\unicode_use.bmp" />
+    <Image Include="resource\unicode_use_q.bmp" />
+    <Image Include="resource\UniPalette.bmp" />
+    <Image Include="resource\UniPalette_q.bmp" />
+    <Image Include="resource\UniSpace.bmp" />
+    <Image Include="resource\UniSpace_q.bmp" />
+    <Image Include="resource\UserDef.bmp" />
+    <Image Include="resource\UserDef_q.bmp" />
+    <Image Include="resource\VertLeft.bmp" />
+    <Image Include="resource\VertLeft_q.bmp" />
+    <Image Include="resource\VertTrans.bmp" />
+    <Image Include="resource\VertTrans_q.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="OrinrinEditor.rc" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

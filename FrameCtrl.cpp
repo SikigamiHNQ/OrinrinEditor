@@ -1,6 +1,6 @@
-/*! @file
-	@brief �g�̖ʓ|����
-	���̃t�@�C���� FrameCtrl.cpp �ł��B
+﻿/*! @file
+	@brief 枠の面倒見る
+	このファイルは FrameCtrl.cpp です。
 	@author	SikigamiHNQ
 	@date	2011/06/08
 */
@@ -22,19 +22,19 @@ If not, see <http://www.gnu.org/licenses/>.
 //-------------------------------------------------------------------------------------------------
 
 /*
-�����s�f�Ђ��g���ɂ�
-�E��؂�́����Ƃ��A�ǂݏ��̃^�C�~���O�œK���ɕύX����
-�E�e�p�[�c�̕��ƍ����������Ă���
-�E�z�u�p�_�~�[���C���{�b�N�X�݂����Ȃ̂�����
-�E�ڕW���ɍ��킹�āA��p�[�c����ׂ�E�E��́A��p�[�c�̉E�������v�Z�����邩�H
-�E�����Ɍ������Ĕz�u���Ă���
-�E�E���Ɍ������Ă����͓̂��������̂͂�
-�E�z�u�o������A�g�{�b�N�X�Ȃ炻�̂܂܃��C�������A�}���Ȃ�A������������炷�������đ}����
+複数行断片を使うには
+・区切りは￥ｎとし、読み書のタイミングで適当に変更する
+・各パーツの幅と高さを持っておく
+・配置用ダミーレイヤボックスみたいなのが居る
+・目標幅に合わせて、上パーツを並べる・右上は、上パーツの右側を削る計算がいるか？
+・左下に向かって配置していく
+・右下に向かっていくのは同じ理屈のはず
+・配置出来たら、枠ボックスならそのままレイヤ処理、挿入なら、元文字列をずらす処理して挿入か
 
-�`�`�����z�u�Ǝ��Ă邩�H
+ＡＡ文字配置と似てるか？
 
-INI�t�@�C���́A������擪�̔��p�͖�������炵���H
-���������p�󔒂Ƃ���
+INIファイルは、文字列先頭の半角は無視するらしい？
+￥ｓ＝半角空白とする
 */
 
 #define FRAMEINSERTBOX_CLASS	TEXT("FRAMEINSBOX_CLASS")
@@ -86,20 +86,20 @@ CONST  TCHAR	*gatDefaultName[20] = {
 //-------------------------------------------------------------------------------------------------
 
 
-extern FILES_ITR	gitFileIt;	//!<	�����Ă�t�@�C���̖{��
-extern INT		gixFocusPage;	//!<	���ڒ��̃y�[�W�E�Ƃ肠�����O�E�O�C���f�b�N�X
+extern FILES_ITR	gitFileIt;	//!<	今見てるファイルの本体
+extern INT		gixFocusPage;	//!<	注目中のページ・とりあえず０・０インデックス
 
 
-extern  HWND	ghViewWnd;		//!<	�r���[�E�C���h�E�n���h��
+extern  HWND	ghViewWnd;		//!<	ビューウインドウハンドル
 
-extern INT		gdHideXdot;		//!<	���̉B�ꕔ��
-extern INT		gdViewTopLine;	//!<	�\�����̍ŏ㕔�s�ԍ�
+extern INT		gdHideXdot;		//!<	左の隠れ部分
+extern INT		gdViewTopLine;	//!<	表示中の最上部行番号
 
-extern HFONT	ghAaFont;		//!<	AA�p�t�H���g
+extern HFONT	ghAaFont;		//!<	AA用フォント
 
-static INT		gNowSel;		//!<	�I�𒆂̘g�O�C���f�b�N�X
+static INT		gNowSel;		//!<	選択中の枠０インデックス
 
-static TCHAR	gatFrameIni[MAX_PATH];	//!<	20110707	�g�p��INI�����E���₵��
+static TCHAR	gatFrameIni[MAX_PATH];	//!<	20110707	枠用のINIいれる・増やした
 
 
 static  ATOM		gFrmInsAtom;	//!<	
@@ -107,29 +107,29 @@ static  HWND		ghFrInbxWnd;
 static  HWND		ghFIBtlbrWnd;
 static HBRUSH		ghBgBrush;
 
-static HIMAGELIST	ghFrameImgLst;	//!<	�}��BOX�p�̃c�[���o�[
+static HIMAGELIST	ghFrameImgLst;	//!<	挿入BOX用のツールバー
 
-static POINT		gstViewOrigin;	//!<	�r���[�̍���E�C���h�E�ʒu�E
-static POINT		gstOffset;		//!<	�r���[���ォ��́A�{�b�N�X�̑��Έʒu
-static POINT		gstFrmSz;		//!<	�E�C���h�E�G�b�W����`��̈�܂ł̃I�t�Z�b�g
-static INT			gdToolBarHei;	//!<	�c�[���o�[����
+static POINT		gstViewOrigin;	//!<	ビューの左上ウインドウ位置・
+static POINT		gstOffset;		//!<	ビュー左上からの、ボックスの相対位置
+static POINT		gstFrmSz;		//!<	ウインドウエッジから描画領域までのオフセット
+static INT			gdToolBarHei;	//!<	ツールバー太さ
 
-static  UINT		gdSelect;		//!<	�I�������g�ԍ��O�`�X
-static BOOLEAN		gbQuickClose;	//!<	�\��t�����璼������
+static  UINT		gdSelect;		//!<	選択した枠番号０～９
+static BOOLEAN		gbQuickClose;	//!<	貼り付けたら直ぐ閉じる
 
-extern HFONT		ghAaFont;		//	AA�p�t�H���g
+extern HFONT		ghAaFont;		//	AA用フォント
 
-static  RECT		gstOrigRect;	//!<	�_�C�����O�N�����A�܂�ŏ��E�C���h�E�T�C�Y
+static  RECT		gstOrigRect;	//!<	ダイヤログ起動時、つまり最小ウインドウサイズ
 
-static LPTSTR		gptFrmSample;	//!<	�g�ݒ�_�C�����O�̌��{�p
-static  RECT		gstSamplePos;	//!<	���{���̍���ʒu�ƁA�������̃I�t�Z�b�g��
+static LPTSTR		gptFrmSample;	//!<	枠設定ダイヤログの見本用
+static  RECT		gstSamplePos;	//!<	見本窓の左上位置と、幅高さのオフセット量
 static FRAMEINFO	gstNowFrameInfo;
 
-static LPTSTR		gptFrmBox;		//!<	�}���g�p�̕�����
+static LPTSTR		gptFrmBox;		//!<	挿入枠用の文字列
 
-static  UINT		gbMultiPaddTemp;	//!<	�O���ɉ����悤�Ƀp�f�B���O���邩�E�}��BOX�p
+static  UINT		gbMultiPaddTemp;	//!<	外周に沿うようにパディングするか・挿入BOX用
 
-static FRAMEINFO	gstFrameInfo[FRAME_MAX];	//!<	�z��ŕK�v���m�ۂł�����
+static FRAMEINFO	gstFrameInfo[FRAME_MAX];	//!<	配列で必要数確保でいいか
 //-------------------------------------------------------------------------------------------------
 
 INT_PTR	CALLBACK FrameEditDlgProc( HWND, UINT, WPARAM, LPARAM );	//!<	
@@ -175,10 +175,10 @@ VOID	Fib_OnWindowPosChanged( HWND, const LPWINDOWPOS );	//!<
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	�g�ݒ��INI�t�@�C�����m�ہE�A�v���N���シ���Ă΂��
-	@param[in]	ptCurrent	��f�B���N�g��
-	@param[in]	hInstance	�C���X�^���X�n���h��
-	@return		HRESULT	�I����ԃR�[�h
+	枠設定のINIファイル名確保・アプリ起動後すぐ呼ばれる
+	@param[in]	ptCurrent	基準ディレクトリ
+	@param[in]	hInstance	インスタンスハンドル
+	@return		HRESULT	終了状態コード
 */
 HRESULT FrameInitialise( LPTSTR ptCurrent, HINSTANCE hInstance )
 {
@@ -200,7 +200,7 @@ HRESULT FrameInitialise( LPTSTR ptCurrent, HINSTANCE hInstance )
 	StringCchCopy( gatFrameIni, MAX_PATH, ptCurrent );
 	PathAppend( gatFrameIni, FRAME_INI_FILE );
 
-//�g�}����
+//枠挿入窓
 	ZeroMemory( &wcex, sizeof(WNDCLASSEX) );
 	wcex.cbSize			= sizeof(WNDCLASSEX);
 	wcex.style			= CS_HREDRAW | CS_VREDRAW;
@@ -231,31 +231,31 @@ HRESULT FrameInitialise( LPTSTR ptCurrent, HINSTANCE hInstance )
 	ZeroMemory( &gstFrmSz, sizeof(POINT) );
 	gdToolBarHei = 0;
 
-	//	�A�C�R��
+	//	アイコン
 	ghFrameImgLst = ImageList_Create( 16, 16, ILC_COLOR24 | ILC_MASK, 23, 1 );
 	resnum = IDBMP_FRMINS_ALPHA;
 	hMsq = LoadBitmap( hInstance, MAKEINTRESOURCE( IDBMQ_FRMINS_SEL ) );
 	for( ici = 0; FRAME_MAX > ici; ici++ )
 	{
 		hImg = LoadBitmap( hInstance, MAKEINTRESOURCE( (resnum++) ) );
-		iRslt = ImageList_Add( ghFrameImgLst, hImg, hMsq );	//	�C���[�W���X�g�ɃC���[�W��ǉ��E�O�`�P�X
+		iRslt = ImageList_Add( ghFrameImgLst, hImg, hMsq );	//	イメージリストにイメージを追加・０～１９
 		DeleteBitmap( hImg );
 	}
 	DeleteBitmap( hMsq );
 
 	hImg = LoadBitmap( hInstance, MAKEINTRESOURCE( IDBMP_FRMINS_INSERT ) );
 	hMsq = LoadBitmap( hInstance, MAKEINTRESOURCE( IDBMQ_FRMINS_INSERT ) );
-	iRslt = ImageList_Add( ghFrameImgLst, hImg, hMsq );	//	�C���[�W���X�g�ɃC���[�W��ǉ��E�Q�O
+	iRslt = ImageList_Add( ghFrameImgLst, hImg, hMsq );	//	イメージリストにイメージを追加・２０
 	DeleteBitmap( hImg );	DeleteBitmap( hMsq );
 
 	hImg = LoadBitmap( hInstance, MAKEINTRESOURCE( IDBMP_REFRESH ) );
 	hMsq = LoadBitmap( hInstance, MAKEINTRESOURCE( IDBMQ_REFRESH ) );
-	iRslt = ImageList_Add( ghFrameImgLst, hImg, hMsq );	//	�C���[�W���X�g�ɃC���[�W��ǉ��E�Q�P
+	iRslt = ImageList_Add( ghFrameImgLst, hImg, hMsq );	//	イメージリストにイメージを追加・２１
 	DeleteBitmap( hImg );	DeleteBitmap( hMsq );
 
 	hImg = LoadBitmap( hInstance, MAKEINTRESOURCE( IDBMP_FRMINS_PADD ) );
 	hMsq = LoadBitmap( hInstance, MAKEINTRESOURCE( IDBMQ_FRMINS_PADD ) );
-	iRslt = ImageList_Add( ghFrameImgLst, hImg, hMsq );	//	�C���[�W���X�g�ɃC���[�W��ǉ��E�Q�Q
+	iRslt = ImageList_Add( ghFrameImgLst, hImg, hMsq );	//	イメージリストにイメージを追加・２２
 	DeleteBitmap( hImg );	DeleteBitmap( hMsq );
 
 
@@ -264,9 +264,9 @@ HRESULT FrameInitialise( LPTSTR ptCurrent, HINSTANCE hInstance )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	�g���̂̓��e�Ń��j���[��ύX
-	@param[in]	hWnd	���C���E�C���h�E�n���h��
-	@return		HRESULT	�I����ԃR�[�h
+	枠名称の内容でメニューを変更
+	@param[in]	hWnd	メインウインドウハンドル
+	@return		HRESULT	終了状態コード
 */
 HRESULT FrameNameModifyMenu( HWND hWnd )
 {
@@ -274,11 +274,11 @@ HRESULT FrameNameModifyMenu( HWND hWnd )
 	UINT	i, j, k;
 	TCHAR	atBuffer[MAX_PATH], atName[MAX_STRING];
 
-	//	���j���[�\���ς�����炱�����ύX�E�ǂ��ɂ��Ȃ��̂�
+	//	メニュー構造変わったらここも変更・どうにかならんのか
 	hMenu = GetMenu( hWnd );
 	hSubMenu = GetSubMenu( hMenu, 2 );
 
-	//	�g
+	//	枠
 	for( i = 0, j = 1; FRAME_MAX > i; i++, j++ )
 	{
 		FrameNameLoad( i, atName, MAX_STRING );
@@ -288,7 +288,7 @@ HRESULT FrameNameModifyMenu( HWND hWnd )
 		else{		k = 'A' + j - 11;	}
 		StringCchPrintf( atBuffer, MAX_PATH, TEXT("%s(&%c)"), atName, k );
 		ModifyMenu( hSubMenu, IDM_INSFRAME_ALPHA+i, MF_BYCOMMAND | MFT_STRING, IDM_INSFRAME_ALPHA+i, atBuffer );
-		//	���j���[���\�[�X�ԍ��̘A�Ԃɒ���
+		//	メニューリソース番号の連番に注意
 	}
 
 	DrawMenuBar( hWnd );
@@ -298,10 +298,10 @@ HRESULT FrameNameModifyMenu( HWND hWnd )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	�|�b�p�b�v���j���[�p�ɖ��O����������΂�����
-	@param[in]	hPopMenu	�Ώۂ̃|�b�p�b�v���j���[�n���h��
-	@param[in]	bMode		��O���j���[�L�[�t����@�O�t���Ȃ�
-	@return		HRESULT	�I����ԃR�[�h
+	ポッパップメニュー用に名前をずっこんばっこん
+	@param[in]	hPopMenu	対象のポッパップメニューハンドル
+	@param[in]	bMode		非０メニューキー付ける　０付けない
+	@return		HRESULT	終了状態コード
 */
 HRESULT FrameNameModifyPopUp( HMENU hPopMenu, UINT bMode )
 {
@@ -324,7 +324,7 @@ HRESULT FrameNameModifyPopUp( HMENU hPopMenu, UINT bMode )
 			StringCchPrintf( atBuffer, MAX_PATH, TEXT("%s"), atName );
 		}
 		ModifyMenu( hPopMenu, IDM_INSFRAME_ALPHA+i, MF_BYCOMMAND | MFT_STRING, IDM_INSFRAME_ALPHA+i, atBuffer );
-		//	���j���[���\�[�X�ԍ��̘A�Ԃɒ���
+		//	メニューリソース番号の連番に注意
 	}
 
 	return S_OK;
@@ -332,11 +332,11 @@ HRESULT FrameNameModifyPopUp( HMENU hPopMenu, UINT bMode )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	�g�̖��O�����������Ă���
-	@param[in]	dNumber	�g�ԍ��O�C���f�b�N�X
-	@param[out]	ptNamed	���O�����o�b�t�@�ւ̃|�C���^�[
-	@param[in]	cchSize	�o�b�t�@�̕������E�o�C�g����Ȃ���
-	@return		HRESULT	�I����ԃR�[�h
+	枠の名前を引っ張ってくる
+	@param[in]	dNumber	枠番号０インデックス
+	@param[out]	ptNamed	名前入れるバッファへのポインター
+	@param[in]	cchSize	バッファの文字数・バイトじゃないぞ
+	@return		HRESULT	終了状態コード
 */
 HRESULT FrameNameLoad( UINT dNumber, LPTSTR ptNamed, UINT_PTR cchSize )
 {
@@ -346,7 +346,7 @@ HRESULT FrameNameLoad( UINT dNumber, LPTSTR ptNamed, UINT_PTR cchSize )
 
 	if( FRAME_MAX <= dNumber )	return E_OUTOFMEMORY;
 
-	//	�����APP�������
+	//	所定のAPP名を作る
 	StringCchPrintf( atAppName, MIN_STRING, TEXT("Frame%u"), dNumber );
 
 	GetPrivateProfileString( atAppName, TEXT("Name"), gatDefaultName[dNumber], ptNamed, cchSize, gatFrameIni );
@@ -355,36 +355,36 @@ HRESULT FrameNameLoad( UINT dNumber, LPTSTR ptNamed, UINT_PTR cchSize )
 }
 //-------------------------------------------------------------------------------------------------
 
-//	20110707	�ꏊ�ς���
+//	20110707	場所変えた
 /*!
-	�g���̃Z�[�u���[�h
-	@param[in]		dMode	��O���[�h�@�O�Z�[�u
-	@param[in]		dNumber	�g�ԍ��O�C���f�b�N�X
-	@param[in,out]	pstInfo	�������o�b�t�@��������ۑ����e�������肷��\���̂ۂ��񂽁`
-	@return			HRESULT	�I����ԃR�[�h
+	枠情報のセーブロード
+	@param[in]		dMode	非０ロード　０セーブ
+	@param[in]		dNumber	枠番号０インデックス
+	@param[in,out]	pstInfo	情報入れるバッファだったり保存内容だったりする構造体ぽいんた～
+	@return			HRESULT	終了状態コード
 */
 HRESULT InitFrameItem( UINT dMode, UINT dNumber, LPFRAMEINFO pstInfo )
 {
 	TCHAR	atAppName[MIN_STRING], atBuff[MIN_STRING];
 	TCHAR	atBuffer[PARTS_CCH];
 
-	//	�����APP�������
+	//	所定のAPP名を作る
 	StringCchPrintf( atAppName, MIN_STRING, TEXT("Frame%u"), dNumber );
 
-//20120105	�����s�������A�����Ɓ����ɂ�鑊�ݕϊ�������p��
+//20120105	複数行を扱う、￥￥と￥ｎによる相互変換函数を用意
 
-	if( dMode )	//	���[�h
+	if( dMode )	//	ロード
 	{
 		GetPrivateProfileString( atAppName, TEXT("Name"), gatDefaultName[dNumber], pstInfo->atFrameName, MAX_STRING, gatFrameIni );
 
-		GetPrivateProfileString( atAppName, TEXT("Daybreak"),  TEXT("��"), pstInfo->stDaybreak.atParts, PARTS_CCH, gatFrameIni );
-		GetPrivateProfileString( atAppName, TEXT("Morning"),   TEXT("��"), pstInfo->stMorning.atParts, PARTS_CCH, gatFrameIni );
-		GetPrivateProfileString( atAppName, TEXT("Noon"),      TEXT("��"), pstInfo->stNoon.atParts, PARTS_CCH, gatFrameIni );
-		GetPrivateProfileString( atAppName, TEXT("Afternoon"), TEXT("��"), pstInfo->stAfternoon.atParts, PARTS_CCH, gatFrameIni );
-		GetPrivateProfileString( atAppName, TEXT("Nightfall"), TEXT("��"), pstInfo->stNightfall.atParts, PARTS_CCH, gatFrameIni );
-		GetPrivateProfileString( atAppName, TEXT("Twilight"),  TEXT("��"), pstInfo->stTwilight.atParts, PARTS_CCH, gatFrameIni );
-		GetPrivateProfileString( atAppName, TEXT("Midnight"),  TEXT("��"), pstInfo->stMidnight.atParts, PARTS_CCH, gatFrameIni );
-		GetPrivateProfileString( atAppName, TEXT("Dawn"),      TEXT("��"), pstInfo->stDawn.atParts, PARTS_CCH, gatFrameIni );
+		GetPrivateProfileString( atAppName, TEXT("Daybreak"),  TEXT("│"), pstInfo->stDaybreak.atParts, PARTS_CCH, gatFrameIni );
+		GetPrivateProfileString( atAppName, TEXT("Morning"),   TEXT("┌"), pstInfo->stMorning.atParts, PARTS_CCH, gatFrameIni );
+		GetPrivateProfileString( atAppName, TEXT("Noon"),      TEXT("─"), pstInfo->stNoon.atParts, PARTS_CCH, gatFrameIni );
+		GetPrivateProfileString( atAppName, TEXT("Afternoon"), TEXT("┐"), pstInfo->stAfternoon.atParts, PARTS_CCH, gatFrameIni );
+		GetPrivateProfileString( atAppName, TEXT("Nightfall"), TEXT("│"), pstInfo->stNightfall.atParts, PARTS_CCH, gatFrameIni );
+		GetPrivateProfileString( atAppName, TEXT("Twilight"),  TEXT("┘"), pstInfo->stTwilight.atParts, PARTS_CCH, gatFrameIni );
+		GetPrivateProfileString( atAppName, TEXT("Midnight"),  TEXT("─"), pstInfo->stMidnight.atParts, PARTS_CCH, gatFrameIni );
+		GetPrivateProfileString( atAppName, TEXT("Dawn"),      TEXT("└"), pstInfo->stDawn.atParts, PARTS_CCH, gatFrameIni );
 
 		FrameDataTranslate( pstInfo->stDaybreak.atParts , 1 );
 		FrameDataTranslate( pstInfo->stMorning.atParts , 1 );
@@ -400,12 +400,12 @@ HRESULT InitFrameItem( UINT dMode, UINT dNumber, LPFRAMEINFO pstInfo )
 		GetPrivateProfileString( atAppName, TEXT("RIGHTOFFSET"), TEXT("0"), atBuff, MIN_STRING, gatFrameIni );
 		pstInfo->dRightOffset = StrToInt( atBuff );
 
-		//�ǉ�
+		//追加
 		GetPrivateProfileString( atAppName, TEXT("RestPadding"),  TEXT("1"), atBuff, MIN_STRING, gatFrameIni );
 		pstInfo->dRestPadd = StrToInt( atBuff );
 
 	}
-	else	//	�Z�[�u
+	else	//	セーブ
 	{
 		WritePrivateProfileString( atAppName, TEXT("Name"), pstInfo->atFrameName, gatFrameIni );
 
@@ -431,7 +431,7 @@ HRESULT InitFrameItem( UINT dMode, UINT dNumber, LPFRAMEINFO pstInfo )
 		StringCchPrintf( atBuff, MIN_STRING, TEXT("%d"), pstInfo->dRightOffset );
 		WritePrivateProfileString( atAppName, TEXT("RIGHTOFFSET"), atBuff, gatFrameIni );
 
-		//	�ǉ�
+		//	追加
 		StringCchPrintf( atBuff, MIN_STRING, TEXT("%d"), pstInfo->dRestPadd );
 		WritePrivateProfileString( atAppName, TEXT("RestPadding"), atBuff, gatFrameIni );
 	}
@@ -442,10 +442,10 @@ HRESULT InitFrameItem( UINT dMode, UINT dNumber, LPFRAMEINFO pstInfo )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	����Z����B�O���Z�Ȃ�O��Ԃ�
-	@param[in]	iLeft	�����鐔
-	@param[in]	iRight	���鐔
-	@return	INT	�v�Z����
+	割り算する。０除算なら０を返す
+	@param[in]	iLeft	割られる数
+	@param[in]	iRight	割る数
+	@return	INT	計算結果
 */
 INT Divinus( INT iLeft, INT iRight )
 {
@@ -461,11 +461,11 @@ INT Divinus( INT iLeft, INT iRight )
 
 
 /*!
-	�g�ݒ�̃_�C�����O���J��
-	@param[in]	hInst	�A�v���̎���
-	@param[in]	hWnd	�{�̂̃E�C���h�E�n���h���ł���悤�ɂ��邱��
-	@param[in]	dRsv	���g�p
-	@return �I���R�[�h
+	枠設定のダイヤログを開く
+	@param[in]	hInst	アプリの実存
+	@param[in]	hWnd	本体のウインドウハンドルであるようにすること
+	@param[in]	dRsv	未使用
+	@return 終了コード
 */
 INT_PTR FrameEditDialogue( HINSTANCE hInst, HWND hWnd, UINT dRsv )
 {
@@ -475,7 +475,7 @@ INT_PTR FrameEditDialogue( HINSTANCE hInst, HWND hWnd, UINT dRsv )
 
 	iRslt = DialogBoxParam( hInst, MAKEINTRESOURCE(IDD_FRAME_EDIT_DLG_2), hWnd, FrameEditDlgProc, 0 );
 
-	//	�������ʂɂ���ẮA�����Ń��j���[�̓��e����
+	//	処理結果によっては、ここでメニューの内容書換
 	if( IDYES == iRslt ){	FrameNameModifyMenu( hWnd );	}
 
 	return iRslt;
@@ -483,13 +483,13 @@ INT_PTR FrameEditDialogue( HINSTANCE hInst, HWND hWnd, UINT dRsv )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	�g�ݒ�_�C�����O�v���V�[�W��
-	@param[in]	hDlg	�_�C�����O�n���h��
-	@param[in]	message	�E�C���h�E���b�Z�[�W�̎��ʔԍ�
-	@param[in]	wParam	�ǉ��̏��P
-	@param[in]	lParam	�ǉ��̏��Q
-	@retval 0	���b�Z�[�W�͏������Ă��Ȃ�
-	@retval no0	�Ȃ񂩏������ꂽ
+	枠設定ダイヤログプロシージャ
+	@param[in]	hDlg	ダイヤログハンドル
+	@param[in]	message	ウインドウメッセージの識別番号
+	@param[in]	wParam	追加の情報１
+	@param[in]	lParam	追加の情報２
+	@retval 0	メッセージは処理していない
+	@retval no0	なんか処理された
 */
 INT_PTR CALLBACK FrameEditDlgProc( HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam )
 {
@@ -511,11 +511,11 @@ INT_PTR CALLBACK FrameEditDlgProc( HWND hDlg, UINT message, WPARAM wParam, LPARA
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	�_�C�����O�N�����̏�����
-	@param[in]	hDlg		�_�C�����O�n���h��
-	@param[in]	hWndFocus	�Ȃ񂾂���
-	@param[in]	lParam		�_�C�����O�I�[�|������Ƃ��ɌĂяo�������n�����l
-	@return		���ɈӖ��͂Ȃ�
+	ダイヤログ起動時の初期化
+	@param[in]	hDlg		ダイヤログハンドル
+	@param[in]	hWndFocus	なんだっけ
+	@param[in]	lParam		ダイヤログオーポンするときに呼び出し側が渡した値
+	@return		特に意味はない
 */
 INT_PTR Frm_OnInitDialog( HWND hDlg, HWND hWndFocus, LPARAM lParam )
 {
@@ -534,40 +534,40 @@ INT_PTR Frm_OnInitDialog( HWND hDlg, HWND hWndFocus, LPARAM lParam )
 
 
 
-	//	�R���{�b�N�X�ɖ��O����Ƃ�
+	//	コンボックスに名前いれとく
 	hWorkWnd = GetDlgItem( hDlg, IDCB_BOX_NAME_SEL );
 
-	for( i = 0; FRAME_MAX > i; i++ )	//	�o�b�t�@�Ɋm��
+	for( i = 0; FRAME_MAX > i; i++ )	//	バッファに確保
 	{
 		FrameDataGet( i, &(gstFrameInfo[i]) );
-		//	INI�t�@�C��������������āA�R���{�b�N�X�ɖ��O�����ꂿ�Ⴄ
+		//	INIファイルから引っ張って、コンボックスに名前をいれちゃう
 		ComboBox_AddString( hWorkWnd, gstFrameInfo[i].atFrameName );
 	}
 
 	ComboBox_SetCurSel( hWorkWnd, gNowSel );
 
-	//	�p�[�c���������
+	//	パーツ情報をいれる
 	FrameInfoDisp( hDlg );
 
 	SetWindowFont( GetDlgItem(hDlg,IDS_FRAME_IMAGE), ghAaFont, FALSE );
 
-	//	���{�E�C���h�E�̈ʒu���m�肵�Ă���
+	//	見本ウインドウの位置を確定しておく
 	GetWindowRect( GetDlgItem(hDlg,IDS_FRAME_IMAGE), &gstSamplePos );
-	//	�������m��
+	//	幅高さ確定
 	gstSamplePos.right -= gstSamplePos.left;
 	gstSamplePos.bottom -= gstSamplePos.top;
 
-	//	�N���C�����g�̈�Ƃ̃Y���𒲐�
+	//	クライヤント領域とのズレを調整
 	GetClientRect( GetDlgItem(hDlg,IDS_FRAME_IMAGE), &rect );
 	ofs = gstSamplePos.right - rect.right;	gstSamplePos.right += ofs;
 	ofs = gstSamplePos.bottom - rect.bottom;	gstSamplePos.bottom += ofs;
 
-	//	�N���C�A���g��ł̈ʒu���m��
+	//	クライアント上での位置を確定
 	point.x = gstSamplePos.left;	point.y = gstSamplePos.top;
 	ScreenToClient( hDlg, &point );
 	gstSamplePos.left = point.x;	gstSamplePos.top  = point.y;
 
-	//	�N���C�A���g�̕������̃I�t�Z�b�g�ʂ��m��
+	//	クライアントの幅高さのオフセット量を確定
 	GetClientRect( hDlg, &rect );
 	gstSamplePos.right  = rect.right  - gstSamplePos.right;
 	gstSamplePos.bottom = rect.bottom - gstSamplePos.bottom;
@@ -580,7 +580,7 @@ INT_PTR Frm_OnInitDialog( HWND hDlg, HWND hWndFocus, LPARAM lParam )
 
 
 	GetClientRect( GetDlgItem(hDlg,IDS_FRAME_IMAGE), &rect );
-	//	������ԂŊm��
+	//	初期状態で確保
 	gptFrmSample = FrameMakeOutsideBoundary( rect.right, rect.bottom, &(gstFrameInfo[gNowSel]) );
 
 
@@ -589,17 +589,17 @@ INT_PTR Frm_OnInitDialog( HWND hDlg, HWND hWndFocus, LPARAM lParam )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	�_�C�����O��COMMAND���b�Z�[�W�̎󂯎��
-	@param[in]	hDlg		�_�C�����O�[�n���h��
-	@param[in]	id			���b�Z�[�W�𔭐��������q�E�C���h�E�̎��ʎq	LOWORD(wParam)
-	@param[in]	hWndCtl		���b�Z�[�W�𔭐��������q�E�C���h�E�̃n���h��	lParam
-	@param[in]	codeNotify	�ʒm���b�Z�[�W	HIWORD(wParam)
-	@return		�������������񂩂�����
+	ダイヤログのCOMMANDメッセージの受け取り
+	@param[in]	hDlg		ダイヤログーハンドル
+	@param[in]	id			メッセージを発生させた子ウインドウの識別子	LOWORD(wParam)
+	@param[in]	hWndCtl		メッセージを発生させた子ウインドウのハンドル	lParam
+	@param[in]	codeNotify	通知メッセージ	HIWORD(wParam)
+	@return		処理したかせんかったか
 */
 INT_PTR Frm_OnCommand( HWND hDlg, INT id, HWND hWndCtl, UINT codeNotify )
 {
-	static BOOLEAN	cbNameMod = FALSE;	//	�_�C�����O�I���p�̍P�v�I�Ȃ���
-	static BOOLEAN	cbNameChg = FALSE;	//	APPLY�p
+	static BOOLEAN	cbNameMod = FALSE;	//	ダイヤログ終わり用の恒久的なもの
+	static BOOLEAN	cbNameChg = FALSE;	//	APPLY用
 	UINT	i;
 	INT		iRslt;
 	HWND	hCmboxWnd;
@@ -623,8 +623,8 @@ INT_PTR Frm_OnCommand( HWND hDlg, INT id, HWND hWndCtl, UINT codeNotify )
 				InitFrameItem( INIT_SAVE, i, &(gstFrameInfo[i]) );
 				if( cbNameChg )
 				{
-					ComboBox_DeleteString( hCmboxWnd, 0 );//�擪������
-					ComboBox_AddString( hCmboxWnd, gstFrameInfo[i].atFrameName );//�����ɕt������
+					ComboBox_DeleteString( hCmboxWnd, 0 );//先頭消して
+					ComboBox_AddString( hCmboxWnd, gstFrameInfo[i].atFrameName );//末尾に付け足す
 				}
 			}
 			ComboBox_SetCurSel( hCmboxWnd, gNowSel );
@@ -646,9 +646,9 @@ INT_PTR Frm_OnCommand( HWND hDlg, INT id, HWND hWndCtl, UINT codeNotify )
 		case IDE_BOXP_DAWN:			if( EN_UPDATE == codeNotify ){	FramePartsUpdate( hDlg , hWndCtl, &(gstFrameInfo[gNowSel].stDawn) );	}		return (INT_PTR)TRUE;
 
 		case IDS_FRAME_IMAGE:
-			if( STN_DBLCLK == codeNotify )	//	�_�{�[�N���b�N���ꂽ
+			if( STN_DBLCLK == codeNotify )	//	ダボークルックされた
 			{
-				TRACE( TEXT("���ځ[�������") );
+				TRACE( TEXT("だぼーくるっく") );
 				InvalidateRect( hWndCtl, NULL, TRUE );
 			}
 			return (INT_PTR)TRUE;
@@ -664,13 +664,13 @@ INT_PTR Frm_OnCommand( HWND hDlg, INT id, HWND hWndCtl, UINT codeNotify )
 			InvalidateRect( GetDlgItem(hDlg,IDS_FRAME_IMAGE), NULL, TRUE );
 			return (INT_PTR)TRUE;
 
-		case IDB_BOXP_NAME_APPLY:	//	���̂�ύX����
+		case IDB_BOXP_NAME_APPLY:	//	名称を変更した
 			Edit_GetText( GetDlgItem(hDlg,IDE_BOXP_NAME_EDIT), gstFrameInfo[gNowSel].atFrameName, MAX_STRING );
 			cbNameMod = TRUE;	cbNameChg = TRUE;
 			return (INT_PTR)TRUE;
 
 		case IDCB_BOX_NAME_SEL:
-			if( CBN_SELCHANGE == codeNotify )	//	�I�����ύX���ꂽ
+			if( CBN_SELCHANGE == codeNotify )	//	選択が変更された
 			{
 				gNowSel = ComboBox_GetCurSel( hWndCtl );
 				FrameInfoDisp( hDlg );
@@ -689,11 +689,11 @@ INT_PTR Frm_OnCommand( HWND hDlg, INT id, HWND hWndCtl, UINT codeNotify )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	�e�p�[�c���X�V���ꂽ��
-	@param[in]	hDlg	�_�C�����Q�n���h�D
-	@param[in]	hWndCtl	�Ώۂ̃p�[�cEDITBOX
-	@param[in]	pstItem	�Ώۃp�[�c�̃f�[�^
-	@return		HRESULT	�I����ԃR�[�h
+	各パーツが更新されたら
+	@param[in]	hDlg	ダイヤロゲハンドゥ
+	@param[in]	hWndCtl	対象のパーツEDITBOX
+	@param[in]	pstItem	対象パーツのデータ
+	@return		HRESULT	終了状態コード
 */
 HRESULT FramePartsUpdate( HWND hDlg, HWND hWndCtl, LPFRAMEITEM pstItem )
 {
@@ -705,16 +705,16 @@ HRESULT FramePartsUpdate( HWND hDlg, HWND hWndCtl, LPFRAMEITEM pstItem )
 		atBuffer[PARTS_CCH-1] = 0;
 		StringCchCopy( pstItem->atParts, PARTS_CCH, atBuffer );
 	}
-	else	//	�������Ȃ�������A�S�p�󔒂ɂ����Ⴄ
+	else	//	文字がなかったら、全角空白にしちゃう
 	{
-		StringCchCopy( pstItem->atParts, PARTS_CCH, TEXT("�@") );
+		StringCchCopy( pstItem->atParts, PARTS_CCH, TEXT("　") );
 	}
 
-	//	�h�b�g���m�F����
+	//	ドット数確認して
 	//pstItem->dDot = FramePartsSizeCalc( pstItem->atParts, &(pstItem->iLine) );
 	pstItem->iLine = DocStringInfoCount( pstItem->atParts, 0, &(pstItem->dDot), NULL );
 
-	//	���łɍĕ`��
+	//	ついでに再描画
 	InvalidateRect( GetDlgItem(hDlg,IDS_FRAME_IMAGE), NULL, TRUE );
 
 	return S_OK;
@@ -722,17 +722,17 @@ HRESULT FramePartsUpdate( HWND hDlg, HWND hWndCtl, LPFRAMEITEM pstItem )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	�_�C�����O�̃T�C�Y�ύX����������O�ɑ����Ă���
-	@param[in]	hDlg	�_�C�����O�̃n���h��
-	@param[in]	pstWpos	�V�����ʒu�Ƒ傫���������Ă�
-	@return		�������������񂩂������ł����H
+	ダイヤログのサイズ変更が完了する前に送られてくる
+	@param[in]	hDlg	ダイヤログのハンドル
+	@param[in]	pstWpos	新しい位置と大きさが入ってる
+	@return		処理したかせんかったかでいい？
 */
 INT_PTR Frm_OnWindowPosChanging( HWND hDlg, LPWINDOWPOS pstWpos )
 {
-	//	�ړ����Ȃ������Ƃ��͉������Ȃ��ł���
+	//	移動がなかったときは何もしないでおｋ
 	if( SWP_NOSIZE & pstWpos->flags )	return FALSE;
 
-	//	x,y�F�E�C���h�E������W�@cx,cy�F�E�C���h�E�̕�����
+	//	x,y：ウインドウ左上座標　cx,cy：ウインドウの幅高さ
 	TRACE( TEXT("FRM CHANGING [%d x %d][%d x %d]"), pstWpos->x, pstWpos->y, pstWpos->cx, pstWpos->cy );
 
 	if( gstOrigRect.right > pstWpos->cx )	pstWpos->cx = gstOrigRect.right;
@@ -743,12 +743,12 @@ INT_PTR Frm_OnWindowPosChanging( HWND hDlg, LPWINDOWPOS pstWpos )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	�_�C�����O���T�C�Y�ύX���ꂽ�Ƃ�
-	@param[in]	hDlg	�_�C�����O�̃n���h��
-	@param[in]	state	�ύX�̏�ԁESIZE_MINIMIZED �Ƃ�
-	@param[in]	cx		�N���C�����g�w�T�C�Y
-	@param[in]	cy		�N���C�����g�x�T�C�Y
-	@return	�������������񂩂�����
+	ダイヤログがサイズ変更されたとき
+	@param[in]	hDlg	ダイヤログのハンドル
+	@param[in]	state	変更の状態・SIZE_MINIMIZED とか
+	@param[in]	cx		クライヤントＸサイズ
+	@param[in]	cy		クライヤントＹサイズ
+	@return	処理したかせんかったか
 */
 INT_PTR Frm_OnSize( HWND hDlg, UINT state, INT cx, INT cy )
 {
@@ -760,7 +760,7 @@ INT_PTR Frm_OnSize( HWND hDlg, UINT state, INT cx, INT cy )
 
 	hSmpWnd = GetDlgItem( hDlg, IDS_FRAME_IMAGE );
 
-	//	�������ɏ�ɑS�J
+	//	下半分に常に全開
 	xx = cx - gstSamplePos.right;
 	yy = cy - gstSamplePos.bottom;
 
@@ -778,10 +778,10 @@ INT_PTR Frm_OnSize( HWND hDlg, UINT state, INT cx, INT cy )
 
 
 /*!
-	�I�[�i�[�h���[�̏����E�X�^�e�B�b�N�̃A��
-	@param[in]	hDlg		�_�C�����Q�n���h�D
-	@param[in]	pstDrawItem	�h���[���ւ̃|�C���^�[
-	@return		�������������񂩂�����
+	オーナードローの処理・スタティックのアレ
+	@param[in]	hDlg		ダイヤロゲハンドゥ
+	@param[in]	pstDrawItem	ドロー情報へのポインター
+	@return		処理したかせんかったか
 */
 INT_PTR Frm_OnDrawItem( HWND hDlg, CONST LPDRAWITEMSTRUCT pstDrawItem )
 {
@@ -791,11 +791,11 @@ INT_PTR Frm_OnDrawItem( HWND hDlg, CONST LPDRAWITEMSTRUCT pstDrawItem )
 
 	if( IDS_FRAME_IMAGE != pstDrawItem->CtlID ){	return (INT_PTR)FALSE;	}
 
-//	hFtOld = SelectFont( pstDrawItem->hDC, ghAaFont );	//	�t�H���g�ݒ�
+//	hFtOld = SelectFont( pstDrawItem->hDC, ghAaFont );	//	フォント設定
 
 	FillRect( pstDrawItem->hDC, &(pstDrawItem->rcItem), GetSysColorBrush( COLOR_WINDOW ) );
 	SetBkMode( pstDrawItem->hDC, TRANSPARENT );
-//�������畡���s��������΂�����
+//ここから複数行処理すればいいか
 
 //	ptMultiStr = FrameMakeOutsideBoundary( pstDrawItem->rcItem.right, pstDrawItem->rcItem.bottom, &(gstFrameInfo[gNowSel]) );
 
@@ -810,39 +810,39 @@ INT_PTR Frm_OnDrawItem( HWND hDlg, CONST LPDRAWITEMSTRUCT pstDrawItem )
 //-------------------------------------------------------------------------------------------------
 
 /*
-�`�敝�͌��܂��Ă���B�g�w��Ȃ�O����A�͈͎w��Ȃ�A������{���E�̕����l�`�w��
+描画幅は決まっている。枠指定なら外から、範囲指定なら、文字列＋左右の幅がＭＡＸ幅
 
-����p�[�c�ƉE��p�[�c�̕����m�F���āA�c�肪��p�[�c�g���B�g�����͕�����Z�o
-��L�s�����قȂ�Ȃ�A���������킹��B�E���͓r���Ő؂鎖���l��
+左上パーツと右上パーツの幅を確認して、残りが上パーツ使う。使う個数は幅から算出
+占有行数が異なるなら、下側を合わせる。右側は途中で切る事も考慮
 
 
-�������������͓����B��L�s���قȂ�Ȃ�A�㑤�����킹��B
+床部分も処理は同じ。占有行数異なるなら、上側を合わせる。
 
-���́A�K�v�s���m�F����B�����s�ɂȂ�Ȃ�A�r���Ő؂�B
-�����͂O��_�A�E���́A�E��E���p�[�c�̍��ɍ��킹��{�I�t�Z�b�g
+柱は、必要行数確認する。複数行になるなら、途中で切る。
+左柱は０基点、右柱は、右上右下パーツの左に合わせる＋オフセット
 
 */
 
 /*!
-	�n���ꂽ�p�[�c����A�K�v�ȂƂ���𔲂��o���ĕ�������
-	@param[in]	bEnable	�s���L���͈͂ł��邩�ǂ����̔��f
-	@param[in]	pstItem	�p�[�c�����������
-	@param[out]	ptDest	����������������o�b�t�@�ւ̃|�C���^�[
-	@param[in]	cchSz	�o�b�t�@�̕������E�o�C�g�ɔ�
+	渡されたパーツから、必要なところを抜き出して文字列作る
+	@param[in]	bEnable	行が有効範囲であるかどうかの判断
+	@param[in]	pstItem	パーツ情報入ったやつ
+	@param[out]	ptDest	作った文字列を入れるバッファへのポインター
+	@param[in]	cchSz	バッファの文字数・バイトに非ず
 	@return	
 */
 UINT FrameMakeMultiSubLine( CONST BOOLEAN bEnable, LPFRAMEITEM pstItem, LPTSTR ptDest, CONST UINT_PTR cchSz )
 {
 	LPTSTR	ptBufStr;
 
-	if( bEnable )	//	�L���ł��邩
+	if( bEnable )	//	有効であるか
 	{
-		//	�}���`�s�̈ꕔ���u�b�R����
+		//	マルチ行の一部をブッコ抜く
 		FrameMultiSubstring( pstItem->atParts, pstItem->iNowLn, ptDest, cchSz, pstItem->dDot );
-		//�ő啝�ɖ����Ȃ��s�́APadding����
+		//最大幅に満たない行は、Paddingする
 		pstItem->iNowLn++;
 	}
-	else	//	�󔒂ł���
+	else	//	空白である
 	{
 		ptBufStr = DocPaddingSpaceWithPeriod( pstItem->dDot, NULL, NULL, NULL, TRUE );//DocPaddingSpaceMake( pstItem->dDot );
 		StringCchCopy( ptDest, cchSz, ptBufStr );
@@ -854,20 +854,20 @@ UINT FrameMakeMultiSubLine( CONST BOOLEAN bEnable, LPFRAMEITEM pstItem, LPTSTR p
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	�g�p�[�c�́A�V��Ə��̐�L�s���ƁA�����̃h�b�g�����m�ۂ���
+	枠パーツの、天井と床の占有行数と、左柱のドット数を確保する
 */
 INT FrameMultiSizeGet( LPFRAMEINFO pstInfo, PINT piUpLine, PINT piDnLine )
 {
 	INT	iUpLine, iDnLine;
 
-	//	�s���̊m�F
-	iUpLine = pstInfo->stMorning.iLine;	//	����
-	if( iUpLine < pstInfo->stNoon.iLine )	iUpLine = pstInfo->stNoon.iLine;	//	��
-	if( iUpLine < pstInfo->stAfternoon.iLine )	iUpLine = pstInfo->stAfternoon.iLine;	//	�E��
+	//	行数の確認
+	iUpLine = pstInfo->stMorning.iLine;	//	左上
+	if( iUpLine < pstInfo->stNoon.iLine )	iUpLine = pstInfo->stNoon.iLine;	//	上
+	if( iUpLine < pstInfo->stAfternoon.iLine )	iUpLine = pstInfo->stAfternoon.iLine;	//	右上
 
-	iDnLine = pstInfo->stDawn.iLine;	//	����
-	if( iDnLine < pstInfo->stMidnight.iLine )	iDnLine = pstInfo->stMidnight.iLine;	//	��
-	if( iDnLine < pstInfo->stTwilight.iLine )	iDnLine = pstInfo->stTwilight.iLine;	//	�E��
+	iDnLine = pstInfo->stDawn.iLine;	//	左下
+	if( iDnLine < pstInfo->stMidnight.iLine )	iDnLine = pstInfo->stMidnight.iLine;	//	下
+	if( iDnLine < pstInfo->stTwilight.iLine )	iDnLine = pstInfo->stTwilight.iLine;	//	右下
 
 	if( piUpLine )	*piUpLine = iUpLine;
 	if( piDnLine )	*piDnLine = iDnLine;
@@ -877,11 +877,11 @@ INT FrameMultiSizeGet( LPFRAMEINFO pstInfo, PINT piUpLine, PINT piDnLine )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	��������󂯂āA�O�p�f�B���O���āA���҂�����ɂȂ�悤�Ƀp�f�B���O������؂����肷��
-	@param[in]		iFwOffs	�O�ǉ����E�O�Ŗ���
-	@param[in,out]	ptStr	������E���H���Ė߂�
-	@param[in]		cchSz	������̕�����
-	@param[in]		iMaxDot	�S�̂̃h�b�g���E�O�Ŗ���
+	文字列を受けて、前パディングして、幅ぴったりになるようにパディングしたり切ったりする
+	@param[in]		iFwOffs	前追加幅・０で無視
+	@param[in,out]	ptStr	文字列・加工して戻す
+	@param[in]		cchSz	文字列の文字数
+	@param[in]		iMaxDot	全体のドット数・０で無視
 	@return	
 */
 UINT StringWidthAdjust( CONST UINT iFwOffs, LPTSTR ptStr, CONST UINT_PTR cchSz, CONST INT iMaxDot )
@@ -907,9 +907,9 @@ UINT StringWidthAdjust( CONST UINT iFwOffs, LPTSTR ptStr, CONST UINT_PTR cchSz, 
 
 	iDot = ViewStringWidthGet( atWork );
 
-	if( (0 != iMaxDot) && (iDot != iMaxDot) )	//	�O�ł͂Ȃ��A���x�ł������ꍇ
+	if( (0 != iMaxDot) && (iDot != iMaxDot) )	//	０ではなく、丁度でも無い場合
 	{
-		if( iDot < iMaxDot )	//	�w�蕝�̂ق����L���Ȃ�p�f�B���O�[
+		if( iDot < iMaxDot )	//	指定幅のほうが広いならパディングー
 		{
 			iPadd = iMaxDot - iDot;
 			ptBufStr = DocPaddingSpaceWithPeriod( iPadd, NULL, NULL, NULL, TRUE );//DocPaddingSpaceMake( iPadd );
@@ -919,16 +919,16 @@ UINT StringWidthAdjust( CONST UINT iFwOffs, LPTSTR ptStr, CONST UINT_PTR cchSz, 
 				FREE( ptBufStr );
 			}
 		}
-		else	//	�����łȂ��Ȃ�Ԃ����؂�
+		else	//	そうでないならぶった切る
 		{
 			StringCchLength( atWork, MAX_PATH, &dMozi );
-			iDotCnt = 0;	//	�����m�F���Ă���
+			iDotCnt = 0;	//	長さ確認していく
 			for( dm = 0; dMozi > dm; dm++ )
 			{
 				iBuf = ViewLetterWidthGet( atWork[dm] );
 				if( iMaxDot < (iDotCnt+iBuf) )
 				{
-					atWork[dm] = NULL;	//	��U���������
+					atWork[dm] = NULL;	//	一旦文字列閉じる
 					iBuf = iMaxDot - iDotCnt;
 					if( 0 < iBuf )
 					{
@@ -955,11 +955,11 @@ UINT StringWidthAdjust( CONST UINT iFwOffs, LPTSTR ptStr, CONST UINT_PTR cchSz, 
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	�O�g�ɍ��킹�āA�����s�g�����
-	@param[in]	iWidth	�O�g���h�b�g��
-	@param[in]	iHeight	�O�g���h�b�g��
-	@param[in]	pstInfo	�g���g�̏��
-	@return	�m�ۂ����������Ԃ��Efree�ɒ��ӁE���s�Ȃ�NULL
+	外枠に合わせて、複数行枠を作る
+	@param[in]	iWidth	外枠幅ドット数
+	@param[in]	iHeight	外枠高ドット数
+	@param[in]	pstInfo	使う枠の情報
+	@return	確保した文字列を返す・freeに注意・失敗ならNULL
 */
 LPTSTR FrameMakeOutsideBoundary( CONST INT iWidth, CONST INT iHeight, LPFRAMEINFO pstInfo )
 {
@@ -967,19 +967,19 @@ LPTSTR FrameMakeOutsideBoundary( CONST INT iWidth, CONST INT iHeight, LPFRAMEINF
 
 	TCHAR		atSubStr[MAX_PATH];
 	LPTSTR		ptBufStr;
-	INT	iLines, i;	//	�S�̍s��
-	INT	iUpLine, iMdLine, iDnLine;	//	�V��A���A���̐�L�s
+	INT	iLines, i;	//	全体行数
+	INT	iUpLine, iMdLine, iDnLine;	//	天井、柱、床の占有行
 
 	INT	iRitOccup;
 	INT	iOfsLine, iRight;
 	INT	iRoofDot, iFloorDot;
-	INT	iRoofCnt, iFloorCnt;	//	��Ɖ��̃p�[�c�̌�
+	INT	iRoofCnt, iFloorCnt;	//	上と下のパーツの個数
 	INT	iRfRstDot, iFlRstDot;
 	INT	iRitOff;//, iPillarDot, iFloodDot;
 	INT	iRitBuf;
 	INT	iRealWid;
 	INT	ic;
-	INT	iTgtLn;	//	�e���̃t�H�[�J�X�s��
+	INT	iTgtLn;	//	各部のフォーカス行数
 	UINT	bMultiPadd;
 	BOOLEAN	bEnable;
 
@@ -988,7 +988,7 @@ LPTSTR FrameMakeOutsideBoundary( CONST INT iWidth, CONST INT iHeight, LPFRAMEINF
 	HRESULT	hRslt;
 
 	wstring	wsWorkStr;
-	vector<wstring>	vcString;	//	��Ɨp
+	vector<wstring>	vcString;	//	作業用
 
 #ifdef DO_TRY_CATCH
 	try{
@@ -996,75 +996,75 @@ LPTSTR FrameMakeOutsideBoundary( CONST INT iWidth, CONST INT iHeight, LPFRAMEINF
 
 	wsWorkStr.assign( TEXT("") );
 
-	iLines =  iHeight / LINE_HEIGHT;	//	�؂�̂Ăł���
+	iLines =  iHeight / LINE_HEIGHT;	//	切り捨てでおｋ
 	TRACE( TEXT("MF LINE %d"), iLines );
 
-	bMultiPadd = pstInfo->dRestPadd;	//	�p�f�B���O���邩�ǂ���
+	bMultiPadd = pstInfo->dRestPadd;	//	パディングするかどうか
 
-	//	�s���̊m�F
+	//	行数の確認
 	FrameMultiSizeGet( pstInfo, &iUpLine, &iDnLine );
 
-	iMdLine = iLines - (iUpLine + iDnLine);	//	��
+	iMdLine = iLines - (iUpLine + iDnLine);	//	柱
 	TRACE( TEXT("MF R[%d] P[%d] F[%d]"), iUpLine, iMdLine, iDnLine );
-	//	���� iMdLine ���}�C�i�X�ɂȂ�����H�@��������Ȃ��Ȃ邾��
-	if( 0 > iMdLine ){	iLines -= iMdLine;	iMdLine = 0;	}	//	�����ɒ��ӃZ��
-	//	�͂ݏo���ƃo�O��̂ŁA�͂ݏo�������͖����������Ƃɂ���
+	//	もし iMdLine がマイナスになったら？　中が作られなくなるだけ
+	if( 0 > iMdLine ){	iLines -= iMdLine;	iMdLine = 0;	}	//	符号に注意セヨ
+	//	はみ出すとバグるので、はみ出した分は無かったことにする
 
 	for( i = 0; iLines > i; i++ )
 	{
-		vcString.push_back( wsWorkStr );	//	��Ɋm��
+		vcString.push_back( wsWorkStr );	//	先に確保
 	}
 
 
 
 	iRealWid = iWidth;
 
-	//	�E�p�[�c�̐�L���A��Ԓ����̂��m�F
-	iRitOccup = pstInfo->stAfternoon.dDot;	//	�E��
-	if( iRitOccup <  pstInfo->stTwilight.dDot ){	iRitOccup = pstInfo->stTwilight.dDot;	}	//	�E��
-	iRitBuf = pstInfo->dRightOffset + pstInfo->stNightfall.dDot;	//	�E�ƃI�t�Z�b�g
-	if( iRitOccup < iRitBuf ){	iRitOccup = iRitBuf;	}	//	�E
-	//	iRitOccup�́A�E�p�[�c�̍ő��L���ł���
-	iRitOff = iWidth - iRitOccup;	//	�E�p�[�c�J�n�ʒu���m��
+	//	右パーツの占有幅、一番長いのを確認
+	iRitOccup = pstInfo->stAfternoon.dDot;	//	右上
+	if( iRitOccup <  pstInfo->stTwilight.dDot ){	iRitOccup = pstInfo->stTwilight.dDot;	}	//	右下
+	iRitBuf = pstInfo->dRightOffset + pstInfo->stNightfall.dDot;	//	右とオフセット
+	if( iRitOccup < iRitBuf ){	iRitOccup = iRitBuf;	}	//	右
+	//	iRitOccupは、右パーツの最大占有幅である
+	iRitOff = iWidth - iRitOccup;	//	右パーツ開始位置を確定
 
-	//	�V��Ɏg����h�b�g�����Q�b�g
-		//iRitOff = iWidth - pstInfo->stAfternoon.dDot;	//	�E��̐�L��
-	iRoofDot  = iRitOff - pstInfo->stMorning.dDot;	//	�V��Ɏg����h�b�g��
+	//	天井に使えるドット数をゲット
+		//iRitOff = iWidth - pstInfo->stAfternoon.dDot;	//	右上の占有分
+	iRoofDot  = iRitOff - pstInfo->stMorning.dDot;	//	天井に使えるドット幅
 	if( 1 <= pstInfo->dLeftOffset ){	iRoofDot -= pstInfo->dLeftOffset;	}
-	iRoofCnt  = Divinus( iRoofDot, pstInfo->stNoon.dDot );	//	��L�h�b�g���m�F���āA���o���B�؂�̂Ăł���
+	iRoofCnt  = Divinus( iRoofDot, pstInfo->stNoon.dDot );	//	占有ドットを確認して、個数出す。切り捨てでおｋ
 	iRfRstDot = iRoofDot - (iRoofCnt * pstInfo->stNoon.dDot);
 
-//�돜�Z����
+//零除算発生
 
-	//	�����ƉE���Ə�
-		//iRitOff = iWidth - pstInfo->stTwilight.dDot;	//	�E���̐�L��
-	iFloorDot = iRitOff - pstInfo->stDawn.dDot;	//	���Ɏg����h�b�g��
+	//	左下と右下と床
+		//iRitOff = iWidth - pstInfo->stTwilight.dDot;	//	右下の占有分
+	iFloorDot = iRitOff - pstInfo->stDawn.dDot;	//	床に使えるドット幅
 	if( 1 <= pstInfo->dLeftOffset ){	iFloorDot -= pstInfo->dLeftOffset;	}
-	iFloorCnt = Divinus( iFloorDot , pstInfo->stMidnight.dDot );	//	��L�h�b�g���m�F���āA���o���B
+	iFloorCnt = Divinus( iFloorDot , pstInfo->stMidnight.dDot );	//	占有ドットを確認して、個数出す。
 	iFlRstDot = iFloorDot - (iFloorCnt * pstInfo->stMidnight.dDot);
 
-	//	�E���J�n�ʒu�E�p�f�B���O���l���Z��
+	//	右柱開始位置・パディングを考慮セヨ
 	if( bMultiPadd )
 	{
 		iRight = iRitOff + pstInfo->dRightOffset;
-		//	���̃I�t�Z�b�g�Ȃ�A�����ɂ߂荞�ނ̂ŁA���̕��[�܂ł̒������k�߂�
+		//	負のオフセットなら、内側にめり込むので、その分端までの長さを縮める
 		if( -1 >= pstInfo->dLeftOffset ){	iRight +=  pstInfo->dLeftOffset;	}
-		//	�����̈����ɒ���
+		//	負数の扱いに注意
 	}
 	else
 	{
 		iRight = (iRoofCnt * pstInfo->stNoon.dDot) + pstInfo->stMorning.dDot + pstInfo->dRightOffset;
 		iRitBuf = (iFloorCnt * pstInfo->stMidnight.dDot) + pstInfo->stDawn.dDot + pstInfo->dRightOffset;
-		if( iRight < iRitBuf ){	iRight = iRitBuf;	};	//	�������ɍ��킹��
+		if( iRight < iRitBuf ){	iRight = iRitBuf;	};	//	長い方に合わせる
 
 		iRight +=  pstInfo->dLeftOffset;
 	}
 
-	//	�g���킹�g�僂�[�h�̂Ƃ��̓I�t�Z�b�g�͍l�����Ȃ�
+	//	枠合わせ拡大モードのときはオフセットは考慮しない
 
 	TRACE( TEXT("MF RD[%d]C[%d][%d] FD[%d]C[%d][%d]"), iRoofDot, iRoofCnt, iRfRstDot, iFloorDot, iFloorCnt, iFlRstDot );
 
-	//	��ƂɌ����ăN�����[
+	//	作業に向けてクルヤー
 	pstInfo->stDaybreak.iNowLn  = 0;
 	pstInfo->stMorning.iNowLn   = 0;
 	pstInfo->stNoon.iNowLn      = 0;
@@ -1074,98 +1074,98 @@ LPTSTR FrameMakeOutsideBoundary( CONST INT iWidth, CONST INT iHeight, LPFRAMEINF
 	pstInfo->stMidnight.iNowLn  = 0;
 	pstInfo->stDawn.iNowLn      = 0;
 
-	//	�V�䂩��E���[�����킹��
+	//	天井から・下端を合わせる
 	for( iTgtLn = 0, iOfsLine = 0; iUpLine > iTgtLn; iTgtLn++, iOfsLine++ )
 	{
-		//	����
+		//	左上
 		if( 0 >= (iUpLine - iTgtLn) - pstInfo->stMorning.iLine )	bEnable = TRUE;
 		else	bEnable = FALSE;
 		FrameMakeMultiSubLine( bEnable, &(pstInfo->stMorning), atSubStr, MAX_PATH );
 		if( 1 <= pstInfo->dLeftOffset ){	StringWidthAdjust( pstInfo->dLeftOffset, atSubStr, MAX_PATH, 0 );	}
 		vcString.at( iOfsLine ).append( atSubStr );
 
-		//	��
+		//	上
 		if( 0 >= (iUpLine - iTgtLn) - pstInfo->stNoon.iLine )	bEnable = TRUE;
 		else	bEnable = FALSE;
 		FrameMakeMultiSubLine( bEnable, &(pstInfo->stNoon), atSubStr, MAX_PATH );
-		//	�K�v���J��Ԃ�
+		//	必要個数繰り返す
 		for( ic = 0; iRoofCnt >  ic; ic++ ){	vcString.at( iOfsLine ).append( atSubStr  );	}
-		//	�]���Ă�h�b�g���߂�
+		//	余ってるドット埋める
 		if( (1 <= iRfRstDot) && bMultiPadd )
 		{
 			StringWidthAdjust( 0, atSubStr, MAX_PATH, iRfRstDot );
 			vcString.at( iOfsLine ).append( atSubStr );
 		}
 
-		//	�E��
+		//	右上
 		if( 0 >= (iUpLine - iTgtLn) - pstInfo->stAfternoon.iLine )	bEnable = TRUE;
 		else	bEnable = FALSE;
 		FrameMakeMultiSubLine( bEnable, &(pstInfo->stAfternoon), atSubStr, MAX_PATH );
 		vcString.at( iOfsLine ).append( atSubStr );
 	}
 
-	//	�������Ă���
+	//	柱おいていく
 	for( iTgtLn = 0; iMdLine > iTgtLn; iTgtLn++, iOfsLine++ )
 	{
-		//	��
-		pstItem = &(pstInfo->stDaybreak);		//	�E�J�n�ʒu�܂Ńp�f�B���O���Ă���
+		//	左
+		pstItem = &(pstInfo->stDaybreak);		//	右開始位置までパディングしておく
 		FrameMultiSubstring( pstItem->atParts, pstItem->iNowLn, atSubStr, MAX_PATH, iRight );
-		//	���̃p�f�B���O���Z�b�g
+		//	負のパディングをセット
 		if( -1 >= pstInfo->dLeftOffset ){	StringWidthAdjust( -(pstInfo->dLeftOffset), atSubStr, MAX_PATH, 0 );	}
-		pstItem->iNowLn++;	//	��s�����[�v�����Ă���
+		pstItem->iNowLn++;	//	壱行ずつループさせていく
 		if( pstItem->iLine <= pstItem->iNowLn ){	pstItem->iNowLn = 0;	}
 		vcString.at( iOfsLine ).append( atSubStr );
 
-		//	�E
-		pstItem = &(pstInfo->stNightfall);		//	���[�Ȃ̂Ńp�f�B���O�͕s�v
+		//	右
+		pstItem = &(pstInfo->stNightfall);		//	末端なのでパディングは不要
 		FrameMultiSubstring( pstItem->atParts, pstItem->iNowLn, atSubStr, MAX_PATH, 0 );
-		pstItem->iNowLn++;	//	��s�����[�v�����Ă���
+		pstItem->iNowLn++;	//	壱行ずつループさせていく
 		if( pstItem->iLine <= pstItem->iNowLn ){	pstItem->iNowLn = 0;	}
 		vcString.at( iOfsLine ).append( atSubStr );
 	}
 
-	//	���E��[�����킹��
+	//	床・上端を合わせる
 	for( iTgtLn = 0; iDnLine > iTgtLn; iTgtLn++, iOfsLine++ )
 	{
-		//	����
+		//	左下
 		if( iTgtLn < pstInfo->stDawn.iLine )	bEnable = TRUE;
 		else	bEnable = FALSE;
 		FrameMakeMultiSubLine( bEnable, &(pstInfo->stDawn), atSubStr, MAX_PATH );
 		if( 1 <= pstInfo->dLeftOffset ){	StringWidthAdjust( pstInfo->dLeftOffset, atSubStr, MAX_PATH, 0 );	}
 		vcString.at( iOfsLine ).append( atSubStr );
 
-		//	��
+		//	下
 		if( iTgtLn < pstInfo->stMidnight.iLine )	bEnable = TRUE;
 		else	bEnable = FALSE;
 		FrameMakeMultiSubLine( bEnable, &(pstInfo->stMidnight), atSubStr, MAX_PATH );
-		//	�K�v���J��Ԃ�
+		//	必要個数繰り返す
 		for( ic = 0; iFloorCnt > ic; ic++ ){	vcString.at( iOfsLine ).append( atSubStr );	}
-		//	�]���Ă�h�b�g���߂�
+		//	余ってるドット埋める
 		if( (1 <= iFlRstDot) && bMultiPadd )
 		{
 			StringWidthAdjust( 0, atSubStr, MAX_PATH, iFlRstDot );
 			vcString.at( iOfsLine ).append( atSubStr );
 		}
 
-		//	�E��
+		//	右下
 		if( iTgtLn < pstInfo->stTwilight.iLine )
 		{
 			FrameMultiSubstring( pstInfo->stTwilight.atParts, pstInfo->stTwilight.iNowLn, atSubStr, MAX_PATH, 0 );
-			pstInfo->stTwilight.iNowLn++;	//	��s�����[�v�����Ă���
+			pstInfo->stTwilight.iNowLn++;	//	壱行ずつループさせていく
 			vcString.at( iOfsLine ).append( atSubStr );
 		}
 	}
 
 	cchTotal = 0;
-	dCount = vcString.size();	//	�L���s��
-	//	�S�̂̕��������m��
+	dCount = vcString.size();	//	有効行数
+	//	全体の文字数を確保
 	for( d = 0; dCount > d; d++ ){	cchTotal += vcString.at( d ).size();	}
-	cchTotal += (dCount * sizeof(TCHAR));	//���s���{�]�T
-	ptBufStr = (LPTSTR)malloc( cchTotal * sizeof(TCHAR) );	//	�T�C�Y�����
-	if( ptBufStr )	//	�`�F�b�N
+	cchTotal += (dCount * sizeof(TCHAR));	//改行分＋余裕
+	ptBufStr = (LPTSTR)malloc( cchTotal * sizeof(TCHAR) );	//	サイズ作って
+	if( ptBufStr )	//	チェック
 	{
 		ZeroMemory( ptBufStr, cchTotal * sizeof(TCHAR) );
-		for( d = 0; dCount > d; d++ )	//	�S���R�s�[
+		for( d = 0; dCount > d; d++ )	//	全部コピー
 		{
 			if( 0 != d )	hRslt = StringCchCat( ptBufStr, cchTotal, TEXT("\r\n") );
 			hRslt = StringCchCat( ptBufStr, cchTotal, vcString.at( d ).c_str() );
@@ -1183,15 +1183,15 @@ LPTSTR FrameMakeOutsideBoundary( CONST INT iWidth, CONST INT iHeight, LPFRAMEINF
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	���g�ɍ��킹�āA�����s�g�����
-	@param[in]		dType	�O�������@�P�V��@�Q��
-	@param[in,out]	piValue	�����ɂ���Ď󂯓n������
-	@param[in]		pstInfo	�g���g�̏��
-	@return	�m�ۂ����������Ԃ��Efree�ɒ��ӁE���s�Ȃ�NULL
+	内枠に合わせて、複数行枠を作る
+	@param[in]		dType	０初期化　１天井　２床
+	@param[in,out]	piValue	処理によって受け渡しする
+	@param[in]		pstInfo	使う枠の情報
+	@return	確保した文字列を返す・freeに注意・失敗ならNULL
 */
 LPTSTR FrameMakeInsideBoundary( UINT dType, PINT piValue, LPFRAMEINFO pstInfo )
 {
-	static INT	iRoofCnt, iFloorCnt;	//	��Ɖ��̃p�[�c�̌�
+	static INT	iRoofCnt, iFloorCnt;	//	上と下のパーツの個数
 	static INT	iRfRstDot, iFlRstDot;
 
 	TCHAR		atSubStr[MAX_PATH];
@@ -1203,7 +1203,7 @@ LPTSTR FrameMakeInsideBoundary( UINT dType, PINT piValue, LPFRAMEINFO pstInfo )
 	INT	iRitOff;
 	INT	iRitBuf, iRitVle;
 	INT	iRoofDot, iFloorDot;
-	INT	iTgtLn;	//	�e���̃t�H�[�J�X�s��
+	INT	iTgtLn;	//	各部のフォーカス行数
 	INT	iOfsLine;
 	BOOLEAN	bEnable;
 
@@ -1212,7 +1212,7 @@ LPTSTR FrameMakeInsideBoundary( UINT dType, PINT piValue, LPFRAMEINFO pstInfo )
 	HRESULT	hRslt;
 
 	wstring	wsWorkStr;
-	vector<wstring>	vcString;	//	��Ɨp
+	vector<wstring>	vcString;	//	作業用
 
 #ifdef DO_TRY_CATCH
 	try{
@@ -1220,39 +1220,39 @@ LPTSTR FrameMakeInsideBoundary( UINT dType, PINT piValue, LPFRAMEINFO pstInfo )
 
 	wsWorkStr.assign( TEXT("") );
 
-	bMultiPadd = pstInfo->dRestPadd;	//	�p�f�B���O���邩�ǂ���
+	bMultiPadd = pstInfo->dRestPadd;	//	パディングするかどうか
 
-	if( 0 == dType )	//	����������static�Ŏ����Ă�����
+	if( 0 == dType )	//	初期化してstaticで持っておくか
 	{
-		//	piValue[in]�����̃h�b�g���@[out]�E���J�n�ʒu
+		//	piValue[in]内部のドット数　[out]右柱開始位置
 
-		//	�E���J�n�ʒu���m��
+		//	右柱開始位置を確定
 		iRitOff = pstInfo->stDaybreak.dDot + *piValue;
-		//	���I�t�Z�b�g�}�C�i�X�Ȃ�A�����������ɂ߂荞�ށE�}�C�i�X�v�Z�ɒ���
+		//	左オフセットマイナスなら、左柱が内側にめり込む・マイナス計算に注意
 		if( -1 >= pstInfo->dLeftOffset ){	iRitOff +=  -(pstInfo->dLeftOffset);	}
-		//	�E�I�t�Z�b�g�}�C�i�X�Ȃ�A�E���������ɂ߂荞��
+		//	右オフセットマイナスなら、右柱が内側にめり込む
 		if( -1 >= pstInfo->dRightOffset ){	iRitOff +=  -(pstInfo->dRightOffset);	}
-		//	���Ȃ킿�A�E�J�n�ʒu�����E�Ɉړ�����
+		//	すなわち、右開始位置がより右に移動する
 
-		//	�V��Ɏg����h�b�g�����Q�b�g
-		iRoofDot  = iRitOff - pstInfo->stMorning.dDot;	//	�V��Ɏg����h�b�g��
+		//	天井に使えるドット数をゲット
+		iRoofDot  = iRitOff - pstInfo->stMorning.dDot;	//	天井に使えるドット幅
 		if( 1 <= pstInfo->dLeftOffset ){	iRoofDot -= pstInfo->dLeftOffset;	}
-		iRoofCnt  = Divinus( iRoofDot, pstInfo->stNoon.dDot );	//	��L�h�b�g���m�F���āA���o���B�؂�̂Ăł���
-		iRfRstDot = iRoofDot - (iRoofCnt * pstInfo->stNoon.dDot);	//	�p�[�c�����Ă�������]��h�b�g��
+		iRoofCnt  = Divinus( iRoofDot, pstInfo->stNoon.dDot );	//	占有ドットを確認して、個数出す。切り捨てでおｋ
+		iRfRstDot = iRoofDot - (iRoofCnt * pstInfo->stNoon.dDot);	//	パーツを入れていったら余るドット数
 
-		//	�����ƉE���Ə�
-		iFloorDot = iRitOff - pstInfo->stDawn.dDot;	//	���Ɏg����h�b�g��
+		//	左下と右下と床
+		iFloorDot = iRitOff - pstInfo->stDawn.dDot;	//	床に使えるドット幅
 		if( 1 <= pstInfo->dLeftOffset ){	iFloorDot -= pstInfo->dLeftOffset;	}
-		iFloorCnt = Divinus( iFloorDot , pstInfo->stMidnight.dDot );	//	��L�h�b�g���m�F���āA���o���B
-		iFlRstDot = iFloorDot - (iFloorCnt * pstInfo->stMidnight.dDot);	//	�p�[�c�����Ă�������]��h�b�g��
+		iFloorCnt = Divinus( iFloorDot , pstInfo->stMidnight.dDot );	//	占有ドットを確認して、個数出す。
+		iFlRstDot = iFloorDot - (iFloorCnt * pstInfo->stMidnight.dDot);	//	パーツを入れていったら余るドット数
 
 		if( !(bMultiPadd) )
 		{
-			//	�p�f�B���O���Ȃ��̂Ȃ�A�]�蕪�̓t���Ɏg���A�E���J�n�ʒu�́A��蒷�����ɍ��킹��
+			//	パディングしないのなら、余り分はフルに使い、右柱開始位置は、より長い方に合わせる
 			if( 0 != iRfRstDot ){	iRoofCnt++;		}
 			if( 0 != iFlRstDot ){	iFloorCnt++;	}
 
-			//	�͂ݏo�����m��
+			//	はみ出し分確保
 			iRitVle = pstInfo->stNoon.dDot - iFlRstDot;
 			iRitBuf = pstInfo->stMidnight.dDot - iFlRstDot;
 			if( iRitVle < iRitBuf ){	iRitVle = iRitBuf;	}
@@ -1260,95 +1260,95 @@ LPTSTR FrameMakeInsideBoundary( UINT dType, PINT piValue, LPFRAMEINFO pstInfo )
 			iRitOff += iRitVle;
 		}
 
-		//	�E�I�t�Z�b�g�u���X�Ȃ�A�E���J�n�ʒu�͂��E�Ɉړ�
+		//	右オフセットブラスなら、右柱開始位置はより右に移動
 		if( 1 <= pstInfo->dRightOffset ){	iRitOff += pstInfo->dRightOffset;	}
 
-		*piValue = iRitOff;	//	�E�J�n�ʒu��߂�
+		*piValue = iRitOff;	//	右開始位置を戻す
 
 		return NULL;
 	}
-	else if( 1 == dType )	//	�V��S��
+	else if( 1 == dType )	//	天井全体
 	{
-		FrameMultiSizeGet( pstInfo, &iUpLine, NULL );	//	�V��̍s��
+		FrameMultiSizeGet( pstInfo, &iUpLine, NULL );	//	天井の行数
 
-		//	��ƂɌ����ăN�����[
+		//	作業に向けてクルヤー
 		pstInfo->stMorning.iNowLn   = 0;
 		pstInfo->stNoon.iNowLn      = 0;
 		pstInfo->stAfternoon.iNowLn = 0;
 
-		//	��Ɋm��
+		//	先に確保
 		for( i = 0; iUpLine > i; i++ ){	vcString.push_back( wsWorkStr );	}
 
-		//	�V�䂩��E���[�����킹��
+		//	天井から・下端を合わせる
 		for( iTgtLn = 0, iOfsLine = 0; iUpLine > iTgtLn; iTgtLn++, iOfsLine++ )
 		{
-			//	����
+			//	左上
 			if( 0 >= (iUpLine - iTgtLn) - pstInfo->stMorning.iLine )	bEnable = TRUE;
 			else	bEnable = FALSE;
 			FrameMakeMultiSubLine( bEnable, &(pstInfo->stMorning), atSubStr, MAX_PATH );
 			if( 1 <= pstInfo->dLeftOffset ){	StringWidthAdjust( pstInfo->dLeftOffset, atSubStr, MAX_PATH, 0 );	}
 			vcString.at( iOfsLine ).append( atSubStr );
 
-			//	��
+			//	上
 			if( 0 >= (iUpLine - iTgtLn) - pstInfo->stNoon.iLine )	bEnable = TRUE;
 			else	bEnable = FALSE;
 			FrameMakeMultiSubLine( bEnable, &(pstInfo->stNoon), atSubStr, MAX_PATH );
-			//	�K�v���J��Ԃ�
+			//	必要個数繰り返す
 			for( ic = 0; iRoofCnt > ic; ic++ ){	vcString.at( iOfsLine ).append( atSubStr );	}
-			//	�]���Ă�h�b�g���߂�
+			//	余ってるドット埋める
 			if( (1 <= iRfRstDot) && bMultiPadd )
 			{
 				StringWidthAdjust( 0, atSubStr, MAX_PATH, iRfRstDot );
 				vcString.at( iOfsLine ).append( atSubStr );
 			}
 
-			//	�E��
+			//	右上
 			if( 0 >= (iUpLine - iTgtLn) - pstInfo->stAfternoon.iLine )	bEnable = TRUE;
 			else	bEnable = FALSE;
 			FrameMakeMultiSubLine( bEnable, &(pstInfo->stAfternoon), atSubStr, MAX_PATH );
 			vcString.at( iOfsLine ).append( atSubStr );
 		}
 	}
-	else if( 2 == dType )	//	���S��
+	else if( 2 == dType )	//	床全体
 	{
-		FrameMultiSizeGet( pstInfo, NULL, &iDnLine );	//	���̍s��
+		FrameMultiSizeGet( pstInfo, NULL, &iDnLine );	//	床の行数
 
-		//	��ƂɌ����ăN�����[
+		//	作業に向けてクルヤー
 		pstInfo->stTwilight.iNowLn  = 0;
 		pstInfo->stMidnight.iNowLn  = 0;
 		pstInfo->stDawn.iNowLn      = 0;
 
-		//	��Ɋm��
+		//	先に確保
 		for( i = 0; iDnLine > i; i++ ){	vcString.push_back( wsWorkStr );	}
 
-		//	���E��[�����킹��
+		//	床・上端を合わせる
 		for( iTgtLn = 0, iOfsLine = 0; iDnLine > iTgtLn; iTgtLn++, iOfsLine++ )
 		{
-			//	����
+			//	左下
 			if( iTgtLn < pstInfo->stDawn.iLine )	bEnable = TRUE;
 			else	bEnable = FALSE;
 			FrameMakeMultiSubLine( bEnable, &(pstInfo->stDawn), atSubStr, MAX_PATH );
 			if( 1 <= pstInfo->dLeftOffset ){	StringWidthAdjust( pstInfo->dLeftOffset, atSubStr, MAX_PATH, 0 );	}
 			vcString.at( iOfsLine ).append( atSubStr );
 
-			//	��
+			//	下
 			if( iTgtLn < pstInfo->stMidnight.iLine )	bEnable = TRUE;
 			else	bEnable = FALSE;
 			FrameMakeMultiSubLine( bEnable, &(pstInfo->stMidnight), atSubStr, MAX_PATH );
-			//	�K�v���J��Ԃ�
+			//	必要個数繰り返す
 			for( ic = 0; iFloorCnt > ic; ic++ ){	vcString.at( iOfsLine ).append( atSubStr );	}
-			//	�]���Ă�h�b�g���߂�
+			//	余ってるドット埋める
 			if( (1 <= iFlRstDot) && bMultiPadd )
 			{
 				StringWidthAdjust( 0, atSubStr, MAX_PATH, iFlRstDot );
 				vcString.at( iOfsLine ).append( atSubStr );
 			}
 
-			//	�E��
+			//	右下
 			if( iTgtLn < pstInfo->stTwilight.iLine )
 			{
 				FrameMultiSubstring( pstInfo->stTwilight.atParts, pstInfo->stTwilight.iNowLn, atSubStr, MAX_PATH, 0 );
-				pstInfo->stTwilight.iNowLn++;	//	��s�����[�v�����Ă���
+				pstInfo->stTwilight.iNowLn++;	//	壱行ずつループさせていく
 				vcString.at( iOfsLine ).append( atSubStr );
 			}
 		}
@@ -1357,19 +1357,19 @@ LPTSTR FrameMakeInsideBoundary( UINT dType, PINT piValue, LPFRAMEINFO pstInfo )
 	else{	return NULL;	}
 
 	cchTotal = 0;
-	dCount = vcString.size();	//	�L���s��
-	//	�S�̂̕��������m��
+	dCount = vcString.size();	//	有効行数
+	//	全体の文字数を確保
 	for( d = 0; dCount > d; d++ ){	cchTotal += vcString.at( d ).size();	}
-	cchTotal += ((dCount+1) * sizeof(TCHAR));	//���s���{�]�T
-	ptBufStr = (LPTSTR)malloc( cchTotal * sizeof(TCHAR) );	//	�T�C�Y�����
-	if( ptBufStr )	//	�`�F�b�N
+	cchTotal += ((dCount+1) * sizeof(TCHAR));	//改行分＋余裕
+	ptBufStr = (LPTSTR)malloc( cchTotal * sizeof(TCHAR) );	//	サイズ作って
+	if( ptBufStr )	//	チェック
 	{
 		ZeroMemory( ptBufStr, cchTotal * sizeof(TCHAR) );
-		for( d = 0; dCount > d; d++ )	//	�S���R�s�[
+		for( d = 0; dCount > d; d++ )	//	全部コピー
 		{
 			hRslt = StringCchCat( ptBufStr, cchTotal, vcString.at( d ).c_str() );
 			hRslt = StringCchCat( ptBufStr, cchTotal, TEXT("\r\n") );
-			//	���s�͏�ɕK�v�ł���
+			//	改行は常に必要である
 		}
 	}
 
@@ -1384,11 +1384,11 @@ LPTSTR FrameMakeInsideBoundary( UINT dType, PINT piValue, LPFRAMEINFO pstInfo )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	�m�[�e�B�t�@�C���b�Z�[�W�̏���
-	@param[in]	hDlg		�_�C�����Q�n���h�D
-	@param[in]	idFrom		NOTIFY�𔭐��������R���g���[���̂h�c
-	@param[in]	pstNmhdr	NOTIFY�̏ڍ�
-	@return		�����������e�Ƃ�
+	ノーティファイメッセージの処理
+	@param[in]	hDlg		ダイヤロゲハンドゥ
+	@param[in]	idFrom		NOTIFYを発生させたコントロールのＩＤ
+	@param[in]	pstNmhdr	NOTIFYの詳細
+	@return		処理した内容とか
 */
 INT_PTR Frm_OnNotify( HWND hDlg, INT idFrom, LPNMHDR pstNmhdr )
 {
@@ -1399,7 +1399,7 @@ INT_PTR Frm_OnNotify( HWND hDlg, INT idFrom, LPNMHDR pstNmhdr )
 
 	nmCode = pstNmhdr->code;
 
-	//	����������f���^�����A�E�ŕ�
+	//	左押したらデルタが正、右で負
 
 	if( IDSP_LEFT_OFFSET == idFrom )
 	{
@@ -1448,10 +1448,10 @@ INT_PTR Frm_OnNotify( HWND hDlg, INT idFrom, LPNMHDR pstNmhdr )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	����̘g�f�[�^��INI�t�@�C�����烍�[�h���ă������Ɋm�ہE�h�b�g�����v�Z
-	@param[in]	dNumber		�g�ԍ�
-	@param[in]	pstFrame	�g�f�[�^�����\���̂ւ̃|�C���^�`
-	@return		HRESULT	�I����ԃR�[�h
+	所定の枠データをINIファイルからロードしてメモリに確保・ドット数も計算
+	@param[in]	dNumber		枠番号
+	@param[in]	pstFrame	枠データ入れる構造体へのポインタ～
+	@return		HRESULT	終了状態コード
 */
 HRESULT FrameDataGet( UINT dNumber, LPFRAMEINFO pstFrame )
 {
@@ -1471,18 +1471,18 @@ HRESULT FrameDataGet( UINT dNumber, LPFRAMEINFO pstFrame )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	�G�f�B�b�g�{�b�N�X�ɐݒ���e������
-	@param[in]	hDlg	�_�C�����Q�n���h�D
-	@return		HRESULT	�I����ԃR�[�h
+	エディットボックスに設定内容を入れる
+	@param[in]	hDlg	ダイヤロゲハンドゥ
+	@return		HRESULT	終了状態コード
 */
 HRESULT FrameInfoDisp( HWND hDlg )
 {
 	TCHAR	atBuff[MIN_STRING];
 
-	//	���O�\��
+	//	名前表示
 	Edit_SetText( GetDlgItem(hDlg,IDE_BOXP_NAME_EDIT), gstFrameInfo[gNowSel].atFrameName );
 
-	//	�p�[�c���������
+	//	パーツ情報をいれる
 	Edit_SetText( GetDlgItem(hDlg,IDE_BOXP_MORNING),   gstFrameInfo[gNowSel].stMorning.atParts );
 	Edit_SetText( GetDlgItem(hDlg,IDE_BOXP_NOON),      gstFrameInfo[gNowSel].stNoon.atParts );
 	Edit_SetText( GetDlgItem(hDlg,IDE_BOXP_AFTERNOON), gstFrameInfo[gNowSel].stAfternoon.atParts );
@@ -1498,7 +1498,7 @@ HRESULT FrameInfoDisp( HWND hDlg )
 	StringCchPrintf( atBuff, MIN_STRING, TEXT("%d"),   gstFrameInfo[gNowSel].dRightOffset );
 	Edit_SetText( GetDlgItem(hDlg,IDE_RIGHT_OFFSET),   atBuff );
 
-	//	�V��Ə��̗]�蕔�����߂邩�ǂ���
+	//	天井と床の余り部分埋めるかどうか
 	Button_SetCheck( GetDlgItem( hDlg, IDB_FRM_PADDING ), gstFrameInfo[gNowSel].dRestPadd ? BST_CHECKED : BST_UNCHECKED );
 
 	return S_OK;
@@ -1506,10 +1506,10 @@ HRESULT FrameInfoDisp( HWND hDlg )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	�g������
-	@param[in]	dMode	���ꂽ���g�̔ԍ��O�C���f�b�N�X
-	@param[in]	dStyle	��`���ǂ���
-	@return		HRESULT	�I����ԃR�[�h
+	枠を入れる
+	@param[in]	dMode	入れたい枠の番号０インデックス
+	@param[in]	dStyle	矩形かどうか
+	@return		HRESULT	終了状態コード
 */
 HRESULT DocFrameInsert( INT dMode, INT dStyle )
 {
@@ -1524,7 +1524,7 @@ HRESULT DocFrameInsert( INT dMode, INT dStyle )
 
 	INT			iMidLine, iUpLine, iDnLine;
 	LPFRAMEITEM	pstItem;
-	TCHAR		atSubStr[MAX_PATH];	//	����邩�H
+	TCHAR		atSubStr[MAX_PATH];	//	足りるか？
 
 #ifdef DO_TRY_CATCH
 	try{
@@ -1532,60 +1532,60 @@ HRESULT DocFrameInsert( INT dMode, INT dStyle )
 
 	FrameDataGet( dMode, &stInfo );
 
-	iLines = DocNowFilePageLineCount( );	//	�y�[�W�S�̂̍s��
+	iLines = DocNowFilePageLineCount( );	//	ページ全体の行数
 
-	//	�J�n�n�_����J�n	//	D_SQUARE
+	//	開始地点から開始	//	D_SQUARE
 	iTop = gitFileIt->vcCont.at( gixFocusPage ).dSelLineTop;
 	iBtm = gitFileIt->vcCont.at( gixFocusPage ).dSelLineBottom;
 	if( 0 >  iTop ){	iTop = 0;	}
 	if( 0 >  iBtm ){	iBtm = iLines - 1;	}
 
-	//	���[���m�F�E���e���Ȃ��Ȃ�A�g�p�s�߂�
+	//	末端を確認・内容がないなら、使用行戻す
 	iInX = DocLineParamGet( iBtm, NULL, NULL );
 	if( 0 == iInX ){	 iBtm--;	}
 
-	//	��`�I�𖳂��Ƃ݂Ȃ�
+	//	矩形選択無しとみなす
 
-	ViewSelPageAll( -1 );	//	�͈͂Ƃ����̂ŉ������Ă���
+	ViewSelPageAll( -1 );	//	範囲とったので解除しておｋ
 
-	//	�I��͈͓��ł����Ƃ������h�b�g�����m�F
+	//	選択範囲内でもっとも長いドット数を確認
 	baseDot = DocPageMaxDotGet( iTop, iBtm );
 
-//�V��̍s���A���̕��A���̍s�����m��
+//天井の行数、左の幅、床の行数を確保
 
-	iMidLine = (iBtm - iTop) + 1;	//	�Ԃ̍s���m��
+	iMidLine = (iBtm - iTop) + 1;	//	間の行数確保
 
 	xMidLen = baseDot;
 	FrameMakeInsideBoundary( 0, &xMidLen, &stInfo );
-	//	������Ԃ��m�肷��
+	//	初期状態を確定する
 
-	//	�V��p�[�c�쐬
+	//	天井パーツ作成
 	ptString = FrameMakeInsideBoundary( 1, &xMidLen, &stInfo );
-	FrameMultiSizeGet( &stInfo, &iUpLine, NULL );	//	�V��̍s��
-	iLns = iTop;	//	���ڍs
-	iInX = 0;	//	�V��ǉ�
+	FrameMultiSizeGet( &stInfo, &iUpLine, NULL );	//	天井の行数
+	iLns = iTop;	//	注目行
+	iInX = 0;	//	天井追加
 	DocInsertString( &iInX, &iLns, NULL, ptString, 0, TRUE );
 	FREE( ptString );
 
-	//	���ƉE����
+	//	左と右つくる
 	stInfo.stDaybreak.iNowLn  = 0;
 	stInfo.stNightfall.iNowLn = 0;
 	for( i = 0; iMidLine > i; i++, iLns++ )
 	{
-		//	��
+		//	左
 		pstItem = &(stInfo.stDaybreak);
-		//	���߂�̂̓p�[�c�ő�ʒu�܂�
+		//	埋めるのはパーツ最大位置まで
 		FrameMultiSubstring( pstItem->atParts, pstItem->iNowLn, atSubStr, MAX_PATH, pstItem->dDot );
-		//	���̃p�f�B���O���Z�b�g
+		//	負のパディングをセット
 		if( -1 >= stInfo.dLeftOffset ){	StringWidthAdjust( -(stInfo.dLeftOffset), atSubStr, MAX_PATH, 0 );	}
-		pstItem->iNowLn++;	//	��s�����[�v�����Ă���
+		pstItem->iNowLn++;	//	壱行ずつループさせていく
 		if( pstItem->iLine <= pstItem->iNowLn ){	pstItem->iNowLn = 0;	}
-		iInX = 0;	//	���[���炢���
+		iInX = 0;	//	左端からいれる
 		DocInsertString( &iInX, &iLns, NULL, atSubStr, 0, FALSE );
 
-		//	�E
-		iEndot = DocLineParamGet( iLns, NULL, NULL );	//	���̍s�̖��[
-		iPadding = xMidLen - iEndot;	//	���ߗʊm�F
+		//	右
+		iEndot = DocLineParamGet( iLns, NULL, NULL );	//	この行の末端
+		iPadding = xMidLen - iEndot;	//	埋め量確認
 		ptPadding = DocPaddingSpaceWithPeriod( iPadding, NULL, NULL, NULL, TRUE );//DocPaddingSpaceMake( iPadding );
 		if( ptPadding )
 		{
@@ -1594,25 +1594,25 @@ HRESULT DocFrameInsert( INT dMode, INT dStyle )
 		}
 		pstItem = &(stInfo.stNightfall);
 		FrameMultiSubstring( pstItem->atParts, pstItem->iNowLn, atSubStr, MAX_PATH, 0 );
-		pstItem->iNowLn++;	//	��s�����[�v�����Ă���
+		pstItem->iNowLn++;	//	壱行ずつループさせていく
 		if( pstItem->iLine <= pstItem->iNowLn ){	pstItem->iNowLn = 0;	}
 		DocInsertString( &iEndot, &iLns, NULL, atSubStr, 0, FALSE );
 	}
 
-	//	�s�����d�n�e�Ȃ炱���ł������Ȏ��ɂȂ�
+	//	行末がＥＯＦならここでおかしな事になる
 	iLast = DocPageParamGet( NULL, NULL );
 	if( iLast <= iLns )
 	{
 		iLns = iLast - 1;
 		iInX = DocLineParamGet( iLns, NULL, NULL );
-		DocCrLfAdd( iInX , iLns, FALSE );	//	�������邽�߂ɉ��s
+		DocCrLfAdd( iInX , iLns, FALSE );	//	床を入れるために改行
 		iLns++;
 	}
 
-	//	�����
+	//	床作る
 	ptString = FrameMakeInsideBoundary( 2, &xMidLen, &stInfo );
-	FrameMultiSizeGet( &stInfo, NULL, &iDnLine );	//	���̍s��
-	iInX = 0;	//	�V��ǉ�
+	FrameMultiSizeGet( &stInfo, NULL, &iDnLine );	//	床の行数
+	iInX = 0;	//	天井追加
 	DocInsertString( &iInX, &iLns, NULL, ptString, 0, FALSE );
 	FREE( ptString );
 
@@ -1626,21 +1626,21 @@ HRESULT DocFrameInsert( INT dMode, INT dStyle )
 	try{
 #endif
 
-	//	�ŏI�I�ȃL�����b�g�̈ʒu�����Z�b�g
+	//	最終的なキャレットの位置をリセット
 	ViewPosResetCaret( iInX , iLns );
 
 	ViewRedrawSetLine( iTop );
-	DocBadSpaceCheck( iTop );	//	�o�b�h�󔒃`�F�L
+	DocBadSpaceCheck( iTop );	//	バッド空白チェキ
 
-	//	���s���Ă邩��A����ȍ~�S���ĕ`��K�v
-	iLns = DocNowFilePageLineCount( );	//	���ݍs���ĔF��
+	//	改行してるから、これ以降全部再描画必要
+	iLns = DocNowFilePageLineCount( );	//	現在行数再認識
 	for( i = iTop; iLns > i; i++ )
 	{
-		DocBadSpaceCheck( i );	//	�o�b�h�󔒃`�F�L
+		DocBadSpaceCheck( i );	//	バッド空白チェキ
 		ViewRedrawSetLine(  i );
 	}
-	//ViewRedrawSetLine( i );	//	�O�̂���
-	//DocBadSpaceCheck( i );	//	�o�b�h�󔒃`�F�L
+	//ViewRedrawSetLine( i );	//	念のため
+	//DocBadSpaceCheck( i );	//	バッド空白チェキ
 
 
 	DocPageInfoRenew( -1, 1 );
@@ -1655,9 +1655,9 @@ HRESULT DocFrameInsert( INT dMode, INT dStyle )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	�����sFrame�́A�����E�����E�������������E0x0D0A�E���p�󔒂̑��ݕϊ�
-	@param[in,out]	ptData	�ϊ����o�b�t�@�ŁA�ϊ��㕶��������BPARTS_CCH�T�C�Y�ł��邱��
-	@param[in]		bMode	�P�F���������s�ɂ���@�O�F���s�������ɂ���
+	複数行Frameの、￥￥・￥ｎ・￥ｓ＜＝＞￥・0x0D0A・半角空白の相互変換
+	@param[in,out]	ptData	変換元バッファで、変換後文字列入れる。PARTS_CCHサイズであること
+	@param[in]		bMode	１：￥ｎを改行にする　０：改行を￥ｎにする
 */
 VOID FrameDataTranslate( LPTSTR ptData, UINT bMode )
 {
@@ -1666,17 +1666,17 @@ VOID FrameDataTranslate( LPTSTR ptData, UINT bMode )
 
 	ZeroMemory( atBuffer, sizeof(atBuffer) );
 
-	StringCchLength( ptData, PARTS_CCH, &cchLen );	//	�����m�F
+	StringCchLength( ptData, PARTS_CCH, &cchLen );	//	長さ確認
 
 	for( i = 0, j = 0; cchLen > i; i++, j++ )
 	{
-		if( 0x0000 == ptData[i] )	break;	//	�����Ӗ��͂Ȃ����ǈ��S�΍�
+		if( 0x0000 == ptData[i] )	break;	//	多分意味はないけど安全対策
 
-		if( bMode  )	//	���������s�ɂ���
+		if( bMode  )	//	￥ｎを改行にする
 		{
-			if( 0x005C == ptData[i] )	//	�G�X�P�[�v�V�[�P���X
+			if( 0x005C == ptData[i] )	//	エスケープシーケンス
 			{
-				i++;	//	���̕������d�v
+				i++;	//	次の文字が重要
 				if( 'n' == ptData[i] )
 				{
 					atBuffer[j++] = 0x000D;
@@ -1686,55 +1686,55 @@ VOID FrameDataTranslate( LPTSTR ptData, UINT bMode )
 				{
 					atBuffer[j] = 0x0020;
 				}
-				else	//	�����ł�����
+				else	//	￥￥であった
 				{
 					atBuffer[j] = ptData[i];
 				}
 			}
-			else	//	�֌W�Ȃ��Ȃ炻�̂܂܃R�s�[���Ă���
+			else	//	関係ないならそのままコピーしていく
 			{
 				atBuffer[j] = ptData[i];
 			}
 		}
-		else	//	���s�������ɂ���
+		else	//	改行を￥ｎにする
 		{
-			if( 0x005C == ptData[i] )	//	���L��
+			if( 0x005C == ptData[i] )	//	￥記号
 			{
 				atBuffer[j++] = 0x005C;
-				atBuffer[j] = 0x005C;	//	�d�˂�
+				atBuffer[j] = 0x005C;	//	重ねる
 			}
-			else if( 0x000D == ptData[i] )	//	���s�͂�����
+			else if( 0x000D == ptData[i] )	//	改行はいった
 			{
 				atBuffer[j++] = 0x005C;
-				atBuffer[j] = TEXT('n');	//	�G�X�P�[�v�V�[�P���X
-				i++;	//	���ɐi�߂�
+				atBuffer[j] = TEXT('n');	//	エスケープシーケンス
+				i++;	//	次に進める
 			}
-			else if( 0x0020 == ptData[i] )	//	���p�󔒂͂�����
+			else if( 0x0020 == ptData[i] )	//	半角空白はいった
 			{
 				atBuffer[j++] = 0x005C;
-				atBuffer[j] = TEXT('s');	//	�G�X�P�[�v�V�[�P���X
+				atBuffer[j] = TEXT('s');	//	エスケープシーケンス
 			}
-			else	//	�֌W�Ȃ��Ȃ炻�̂܂܃R�s�[���Ă���
+			else	//	関係ないならそのままコピーしていく
 			{
 				atBuffer[j] = ptData[i];
 			}
 		}
 	}
 
-	StringCchCopy( ptData, PARTS_CCH, atBuffer );	//	�����߂�
+	StringCchCopy( ptData, PARTS_CCH, atBuffer );	//	書き戻す
 
 	return;
 }
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	���s���܂ޕ�������󂯎���āA�w��s�̓��e���o�b�t�@�ɓ����
-	@param[in]	ptSrc	��������
-	@param[in]	dLine	�؂�o���s�ԍ��E�O�C���f�b�N�X
-	@param[out]	ptDest	�؂�o���������������o�b�t�@�ւ̃|�C���^�[
-	@param[in]	cchSz	�o�b�t�@�̕������E�o�C�g�ɔ�
-	@param[in]	iUseDot	�K�v�Ƃ���h�b�g���E����Ȃ��Ȃ�p�f�B���O�E�����Ȃ���u
-	@return	UINT	�S�̂̍s��
+	改行を含む文字列を受け取って、指定行の内容をバッファに入れる
+	@param[in]	ptSrc	元文字列
+	@param[in]	dLine	切り出す行番号・０インデックス
+	@param[out]	ptDest	切り出した文字列を入れるバッファへのポインター
+	@param[in]	cchSz	バッファの文字数・バイトに非ず
+	@param[in]	iUseDot	必要とするドット数・足りないならパディング・多いなら放置
+	@return	UINT	全体の行数
 */
 UINT FrameMultiSubstring( LPCTSTR ptSrc, CONST UINT dLine, LPTSTR ptDest, CONST UINT_PTR cchSz, CONST INT iUseDot )
 {
@@ -1743,31 +1743,31 @@ UINT FrameMultiSubstring( LPCTSTR ptSrc, CONST UINT dLine, LPTSTR ptDest, CONST 
 	UINT_PTR	cchSrc, c, d;
 	UINT		iLnCnt;
 
-	StringCchLength( ptSrc, STRSAFE_MAX_CCH , &cchSrc );	//	��������̒����m�F
+	StringCchLength( ptSrc, STRSAFE_MAX_CCH , &cchSrc );	//	元文字列の長さ確認
 
-	ZeroMemory( ptDest, cchSz * sizeof(TCHAR) );	//	�Ƃ肠�����E�P����
+	ZeroMemory( ptDest, cchSz * sizeof(TCHAR) );	//	とりあえずウケを浄化
 
 	iLnCnt = 0;	d = 0;
 	for( c = 0; cchSrc > c; c++ )
 	{
-		if( 0x000D == ptSrc[c] )	//	�������傤�͂�����
+		if( 0x000D == ptSrc[c] )	//	かいぎょうはっけん
 		{
-			c++;	//	0x0A���΂�
-			iLnCnt++;	//	�t�H�[�J�X�s��
+			c++;	//	0x0Aを飛ばす
+			iLnCnt++;	//	フォーカス行数
 		}
-		else	//	���ʂ̕���
+		else	//	普通の文字
 		{
-			if( dLine == iLnCnt )	//	�s����v������
+			if( dLine == iLnCnt )	//	行が一致したら
 			{
 				if( cchSz > d ){	ptDest[d] = ptSrc[c];	d++;	}
 			}
 		}
 	}
-	ptDest[(cchSz-1)] = NULL;	//	�k���^�[�~�l�[�^
+	ptDest[(cchSz-1)] = NULL;	//	ヌルターミネータ
 
-//	StringCchLength( ptDest, cchSz, &cchSrc );	//	�u�b�R������������̒���
-	iStrDot = ViewStringWidthGet( ptDest );	//	�u�b�R������������̃h�b�g��
-	//	�p�f�B���O�������Ⴄ
+//	StringCchLength( ptDest, cchSz, &cchSrc );	//	ブッコ抜いた文字列の長さ
+	iStrDot = ViewStringWidthGet( ptDest );	//	ブッコ抜いた文字列のドット長
+	//	パディングもしちゃう
 	iPaDot = iUseDot - iStrDot;
 	if( 1 <= iPaDot )
 	{
@@ -1776,17 +1776,17 @@ UINT FrameMultiSubstring( LPCTSTR ptSrc, CONST UINT dLine, LPTSTR ptDest, CONST 
 		FREE( ptPadding );
 	}
 
-	iLnCnt++;	//	�O�C���f�b�N�X�Ȃ̂łP���₷�̂�����
+	iLnCnt++;	//	０インデックスなので１増やすのが正解
 	return iLnCnt;
 }
 //-------------------------------------------------------------------------------------------------
 
-//�}���E�C���h�E�ɂ���
+//挿入ウインドウについて
 
 /*!
-	�}���p�E�C���h�E���
-	@param[in]	hInst	�����n���h��
-	@param[in]	hPrWnd	���C���̃E�C���h�E�n���h��
+	挿入用ウインドウ作る
+	@param[in]	hInst	実存ハンドル
+	@param[in]	hPrWnd	メインのウインドウハンドル
 */
 HWND FrameInsBoxCreate( HINSTANCE hInst, HWND hPrWnd )
 {
@@ -1805,20 +1805,20 @@ HWND FrameInsBoxCreate( HINSTANCE hInst, HWND hPrWnd )
 		return ghFrInbxWnd;
 	}
 
-	//	�{�̃E�C���h�E
+	//	本体ウインドウ
 	ghFrInbxWnd = CreateWindowEx( WS_EX_LAYERED | WS_EX_TOOLWINDOW,
-		FRAMEINSERTBOX_CLASS, TEXT("�g�}���{�b�N�X"),
+		FRAMEINSERTBOX_CLASS, TEXT("边框插入工具"),
 		WS_POPUP | WS_THICKFRAME | WS_CAPTION | WS_SYSMENU,
 		0, 0, FIB_WIDTH, FIB_HEIGHT, NULL, NULL, hInst, NULL );
 	SetLayeredWindowAttributes( ghFrInbxWnd, TRANCE_COLOUR, 0xFF, LWA_COLORKEY );
 										//	TRANCE_COLOUR
 
-	//	�c�[���o�[
+	//	ツールバー
 	ghFIBtlbrWnd = CreateWindowEx( WS_EX_CLIENTEDGE, TOOLBARCLASSNAME, TEXT("fibtoolbar"),
 		WS_CHILD | WS_VISIBLE | TBSTYLE_FLAT | TBSTYLE_LIST | TBSTYLE_TOOLTIPS,
 		0, 0, 0, 0, ghFrInbxWnd, (HMENU)IDTB_FRMINSBOX_TOOLBAR, hInst, NULL );
 
-	if( 0 == gdToolBarHei )	//	���l���擾�Ȃ�
+	if( 0 == gdToolBarHei )	//	数値未取得なら
 	{
 		GetWindowRect( ghFIBtlbrWnd, &rect );
 		gdToolBarHei = rect.bottom - rect.top;
@@ -1828,52 +1828,52 @@ HWND FrameInsBoxCreate( HINSTANCE hInst, HWND hPrWnd )
 		ClientToScreen( ghFrInbxWnd, &gstFrmSz );
 	}
 
-	//	�����c�[���`�b�v�X�^�C����ǉ�
+	//	自動ツールチップスタイルを追加
 	SendMessage( ghFIBtlbrWnd, TB_SETEXTENDEDSTYLE, 0, TBSTYLE_EX_MIXEDBUTTONS );
 
-	//	�A�C�R��
+	//	アイコン
 	SendMessage( ghFIBtlbrWnd, TB_SETIMAGELIST, 0, (LPARAM)ghFrameImgLst );
 	SendMessage( ghFIBtlbrWnd, TB_SETBUTTONSIZE, 0, MAKELPARAM(16,16) );
 	SendMessage( ghFIBtlbrWnd, TB_BUTTONSTRUCTSIZE, (WPARAM)sizeof(TBBUTTON), 0 );
 
-	//	�c�[���`�b�v�������ݒ�E�{�^���e�L�X�g���c�[���`�b�v�ɂȂ�
-	StringCchCopy( atBuffer, MAX_STRING, TEXT("�}������") );
+	//	ツールチップ文字列を設定・ボタンテキストがツールチップになる
+	StringCchCopy( atBuffer, MAX_STRING, TEXT("插入") );
 	gstFIBTBInfo[0].iString = SendMessage( ghFIBtlbrWnd, TB_ADDSTRING, 0, (LPARAM)atBuffer );
 	for( d = 0; FRAME_MAX > d; d++ )
 	{
 		FrameNameLoad( d, atBuffer, MAX_STRING );
 		gstFIBTBInfo[d+2].iString = SendMessage( ghFIBtlbrWnd, TB_ADDSTRING, 0, (LPARAM)atBuffer );
 	}
-	StringCchCopy( atBuffer, MAX_STRING, TEXT("�}�����������") );
+	StringCchCopy( atBuffer, MAX_STRING, TEXT("插入后关闭") );
 	gstFIBTBInfo[23].iString = SendMessage( ghFIBtlbrWnd, TB_ADDSTRING, 0, (LPARAM)atBuffer );
-	StringCchCopy( atBuffer, MAX_STRING, TEXT("�㉺�̒[���𖄂߂�\r\n�i�����ł̕ύX�͕ۑ�����܂���j") );
+	StringCchCopy( atBuffer, MAX_STRING, TEXT("填充上下的内容\r\n（这里的变更不会被保存）") );
 	gstFIBTBInfo[25].iString = SendMessage( ghFIBtlbrWnd, TB_ADDSTRING, 0, (LPARAM)atBuffer );
 
 
-	SendMessage( ghFIBtlbrWnd , TB_ADDBUTTONS, (WPARAM)TB_ITEMS, (LPARAM)&gstFIBTBInfo );	//	�c�[���o�[�Ƀ{�^����}��
+	SendMessage( ghFIBtlbrWnd , TB_ADDBUTTONS, (WPARAM)TB_ITEMS, (LPARAM)&gstFIBTBInfo );	//	ツールバーにボタンを挿入
 
-	SendMessage( ghFIBtlbrWnd , TB_AUTOSIZE, 0, 0 );	//	�{�^���̃T�C�Y�ɍ��킹�ăc�[���o�[�����T�C�Y
-	InvalidateRect( ghFIBtlbrWnd , NULL, TRUE );		//	�N���C�A���g�S�̂��ĕ`�悷�閽��
+	SendMessage( ghFIBtlbrWnd , TB_AUTOSIZE, 0, 0 );	//	ボタンのサイズに合わせてツールバーをリサイズ
+	InvalidateRect( ghFIBtlbrWnd , NULL, TRUE );		//	クライアント全体を再描画する命令
 
-	//	������ԂƂ��ăA���t�@���`�F�L��Ԃ�
+	//	初期状態としてアルファをチェキ状態に
 	SendMessage( ghFIBtlbrWnd, TB_CHECKBUTTON, IDM_INSFRAME_ALPHA, TRUE );
 	gdSelect = 0;
 
-	//	�������邩�ǂ���
+	//	直ぐ閉じるかどうか
 	SendMessage( ghFIBtlbrWnd, TB_CHECKBUTTON, IDM_FRMINSBOX_QCLOSE, gbQuickClose );
 
-	FrameDataGet( gdSelect , &gstNowFrameInfo );	//	�g�p�[�c���m��
+	FrameDataGet( gdSelect , &gstNowFrameInfo );	//	枠パーツ情報確保
 
-	//	���߂邩�ǂ���
+	//	埋めるかどうか
 	SendMessage( ghFIBtlbrWnd, TB_CHECKBUTTON, IDM_FRMINSBOX_PADDING, gstNowFrameInfo.dRestPadd );
 	gbMultiPaddTemp = gstNowFrameInfo.dRestPadd;	//	
 
-	topOst = FrameInsBoxSizeGet( &stFrmRct );	//	FRAME���Ă͂ߘg�̃T�C�Y
+	topOst = FrameInsBoxSizeGet( &stFrmRct );	//	FRAME当てはめ枠のサイズ
 	gptFrmBox = FrameMakeOutsideBoundary( stFrmRct.right, stFrmRct.bottom, &gstNowFrameInfo );
 
-	//	�E�C���h�E�ʒu���m�肳����
+	//	ウインドウ位置を確定させる
 	GetWindowRect( ghViewWnd, &vwRect );
-	gstViewOrigin.x = vwRect.left;//�ʒu�L�^�E���������ς����̂���Ȃ�
+	gstViewOrigin.x = vwRect.left;//位置記録・そうそう変わるものじゃない
 	gstViewOrigin.y = vwRect.top;
 	x = (vwRect.left + LINENUM_WID) - gstFrmSz.x;
 	y = (vwRect.top  + RULER_AREA)  - gstFrmSz.y;
@@ -1893,9 +1893,9 @@ HWND FrameInsBoxCreate( HINSTANCE hInst, HWND hPrWnd )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	�t���[���T�C�Y���m��
-	@param[out]	pstRect	�t���[���T�C�Y������o�b�t�@
-	@return		�����I�t�Z�b�g�i�c�[���o�[�̍����j
+	フレームサイズを確保
+	@param[out]	pstRect	フレームサイズを入れるバッファ
+	@return		高さオフセット（ツールバーの高さ）
 */
 INT FrameInsBoxSizeGet( LPRECT pstRect )
 {
@@ -1903,7 +1903,7 @@ INT FrameInsBoxSizeGet( LPRECT pstRect )
 
 	GetClientRect( ghFrInbxWnd, &rect );
 
-	//	�N���C�����g��������A�c�[���o�[�������k��
+	//	クライヤント高さから、ツールバー高さをヌく
 	rect.bottom -= gdToolBarHei;
 
 	*pstRect = rect;
@@ -1913,8 +1913,8 @@ INT FrameInsBoxSizeGet( LPRECT pstRect )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	�}�����s
-	@param[in]	hWnd	�E�C���h�E�n���h��
+	挿入実行
+	@param[in]	hWnd	ウインドウハンドル
 */
 HRESULT FrameInsBoxDoInsert( HWND hWnd )
 {
@@ -1922,18 +1922,18 @@ HRESULT FrameInsBoxDoInsert( HWND hWnd )
 	HWND		hLyrWnd;
 	RECT		rect;
 
-	//	�}�������ɂ́A���C���{�b�N�X���\�������Ŏg��
+	//	挿入処理には、レイヤボックスを非表示処理で使う
 	hLyrWnd = LayerBoxVisibalise( GetModuleHandle(NULL), gptFrmBox, 0x10 );
 
-	//	���C���̈ʒu��ύX
+	//	レイヤの位置を変更
 	GetWindowRect( hWnd, &rect );
 	LayerBoxPositionChange( hLyrWnd, (rect.left + gstFrmSz.x), (rect.top + gstFrmSz.y) );
-	//	�󔒂�S�����ߎw��ɂ���
+	//	空白を全部透過指定にする
 	LayerTransparentToggle( hLyrWnd, 1 );
-	//	�㏑������
+	//	上書きする
 	LayerContentsImportable( hLyrWnd, IDM_LYB_OVERRIDE, &iX, &iY, D_INVISI );
 	ViewPosResetCaret( iX, iY );	
-	//	�I����������
+	//	終わったら閉じる
 	DestroyWindow( hLyrWnd );
 
 	if( gbQuickClose )	DestroyWindow( hWnd );
@@ -1943,22 +1943,22 @@ HRESULT FrameInsBoxDoInsert( HWND hWnd )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	�E�C���h�E�v���V�[�W��
-	@param[in]	hWnd	�E�C���h�E�n���h��
-	@param[in]	message	�E�C���h�E���b�Z�[�W�̎��ʔԍ�
-	@param[in]	wParam	�ǉ��̏��P
-	@param[in]	lParam	�ǉ��̏��Q
-	@retval 0	���b�Z�[�W�����ς�
-	@retval no0	�����ł͏����������ɉ�
+	ウインドウプロシージャ
+	@param[in]	hWnd	ウインドウハンドル
+	@param[in]	message	ウインドウメッセージの識別番号
+	@param[in]	wParam	追加の情報１
+	@param[in]	lParam	追加の情報２
+	@retval 0	メッセージ処理済み
+	@retval no0	ここでは処理せず次に回す
 */
 LRESULT CALLBACK FrameInsProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam )
 {
 	switch( message )
 	{
-		HANDLE_MSG( hWnd, WM_PAINT,		Fib_OnPaint );		//	��ʂ̍X�V�Ƃ�
+		HANDLE_MSG( hWnd, WM_PAINT,		Fib_OnPaint );		//	画面の更新とか
 		HANDLE_MSG( hWnd, WM_KEYDOWN,	Fib_OnKey );
 		HANDLE_MSG( hWnd, WM_COMMAND,	Fib_OnCommand );	
-		HANDLE_MSG( hWnd, WM_DESTROY,	Fib_OnDestroy );	//	�I�����̏���
+		HANDLE_MSG( hWnd, WM_DESTROY,	Fib_OnDestroy );	//	終了時の処理
 		HANDLE_MSG( hWnd, WM_WINDOWPOSCHANGING, Fib_OnWindowPosChanging );
 		HANDLE_MSG( hWnd, WM_WINDOWPOSCHANGED,  Fib_OnWindowPosChanged );
 
@@ -1972,12 +1972,12 @@ LRESULT CALLBACK FrameInsProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lP
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	COMMAND���b�Z�[�W�̎󂯎��B�{�^�������ꂽ�Ƃ��Ŕ���
-	@param[in]	hWnd		�E�C���h�E�n���h��
-	@param[in]	id			���b�Z�[�W�𔭐��������q�E�C���h�E�̎��ʎq	LOWORD(wParam)
-	@param[in]	hWndCtl		���b�Z�[�W�𔭐��������q�E�C���h�E�̃n���h��	lParam
-	@param[in]	codeNotify	�ʒm���b�Z�[�W	HIWORD(wParam)
-	@return		�Ȃ�
+	COMMANDメッセージの受け取り。ボタン押されたとかで発生
+	@param[in]	hWnd		ウインドウハンドル
+	@param[in]	id			メッセージを発生させた子ウインドウの識別子	LOWORD(wParam)
+	@param[in]	hWndCtl		メッセージを発生させた子ウインドウのハンドル	lParam
+	@param[in]	codeNotify	通知メッセージ	HIWORD(wParam)
+	@return		なし
 */
 VOID Fib_OnCommand( HWND hWnd, INT id, HWND hWndCtl, UINT codeNotify )
 {
@@ -2017,7 +2017,7 @@ VOID Fib_OnCommand( HWND hWnd, INT id, HWND hWndCtl, UINT codeNotify )
 		default:	return;
 	}
 
-	FrameDataGet( gdSelect, &gstNowFrameInfo );	//	�g�p�[�c���m��
+	FrameDataGet( gdSelect, &gstNowFrameInfo );	//	枠パーツ情報確保
 
 	if( 0 <= iRslt ){	gstNowFrameInfo.dRestPadd = iRslt;	gbMultiPaddTemp = iRslt;	}
 	else
@@ -2026,7 +2026,7 @@ VOID Fib_OnCommand( HWND hWnd, INT id, HWND hWndCtl, UINT codeNotify )
 		SendMessage( ghFIBtlbrWnd, TB_CHECKBUTTON, IDM_FRMINSBOX_PADDING, gstNowFrameInfo.dRestPadd );
 	}
 
-	topOst = FrameInsBoxSizeGet( &stFrmRct );	//	FRAME���Ă͂ߘg�̃T�C�Y
+	topOst = FrameInsBoxSizeGet( &stFrmRct );	//	FRAME当てはめ枠のサイズ
 	FREE( gptFrmBox );
 	gptFrmBox = FrameMakeOutsideBoundary( stFrmRct.right, stFrmRct.bottom, &gstNowFrameInfo );
 
@@ -2038,13 +2038,13 @@ VOID Fib_OnCommand( HWND hWnd, INT id, HWND hWndCtl, UINT codeNotify )
 
 
 /*!
-	�L�[�_�E���������E�L�[�{�[�h�ňړ��p
-	@param[in]	hWnd	�E�C���h�E�n���h���E�r���[�̂Ƃ͌���Ȃ��̂Œ��ӃZ��
-	@param[in]	vk		�����ꂽ�L�[�����z�L�[�R�[�h�ŗ���
-	@param[in]	fDown	��O�_�E���@�O�A�b�v
-	@param[in]	cRepeat	�A���I�T���񐔁E���ĂȂ��H
-	@param[in]	flags	�L�[�t���O���낢��
-	@return		����
+	キーダウンが発生・キーボードで移動用
+	@param[in]	hWnd	ウインドウハンドル・ビューのとは限らないので注意セヨ
+	@param[in]	vk		押されたキーが仮想キーコードで来る
+	@param[in]	fDown	非０ダウン　０アップ
+	@param[in]	cRepeat	連続オサレ回数・取れてない？
+	@param[in]	flags	キーフラグいろいろ
+	@return		無し
 */
 VOID Fib_OnKey( HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UINT flags )
 {
@@ -2056,10 +2056,10 @@ VOID Fib_OnKey( HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UINT flags )
 	{
 		switch( vk )
 		{
-			case VK_RIGHT:	TRACE( TEXT("�E") );	rect.left++;	break;
-			case VK_LEFT:	TRACE( TEXT("��") );	rect.left--;	break;
-			case VK_DOWN:	TRACE( TEXT("��") );	rect.top += LINE_HEIGHT;	break;
-			case  VK_UP:	TRACE( TEXT("��") );	rect.top -= LINE_HEIGHT;	break;
+			case VK_RIGHT:	TRACE( TEXT("右") );	rect.left++;	break;
+			case VK_LEFT:	TRACE( TEXT("左") );	rect.left--;	break;
+			case VK_DOWN:	TRACE( TEXT("下") );	rect.top += LINE_HEIGHT;	break;
+			case  VK_UP:	TRACE( TEXT("上") );	rect.top -= LINE_HEIGHT;	break;
 			default:	return;
 		}
 	}
@@ -2072,8 +2072,8 @@ VOID Fib_OnKey( HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UINT flags )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	PAINT�B�����̈悪�o�����Ƃ��ɔ����B�w�i�̈����ɒ��ӁB�w�i��h��Ԃ��Ă���A�I�u�W�F�N�g��`��
-	@param[in]	hWnd	�e�E�C���h�E�̃n���h��
+	PAINT。無効領域が出来たときに発生。背景の扱いに注意。背景を塗りつぶしてから、オブジェクトを描画
+	@param[in]	hWnd	親ウインドウのハンドル
 */
 VOID Fib_OnPaint( HWND hWnd )
 {
@@ -2088,7 +2088,7 @@ VOID Fib_OnPaint( HWND hWnd )
 
 	FillRect( hdc, &rect, ghBgBrush );
 
-	//	������ĕ`��
+	//	文字列再描画
 	FrameInsBoxFrmDraw( hdc );
 
 	EndPaint( hWnd, &ps );
@@ -2098,8 +2098,8 @@ VOID Fib_OnPaint( HWND hWnd )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	�`��
-	@param[in]	hDC	�`�悷��f�o�C�X�R���e�L�X�g
+	描画
+	@param[in]	hDC	描画するデバイスコンテキスト
 */
 VOID FrameInsBoxFrmDraw( HDC hDC )
 {
@@ -2115,13 +2115,13 @@ VOID FrameInsBoxFrmDraw( HDC hDC )
 //	SetBkMode( hDC, OPAQUE );
 	SetBkColor( hDC, ViewBackColourGet( NULL ) );	//	
 
-	hOldFnt = SelectFont( hDC, ghAaFont );	//	�t�H���g��������
+	hOldFnt = SelectFont( hDC, ghAaFont );	//	フォントくっつける
 
-	topOst = FrameInsBoxSizeGet( &stFrmRct );	//	FRAME���Ă͂ߘg�̃T�C�Y
+	topOst = FrameInsBoxSizeGet( &stFrmRct );	//	FRAME当てはめ枠のサイズ
 
 //	ptMultiStr = FrameMakeOutsideBoundary( stFrmRct.right, stFrmRct.bottom, &gstNowFrameInfo );
 
-	dLines = DocStringInfoCount( gptFrmBox, 0, NULL, NULL );	//	�s���m��
+	dLines = DocStringInfoCount( gptFrmBox, 0, NULL, NULL );	//	行数確保
 							//	ptMultiStr
 
 //	stFrmRct.top = topOst;
@@ -2138,17 +2138,17 @@ VOID FrameInsBoxFrmDraw( HDC hDC )
 
 //	FREE( ptMultiStr );
 
-	SelectFont( hDC , hOldFnt );	//	�t�H���g�߂�
+	SelectFont( hDC , hOldFnt );	//	フォント戻す
 
 	return;
 }
 //-This way-----------------------------------------------------------------------------------------------
 
 /*!
-	��s���̕`��
-	@param[in]	hDC		�`�悷��f�o�C�X�R���e�L�X�g
-	@param[in]	iY		�`�悷�鍂���i���͏�ɂO�ł�낵�j
-	@param[in]	ptLine	��s���̃f�[�^
+	壱行分の描画
+	@param[in]	hDC		描画するデバイスコンテキスト
+	@param[in]	iY		描画する高さ（左は常に０でよろし）
+	@param[in]	ptLine	壱行分のデータ
 */
 VOID FrameDrawItem( HDC hDC, INT iY, LPTSTR ptLine )
 {
@@ -2164,15 +2164,15 @@ VOID FrameDrawItem( HDC hDC, INT iY, LPTSTR ptLine )
 	iX = 0;
 	for( cl = 0; cchSize > cl; )
 	{
-		mRslt = iswspace(  ptLine[cl] );	//	�J�n�ʒu�̕����^�C�v�m�F
+		mRslt = iswspace(  ptLine[cl] );	//	開始位置の文字タイプ確認
 		ptBgn = &(ptLine[cl]);
 
 		for( len= 0; cchSize > cl; len++, cl++ )
 		{
-			mBase = iswspace(  ptBgn[len] );	//	�����^�C�v���m�F���Ă���
-			if( mRslt != mBase ){	break;	}	//	�^�C�v���ς������
+			mBase = iswspace(  ptBgn[len] );	//	文字タイプを確認していく
+			if( mRslt != mBase ){	break;	}	//	タイプが変わったら
 		}
-		GetTextExtentPoint32( hDC, ptBgn, len, &stSize );	//	�h�b�g���m�F
+		GetTextExtentPoint32( hDC, ptBgn, len, &stSize );	//	ドット数確認
 
 		if( mRslt ){	SetBkMode( hDC, TRANSPARENT );	}
 		else{	SetBkMode( hDC, OPAQUE );	}
@@ -2188,9 +2188,9 @@ VOID FrameDrawItem( HDC hDC, INT iY, LPTSTR ptLine )
 
 
 /*!
-	�E�C���h�E�����Ƃ��ɔ����B�f�o�C�X�R���e�L�X�g�Ƃ��m�ۂ�����ʍ\���̃������Ƃ����I���B
-	@param[in]	hWnd	�e�E�C���h�E�̃n���h��
-	@return		����
+	ウインドウを閉じるときに発生。デバイスコンテキストとか確保した画面構造のメモリとかも終了。
+	@param[in]	hWnd	親ウインドウのハンドル
+	@return		無し
 */
 VOID Fib_OnDestroy( HWND hWnd )
 {
@@ -2205,9 +2205,9 @@ VOID Fib_OnDestroy( HWND hWnd )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	��������Ă���Ƃ��ɔ����E�}�E�X�ŃE�C���h�E�h���b�O���Ƃ�
-	@param[in]	hWnd	�E�C���h�E�n���h��
-	@param[in]	pstPos	���̏u�Ԃ̃X�N���[�����W
+	動かされているときに発生・マウスでウインドウドラッグ中とか
+	@param[in]	hWnd	ウインドウハンドル
+	@param[in]	pstPos	その瞬間のスクリーン座標
 */
 VOID Fib_OnMoving( HWND hWnd, LPRECT pstPos )
 {
@@ -2216,27 +2216,27 @@ VOID Fib_OnMoving( HWND hWnd, LPRECT pstPos )
 	BOOLEAN	bMinus = FALSE;
 	TCHAR	atBuffer[SUB_STRING];
 
-	//	�t���[�����̍���X�N���[�����W
+	//	フレーム窓の左上スクリーン座標
 	xLy = pstPos->left + gstFrmSz.x;
 	yLy = pstPos->top  + gstFrmSz.y;
 
-	//	�r���[�̍���e�L�X�g�G���A�ʒu
+	//	ビューの左上テキストエリア位置
 	xEt = (gstViewOrigin.x + LINENUM_WID);
 	yEt = (gstViewOrigin.y + RULER_AREA);
 //	TRACE( TEXT("%d x %d"), xEt, yEt );
 
-	//	�I�t�Z�b�g��
-	xSb = xLy - xEt;	//	�w�͂��̂܂܃h�b�g��
-	ySb = yLy - yEt;	//	�x���h�b�g�Ȃ̂ōs���ɂ��Ȃ��Ƃ����Ȃ�
+	//	オフセット量
+	xSb = xLy - xEt;	//	Ｘはそのままドット数
+	ySb = yLy - yEt;	//	Ｙもドットなので行数にしないといけない
 
-	if( 0 > ySb ){	ySb *= -1;	bMinus = TRUE;	}	//	�}�C�i�X�␳
-	//	�s���I�ȃ��m�����߂���Ă΂�
+	if( 0 > ySb ){	ySb *= -1;	bMinus = TRUE;	}	//	マイナス補正
+	//	行数的なモノを求めるってばよ
 	dLine = ySb / LINE_HEIGHT;
 	dRema = ySb % LINE_HEIGHT;
 	if( (LINE_HEIGHT/2) < dRema ){	dLine++;	}
 	if( bMinus ){	dLine *= -1;	}else{	dLine++;	}
 
-	//	20110704	�����ł́A�܂��ʒu�̓X�N���[���̃Y�����l������ĂȂ�
+	//	20110704	ここでは、まだ位置はスクロールのズレが考慮されてない
 	xSb += gdHideXdot;
 	dLine += gdViewTopLine;
 
@@ -2249,10 +2249,10 @@ VOID Fib_OnMoving( HWND hWnd, LPRECT pstPos )
 
 
 /*!
-	�E�B���h�E�̃T�C�Y�ύX����������O�ɑ����Ă���
-	@param[in]	hWnd	�E�C���h�E�n���h��
-	@param[in]	pstWpos	�V�����ʒu�Ƒ傫���������Ă�
-	@return		����Message������������O
+	ウィンドウのサイズ変更が完了する前に送られてくる
+	@param[in]	hWnd	ウインドウハンドル
+	@param[in]	pstWpos	新しい位置と大きさが入ってる
+	@return		このMessageを処理したら０
 */
 BOOL Fib_OnWindowPosChanging( HWND hWnd, LPWINDOWPOS pstWpos )
 {
@@ -2260,14 +2260,14 @@ BOOL Fib_OnWindowPosChanging( HWND hWnd, LPWINDOWPOS pstWpos )
 	BOOLEAN	bMinus = FALSE;
 	RECT	vwRect;
 
-	//	�ړ����Ȃ������Ƃ��͉������Ȃ��ł���
+	//	移動がなかったときは何もしないでおｋ
 	if( SWP_NOMOVE & pstWpos->flags )	return TRUE;
 
-	clPosY = pstWpos->y + gstFrmSz.y;	//	�\���ʒu��TOP
+	clPosY = pstWpos->y + gstFrmSz.y;	//	表示位置のTOP
 
-	//	�\����������s�P�ʂɍ��킹��
+	//	表示高さを壱行単位に合わせる
 	GetWindowRect( ghViewWnd, &vwRect );
-	gstViewOrigin.x = vwRect.left;//�ʒu�L�^�E���������ς����̂���Ȃ�
+	gstViewOrigin.x = vwRect.left;//位置記録・そうそう変わるものじゃない
 	gstViewOrigin.y = vwRect.top;
 	vwTopY = (vwRect.top  + RULER_AREA);
 
@@ -2289,9 +2289,9 @@ BOOL Fib_OnWindowPosChanging( HWND hWnd, LPWINDOWPOS pstWpos )
 //-------------------------------------------------------------------------------------------------
 
 /*!
-	�E�B���h�E�̃T�C�Y�ύX�����������瑗���Ă���
-	@param[in]	hWnd	�E�C���h�E�n���h��
-	@param[in]	pstWpos	�V�����ʒu�Ƒ傫���������Ă�
+	ウィンドウのサイズ変更が完了したら送られてくる
+	@param[in]	hWnd	ウインドウハンドル
+	@param[in]	pstWpos	新しい位置と大きさが入ってる
 */
 VOID Fib_OnWindowPosChanged( HWND hWnd, const LPWINDOWPOS pstWpos )
 {
@@ -2299,22 +2299,22 @@ VOID Fib_OnWindowPosChanged( HWND hWnd, const LPWINDOWPOS pstWpos )
 	RECT	stFrmRct;
 	INT		topOst;
 
-	MoveWindow( ghFIBtlbrWnd, 0, 0, 0, 0, TRUE );	//	�c�[���o�[�͐��l�Ȃ��Ă�����ɍ��킹�Ă����
+	MoveWindow( ghFIBtlbrWnd, 0, 0, 0, 0, TRUE );	//	ツールバーは数値なくても勝手に合わせてくれる
 
-	FrameDataGet( gdSelect, &gstNowFrameInfo );	//	�g�p�[�c���m��
-	gstNowFrameInfo.dRestPadd = gbMultiPaddTemp;	//	�ꎞ�ݒ�
+	FrameDataGet( gdSelect, &gstNowFrameInfo );	//	枠パーツ情報確保
+	gstNowFrameInfo.dRestPadd = gbMultiPaddTemp;	//	一時設定
 
-	topOst = FrameInsBoxSizeGet( &stFrmRct );	//	FRAME���Ă͂ߘg�̃T�C�Y
+	topOst = FrameInsBoxSizeGet( &stFrmRct );	//	FRAME当てはめ枠のサイズ
 	FREE( gptFrmBox );
 	gptFrmBox = FrameMakeOutsideBoundary( stFrmRct.right, stFrmRct.bottom, &gstNowFrameInfo );
 
 	InvalidateRect( hWnd, NULL, TRUE );
 
-	//	�ړ����Ȃ������Ƃ��͉������Ȃ��ł���
+	//	移動がなかったときは何もしないでおｋ
 	if( SWP_NOMOVE & pstWpos->flags )	return;
 
 	GetWindowRect( ghViewWnd, &vwRect );
-	gstViewOrigin.x = vwRect.left;//�ʒu�L�^�E���������ς����̂���Ȃ�
+	gstViewOrigin.x = vwRect.left;//位置記録・そうそう変わるものじゃない
 	gstViewOrigin.y = vwRect.top;
 
 	gstOffset.x = pstWpos->x - vwRect.left;
@@ -2326,10 +2326,10 @@ VOID Fib_OnWindowPosChanged( HWND hWnd, const LPWINDOWPOS pstWpos )
 
 
 /*!
-	�r���[���ړ�����
-	@param[in]	hWnd	�{�̃E�C���h�E�n���h���E���܂�Ӗ��͂Ȃ�
-	@param[in]	state	����ԁE�ŏ����Ȃ�Ⴄ�R�g����
-	@return		HRESULT	�I����ԃR�[�h
+	ビューが移動した
+	@param[in]	hWnd	本体ウインドウハンドル・あまり意味はない
+	@param[in]	state	窓状態・最小化なら違うコトする
+	@return		HRESULT	終了状態コード
 */
 HRESULT FrameMoveFromView( HWND hWnd, UINT state )
 {
@@ -2338,12 +2338,12 @@ HRESULT FrameMoveFromView( HWND hWnd, UINT state )
 
 	if( !(ghFrInbxWnd) )	return S_FALSE;
 
-	//	�ŏ������͔�\���ɂ���Ƃ�	SIZE_MINIMIZED
+	//	最小化時は非表示にするとか	SIZE_MINIMIZED
 
 	if( SIZE_MINIMIZED != state )
 	{
 		GetWindowRect( ghViewWnd, &vwRect );
-		gstViewOrigin.x = vwRect.left;//�ʒu�L�^
+		gstViewOrigin.x = vwRect.left;//位置記録
 		gstViewOrigin.y = vwRect.top;
 	}
 

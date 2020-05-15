@@ -1,0 +1,634 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="ソース ファイル">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="ヘッダー ファイル">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="リソース ファイル">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav</Extensions>
+    </Filter>
+    <Filter Include="リソース ファイル\ビットマップ">
+      <UniqueIdentifier>{3ed028a8-c693-41e5-8704-c027e7c93618}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="BrushTemplate.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="ContextCtrl.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="DocAdjustant.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="DocCore.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="DocFileCtrl.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="DocInsDelCtrl.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="DocInverseCtrl.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="DocMiscellaneous.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="DocOperateLog.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="DocPreview.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="DocSearchCtrl.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="DocSelect.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="DraughtBoard.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="FrameCtrl.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="HoverTip.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="LayerBox.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="LineTemplate.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="MaaCatalogue.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="MaaItems.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="MaaSqlManipulate.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="MaaTemplate.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="MaaTreeView.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="MiniTemplate.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="MoziScript.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="OrinrinEditor.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="PageCtrl.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="SplitBar.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="ToolBar.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="TraceCtrl.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="UnicodePalette.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="UserDefinition.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="VerticalScript.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="ViewCaret.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="ViewCentral.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="ViewKeyButton.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="ViewSelect.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="ViewTrace.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Entity.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="MaaTemplate.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="OrinrinEditor.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="SplitBar.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="sqlite3.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="UnicodePalette.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="imgctl.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="resource\dir_extra.ico">
+      <Filter>リソース ファイル</Filter>
+    </Image>
+    <Image Include="resource\dir_open.ico">
+      <Filter>リソース ファイル</Filter>
+    </Image>
+    <Image Include="resource\directory.ico">
+      <Filter>リソース ファイル</Filter>
+    </Image>
+    <Image Include="resource\file_ast.ico">
+      <Filter>リソース ファイル</Filter>
+    </Image>
+    <Image Include="resource\file_etc.ico">
+      <Filter>リソース ファイル</Filter>
+    </Image>
+    <Image Include="resource\file_mlt.ico">
+      <Filter>リソース ファイル</Filter>
+    </Image>
+    <Image Include="OrinrinEditor.ico">
+      <Filter>リソース ファイル</Filter>
+    </Image>
+    <Image Include="resource\AllSelect.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\AllSelect_q.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\arrow_leftright.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\arrow_leftright_q.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\arrow_updown.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\arrow_updown_q.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\Box1.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\Box10.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\Box11.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\Box12.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\Box13.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\Box14.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\Box15.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\Box16.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\Box17.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\Box18.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\Box19.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\Box2.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\Box20.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\Box3.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\Box4.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\Box5.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\Box6.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\Box7.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\Box8.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\Box9.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\Box_q.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\BoxInsert.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\BoxInsert_q.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\BoxSelect.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\BoxSelect_q.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\BrushMode.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\BrushMode_q.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\ColourTag.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\ColourTag_q.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\Copy.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\Copy_q.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\Cut.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\Cut_q.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\DecrementDot.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\DecrementDot_q.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\Delete.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\Delete_q.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\DotSplitLeft.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\DotSplitLeft_q.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\DotSplitRight.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\DotSplitRight_q.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\DraughtBoard.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\DraughtBoard_q.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\Extract.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\Extract_q.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\ExtractLayer.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\ExtractLayer_q.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\FileCreate.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\FileCreate_q.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\FileOpen.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\FileOpen_q.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\FileSave.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\FileSave_q.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\Frame.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\Frame_q.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\FramePadding.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\FramePadding_q.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\HeadSpaceAdd.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\HeadSpaceAdd_q.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\HeadSpaceDel.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\HeadSpaceDel_q.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\IncrementDot.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\IncrementDot_q.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\LaayerOverWrite.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\LaayerOverWrite_q.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\LayerBox.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\LayerBox_q.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\LayerInsert.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\LayerInsert_q.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\LayerTextEdit.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\LayerTextEdit_q.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\LinesShiftLeft.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\LinesShiftLeft_q.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\LinesShiftRight.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\LinesShiftRight_q.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\MoziAdv.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\MoziAdv_q.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\MoziScript.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\MoziScript_q.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\MoziWrite.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\PageCombine.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\PageCombine_q.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\PageCreate.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\PageCreate_q.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\PageDelete.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\PageDelete_q.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\PageDivide.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\PageDivide_q.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\PageDuplicate.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\PageDuplicate_q.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\PageInsert.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\PageInsert_q.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\PageNameChange.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\PageNameChange_q.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\PageSjisCopy.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\PageSjisCopy_q.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\PageUnderShift.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\PageUnderShift_q.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\PageUpperShift.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\PageUpperShift_q.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\Paste.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\Paste_q.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\Preview.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\Preview_q.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\PreviewAll.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\PreviewAll_q.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\Redo.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\Redo_q.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\Refresh.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\Refresh_q.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\RightGuide.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\RightGuide_q.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\RightShift.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\RightShift_q.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\Setting.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\Setting_q.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\SJIScopy.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\SJIScopy_q.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\TailLetterDel.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\TailLetterDel_q.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\TailSpaceDel.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\TailSpaceDel_q.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\thumbnail.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\thumbnail_q.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\TraceMode.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\TraceMode_q.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\Undo.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\Undo_q.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\unicode_use.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\unicode_use_q.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\UniPalette.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\UniPalette_q.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\UniSpace.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\UniSpace_q.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\UserDef.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\UserDef_q.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\VertLeft.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\VertLeft_q.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\VertTrans.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+    <Image Include="resource\VertTrans_q.bmp">
+      <Filter>リソース ファイル\ビットマップ</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="OrinrinEditor.rc">
+      <Filter>リソース ファイル</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>

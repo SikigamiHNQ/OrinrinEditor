@@ -27,7 +27,7 @@ typedef struct tagENTITYLIST
 } ENTITYLIST, *LPENTITYLIST;
 
 //	HTML的にヤバイやつ
-CONST ENTITYLIST	gstEttySP[] = {
+static CONST ENTITYLIST	gstEttySP[] = {
 	{ 0x0022,	("&quot;"),		TEXT("&quot;"),		TEXT("引用符") },	//	34
 	{ 0x0026,	("&amp;"),		TEXT("&amp;"),		TEXT("アンパサンド") },	//	38
 	{ 0x003C,	("&lt;"),		TEXT("&lt;"),		TEXT("不等号（より小）") },	//	60
@@ -36,7 +36,7 @@ CONST ENTITYLIST	gstEttySP[] = {
 };
 
 //	SJISじゃ表現出来ないアレ
-CONST ENTITYLIST	gstEtyAlpha[] = {
+static CONST ENTITYLIST	gstEtyAlpha[] = {
 	{ 0x00C1,	("&Aacute;"),	TEXT("&Aacute;"),	TEXT("アキュートアクセント付きA") },	//	193		
 	{ 0x00E1,	("&aacute;"),	TEXT("&aacute;"),	TEXT("アキュートアクセント付きA小文字") },	//	225		
 	{ 0x00C2,	("&Acirc;"),	TEXT("&Acirc;"),	TEXT("サーカムフレックスアクセント付きA") },	//	194		
@@ -61,7 +61,7 @@ CONST ENTITYLIST	gstEtyAlpha[] = {
 	{ 0x0000,	(" "),			TEXT(" "),			TEXT("末端ダミー") }
 };
 
-CONST ENTITYLIST	gstEtyBravo[] = {
+static CONST ENTITYLIST	gstEtyBravo[] = {
 	{ 0x201E,	("&bdquo;"),	TEXT("&bdquo;"),	TEXT("下付ダブル引用符") },	//	8222		
 	{ 0x0392,	("&Beta;"),		TEXT("&Beta;"),		TEXT("大文字ベータ") },	//	914
 	{ 0x03B2,	("&beta;"),		TEXT("&beta;"),		TEXT("小文字ベータ") },	//	946
@@ -70,7 +70,7 @@ CONST ENTITYLIST	gstEtyBravo[] = {
 	{ 0x0000,	(" "),			TEXT(" "),			TEXT("末端ダミー") }
 };
 
-CONST ENTITYLIST	gstEtyCharlie[] = {
+static CONST ENTITYLIST	gstEtyCharlie[] = {
 	{ 0x2229,	("&cap;"),		TEXT("&cap;"),		TEXT("共通集合") },	//	8745
 	{ 0x00C7,	("&Ccedil;"),	TEXT("&Ccedil;"),	TEXT("セディラ付きC") },	//	199		
 	{ 0x00E7,	("&ccedil;"),	TEXT("&ccedil;"),	TEXT("セディラ付きC小文字") },	//	231		
@@ -88,7 +88,7 @@ CONST ENTITYLIST	gstEtyCharlie[] = {
 	{ 0x0000,	(" "),			TEXT(" "),			TEXT("末端ダミー") }
 };
 
-CONST ENTITYLIST	gstEtyDelta[] = {
+static CONST ENTITYLIST	gstEtyDelta[] = {
 	{ 0x2020,	("&dagger;"),	TEXT("&dagger;"),	TEXT("ダガー") },	//	8224		
 	{ 0x2021,	("&Dagger;"),	TEXT("&Dagger;"),	TEXT("ダブルダガー") },	//	8225		
 	{ 0x2193,	("&darr;"),		TEXT("&darr;"),		TEXT("下向矢印") },	//	8595
@@ -101,7 +101,7 @@ CONST ENTITYLIST	gstEtyDelta[] = {
 	{ 0x0000,	(" "),			TEXT(" "),			TEXT("末端ダミー") }
 };
 
-CONST ENTITYLIST	gstEtyEcho[] = {
+static CONST ENTITYLIST	gstEtyEcho[] = {
 	{ 0x00C9,	("&Eacute;"),	TEXT("&Eacute;"),	TEXT("アキュートアクセント付きE") },	//	201		
 	{ 0x00E9,	("&eacute;"),	TEXT("&eacute;"),	TEXT("アキュートアクセント付きE小文字") },	//	233		
 	{ 0x00CA,	("&Ecirc;"),	TEXT("&Ecirc;"),	TEXT("サーカムフレックスアクセント付きE") },	//	202		
@@ -125,7 +125,7 @@ CONST ENTITYLIST	gstEtyEcho[] = {
 	{ 0x0000,	(" "),			TEXT(" "),			TEXT("末端ダミー") }
 };
 
-CONST ENTITYLIST	gstEtyFoxtrot[] = {
+static CONST ENTITYLIST	gstEtyFoxtrot[] = {
 	{ 0x0192,	("&fnof;"),		TEXT("&fnof;"),		TEXT("小文字f（フック付き）、関数") },	//	402
 	{ 0x2200,	("&forall;"),	TEXT("&forall;"),	TEXT("すべての（普通限定子）") },	//	8704		
 	{ 0x00BD,	("&frac12;"),	TEXT("&frac12;"),	TEXT("2分の1") },	//	189		
@@ -135,14 +135,14 @@ CONST ENTITYLIST	gstEtyFoxtrot[] = {
 	{ 0x0000,	(" "),			TEXT(" "),			TEXT("末端ダミー") }
 };
 
-CONST ENTITYLIST	gstEtyGolf[] = {
+static CONST ENTITYLIST	gstEtyGolf[] = {
 	{ 0x0393,	("&Gamma;"),	TEXT("&Gamma;"),	TEXT("大文字ガンマ") },	//	915		
 	{ 0x03B3,	("&gamma;"),	TEXT("&gamma;"),	TEXT("小文字ガンマ") },	//	947		
 	{ 0x2265,	("&ge;"),		TEXT("&ge;"),		TEXT("大なりまたは等しい") },	//	8805
 	{ 0x0000,	(" "),			TEXT(" "),			TEXT("末端ダミー") }
 };
 
-CONST ENTITYLIST	gstEtyHotel[] = {
+static CONST ENTITYLIST	gstEtyHotel[] = {
 	{ 0x2194,	("&harr;"),		TEXT("&harr;"),		TEXT("左右向矢印") },	//	8596
 	{ 0x21D4,	("&hArr;"),		TEXT("&hArr;"),		TEXT("同値") },	//	8660
 	{ 0x2665,	("&hearts;"),	TEXT("&hearts;"),	TEXT("ハート") },	//	9829		
@@ -150,7 +150,7 @@ CONST ENTITYLIST	gstEtyHotel[] = {
 	{ 0x0000,	(" "),			TEXT(" "),			TEXT("末端ダミー") }
 };
 
-CONST ENTITYLIST	gstEtyIndia[] = {
+static CONST ENTITYLIST	gstEtyIndia[] = {
 	{ 0x00CD,	("&Iacute;"),	TEXT("&Iacute;"),	TEXT("アキュートアクセント付きI") },	//	205		
 	{ 0x00ED,	("&iacute;"),	TEXT("&iacute;"),	TEXT("アキュートアクセント付きI小文字") },	//	237		
 	{ 0x00CE,	("&Icirc;"),	TEXT("&Icirc;"),	TEXT("サーカムフレックスアクセント付きI") },	//	206		
@@ -170,17 +170,17 @@ CONST ENTITYLIST	gstEtyIndia[] = {
 	{ 0x0000,	(" "),			TEXT(" "),			TEXT("末端ダミー") }
 };
 
-CONST ENTITYLIST	gstEtyJuliette[] = {
+static CONST ENTITYLIST	gstEtyJuliette[] = {
 	{ 0x0000,	(" "),			TEXT(" "),			TEXT("末端ダミー") }
 };
 
-CONST ENTITYLIST	gstEtyKilo[] = {
+static CONST ENTITYLIST	gstEtyKilo[] = {
 	{ 0x039A,	("&Kappa;"),	TEXT("&Kappa;"),	TEXT("大文字カッパ") },	//	922		
 	{ 0x03BA,	("&kappa;"),	TEXT("&kappa;"),	TEXT("小文字カッパ") },	//	954		
 	{ 0x0000,	(" "),			TEXT(" "),			TEXT("末端ダミー") }
 };
 
-CONST ENTITYLIST	gstEtyLima[] = {
+static CONST ENTITYLIST	gstEtyLima[] = {
 	{ 0x039B,	("&Lambda;"),	TEXT("&Lambda;"),	TEXT("大文字ラムダ") },	//	923		
 	{ 0x03BB,	("&lambda;"),	TEXT("&lambda;"),	TEXT("小文字ラムダ") },	//	955		
 	{ 0x2329,	("&lang;"),		TEXT("&lang;"),		TEXT("左角括弧") },	//	9001
@@ -199,7 +199,7 @@ CONST ENTITYLIST	gstEtyLima[] = {
 	{ 0x0000,	(" "),			TEXT(" "),			TEXT("末端ダミー") }
 };
 
-CONST ENTITYLIST	gstEtyMike[] = {
+static CONST ENTITYLIST	gstEtyMike[] = {
 	{ 0x00AF,	("&macr;"),		TEXT("&macr;"),		TEXT("マクロン") },	//	175
 	{ 0x2014,	("&mdash;"),	TEXT("&mdash;"),	TEXT("m字幅のダッシュ（全角ダッシュ）") },	//	8212		
 	{ 0x00B5,	("&micro;"),	TEXT("&micro;"),	TEXT("マイクロ記号") },	//	181		
@@ -210,7 +210,7 @@ CONST ENTITYLIST	gstEtyMike[] = {
 	{ 0x0000,	(" "),			TEXT(" "),			TEXT("末端ダミー") }
 };
 
-CONST ENTITYLIST	gstEtyNovember[] = {
+static CONST ENTITYLIST	gstEtyNovember[] = {
 	{ 0x2207,	("&nabla;"),	TEXT("&nabla;"),	TEXT("ナブラ") },	//	8711		
 	{ 0x00A0,	("&nbsp;"),		TEXT("&nbsp;"),		TEXT("ノーブレークスペース") },	//	160
 	{ 0x2013,	("&ndash;"),	TEXT("&ndash;"),	TEXT("n字幅のダッシュ（半角ダッシュ）") },	//	8211		
@@ -226,7 +226,7 @@ CONST ENTITYLIST	gstEtyNovember[] = {
 	{ 0x0000,	(" "),			TEXT(" "),			TEXT("末端ダミー") }
 };
 
-CONST ENTITYLIST	gstEtyOscar[] = {
+static CONST ENTITYLIST	gstEtyOscar[] = {
 	{ 0x00D3,	("&Oacute;"),	TEXT("&Oacute;"),	TEXT("アキュートアクセント付きO") },	//	211		
 	{ 0x00F3,	("&oacute;"),	TEXT("&oacute;"),	TEXT("アキュートアクセント付きO小文字") },	//	243		
 	{ 0x00D4,	("&Ocirc;"),	TEXT("&Ocirc;"),	TEXT("サーカムフレックスアクセント付きO") },	//	212		
@@ -254,7 +254,7 @@ CONST ENTITYLIST	gstEtyOscar[] = {
 	{ 0x0000,	(" "),			TEXT(" "),			TEXT("末端ダミー") }
 };
 
-CONST ENTITYLIST	gstEtyPapa[] = {
+static CONST ENTITYLIST	gstEtyPapa[] = {
 	{ 0x00B6,	("&para;"),		TEXT("&para;"),		TEXT("段落記号") },	//	182
 	{ 0x2202,	("&part;"),		TEXT("&part;"),		TEXT("デル、ラウンドディー") },	//	8706
 	{ 0x2030,	("&permil;"),	TEXT("&permil;"),	TEXT("パーミル") },	//	8240		
@@ -275,11 +275,11 @@ CONST ENTITYLIST	gstEtyPapa[] = {
 	{ 0x0000,	(" "),			TEXT(" "),			TEXT("末端ダミー") }
 };
 
-CONST ENTITYLIST	gstEtyQuebec[] = {
+static CONST ENTITYLIST	gstEtyQuebec[] = {
 	{ 0x0000,	(" "),			TEXT(" "),			TEXT("末端ダミー") }
 };
 
-CONST ENTITYLIST	gstEtyRomeo[] = {
+static CONST ENTITYLIST	gstEtyRomeo[] = {
 	{ 0x221A,	("&radic;"),	TEXT("&radic;"),	TEXT("根号") },	//	8730		
 	{ 0x232A,	("&rang;"),		TEXT("&rang;"),		TEXT("右角括弧") },	//	9002
 	{ 0x00BB,	("&raquo;"),	TEXT("&raquo;"),	TEXT("終わり二重山括弧引用記号、終わりギュメ") },	//	187		
@@ -298,7 +298,7 @@ CONST ENTITYLIST	gstEtyRomeo[] = {
 	{ 0x0000,	(" "),			TEXT(" "),			TEXT("末端ダミー") }
 };
 
-CONST ENTITYLIST	gstEtySierra[] = {
+static CONST ENTITYLIST	gstEtySierra[] = {
 	{ 0x201A,	("&sbquo;"),	TEXT("&sbquo;"),	TEXT("下付引用符") },	//	8218		
 	{ 0x0160,	("&Scaron;"),	TEXT("&Scaron;"),	TEXT("キャロン付きS") },	//	352		
 	{ 0x0161,	("&scaron;"),	TEXT("&scaron;"),	TEXT("キャロン付きS小文字") },	//	353		
@@ -322,7 +322,7 @@ CONST ENTITYLIST	gstEtySierra[] = {
 	{ 0x0000,	(" "),			TEXT(" "),			TEXT("末端ダミー") }
 };
 
-CONST ENTITYLIST	gstEtyTango[] = {
+static CONST ENTITYLIST	gstEtyTango[] = {
 	{ 0x03A4,	("&Tau;"),		TEXT("&Tau;"),		TEXT("大文字タウ") },	//	932
 	{ 0x03C4,	("&tau;"),		TEXT("&tau;"),		TEXT("小文字タウ") },	//	964
 	{ 0x2234,	("&there4;"),	TEXT("&there4;"),	TEXT("ゆえに") },	//	8756		
@@ -338,7 +338,7 @@ CONST ENTITYLIST	gstEtyTango[] = {
 	{ 0x0000,	(" "),			TEXT(" "),			TEXT("末端ダミー") }
 };
 
-CONST ENTITYLIST	gstEtyUniform[] = {
+static CONST ENTITYLIST	gstEtyUniform[] = {
 	{ 0x00DA,	("&Uacute;"),	TEXT("&Uacute;"),	TEXT("アキュートアクセント付きU") },	//	218		
 	{ 0x00FA,	("&uacute;"),	TEXT("&uacute;"),	TEXT("アキュートアクセント付きU小文字") },	//	250		
 	{ 0x2191,	("&uarr;"),		TEXT("&uarr;"),		TEXT("上向矢印") },	//	8593
@@ -356,22 +356,22 @@ CONST ENTITYLIST	gstEtyUniform[] = {
 	{ 0x0000,	(" "),			TEXT(" "),			TEXT("末端ダミー") }
 };
 
-CONST ENTITYLIST	gstEtyVictor[] = {
+static CONST ENTITYLIST	gstEtyVictor[] = {
 	{ 0x0000,	(" "),			TEXT(" "),			TEXT("末端ダミー") }
 };
 
-CONST ENTITYLIST	gstEtyWhiskey[] = {
+static CONST ENTITYLIST	gstEtyWhiskey[] = {
 	{ 0x2118,	("&weierp;"),	TEXT("&weierp;"),	TEXT("大文字のP（スクリプト体）、WeierstrassのP関数") },	//	8472		
 	{ 0x0000,	(" "),			TEXT(" "),			TEXT("末端ダミー") }
 };
 
-CONST ENTITYLIST	gstEtyXray[] = {
+static CONST ENTITYLIST	gstEtyXray[] = {
 	{ 0x039E,	("&Xi;"),		TEXT("&Xi;"),		TEXT("大文字グザイ") },	//	926
 	{ 0x03BE,	("&xi;"),		TEXT("&xi;"),		TEXT("小文字グザイ") },	//	958
 	{ 0x0000,	(" "),			TEXT(" "),			TEXT("末端ダミー") }
 };
 
-CONST ENTITYLIST	gstEtyYankee[] = {
+static CONST ENTITYLIST	gstEtyYankee[] = {
 	{ 0x00DD,	("&Yacute;"),	TEXT("&Yacute;"),	TEXT("アキュートアクセント付きY") },	//	221		
 	{ 0x00FD,	("&yacute;"),	TEXT("&yacute;"),	TEXT("アキュートアクセント付きY小文字") },	//	253		
 	{ 0x00A5,	("&yen;"),		TEXT("&yen;"),		TEXT("円記号") },	//	165
@@ -380,7 +380,7 @@ CONST ENTITYLIST	gstEtyYankee[] = {
 	{ 0x0000,	(" "),			TEXT(" "),			TEXT("末端ダミー") }
 };
 
-CONST ENTITYLIST	gstEtyZulu[] = {
+static CONST ENTITYLIST	gstEtyZulu[] = {
 	{ 0x0396,	("&Zeta;"),		TEXT("&Zeta;"),		TEXT("大文字ゼータ") },	//	918
 	{ 0x03B6,	("&zeta;"),		TEXT("&zeta;"),		TEXT("小文字ゼータ") },	//	950
 	{ 0x200D,	("&zwj;"),		TEXT("&zwj;"),		TEXT("幅なし接続子") },	//	8205
@@ -388,7 +388,7 @@ CONST ENTITYLIST	gstEtyZulu[] = {
 	{ 0x0000,	(" "),			TEXT(" "),			TEXT("末端ダミー") }
 };
 
-CONST ENTITYLIST	*gpstEntitys[] = { gstEtyAlpha, gstEtyBravo,
+static CONST ENTITYLIST	*gpstEntitys[] = { gstEtyAlpha, gstEtyBravo,
 	gstEtyCharlie, gstEtyDelta, gstEtyEcho, gstEtyFoxtrot, gstEtyGolf,
 	gstEtyHotel, gstEtyIndia, gstEtyJuliette, gstEtyKilo, gstEtyLima,
 	gstEtyMike, gstEtyNovember, gstEtyOscar, gstEtyPapa, gstEtyQuebec,
